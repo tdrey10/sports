@@ -90,3 +90,17 @@ def test_unproven_sport_never_loosens_the_threshold():
     sides = [side(f"g{i}", 0.6, 0.5, american=-110, won=rng.random() < 0.45) for i in range(400)]
     st = study_sides(sides, SPORTS["nba"], games=400, window="test")
     assert not st.proven and st.min_ev >= 0.02
+
+
+def test_history_ignores_final_in_game_prices(tmp_path):
+    from sportsedge.models.ratings import GameResult
+
+    (tmp_path / "epl.json").write_text(json.dumps({"g1": [
+        ["h2h", "home", None, "draftkings", 220.0], ["h2h", "away", None, "draftkings", 125.0],
+        ["h2h", "draw", None, "draftkings", 245.0],
+        ["h2h", "home", None, "bet365", -2000.0], ["h2h", "away", None, "bet365", 25000.0],
+    ]}))
+    history = ClosingHistory(tmp_path, lambda cfg, g: None)
+    game = GameResult("g1", datetime(2026, 9, 1, tzinfo=timezone.utc), "A", "B", 2, 0)
+    quotes = history.quotes(SPORTS["epl"], game)
+    assert len(quotes) == 3 and {q.book for q in quotes} == {"draftkings"}
