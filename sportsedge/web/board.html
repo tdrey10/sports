@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 /* Layout: the photo is the cover. A scoreboard-sized title, then today's #1 pick as a betting ticket,
-   then a ranked Top 10 with an edge meter on every pick, then the board by game. Parlay slip docked below. */
+   then a ranked Top 10 with an edge meter on every pick, then the board by game. Straight bets only. */
 :root {
   /* Trail Blazers night: black, Blazers red, silver. One committed dark look. */
   --bg: #0b0b0c; --surface: #161618; --surface-2: #1f1f22; --line: #2b2b30; --line-2: #3b3b41;
@@ -38,7 +38,7 @@ body { margin: 0; background: transparent; color: var(--fg); font: 16px/1.45 var
       var(--mascot) 50% var(--py) / var(--pw) var(--ph) no-repeat, var(--bg); }
 }
 
-.wrap { max-width: 820px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 128px; display: grid;
+.wrap { max-width: 820px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 64px; display: grid;
   grid-template-columns: minmax(0, 1fr); gap: 18px; }
 .wrap > *, .panel > *, .grid > * { min-width: 0; }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
@@ -81,8 +81,6 @@ button, select { font: inherit; color: inherit; }
 .ticket .t-stub::before, .ticket .t-stub::after { content: ""; position: absolute; top: -10px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); }
 .ticket .t-stub::before { left: -9px; } .ticket .t-stub::after { right: -9px; }
 .ticket .t-stub .meter { --track: #d9d6d0; }
-.ticket .add { border-color: var(--ticket-ink); color: var(--ticket-ink); }
-.ticket .add[aria-pressed="true"] { background: var(--ticket-ink); color: var(--ticket); }
 .ticket .muted, .ticket .move-bad { color: var(--ticket-muted); }
 .ticket .move-good { color: #1d6b3a; }
 .ticket-empty { background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1px dashed var(--line-2); border-radius: 14px; padding: 18px 20px; display: grid; gap: 6px; }
@@ -197,9 +195,6 @@ details.more summary::-webkit-details-marker { display: none; }
 details.more summary::after { content: " ›"; }
 details.more[open] summary::after { content: " ‹"; }
 details.more ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; display: grid; gap: 3px; color: var(--silver); }
-.add { background: none; border: 1px solid var(--line-2); border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
-.add:hover { border-color: var(--fg); }
-.add[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 
 /* ---------- live ---------- */
 .slot { border: 1px solid var(--line); border-top: 3px solid var(--live); border-radius: 12px; padding: 12px; background: var(--surface-2); display: grid; gap: 4px; }
@@ -227,16 +222,6 @@ td { font-variant-numeric: tabular-nums; }
 .pill.wait { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
 .calib { width: 100%; max-width: 360px; height: auto; display: block; }
 
-/* ---------- parlay slip ---------- */
-.slip { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: var(--surface); border-top: 2px solid var(--accent); box-shadow: 0 -8px 24px rgba(0, 0, 0, .45); }
-.slip-in { max-width: 820px; margin: 0 auto; padding: 10px 16px; display: grid; gap: 8px; }
-.slip-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-.slip-bar button { background: none; border: 0; cursor: pointer; font: 800 17px/1 var(--display); letter-spacing: .06em; text-transform: uppercase; padding: 4px 0; }
-.slip-body { display: grid; gap: 8px; max-height: 45vh; overflow-y: auto; }
-.slip-body ol { margin: 0; padding-left: 20px; font-size: 15px; }
-.slip-body .stake { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.slip-body input { width: 90px; border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 8px; background: var(--surface-2); color: var(--fg); font: 600 15px var(--mono); }
 footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 12px; }
 </style>
 
@@ -254,19 +239,16 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   <div class="filters"><div class="seg" id="sports" aria-label="Sport"></div><div class="seg" id="markets" aria-label="Bet type"></div></div>
   <div id="view" class="grid"></div>
   <footer>
-    <span>Free data: ESPN stats and DraftKings lines. Picks only; no bets are placed.</span>
+    <span>Free data: ESPN stats and DraftKings lines. Picks only; no bets are placed. Straight bets only: no parlays.</span>
     <span>No model wins every bet. Judge it by the record and the closing-line value over many picks. Bet only what you can afford to lose.</span>
   </footer>
 </main>
-<aside class="slip" id="slip" aria-label="Parlay slip" hidden></aside>
 
 <script id="edge-data" type="application/json">__DATA__</script>
 <script>
 (function () {
   "use strict";
   let DATA = JSON.parse(document.getElementById("edge-data").textContent);
-  const slip = new Set();
-  let slipOpen = false;
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
@@ -331,10 +313,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     if (e.status === "live" && e.live) return `<span class="live-dot">${esc(e.away)} ${e.live.away ?? ""}, ${esc(e.home)} ${e.live.home ?? ""} · ${esc(e.live.detail || "")}</span>`;
     return "";
   }
-  function addBtn(e) {
-    if (!isOpen(e)) return "";
-    return `<button class="add" data-add="${e.id}" aria-pressed="${slip.has(e.id)}">${slip.has(e.id) ? "In slip" : "+ Slip"}</button>`;
-  }
+  const addBtn = () => "";  // straight bets only: no parlay slip
   const more = (e) => (e.reasons && e.reasons.length ? `<details class="more"><summary>Stats &amp; why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "");
   function row(e, opts = {}) {
     return `<div class="row">
@@ -498,22 +477,6 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
        ${rows ? `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Games</th><th>Winner</th><th>vs coin flip</th></tr></thead><tbody>${rows}</tbody></table></div>` : ""}`);
   }
 
-  function renderSlip() {
-    const legs = DATA.entries.filter((e) => slip.has(e.id));
-    $("slip").hidden = !legs.length;
-    if (!legs.length) return;
-    const d = legs.reduce((x, e) => x * dec(e.current_odds ?? e.odds), 1), p = legs.reduce((x, e) => x * e.win_prob, 1);
-    const games = new Set(legs.map((e) => e.event_id));
-    let stake = 10;
-    try { stake = parseFloat($("stake")?.value) || 10; } catch (e) {}
-    $("slip").innerHTML = `<div class="slip-in"><div class="slip-bar"><button id="slip-toggle" aria-expanded="${slipOpen}">Parlay · ${legs.length} leg${legs.length > 1 ? "s" : ""} · <span class="num">${odds(toAmerican(d))}</span> ${slipOpen ? "▾" : "▴"}</button>
-      <span class="small"><span class="${cls(p * d - 1)}">${signed((p * d - 1) * 100, 1)}% EV</span> · hits ${pct(p, 1)}</span></div>
-      ${slipOpen ? `<div class="slip-body"><ol>${legs.map((e) => `<li>${esc(e.selection)} <span class="num">${odds(e.current_odds ?? e.odds)}</span></li>`).join("")}</ol>
-        ${games.size < legs.length ? `<p class="small neg" style="margin:0">Two legs from one game move together; most books won't take that parlay.</p>` : ""}
-        <div class="stake"><label for="stake">Stake $</label><input id="stake" type="number" min="1" value="${stake}" inputmode="decimal"><span>pays <b class="num" id="pays">${money(stake * d)}</b></span>
-        <button class="add" id="clear-slip">Clear</button></div></div>` : ""}</div>`;
-  }
-
   function renderTop() {
     const st = DATA.stats, o = st.overall;
     $("updated").innerHTML = `<span class="dot"></span>Sports picks engine · updated ${esc(fmt(DATA.generated_at, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}`;
@@ -538,7 +501,6 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves", "Nothing early yet."),
     };
     $("view").innerHTML = (views[state.tab] || viewToday)();
-    renderSlip();
   }
 
   document.addEventListener("click", (ev) => {
@@ -547,14 +509,6 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     if (t.dataset.tab) { state.tab = t.dataset.tab; save(); render(); }
     else if (t.dataset.sport) { state.sport = t.dataset.sport; save(); render(); }
     else if (t.dataset.market) { state.market = t.dataset.market; save(); render(); }
-    else if (t.dataset.add) { slip.has(t.dataset.add) ? slip.delete(t.dataset.add) : slip.add(t.dataset.add); if (slip.size === 1) slipOpen = true; render(); }
-    else if (t.id === "slip-toggle") { slipOpen = !slipOpen; renderSlip(); }
-    else if (t.id === "clear-slip") { slip.clear(); render(); }
-  });
-  document.addEventListener("input", (ev) => {
-    if (ev.target.id !== "stake") return;
-    const d = DATA.entries.filter((e) => slip.has(e.id)).reduce((x, e) => x * dec(e.current_odds ?? e.odds), 1);
-    $("pays").textContent = money((parseFloat(ev.target.value) || 0) * d);
   });
   render();
   if (location.protocol.startsWith("http")) {

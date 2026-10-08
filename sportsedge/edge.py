@@ -37,6 +37,7 @@ class Settings:
     hide_flagged: bool = True  # leave out picks where model and market disagree by > disagreement_warning
     max_odds: float = 600  # skip extreme longshots (e.g. +1500 props)
     max_ev: float = 0.20  # EV above this is almost always stale data / news the model can't see
+    max_favorite: float = -150  # never bet a price worse than this: big favorites kill ROI
 
     def min_ev_for(self, pick: "Pick") -> float:
         if pick.is_prop:
@@ -204,6 +205,7 @@ def qualifying(picks: list[Pick], settings: Settings) -> list[Pick]:
     out = [
         p for p in picks
         if settings.min_ev_for(p) <= p.ev <= settings.max_ev and not (settings.hide_flagged and p.warnings)
+        and p.american >= settings.max_favorite
     ]
     return sorted(out, key=lambda p: p.ev, reverse=True)
 

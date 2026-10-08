@@ -230,7 +230,7 @@ from .odds import implied_prob  # noqa: E402
 from .tiers import Card, units_for  # noqa: E402
 
 
-LIVE_WIN_MIN_ODDS = -300  # "most likely to win" can be a favourite, within reason
+LIVE_WIN_MIN_ODDS = -150  # never bet worse than -150, live included
 LIVE_WIN_MIN_PROB = 0.60  # and it has to be a bet we expect to cash at least 60% of the time
 
 

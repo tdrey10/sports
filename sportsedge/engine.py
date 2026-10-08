@@ -26,6 +26,8 @@ class EventContext:
     home_rest: float | None
     away_rest: float | None
     injuries: dict[str, list[str]] = field(default_factory=dict)  # team -> players out
+    injuries_unknown: list[str] = field(default_factory=list)  # teams with no injury report: no bet on this game
+    injury_notes: list[str] = field(default_factory=list)  # weighted absences, for display
     home_pitcher: str = ""
     home_pitcher_era: float | None = None
     away_pitcher: str = ""
@@ -53,6 +55,27 @@ class SportScan:
     brain: BrainReport | None = None
     warnings: list[str] = field(default_factory=list)
     events: int = 0
+
+
+# Key players out, as win-chance points (the blueprint's weights). Weighed into the
+# read, never a hard rule; the total per team is capped.
+INJURY_WIN_PCT = {
+    "nfl": {"QB": 0.08, "RB": 0.03, "WR": 0.03},
+    "ncaaf": {"QB": 0.03},
+}
+MAX_INJURY_WIN_PCT = 0.12
+
+
+def injury_factor(cfg: SportConfig, win_pct: float, expected_score: float) -> float:
+    """Scale a team's expected score so its win chance drops by about ``win_pct``.
+
+    Near a pick'em, one point of margin is worth pdf(0)/sd of win chance, so the
+    points to remove are win_pct * sd / 0.3989.
+    """
+    if win_pct <= 0 or cfg.scoring != "normal" or expected_score <= 0:
+        return 1.0
+    points = min(win_pct, MAX_INJURY_WIN_PCT) * cfg.margin_sd / 0.3989
+    return max(1 - points / expected_score, 0.7)
 
 
 class Engine:
@@ -106,6 +129,7 @@ class Engine:
         matcher = NameMatcher(teams)
         scheduled = [g for g in results if not g.completed]
         injury_matcher = NameMatcher(injuries) if injuries else None
+        injury_weights = INJURY_WIN_PCT.get(cfg.key, {})
 
         for event in events:
             home = matcher.match(event.home) or event.home
@@ -128,19 +152,31 @@ class Engine:
                 ctx.away_pitcher, ctx.away_pitcher_era = sched.away_pitcher, sched.away_pitcher_era
                 ctx.home_pitcher_decisions = sched.home_pitcher_decisions
                 ctx.away_pitcher_decisions = sched.away_pitcher_decisions
-            if injury_matcher:
-                for team in (home, away):
-                    key = injury_matcher.match(team)
-                    if key:
-                        ctx.injuries[team] = [p for p, status in injuries[key] if is_out(status)]
+            # A team with no injury report is unknown, not healthy: its games get no bet.
+            win_hit = {home: 0.0, away: 0.0}
+            for team in (home, away):
+                key = injury_matcher.match(team) if injury_matcher else None
+                if key is None:
+                    ctx.injuries_unknown.append(team)
+                    continue
+                out = [(p, pos) for p, status, pos in injuries[key] if is_out(status)]
+                ctx.injuries[team] = [p for p, _ in out]
+                for p, pos in out:
+                    hit = injury_weights.get(pos.upper(), 0.0)
+                    if hit:
+                        win_hit[team] += hit
+                        ctx.injury_notes.append(f"{team} without {p} ({pos}): -{hit:.0%} win chance")
             scan.contexts[event.id] = ctx
             use_rest = cfg.rest_effects
+            eh, ea = ratings.expected_scores(home, away, neutral)
             pred = predict_game(
                 cfg, ratings, home, away, neutral,
                 home_b2b=use_rest and ctx.home_b2b, away_b2b=use_rest and ctx.away_b2b,
-                # The away starter limits the home offence and vice versa.
-                home_factor=pitcher_factor(ctx.away_pitcher_era, ctx.away_pitcher_decisions),
-                away_factor=pitcher_factor(ctx.home_pitcher_era, ctx.home_pitcher_decisions),
+                # The away starter limits the home offence and vice versa; key players out lower a team's score.
+                home_factor=pitcher_factor(ctx.away_pitcher_era, ctx.away_pitcher_decisions)
+                * injury_factor(cfg, win_hit[home], eh),
+                away_factor=pitcher_factor(ctx.home_pitcher_era, ctx.home_pitcher_decisions)
+                * injury_factor(cfg, win_hit[away], ea),
             )
             scan.predictions[event.id] = pred
             scan.picks.extend(self._game_picks(cfg, event, pred))
@@ -165,15 +201,17 @@ class Engine:
             rest_effects=cfg.rest_effects,
         )
 
-    def _injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
+    def _injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str, str]]] | None:
+        """The league injury report, or None when there is none (injuries unknown)."""
         getter = getattr(self.provider, "injuries", None)
         if getter is None:
-            return {}
+            return None
         try:
-            return getter(cfg) or {}
-        except Exception as exc:  # injury feeds are best effort
+            report = getter(cfg)
+        except Exception as exc:  # a failed feed means unknown, never healthy
             log.warning("injuries for %s unavailable: %s", cfg.key, exc)
-            return {}
+            return None
+        return {t: [tuple(x) + ("",) * (3 - len(x)) for x in v] for t, v in report.items()} if report else None
 
     # --------------------------------------------------------------- internals
     def _game_picks(self, cfg: SportConfig, event: Event, pred: GamePrediction) -> list[Pick]:

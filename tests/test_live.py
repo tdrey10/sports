@@ -183,9 +183,10 @@ def test_live_picks_one_likely_winner_and_one_plus_money():
     coin = make_pick(event_id="d", american=+105, win_prob=0.52, market_prob=0.49, ev=0.07)
     coin.model_prob = 0.55  # a coin flip is never the "most likely to win" pick
     cards = live_cards([fav, dog, small, coin], S(), {"nfl": "NFL"})
-    assert [(c.tier, c.pick.event_id) for c in cards] == [("live_win", "a"), ("live_plus", "b")]
-    # Already posted the likely winner for game "a": next best likely winner is chosen instead.
-    cards = live_cards([fav, dog, small, coin], S(), {"nfl": "NFL"}, {("a", "live_win")})
-    assert cards[0].tier == "live_win" and cards[0].pick.event_id == "c"
+    # The -200 favourite breaks the never-worse-than--150 rule, so the -150 side is the likely winner.
+    assert [(c.tier, c.pick.event_id) for c in cards] == [("live_win", "c"), ("live_plus", "b")]
+    # Already posted the likely winner for game "c": no other side qualifies, so none is forced.
+    cards = live_cards([fav, dog, small, coin], S(), {"nfl": "NFL"}, {("c", "live_win")})
+    assert [c.tier for c in cards] == ["live_plus"]
     cards = live_cards([coin], S(), {"nfl": "NFL"})
     assert [c.tier for c in cards] == ["live_plus"]

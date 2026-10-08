@@ -24,7 +24,7 @@ TIER_LABELS = {
 LIVE_TIERS = ("live", "live_win", "live_plus")
 UNIT_TIERS = ("lock", "dog", "prop", "value", "early") + LIVE_TIERS
 
-LOCK_MIN_ODDS = -250  # a lock still has to be worth the juice
+LOCK_MIN_ODDS = -150  # never bet worse than -150, the Lock included
 # The Lock of the Day is the safest pick, not the biggest edge, so it must clear every check:
 LOCK_MIN_PROB = 0.58  # model alone gives it at least this
 LOCK_MAX_GAP = 0.06  # model and the no-vig market agree to within 6 points
@@ -96,6 +96,15 @@ def build_cards(
         game.extend(p for p in scan.picks if not p.is_prop)
         props.extend(p for p in scan.picks if p.is_prop)
 
+    # No bet on a game where either team's injury report is unknown; those picks can
+    # still show as leans (no units), so they are tracked.
+    unknown = {
+        ev_id for scan in scans for ev_id, ctx in scan.contexts.items() if ctx.injuries_unknown
+    }
+    blocked = [p for p in game + props if p.event_id in unknown]
+    game = [p for p in game if p.event_id not in unknown]
+    props = [p for p in props if p.event_id not in unknown]
+
     soon_cut = now + timedelta(hours=EARLY_HOURS)
     candidates = best_per_event(game, settings)
     soon = [p for p in candidates if p.commence_time <= soon_cut]
@@ -140,6 +149,10 @@ def build_cards(
     leans = [
         p for p in game
         if p.event_id not in covered and 0 < p.ev < settings.min_ev and not p.warnings
+        and p.american >= settings.max_favorite
+    ] + [
+        p for p in blocked
+        if not p.is_prop and p.ev > 0 and not p.warnings and p.american >= settings.max_favorite
     ]
     best_lean: dict[str, Pick] = {}
     for p in sorted(leans, key=lambda p: p.ev, reverse=True):
@@ -165,6 +178,10 @@ def build_cards(
             sc, cq, cev = scores[id(pick)]
             bullets.insert(0, f"Edge score {sc:.0f}/100: {cev:+.1%} edge after the studies' calibration, "
                               f"cashes {cq:.0%} of the time.")
+        ctx = scan.contexts.get(pick.event_id) if scan else None
+        if ctx and ctx.injuries_unknown:
+            bullets.insert(0, f"No bet: no injury report for {', '.join(ctx.injuries_unknown)}, "
+                              "so injuries are unknown. Tracked as a lean only.")
         if tier == "lock":
             bullets.insert(0, f"Passed every Lock check: our model ({pick.model_prob:.0%}) and the market "
                               f"({pick.market_prob:.0%}) agree, no data warnings, and both teams have "
