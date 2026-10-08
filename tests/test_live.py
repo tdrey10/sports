@@ -178,10 +178,14 @@ def test_live_picks_one_likely_winner_and_one_plus_money():
     fav.model_prob = 0.75
     dog = make_pick(event_id="b", american=+180, win_prob=0.40, market_prob=0.35, ev=0.12)
     dog.model_prob = 0.45
-    small = make_pick(event_id="c", american=+110, win_prob=0.50, market_prob=0.47, ev=0.05)
-    small.model_prob = 0.55
-    cards = live_cards([fav, dog, small], S(), {"nfl": "NFL"})
+    small = make_pick(event_id="c", american=-150, win_prob=0.64, market_prob=0.60, ev=0.03)
+    small.model_prob = 0.68
+    coin = make_pick(event_id="d", american=+105, win_prob=0.52, market_prob=0.49, ev=0.07)
+    coin.model_prob = 0.55  # a coin flip is never the "most likely to win" pick
+    cards = live_cards([fav, dog, small, coin], S(), {"nfl": "NFL"})
     assert [(c.tier, c.pick.event_id) for c in cards] == [("live_win", "a"), ("live_plus", "b")]
     # Already posted the likely winner for game "a": next best likely winner is chosen instead.
-    cards = live_cards([fav, dog, small], S(), {"nfl": "NFL"}, {("a", "live_win")})
+    cards = live_cards([fav, dog, small, coin], S(), {"nfl": "NFL"}, {("a", "live_win")})
     assert cards[0].tier == "live_win" and cards[0].pick.event_id == "c"
+    cards = live_cards([coin], S(), {"nfl": "NFL"})
+    assert [c.tier for c in cards] == ["live_plus"]
