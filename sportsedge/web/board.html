@@ -1,0 +1,486 @@
+<title>Funky Buttlovin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one phone-width column of betting tickets; headliners first, then the board, the slip, the record and the model report. */
+:root {
+  --bg: #10151f; --panel: #171e2b; --panel-2: #1d2636; --line: #2a3448;
+  --fg: #e9edf4; --muted: #8e99ae; --accent: #f2b33d; --accent-ink: #1b1405;
+  --win: #3fd093; --loss: #ff6363; --live: #ff8a3d; --dog: #6cb6ff;
+  --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #eef0f4; --panel: #ffffff; --panel-2: #f6f7fa; --line: #d9dee7;
+  --fg: #151a24; --muted: #5b6577; --accent: #b77700; --accent-ink: #ffffff;
+  --win: #11895a; --loss: #cf3434; --live: #c75a12; --dog: #1f6fc4; color-scheme: light } }
+:root[data-theme="light"] {
+  --bg: #eef0f4; --panel: #ffffff; --panel-2: #f6f7fa; --line: #d9dee7;
+  --fg: #151a24; --muted: #5b6577; --accent: #b77700; --accent-ink: #ffffff;
+  --win: #11895a; --loss: #cf3434; --live: #c75a12; --dog: #1f6fc4; color-scheme: light }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--body); }
+.wrap { max-width: 640px; margin: 0 auto; padding-inline: 16px; padding-block: 12px 48px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+.wrap > *, section > *, .rows > *, .t-body > * { min-width: 0; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: .01em; }
+.label { font: 600 12px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* header */
+.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand h1 { font-size: 40px; font-weight: 800; line-height: .9; text-transform: uppercase; display: flex; flex-wrap: wrap; column-gap: .25em; }
+.brand h1 span { color: var(--accent); }
+.brand p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+.chips-top { display: flex; gap: 8px; flex-wrap: wrap; }
+.stat-chip { background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font: 600 13px/1 var(--mono); white-space: nowrap; }
+.stat-chip b { color: var(--win); font-weight: 600; }
+.stat-chip b.neg { color: var(--loss); }
+.demo { background: var(--accent); color: var(--accent-ink); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600; }
+
+/* sport filter */
+.filters { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.filters button { flex: none; background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; color: var(--muted); }
+.filters button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+section { display: grid; gap: 12px; }
+.sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.sec-head h2 { font-size: 26px; font-weight: 700; text-transform: uppercase; }
+.sec-head .label { text-align: right; }
+.empty { color: var(--muted); font-size: 14px; padding: 12px 0; }
+
+/* ticket */
+.ticket { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.ticket.lock { border-color: color-mix(in srgb, var(--accent) 60%, var(--line)); }
+.t-head { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 14px 16px 12px; }
+.tier { font: 700 13px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; }
+.tier.lock { color: var(--accent); } .tier.dog { color: var(--dog); } .tier.prop { color: var(--live); }
+.tier.value, .tier.early, .tier.lean { color: var(--muted); }
+.units { font: 600 13px/1 var(--mono); justify-self: end; }
+.big-odds { font: 800 54px/1 var(--display); letter-spacing: -.01em; }
+.payout { justify-self: end; align-self: end; text-align: right; font-size: 13px; color: var(--muted); }
+.payout b { display: block; font: 700 20px/1.1 var(--mono); color: var(--win); }
+.perf { height: 14px; position: relative; }
+.perf::before { content: ""; position: absolute; left: 14px; right: 14px; top: 6px; border-top: 2px dashed var(--line); }
+.perf::after { content: ""; position: absolute; inset: 0; background:
+  radial-gradient(circle at 0 50%, var(--bg) 7px, transparent 7.5px),
+  radial-gradient(circle at 100% 50%, var(--bg) 7px, transparent 7.5px); }
+.t-body { padding: 10px 16px 14px; display: grid; gap: 8px; }
+.sel { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.sel h3 { font-size: 24px; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.sel .o { font: 600 16px/1 var(--mono); }
+.meta { font-size: 13px; color: var(--muted); }
+.meta .when { color: var(--accent); font-weight: 600; }
+.headline { margin: 0; }
+.move { font-size: 13px; font-weight: 600; }
+.move.beat { color: var(--win); } .move.worse { color: var(--muted); }
+.scoreline { display: flex; align-items: center; gap: 4px 8px; font: 600 13px/1.4 var(--mono); flex-wrap: wrap; overflow-wrap: anywhere; }
+.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px 9px; font: 700 11px/1.2 var(--body); letter-spacing: .08em; text-transform: uppercase; border: 1px solid currentColor; }
+.pill.won { color: var(--win); } .pill.lost { color: var(--loss); } .pill.push, .pill.void { color: var(--muted); }
+.pill.live { color: var(--live); }
+.pill.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: pulse 1.4s infinite; }
+@keyframes pulse { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .pill.live::before { animation: none; } }
+details { border-top: 1px solid var(--line); }
+summary { cursor: pointer; padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--muted); list-style: none; display: flex; justify-content: space-between; }
+summary::after { content: "+"; font-family: var(--mono); }
+details[open] summary::after { content: "–"; }
+details ul { margin: 0; padding: 0 16px 14px 32px; display: grid; gap: 4px; font-size: 14px; }
+.foot { display: flex; align-items: flex-start; border-top: 1px solid var(--line); }
+.foot details { flex: 1; border-top: 0; min-width: 0; }
+.t-actions { display: flex; justify-content: flex-end; padding: 6px 12px 6px 0; }
+.add { background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.add[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+/* compact rows */
+.rows { display: grid; gap: 8px; }
+.row { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.row-main { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 14px; }
+.row-main h3 { font-size: 20px; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.row-main .o { font: 600 15px/1.2 var(--mono); justify-self: end; }
+.row-main .meta { grid-column: 1 / -1; }
+.row-side { justify-self: end; display: flex; gap: 6px; align-items: center; }
+.ev { font: 600 12px/1 var(--mono); color: var(--win); }
+.kind { font: 700 10px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 3px 5px; }
+.rank { font: 800 28px/1 var(--display); color: var(--accent); min-width: 1.4ch; }
+.row.best .row-main { grid-template-columns: auto 1fr auto; }
+.row.best .row-main .meta, .row.best .row-main .stamp { grid-column: 2 / -1; }
+.stamp { grid-column: 1 / -1; }
+
+/* slip */
+.slip { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
+.slip ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.slip li { font-size: 14px; }
+.slip-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.kv { background: var(--panel-2); border-radius: 10px; padding: 10px; display: grid; gap: 4px; }
+.kv b { font: 700 22px/1 var(--display); }
+.stake-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 14px; }
+.stake-row input { width: 110px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; color: var(--fg); font: 600 15px var(--mono); }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+.warn { color: var(--loss); }
+
+/* record */
+.bank { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 10px; }
+.bank-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.bank-top b { font: 800 48px/1 var(--display); }
+.spark { width: 100%; height: 90px; display: block; }
+.grid4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 480px) { .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .slip-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .big-odds { font-size: 46px; } }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 4px; min-width: 0; }
+.tile b { font: 700 24px/1 var(--display); }
+.tile small { color: var(--muted); font-size: 12px; }
+.pos { color: var(--win); } .neg { color: var(--loss); }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 9px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+th:first-child, td:first-child { text-align: left; }
+th { font: 600 11px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+td { font-variant-numeric: tabular-nums; }
+
+/* brain */
+.brain p { margin: 0; }
+.cal { display: grid; gap: 4px; }
+footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+
+<main class="wrap" id="app">
+  <header class="top">
+    <div class="brand">
+      <h1>Funky <span>Buttlovin</span></h1>
+      <p id="updated">Loading the board…</p>
+    </div>
+    <div class="chips-top" id="topchips"></div>
+  </header>
+  <div id="demo"></div>
+  <nav class="filters" id="filters" aria-label="Filter by sport"></nav>
+  <nav class="filters" id="markets" aria-label="Filter by bet type" style="margin-top:-20px"></nav>
+
+  <section id="best" aria-labelledby="h-best">
+    <div class="sec-head"><h2 id="h-best">Best bets</h2><span class="label">Top 5 · ranked by bankroll growth</span></div>
+    <div id="best-list" class="rows"></div>
+  </section>
+
+  <section id="headliners" aria-labelledby="h-today">
+    <div class="sec-head"><h2 id="h-today">Today's best</h2><span class="label" id="today-date"></span></div>
+    <div id="headliner-list" class="rows"></div>
+  </section>
+
+  <section aria-labelledby="h-board">
+    <div class="sec-head"><h2 id="h-board">The board</h2><span class="label">Value plays · sized by Kelly</span></div>
+    <div id="value-list" class="rows"></div>
+  </section>
+
+  <section aria-labelledby="h-props">
+    <div class="sec-head"><h2 id="h-props">Player props</h2><span class="label">Box-score projections</span></div>
+    <div id="prop-list" class="rows"></div>
+  </section>
+
+  <section aria-labelledby="h-early">
+    <div class="sec-head"><h2 id="h-early">Early value</h2><span class="label">Bet before the line moves</span></div>
+    <div id="early-list" class="rows"></div>
+  </section>
+
+  <section aria-labelledby="h-leans">
+    <div class="sec-head"><h2 id="h-leans">Leans</h2><span class="label">No units · tracked anyway</span></div>
+    <div id="lean-list" class="rows"></div>
+  </section>
+
+  <section aria-labelledby="h-slip">
+    <div class="sec-head"><h2 id="h-slip">Parlay slip</h2><span class="label">Tap "Add to slip" on any open pick</span></div>
+    <div class="slip" id="slip"></div>
+  </section>
+
+  <section aria-labelledby="h-record">
+    <div class="sec-head"><h2 id="h-record">The record</h2><span class="label">Every pick, graded automatically</span></div>
+    <div id="record"></div>
+  </section>
+
+  <section aria-labelledby="h-brain" class="brain">
+    <div class="sec-head"><h2 id="h-brain">The brain</h2><span class="label" id="brain-time"></span></div>
+    <div id="brain"></div>
+  </section>
+
+  <footer>
+    <p>Funky Buttlovin prices every spread, over/under, moneyline and player prop. Probabilities come from team ratings fitted to every final score (recent games weigh more; back-to-backs, home field and key numbers like 3 and 7 learned from data; MLB starting pitchers), player box scores for props (opponent matchups, teammates out), and the no-vig consensus of the sportsbooks. The blend between our model and the market is re-learned from graded picks.</p>
+    <p>Closing-line value (CLV) is the long-run tell: if our prices beat the closing line, the edge is real. No system wins every bet. Bet only what you can afford to lose, and only where it is legal for you.</p>
+  </footer>
+</main>
+
+<script id="edge-data" type="application/json">__DATA__</script>
+<script>
+(function () {
+  "use strict";
+  let DATA = JSON.parse(document.getElementById("edge-data").textContent);
+  const slip = new Set();
+  let sport = "all", market = "all";
+  try { sport = localStorage.getItem("edge-sport") || "all"; market = localStorage.getItem("edge-market") || "all"; } catch (e) {}
+  const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "Over/Under"], ["props", "Props"], ["moneyline", "Moneyline"]];
+  const groupOf = (e) => (e.player ? "props" : e.market === "spreads" ? "spreads" : e.market === "totals" ? "totals" : "moneyline");
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const odds = (a) => (a > 0 ? "+" : "") + Math.round(a);
+  const dec = (a) => (a > 0 ? 1 + a / 100 : 1 + 100 / -a);
+  const implied = (a) => 1 / dec(a);
+  const toAmerican = (d) => (d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1)));
+  const pct = (x, d = 0) => (x == null ? "–" : (x * 100).toFixed(d) + "%");
+  const signed = (x, d = 1) => (x == null ? "–" : (x >= 0 ? "+" : "") + x.toFixed(d));
+  const money = (x) => (x < 0 ? "-$" : "$") + Math.abs(x).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const tz = DATA.tz || undefined;
+  const fmtTime = (iso, opts) => new Date(iso).toLocaleString(undefined, Object.assign({ timeZone: tz }, opts));
+  const TIER = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day", value: "Value play", early: "Early value", lean: "Lean" };
+
+  function visible(e) { return (sport === "all" || e.sport === sport) && (market === "all" || groupOf(e) === market); }
+  function isOpen(e) { return e.status === "pending" && new Date(e.commence_time) > new Date(); }
+
+  function whenLine(e) {
+    const d = new Date(e.commence_time), now = new Date();
+    const sameDay = fmtTime(d, { dateStyle: "short" }) === fmtTime(now, { dateStyle: "short" });
+    const day = sameDay ? "Today" : fmtTime(d, { weekday: "short", month: "numeric", day: "numeric" });
+    return `${day} · ${fmtTime(d, { hour: "numeric", minute: "2-digit", timeZoneName: "short" })}`;
+  }
+
+  function movement(e) {
+    if (e.current_odds == null || e.settled) return "";
+    const pointMoved = e.current_point != null && e.point != null && e.current_point !== e.point;
+    if (e.current_odds === e.odds && !pointMoved) return `<div class="move worse">Got it at ${odds(e.odds)} · hasn't moved</div>`;
+    const now = pointMoved ? `${signed(e.current_point, 1).replace(".0", "")} ${odds(e.current_odds)}` : odds(e.current_odds);
+    const beat = implied(e.current_odds) > implied(e.odds) || (pointMoved && e.market === "spreads" && e.current_point < e.point);
+    return beat
+      ? `<div class="move beat">Got it at ${odds(e.odds)} → now ${now} · we beat the line</div>`
+      : `<div class="move worse">Got it at ${odds(e.odds)} → now ${now} · better price now</div>`;
+  }
+
+  function statusBits(e) {
+    if (e.status === "live" && e.live) {
+      return `<div class="scoreline"><span class="pill live">Live</span>${esc(e.away)} ${e.live.away ?? ""} @ ${esc(e.home)} ${e.live.home ?? ""} · ${esc(e.live.detail || "")}</div>`;
+    }
+    if (["won", "lost", "push", "void", "half_won", "half_lost"].includes(e.status)) {
+      const cls = e.status.replace("half_", "");
+      const label = { won: "Won", lost: "Lost", push: "Push", void: "Void", half_won: "Half won", half_lost: "Half lost" }[e.status];
+      const val = e.result_value != null ? ` · finished with ${e.result_value}` : "";
+      const p = e.units > 0 && e.profit != null ? ` · ${signed(e.profit, 2)}u` : "";
+      return `<div class="scoreline"><span class="pill ${cls}">${label}</span>${esc(e.final || "")}${val}${p}</div>`;
+    }
+    return "";
+  }
+
+  function details(e) {
+    if (!e.reasons || !e.reasons.length) return `<span style="flex:1"></span>`;
+    return `<details><summary>Full breakdown</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>`;
+  }
+
+  function addBtn(e) {
+    if (!isOpen(e)) return "";
+    const on = slip.has(e.id);
+    return `<div class="t-actions"><button class="add" data-add="${e.id}" aria-pressed="${on}">${on ? "On slip ✓" : "Add to slip"}</button></div>`;
+  }
+
+  function unitsText(e) { return e.units > 0 ? `${e.units % 1 ? e.units.toFixed(1) : e.units} unit${e.units === 1 ? "" : "s"}` : "No units · lean"; }
+
+  function ticket(e) {
+    const win = 100 * (dec(e.odds) - 1);
+    return `<article class="ticket ${e.tier}">
+      <div class="t-head">
+        <span class="tier ${e.tier}">${TIER[e.tier]}</span><span class="units">${unitsText(e)}</span>
+        <span class="big-odds num">${odds(e.odds)}</span>
+        <span class="payout">$100 wins<b class="num">$${win.toFixed(0)}</b></span>
+      </div>
+      <div class="perf" aria-hidden="true"></div>
+      <div class="t-body">
+        <div class="sel"><h3>${esc(e.selection)}</h3><span class="o num">${pct(e.win_prob)}</span></div>
+        <div class="meta">${esc(e.sport_name)} · ${esc(e.matchup)} · <span class="when">${whenLine(e)}</span></div>
+        <p class="headline">${esc(e.headline)}</p>
+        ${movement(e)}${statusBits(e)}
+      </div>
+      <div class="foot">${details(e)}${addBtn(e)}</div>
+    </article>`;
+  }
+
+  const KIND = { spreads: "Spread", totals: "O/U", props: "Prop", moneyline: "ML" };
+
+  function row(e, ranked) {
+    const rank = ranked && e.best_rank ? `<span class="rank num">${e.best_rank}</span>` : "";
+    return `<article class="row${rank ? " best" : ""}">
+      <div class="row-main">
+        ${rank}<h3>${esc(e.selection)}</h3>
+        <div class="row-side"><span class="kind">${KIND[groupOf(e)]}</span><span class="ev">${e.ev >= 0 ? "+" : ""}${(e.ev * 100).toFixed(1)}% EV</span><span class="o num">${odds(e.odds)}</span></div>
+        <div class="meta">${esc(e.sport_name)} · ${esc(e.matchup)} · <span class="when">${whenLine(e)}</span> · ${unitsText(e)}</div>
+        <div class="meta">${esc(e.headline)}</div>
+        <div class="stamp">${movement(e)}${statusBits(e)}</div>
+      </div>
+      <div class="foot">${details(e)}${addBtn(e)}</div>
+    </article>`;
+  }
+
+  // The ledger's day for a timestamp, in the engine's time zone (YYYY-MM-DD).
+  const dayOf = (iso) => new Date(iso).toLocaleDateString("en-CA", { timeZone: tz });
+
+  function boardEntries() {
+    // Today's board: anything still open, plus today's picks that already finished.
+    const today = dayOf(DATA.generated_at);
+    return DATA.entries.filter((e) => visible(e) && (!e.settled || e.day === today));
+  }
+
+  function renderBoard() {
+    const items = boardEntries().sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time));
+    const today = dayOf(DATA.generated_at);
+    const head = items.filter((e) => ["lock", "dog", "prop"].includes(e.tier) && (e.day === today || !e.settled))
+      .sort((a, b) => ["lock", "dog", "prop"].indexOf(a.tier) - ["lock", "dog", "prop"].indexOf(b.tier));
+    const fill = (id, list, fn, empty) => { $(id).innerHTML = list.length ? list.map(fn).join("") : `<p class="empty">${empty}</p>`; };
+    fill("best-list", items.filter((e) => e.best_rank).sort((a, b) => a.best_rank - b.best_rank), (e) => row(e, true), "Best bets post once today's games clear the bar.");
+    fill("headliner-list", head, ticket, "No headliners yet. They post once a game clears the bar.");
+    fill("value-list", items.filter((e) => e.tier === "value" && !e.player).sort((a, b) => b.ev - a.ev), (e) => row(e), "No game-line value plays right now.");
+    fill("prop-list", items.filter((e) => e.tier === "value" && e.player).sort((a, b) => b.ev - a.ev), (e) => row(e), "No prop edges right now.");
+    fill("early-list", items.filter((e) => e.tier === "early").sort((a, b) => b.ev - a.ev), (e) => row(e), "Nothing early yet.");
+    fill("lean-list", items.filter((e) => e.tier === "lean"), (e) => row(e), "No leans right now.");
+  }
+
+  function renderSlip() {
+    const legs = DATA.entries.filter((e) => slip.has(e.id));
+    if (!legs.length) {
+      $("slip").innerHTML = `<p class="note">Your slip is empty. Add open picks from different games to price a parlay with our probabilities.</p>`;
+      return;
+    }
+    const events = new Set(), dupes = new Set();
+    legs.forEach((e) => { if (events.has(e.event_id)) dupes.add(e.event_id); events.add(e.event_id); });
+    const d = legs.reduce((x, e) => x * dec(e.current_odds ?? e.odds), 1);
+    const p = legs.reduce((x, e) => x * e.win_prob, 1);
+    const ev = p * d - 1;
+    let stake = 10;
+    try { stake = parseFloat($("stake")?.value) || 10; } catch (e) {}
+    $("slip").innerHTML = `
+      <ol>${legs.map((e) => `<li>${esc(e.selection)} <span class="num">${odds(e.current_odds ?? e.odds)}</span> <span class="meta">· ${pct(e.win_prob)}</span></li>`).join("")}</ol>
+      <div class="slip-grid">
+        <div class="kv"><span class="label">Price</span><b class="num">${odds(toAmerican(d))}</b></div>
+        <div class="kv"><span class="label">Hits</span><b class="num">${pct(p, 1)}</b></div>
+        <div class="kv"><span class="label">EV</span><b class="num ${ev >= 0 ? "pos" : "neg"}">${signed(ev * 100, 1)}%</b></div>
+      </div>
+      <div class="stake-row"><label for="stake">Stake $</label><input id="stake" type="number" min="1" step="1" value="${stake}" inputmode="decimal">
+        <span>pays <b class="num" id="pays">${money(stake * d)}</b></span></div>
+      ${dupes.size ? `<p class="note warn">Two legs from the same game are correlated, so most books won't allow it and these odds would be off.</p>` : ""}
+      <p class="note">Parlays multiply the book's margin along with any edge. Each leg here is +EV on its own; keep parlay stakes small.</p>
+      <button class="add" id="clear-slip">Clear slip</button>`;
+  }
+
+  function spark(curve, start) {
+    if (!curve.length) return "";
+    const pts = [[null, start], ...curve];
+    const vals = pts.map((p) => p[1]);
+    const lo = Math.min(...vals, start), hi = Math.max(...vals, start);
+    const W = 600, H = 90, pad = 6, span = hi - lo || 1;
+    const x = (i) => pad + (i / (pts.length - 1)) * (W - 2 * pad);
+    const y = (v) => H - pad - ((v - lo) / span) * (H - 2 * pad);
+    const line = pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p[1]).toFixed(1)}`).join("");
+    const last = vals[vals.length - 1];
+    const color = last >= start ? "var(--win)" : "var(--loss)";
+    return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Bankroll over time">
+      <line x1="0" x2="${W}" y1="${y(start)}" y2="${y(start)}" stroke="var(--line)" stroke-dasharray="4 4" />
+      <path d="${line}L${x(pts.length - 1)},${H}L${x(0)},${H}Z" fill="${color}" opacity=".12" />
+      <path d="${line}" fill="none" stroke="${color}" stroke-width="2.5" vector-effect="non-scaling-stroke" />
+      <circle cx="${x(pts.length - 1)}" cy="${y(last)}" r="4" fill="${color}" />
+    </svg>`;
+  }
+
+  function rec(s) { return `${s.won}-${s.lost}${s.push ? "-" + s.push : ""}`; }
+
+  function renderRecord() {
+    const st = DATA.stats, o = st.overall;
+    const cls = (x) => (x == null ? "" : x >= 0 ? "pos" : "neg");
+    const tiers = ["lock", "dog", "prop", "value", "early"].map((t) => {
+      const s = st.by_tier[t];
+      return `<div class="tile"><span class="label">${TIER[t]}</span><b class="num">${rec(s)}</b>
+        <small class="${cls(s.units)}">${signed(s.units, 1)}u · ${s.roi == null ? "–" : signed(s.roi * 100, 0) + "% ROI"}</small></div>`;
+    }).join("") + `<div class="tile"><span class="label">Leans</span><b class="num">${st.leans.won}-${st.leans.lost}</b><small>${pct(st.leans.win_pct)} · no units</small></div>`;
+    const byMarket = MARKETS.slice(1).map(([k, n]) => {
+      const s = st.by_market[k];
+      return `<div class="tile"><span class="label">${n}</span><b class="num">${rec(s)}</b>
+        <small class="${cls(s.units)}">${signed(s.units, 1)}u · CLV ${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</small></div>`;
+    }).join("");
+    const sports = Object.entries(st.by_sport).map(([k, s]) =>
+      `<tr><td>${esc(s.name)}</td><td>${rec(s)}</td><td>${pct(s.win_pct)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.roi)}">${s.roi == null ? "–" : signed(s.roi * 100, 1) + "%"}</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`).join("");
+    const recent = DATA.entries.filter((e) => e.settled && e.status !== "void" && visible(e))
+      .sort((a, b) => (b.graded_at || "").localeCompare(a.graded_at || "")).slice(0, 12);
+    $("record").innerHTML = `
+      <div class="bank">
+        <div class="bank-top"><div><span class="label">Bankroll</span><br><b class="num ${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b></div>
+          <div class="meta">Started at ${money(st.start_bankroll)} · 1 unit = ${money(st.unit_value)}</div></div>
+        ${spark(st.curve, st.start_bankroll)}
+      </div>
+      <div class="grid3" style="margin-top:8px">
+        <div class="tile"><span class="label">Unit plays</span><b class="num">${rec(o)}</b><small>${pct(o.win_pct)} winners</small></div>
+        <div class="tile"><span class="label">Profit</span><b class="num ${cls(o.units)}">${signed(o.units, 1)}u</b><small>${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
+        <div class="tile"><span class="label">Beat the close</span><b class="num">${pct(o.beat_close)}</b><small>avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</small></div>
+        <div class="tile"><span class="label">Best bets</span><b class="num">${rec(st.best)}</b><small class="${cls(st.best.units)}">${signed(st.best.units, 1)}u · ${st.best.roi == null ? "–" : signed(st.best.roi * 100, 0) + "% ROI"}</small></div>
+        <div class="tile"><span class="label">Last 7 days</span><b class="num ${cls(st.last7.units)}">${signed(st.last7.units, 1)}u</b><small>${rec(st.last7)}</small></div>
+      </div>
+      <div class="grid3" style="margin-top:8px">${tiers}</div>
+      <div class="grid4" style="margin-top:8px">${byMarket}</div>
+      ${sports ? `<div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>Sport</th><th>W-L</th><th>Win</th><th>Units</th><th>ROI</th><th>CLV</th></tr></thead><tbody>${sports}</tbody></table></div>` : ""}
+      <h3 style="font-size:20px;margin:18px 0 8px">Latest results</h3>
+      <div class="rows">${recent.length ? recent.map((e) => row(e)).join("") : `<p class="empty">No graded picks yet.</p>`}</div>`;
+  }
+
+  function renderBrain() {
+    const b = DATA.brains || [];
+    if (b[0]) $("brain-time").textContent = "Retrained " + fmtTime(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    const rows = b.filter((x) => x.games).map((x) => {
+      const gain = x.baseline_log_loss ? (1 - x.log_loss / x.baseline_log_loss) : null;
+      return `<tr><td>${esc(x.name)}</td><td>${x.games}</td><td>${pct(x.accuracy, 1)}</td><td>${x.log_loss.toFixed(3)}</td><td class="${gain >= 0 ? "pos" : "neg"}">${signed(gain * 100, 1)}%</td><td>${x.margin_sd ? x.margin_sd.toFixed(1) : "–"}</td></tr>`;
+    }).join("");
+    const all = b.reduce((a, x) => ({ g: a.g + x.games, w: a.w + x.accuracy * x.games }), { g: 0, w: 0 });
+    const weights = Object.entries(DATA.weights || {}).map(([k, w]) => `${esc(k.replace(":", " "))}: ${(100 - w * 100).toFixed(0)}% model / ${(w * 100).toFixed(0)}% market`);
+    $("brain").innerHTML = `
+      <p>${all.g ? `The model picks the straight-up winner <b>${pct(all.w / all.g, 0)}</b> of the time on ${all.g.toLocaleString()} recent games it never saw. It refits after every final score and re-tunes how spread out each sport's scores are, so a 60% call means 60%.` : "The brain needs a few weeks of results before it reports accuracy."}</p>
+      ${rows ? `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Games</th><th>Winner</th><th>Log loss</th><th>vs. coin flip</th><th>Margin SD</th></tr></thead><tbody>${rows}</tbody></table></div>` : ""}
+      <p class="note">${weights.length ? "Learned trust from graded picks: " + weights.join(" · ") + "." : "Model/market blend starts at 25/75 for game lines and 20/80 for props, and is re-learned once a sport has 60 graded picks."}</p>`;
+  }
+
+  function renderTop() {
+    const st = DATA.stats, o = st.overall;
+    $("updated").textContent = "Updated " + fmtTime(DATA.generated_at, { weekday: "short", hour: "numeric", minute: "2-digit" }) + (DATA.live_note ? " · " + DATA.live_note : "");
+    $("today-date").textContent = fmtTime(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" });
+    const u = o.units;
+    $("topchips").innerHTML = `<span class="stat-chip">${rec(o)}</span><span class="stat-chip"><b class="${u < 0 ? "neg" : ""}">${signed(u, 1)}u</b></span><span class="stat-chip">${money(st.bankroll)}</span>`;
+    $("demo").innerHTML = DATA.demo ? `<div class="demo">Demo data: made-up teams, players and odds so you can see how the board works. Nothing here is a real bet.</div>` : "";
+    const sports = [["all", "All"], ...DATA.sports.map((s) => [s.key, s.name])];
+    $("filters").innerHTML = sports.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${k === sport}">${esc(n)}</button>`).join("");
+    $("markets").innerHTML = MARKETS.map(([k, n]) => `<button data-market="${k}" aria-pressed="${k === market}">${esc(n)}</button>`).join("");
+  }
+
+  function render() { renderTop(); renderBoard(); renderSlip(); renderRecord(); renderBrain(); }
+
+  document.addEventListener("click", (ev) => {
+    const t = ev.target.closest("button");
+    if (!t) return;
+    if (t.dataset.market) { market = t.dataset.market; try { localStorage.setItem("edge-market", market); } catch (e) {} render(); }
+    else if (t.dataset.sport) { sport = t.dataset.sport; try { localStorage.setItem("edge-sport", sport); } catch (e) {} render(); }
+    else if (t.dataset.add) { slip.has(t.dataset.add) ? slip.delete(t.dataset.add) : slip.add(t.dataset.add); render(); }
+    else if (t.id === "clear-slip") { slip.clear(); render(); }
+  });
+  document.addEventListener("input", (ev) => {
+    if (ev.target.id !== "stake") return;
+    const legs = DATA.entries.filter((e) => slip.has(e.id));
+    const d = legs.reduce((x, e) => x * dec(e.current_odds ?? e.odds), 1);
+    $("pays").textContent = money((parseFloat(ev.target.value) || 0) * d);
+  });
+
+  render();
+  // When served by `sportsedge serve` or GitHub Pages, pull fresh data every minute.
+  if (location.protocol.startsWith("http")) {
+    setInterval(async () => {
+      try {
+        const r = await fetch("data.json", { cache: "no-store" });
+        if (r.ok) { DATA = await r.json(); render(); }
+      } catch (e) {}
+    }, 60000);
+  }
+})();
+</script>

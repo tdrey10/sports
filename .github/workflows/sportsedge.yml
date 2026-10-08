@@ -1,0 +1,90 @@
+name: SportsEdge
+
+# Odds scans cost The Odds API credits; score updates and grading use ESPN only and are free.
+on:
+  schedule:
+    - cron: "17 */3 * * *"   # full cycle: odds, new picks, line tracking, grading
+    - cron: "*/20 * * * *"   # live scores + grading only
+  workflow_dispatch:
+    inputs:
+      props:
+        description: "Also price player props (uses more Odds API credits)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# Publishing to GitHub Pages is OFF unless you set the repository variable
+# PUBLISH_PAGES=true. Leave it off if this GitHub account hosts any other site
+# (for example a business site with a custom domain): project pages inherit
+# that domain. Without Pages, open the dashboard from the uploaded artifact or
+# run `funky serve` locally.
+
+concurrency:
+  group: sportsedge
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache ESPN downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/sportsedge
+          key: espn-${{ github.run_id }}
+          restore-keys: espn-
+
+      - run: pip install -e .
+
+      - name: Live scores and grading
+        if: github.event.schedule == '*/20 * * * *'
+        run: sportsedge run all --scores-only
+
+      - name: Full engine cycle
+        if: github.event.schedule != '*/20 * * * *'
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: sportsedge run all ${{ inputs.props && '--props' || '' }}
+
+      - name: Save the ledger
+        run: |
+          git config user.name "sportsedge-bot"
+          git config user.email "sportsedge-bot@users.noreply.github.com"
+          git add data/ledger.json data/brain.json
+          git diff --cached --quiet || git commit -m "Update pick ledger"
+          git pull --rebase --autostash && git push
+
+      - name: Keep the dashboard as a private download
+        uses: actions/upload-artifact@v4
+        with:
+          name: funky-buttlovin-dashboard
+          path: site
+          retention-days: 7
+
+      - name: Package for GitHub Pages
+        if: vars.PUBLISH_PAGES == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  publish:
+    needs: run
+    if: vars.PUBLISH_PAGES == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
