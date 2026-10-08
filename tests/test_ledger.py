@@ -228,10 +228,14 @@ def test_pitcher_factor_and_parse():
     ev = {"id": "1", "date": "2026-10-08T23:05Z", "status": {"type": {"completed": False, "state": "pre"}},
           "competitions": [{"competitors": [
               {"homeAway": "home", "team": {"displayName": "Yankees"},
-               "probables": [{"athlete": {"displayName": "Gerrit Cole"}, "statistics": [{"abbreviation": "ERA", "displayValue": "2.95"}]}]},
+               "probables": [{"athlete": {"displayName": "Gerrit Cole"}, "statistics": [
+                   {"abbreviation": "W", "displayValue": "9"}, {"abbreviation": "L", "displayValue": "4"},
+                   {"abbreviation": "ERA", "displayValue": "2.95"}]}]},
               {"homeAway": "away", "team": {"displayName": "Red Sox"}}]}]}
     g = _parse_event(ev)
     assert g.home_pitcher == "Gerrit Cole" and g.home_pitcher_era == 2.95 and g.away_pitcher == ""
+    assert g.home_pitcher_decisions == 13
+    assert pitcher_factor(6.0, 0) == 1.0  # one bad start says nothing yet
 
 
 def test_prop_matchup_and_usage_factors():

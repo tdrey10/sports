@@ -115,7 +115,7 @@ def test_espn_client_results_and_box_scores(tmp_path):
         if url.endswith("/scoreboard"):
             return {"events": [
                 espn_event("10", "Boston Celtics", "Miami Heat", 110, 101),
-                espn_event("11", "Miami Heat", "Boston Celtics", 0, 0, completed=False, date="2026-01-03T00:30Z"),
+                espn_event("11", "Miami Heat", "Boston Celtics", 0, 0, completed=False, date="2026-01-01T20:30Z"),
             ]}
         return NBA_SUMMARY
 
@@ -176,3 +176,37 @@ def test_odds_client_request(monkeypatch):
     assert url.endswith("/sports/soccer_epl/odds")
     assert params["bookmakers"] == "draftkings" and "regions" not in params
     assert events[0].home == "Arsenal" and client.requests_remaining == "499"
+
+
+def test_espn_never_requests_date_ranges(tmp_path):
+    session = FakeSession(lambda url, params: {"events": []})
+    client = EspnClient(cache=JsonCache(tmp_path), session=session)
+    client.game_results(SPORTS["nba"], datetime(2026, 1, 15, tzinfo=timezone.utc), datetime(2026, 3, 2, tzinfo=timezone.utc))
+    dates = [p["dates"] for _, p in session.calls]
+    assert dates == ["202601", "202602", "202603"]  # pro leagues: one request per month
+    assert all(p["limit"] == 1000 for _, p in session.calls)
+
+    session.calls.clear()
+    client.game_results(SPORTS["ncaab"], datetime(2026, 2, 27, tzinfo=timezone.utc), datetime(2026, 3, 2, tzinfo=timezone.utc))
+    dates = [p["dates"] for _, p in session.calls]
+    assert dates == ["20260227", "20260228", "20260301", "20260302"]  # college: day by day
+    assert all("-" not in d for d in dates)
+
+
+def test_espn_month_falls_back_to_days_when_truncated(tmp_path):
+    def router(url, params):
+        if len(params["dates"]) == 6:
+            return {"events": [espn_event(str(i), "A", "B", 1, 0) for i in range(1000)]}
+        return {"events": []}
+    session = FakeSession(router)
+    client = EspnClient(cache=JsonCache(tmp_path), session=session)
+    client.game_results(SPORTS["mlb"], datetime(2026, 8, 1, tzinfo=timezone.utc), datetime(2026, 8, 31, tzinfo=timezone.utc))
+    assert len([1 for _, p in session.calls if len(p["dates"]) == 8]) == 31
+
+
+def test_preseason_games_are_ignored():
+    from sportsedge.data.espn import _parse_event
+    ev = espn_event("9", "Boston Celtics", "Miami Heat", 100, 90)
+    assert _parse_event(ev) is not None
+    ev["season"] = {"year": 2026, "type": 1, "slug": "preseason"}
+    assert _parse_event(ev) is None
