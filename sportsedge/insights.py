@@ -157,6 +157,7 @@ BOOK_NAMES = {
     "williamhill_us": "Caesars", "pinnacle": "Pinnacle", "betrivers": "BetRivers", "espnbet": "ESPN BET",
     "fanatics": "Fanatics", "bovada": "Bovada", "betonlineag": "BetOnline", "mybookieag": "MyBookie",
     "hardrockbet": "Hard Rock", "ballybet": "Bally Bet", "lowvig": "LowVig", "betus": "BetUS",
+    "bet365": "bet365", "draftkings_est": "DraftKings (price not shown by ESPN, assumed -115; take it at -115 or better)",
 }
 
 

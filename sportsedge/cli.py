@@ -23,6 +23,10 @@ def _provider(args):
 
     if args.command in ("ratings", "backtest") or getattr(args, "scores_only", False):
         return EspnClient()  # stats only, no odds key needed
+    if getattr(args, "odds_source", "espn") == "espn":
+        from .data.live import EspnProvider
+
+        return EspnProvider()  # free: ESPN stats + DraftKings lines via ESPN
     from .data.live import LiveProvider
     from .data.oddsapi import OddsApiClient
 
@@ -39,7 +43,7 @@ def cmd_scan(args) -> int:
         min_ev=args.min_ev,
         max_ev=args.max_ev,
         market_weight=args.market_weight,
-        prop_market_weight=args.prop_market_weight,
+        prop_market_weight=0.65 if args.odds_source == "espn" and args.prop_market_weight == 0.8 else args.prop_market_weight,
         kelly_multiplier=args.kelly,
         max_stake=args.max_stake,
         bankroll=args.bankroll,
@@ -100,11 +104,16 @@ DEMO_SPORTS = "nfl,ncaaf,nba,ncaab,mlb,nhl,epl"
 
 
 def _settings(args) -> Settings:
+    prop_weight = args.prop_market_weight
+    if getattr(args, "odds_source", None) == "espn" and prop_weight == 0.8:
+        # ESPN shows the prop line but not its price, so the "market" there is only the line's
+        # 50/50 midpoint. Trust our projection a bit more than with real prices.
+        prop_weight = 0.65
     return Settings(
         min_ev=args.min_ev,
         max_ev=args.max_ev,
         market_weight=args.market_weight,
-        prop_market_weight=args.prop_market_weight,
+        prop_market_weight=prop_weight,
         kelly_multiplier=args.kelly,
         max_stake=args.max_stake,
         hide_flagged=not args.show_flagged,
@@ -355,6 +364,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--hours", type=float, help="only events starting within this many hours")
     s.add_argument("--books", help="comma separated bookmaker keys, e.g. draftkings,fanduel")
     s.add_argument("--regions", default="us", help="The Odds API regions (default us)")
+    s.add_argument("--odds-source", choices=["espn", "oddsapi"], default="espn",
+                   help="espn (free, DraftKings lines) or oddsapi (many books, needs ODDS_API_KEY)")
     s.add_argument("--top", type=int, default=15, help="number of props to show")
     s.add_argument("--all", action="store_true", help="show every qualifying game-line edge, not just one per game")
     s.add_argument("--json", help="write qualifying picks to a JSON file")
@@ -393,6 +404,8 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--tz", default="America/Los_Angeles", help="time zone for 'today' (default Pacific)")
         sp.add_argument("--start-bankroll", type=float, default=1000.0)
         sp.add_argument("--history-days", type=int, default=14, help="demo only: days of simulated history")
+        sp.add_argument("--odds-source", choices=["espn", "oddsapi"], default="espn",
+                        help="espn (free, DraftKings lines) or oddsapi (many books, needs ODDS_API_KEY)")
         sp.add_argument("--credit-floor", type=float, default=60,
                         help="never let an odds scan take The Odds API credits below this (default 60)")
 
