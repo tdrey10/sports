@@ -230,30 +230,53 @@ from .odds import implied_prob  # noqa: E402
 from .tiers import Card, units_for  # noqa: E402
 
 
-def live_cards(picks: list[Pick], scanner: LiveScanner, sport_names: dict[str, str]) -> list[Card]:
-    """The best live edge per game, as cards for the ledger."""
-    cards = []
+LIVE_WIN_MIN_ODDS = -300  # "most likely to win" can be a favourite, within reason
+
+
+def _trusted(p: Pick) -> bool:
     # Live prices across books are rarely in sync, so an "edge" that only comes from one book's
-    # stale price (our model is below the market) is not trusted.
-    trusted = [
-        p for p in picks
-        if p.american >= LIVE_MIN_ODDS and (p.market_prob is None or p.model_prob >= p.market_prob)
-    ]
-    for p in best_per_event(trusted, scanner.settings):
+    # stale price (our model below the market) is not trusted.
+    return p.market_prob is None or p.model_prob >= p.market_prob
+
+
+def live_cards(
+    picks: list[Pick], scanner: LiveScanner, sport_names: dict[str, str], taken: set[tuple[str, str]] = frozenset()
+) -> list[Card]:
+    """Up to two live bets per check, across every game in progress:
+
+    - ``live_win``: the bet most likely to cash that still has an edge (EV >= 0, odds -300 or longer);
+    - ``live_plus``: the best plus-money bet (+100 or longer, EV >= the live minimum).
+
+    ``taken`` holds (event_id, tier) pairs already posted, so each game gets at most one of each.
+    """
+    ok = [p for p in picks if _trusted(p) and p.ev <= scanner.settings.max_ev and not p.warnings]
+    win = [p for p in ok if p.ev >= 0 and p.american >= LIVE_WIN_MIN_ODDS and (p.event_id, "live_win") not in taken]
+    plus = [p for p in ok if p.american >= 100 and p.ev >= scanner.settings.min_ev
+            and (p.event_id, "live_plus") not in taken]
+    chosen: list[tuple[str, Pick]] = []
+    if win:
+        chosen.append(("live_win", max(win, key=lambda p: (p.win_prob, p.ev))))
+    if plus:
+        best_plus = max(plus, key=lambda p: p.ev)
+        if not chosen or best_plus is not chosen[0][1]:
+            chosen.append(("live_plus", best_plus))
+
+    cards = []
+    for tier, p in chosen:
         game = scanner.states.get(p.event_id)
-        headline = (
-            f"Live: we make {p.selection.replace(' (live)', '')} {p.win_prob:.0%} to cash; "
-            f"{p.american:+.0f} only needs {implied_prob(p.american):.0%}."
-        )
+        name = p.selection.replace(" (live)", "")
+        if tier == "live_win":
+            headline = f"Live: {name} cashes {p.win_prob:.0%} of the time on our numbers; {p.american:+.0f} only needs {implied_prob(p.american):.0%}."
+        else:
+            headline = f"Live plus money: {name} at {p.american:+.0f} pays like {implied_prob(p.american):.0%}; we make it {p.win_prob:.0%}."
         reasons = [
             f"{p.projection}.",
             f"Model {p.model_prob:.0%} · market (no-vig) {p.market_prob:.0%} · blended {p.win_prob:.0%}."
             if p.market_prob is not None else f"Model {p.model_prob:.0%}.",
-            f"Best live price {p.american:+.0f} at {p.book} ({p.books} books). Live lines move fast: "
-            "confirm the score and price before betting.",
+            f"Best live price {p.american:+.0f} at {p.book}. Live lines move fast: confirm the score and price before betting.",
         ]
         cards.append(Card(
-            tier="live", units=min(units_for(p), LIVE_MAX_UNITS), headline=headline, reasons=reasons, sport=p.sport,
+            tier=tier, units=min(units_for(p), LIVE_MAX_UNITS), headline=headline, reasons=reasons, sport=p.sport,
             sport_name=sport_names.get(p.sport, p.sport), pick=p,
             home=game.home if game else "", away=game.away if game else "",
         ))

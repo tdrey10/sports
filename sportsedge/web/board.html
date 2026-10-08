@@ -68,7 +68,7 @@ button { font: inherit; color: inherit; }
     linear-gradient(180deg, color-mix(in srgb, var(--c) 8%, var(--panel)), var(--panel) 140px) padding-box,
     linear-gradient(135deg, var(--c), var(--c2)) border-box;
   box-shadow: 0 0 28px -8px color-mix(in srgb, var(--c) 70%, transparent), 0 0 46px -18px color-mix(in srgb, var(--c2) 60%, transparent); }
-.card.live { --c: var(--live); --c2: var(--live-2); } .card.lock { --c: var(--lock); --c2: var(--lock-2); }
+.card.live, .card.live_win, .card.live_plus { --c: var(--live); --c2: var(--live-2); } .card.lock { --c: var(--lock); --c2: var(--lock-2); }
 .card.dog { --c: var(--dog); --c2: var(--dog-2); } .card.prop { --c: var(--prop); --c2: var(--prop-2); }
 .card.early { --c: var(--early); --c2: var(--early-2); } .card.value { --c: var(--board); --c2: var(--board-2); }
 .card.lean { --c: var(--lean); --c2: var(--lean-2); } .card.best { --c: var(--best); --c2: var(--best-2); }
@@ -218,7 +218,8 @@ footer b { color: var(--fg); letter-spacing: .08em; }
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "Over/Under"], ["props", "Props"], ["moneyline", "Moneyline"]];
   const EMOJI = { nfl: "🏈", ncaaf: "🏈", nba: "🏀", ncaab: "🏀", mlb: "⚾", nhl: "🏒" };
   const TIER = {
-    live: ["🔴", "Live bet", "Bet it now"], lock: ["🔒", "Lock of the day", "Lock"], dog: ["🐺", "Dog of the day", "Value play"],
+    live: ["🔴", "Live bet", "Bet it now"], live_win: ["🔴", "Live · most likely to win", "Bet it now"],
+    live_plus: ["💰", "Live plus money", "Bet it now"], lock: ["🔒", "Lock of the day", "Lock"], dog: ["🐺", "Dog of the day", "Value play"],
     prop: ["🎯", "Prop of the day", "Prop"], value: ["🔥", "Value play", "Value"], early: ["⏰", "We got in early", "Early"],
     lean: ["🟡", "Lean", "No units"],
   };
@@ -250,7 +251,9 @@ footer b { color: var(--fg); letter-spacing: .08em; }
     return `💰 ${u} UNIT${e.units > 1 ? "S" : ""}`;
   }
   function blurb(e) {
-    if (e.tier === "live") return "Live line — confirm the score and price before you bet.";
+    if (e.tier === "live_win") return "Our safest live bet right now. Confirm the score and price first.";
+    if (e.tier === "live_plus") return "Plus money live. Small bet, big payout. Confirm the price first.";
+    if (e.tier.startsWith("live")) return "Live line. Confirm the score and price before you bet.";
     if (!(e.units > 0)) return "Our read, no money on it.";
     if (e.units >= 2) return "Strong edge at this price — full send.";
     if (e.units >= 1) return "The value's real — a solid bet.";
@@ -262,7 +265,7 @@ footer b { color: var(--fg); letter-spacing: .08em; }
     return `${day} · game starts at ${fmt(d, { hour: "numeric", minute: "2-digit", timeZoneName: "short" })}`;
   }
   function movement(e) {
-    if (e.current_odds == null || e.settled || e.tier === "live") return "";
+    if (e.current_odds == null || e.settled || e.tier.startsWith("live")) return "";
     const moved = e.current_point != null && e.point != null && e.current_point !== e.point;
     if (e.current_odds === e.odds && !moved) return `<div class="move flat">📈 Got it at ${odds(e.odds)} → still ${odds(e.odds)} · hasn't moved</div>`;
     const now = moved ? `${e.current_point > 0 ? "+" : ""}${e.current_point} ${odds(e.current_odds)}` : odds(e.current_odds);
@@ -302,7 +305,7 @@ footer b { color: var(--fg); letter-spacing: .08em; }
       <div class="pick"><h4>${opts.rank ? `<span class="rank">${e.best_rank}</span>` : ""}${name} ${mk}</h4><span class="o num">${odds(e.odds)}</span></div>
       <div class="opp">${esc(e.matchup)}</div>
       <p class="why">🧠 ${esc(e.headline)}</p>
-      ${e.tier === "live" ? "" : `<div class="when">${when(e)}</div>`}
+      ${e.tier.startsWith("live") ? "" : `<div class="when">${when(e)}</div>`}
       ${movement(e)}${liveLine(e)}${result(e)}`;
   }
 
@@ -334,7 +337,8 @@ footer b { color: var(--fg); letter-spacing: .08em; }
 
   function renderPicks() {
     const items = boardEntries().sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time));
-    const live = items.filter((e) => e.tier === "live");
+    const live = items.filter((e) => e.tier.startsWith("live"))
+      .sort((a, b) => (a.tier === "live_win" ? 0 : 1) - (b.tier === "live_win" ? 0 : 1));
     $("live").innerHTML = live.length ? live.map(bigCard).join("") :
       empty("No live bets right now. To get live picks during games, open the GitHub app → Actions → <b>Live session</b> → Run workflow. New live edges show up here and as a phone notification.");
     $("live-aside").textContent = live.length ? `${live.length} live` : "Starts when you run a live session";
@@ -411,7 +415,7 @@ footer b { color: var(--fg); letter-spacing: .08em; }
         <div><span>🔒 Locks</span><span class="${cls(st.by_tier.lock.units)}">${money(st.by_tier.lock.dollars)} · ${roi(st.by_tier.lock)}</span></div>
         <div><span>⏰ Early value</span><span class="${cls(st.by_tier.early.units)}">${money(st.by_tier.early.dollars)} · ${roi(st.by_tier.early)}</span></div>
         <div><span>🔴 Live bets</span><span class="${cls((st.by_tier.live || {}).units)}">${money((st.by_tier.live || { dollars: 0 }).dollars)} · ${roi(st.by_tier.live || {})}</span></div></div></div>
-      <div class="tiles">${tierTile("lock", "🔒 Lock of the day", "--lock")}${tierTile("dog", "🐺 Dog of the day", "--dog")}${tierTile("prop", "🎯 Prop of the day", "--prop")}${tierTile("value", "🔥 Value plays", "--board")}${tierTile("early", "⏰ Early value", "--early")}${tierTile("live", "🔴 Live bets", "--live")}</div>
+      <div class="tiles">${tierTile("lock", "🔒 Lock of the day", "--lock")}${tierTile("dog", "🐺 Dog of the day", "--dog")}${tierTile("prop", "🎯 Prop of the day", "--prop")}${tierTile("value", "🔥 Value plays", "--board")}${tierTile("early", "⏰ Early value", "--early")}${tierTile("live_win", "🔴 Live: likely winners", "--live")}${tierTile("live_plus", "💰 Live plus money", "--live")}</div>
       <div class="sec-head"><h2 style="font-size:14px">By bet type</h2></div><div class="tiles">${MARKETS.slice(1).map(marketTile).join("")}</div>
       ${sports ? `<div class="sec-head"><h2 style="font-size:14px">By sport (unit plays)</h2></div><div class="sports">${sports}</div>` : ""}
       <div class="sec-head"><h2 style="font-size:14px">Latest graded</h2></div>
@@ -434,7 +438,7 @@ footer b { color: var(--fg); letter-spacing: .08em; }
   }
 
   function renderTop() {
-    const live = DATA.entries.some((e) => e.status === "live" || (e.tier === "live" && !e.settled));
+    const live = DATA.entries.some((e) => e.status === "live" || (e.tier.startsWith("live") && !e.settled));
     $("livepill").className = "live-pill" + (live ? " on" : "");
     $("updated").textContent = "Updated " + fmt(DATA.generated_at, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
     $("today").textContent = fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" });

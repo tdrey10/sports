@@ -60,8 +60,10 @@ class GitHubIssueNotifier:
 
 def format_live_card(card) -> str:
     p = card.pick
+    label = {"live_win": "🔴 LIVE · MOST LIKELY TO WIN", "live_plus": "💰 LIVE PLUS MONEY"}.get(card.tier, "🔴 LIVE")
     lines = [
-        f"### 🔴 {p.selection.replace(' (live)', '')} {p.american:+.0f}",
+        f"**{label}**",
+        f"### {p.selection.replace(' (live)', '')} {p.american:+.0f}",
         f"**{card.sport_name}** · {p.matchup} · **{card.units:g} unit{'s' if card.units != 1 else ''}** · "
         f"+{p.ev * 100:.1f}% EV · best price at {p.book}",
         "",

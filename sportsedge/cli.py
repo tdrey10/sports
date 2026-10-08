@@ -308,10 +308,11 @@ def cmd_live(args) -> int:
             except Exception as exc:  # keep the session alive through one bad poll
                 print(f"{cfg.name}: live scan failed: {exc}")
                 continue
-            cards = {c.pick.event_id: c for c in live_cards(picks, scanner, names)}
+            cards = {(c.pick.event_id, c.tier): c for c in live_cards(picks, scanner, names, ws.ledger.live_taken())}
             for entry in ws.ledger.publish(list(cards.values()), now):
-                card = cards[entry.event_id]
-                print(f"LIVE {entry.sport_name}: {entry.selection} {entry.odds:+.0f} ({entry.units:g}u, EV {entry.ev:+.1%})")
+                card = cards[(entry.event_id, entry.tier)]
+                print(f"{entry.tier.upper()} {entry.sport_name}: {entry.selection} {entry.odds:+.0f} "
+                      f"({entry.units:g}u, EV {entry.ev:+.1%})")
                 if notifier:
                     notifier.post(format_live_card(card))
         remaining = getattr(getattr(ws.provider, "odds", None), "requests_remaining", None)

@@ -25,7 +25,7 @@ from .models.props import PlayerGame, stat_value
 from .models.ratings import GameResult
 from .odds import american_to_decimal
 from .sports import SPORTS
-from .tiers import Card
+from .tiers import LIVE_TIERS, Card
 
 DAY_TIERS = ("lock", "dog", "prop")
 GRADE_AFTER = timedelta(hours=2)  # earliest a game can be final
@@ -137,6 +137,9 @@ class Ledger:
     def day_of(self, when: datetime) -> str:
         return when.astimezone(self.tz).date().isoformat()
 
+    def live_taken(self) -> set[tuple[str, str]]:
+        return {(e.event_id, e.tier) for e in self.entries.values() if e.tier in LIVE_TIERS}
+
     def best_taken(self, now: datetime) -> int:
         today = self.day_of(now)
         return sum(1 for e in self.entries.values() if e.day == today and e.best_rank)
@@ -151,21 +154,21 @@ class Ledger:
         and each game gets at most one game-line unit play."""
         added = []
         unit_events = {
-            e.event_id for e in self.entries.values() if e.is_unit_play and e.player is None and e.tier != "live"
+            e.event_id for e in self.entries.values() if e.is_unit_play and e.player is None and e.tier not in LIVE_TIERS
         }
-        live_events = {e.event_id for e in self.entries.values() if e.tier == "live"}
+        live_taken = self.live_taken()
         today = self.day_of(now)
         ranked_today = [e for e in self.entries.values() if e.day == today and e.best_rank]
         next_rank = max((e.best_rank for e in ranked_today), default=0) + 1
         for card in sorted(cards, key=lambda c: c.best_rank or 99):
             p = card.pick
-            live = card.tier == "live"
+            live = card.tier in LIVE_TIERS
             eid = entry_id(p, live=live)
             if live:
-                # One live bet per game: the first edge found, at the price we got.
-                if eid in self.entries or p.event_id in live_events:
+                # One live bet of each kind per game, at the price we got.
+                if eid in self.entries or (p.event_id, card.tier) in live_taken:
                     continue
-                live_events.add(p.event_id)
+                live_taken.add((p.event_id, card.tier))
             elif eid in self.entries:
                 existing = self.entries[eid]
                 # Promote an open unit play that is now one of today's best bets.
@@ -340,7 +343,8 @@ class Ledger:
             }
 
         week_ago = now - timedelta(days=7)
-        by_tier = {t: summary([e for e in plays if e.tier == t]) for t in ("lock", "dog", "prop", "value", "early", "live")}
+        by_tier = {t: summary([e for e in plays if e.tier == t]) for t in ("lock", "dog", "prop", "value", "early", "live_win", "live_plus")}
+        by_tier["live"] = summary([e for e in plays if e.tier in LIVE_TIERS])
         by_sport = {}
         for sport in sorted({e.sport for e in plays}):
             by_sport[sport] = {"name": SPORTS[sport].name if sport in SPORTS else sport,
