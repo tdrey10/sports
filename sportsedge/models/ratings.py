@@ -31,6 +31,7 @@ class GameResult:
     away_score: float | None
     neutral: bool = False
     state: str = ""  # "pre", "in" or "post" when known
+    time_tbd: bool = False  # ESPN has the date but no start time yet (shown as midnight Eastern)
     detail: str = ""  # e.g. "1:28 - 3rd" for games in progress
     live_home: float | None = None
     live_away: float | None = None
