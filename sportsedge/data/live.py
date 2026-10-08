@@ -60,6 +60,9 @@ class EspnProvider:
     def prop_quotes(self, cfg: SportConfig, event: Event, markets: list[str]) -> list[Quote]:
         return self.espn_odds.prop_quotes(cfg, event, markets)
 
+    def closing_quotes(self, cfg: SportConfig, game: GameResult) -> list[Quote] | None:
+        return self.espn_odds.closing_quotes(cfg, game.event_id)
+
     def player_games(self, cfg: SportConfig, results: list[GameResult], team: str) -> list[PlayerGame]:
         return self.espn.player_games(cfg, results, team)
 

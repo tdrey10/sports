@@ -26,6 +26,8 @@ class Settings:
     market_weight: float = 0.75  # 0 = trust the model only, 1 = trust the market only
     prop_market_weight: float = 0.8  # props: player samples are small, lean on the market more
     weight_overrides: dict[str, float] = field(default_factory=dict)  # "sport:game"/"sport:prop" -> learned weight
+    min_ev_overrides: dict[str, float] = field(default_factory=dict)  # sport -> EV threshold chosen by the studies
+    calibration: dict[str, tuple[float, float]] = field(default_factory=dict)  # sport -> Platt (a, b) from the studies
     kelly_multiplier: float = 0.25
     max_stake: float = 0.03  # cap on fraction of bankroll per bet
     bankroll: float | None = None
@@ -35,6 +37,11 @@ class Settings:
     hide_flagged: bool = True  # leave out picks where model and market disagree by > disagreement_warning
     max_odds: float = 600  # skip extreme longshots (e.g. +1500 props)
     max_ev: float = 0.20  # EV above this is almost always stale data / news the model can't see
+
+    def min_ev_for(self, pick: "Pick") -> float:
+        if pick.is_prop:
+            return self.min_ev
+        return max(self.min_ev_overrides.get(pick.sport, self.min_ev), 0.0)
 
     def weight_for(self, sport: str, is_prop: bool) -> float:
         key = f"{sport}:{'prop' if is_prop else 'game'}"
@@ -196,7 +203,7 @@ def qualifying(picks: list[Pick], settings: Settings) -> list[Pick]:
     """Picks clearing the EV threshold and the sanity cap, best first."""
     out = [
         p for p in picks
-        if settings.min_ev <= p.ev <= settings.max_ev and not (settings.hide_flagged and p.warnings)
+        if settings.min_ev_for(p) <= p.ev <= settings.max_ev and not (settings.hide_flagged and p.warnings)
     ]
     return sorted(out, key=lambda p: p.ev, reverse=True)
 
@@ -214,6 +221,27 @@ def growth(p: Pick) -> float:
     if f <= 0:
         return 0.0
     return win * math.log(1 + b * f) + loss * math.log(1 - f)
+
+
+def edge_score(p: Pick, settings: Settings) -> tuple[float, float, float]:
+    """(score 0-100, calibrated win prob, calibrated EV).
+
+    The win probability is first corrected by what the studies measured (when we
+    said 60%, how often did it really win?), then the score weighs edge (60 points:
+    calibrated EV, full marks at +10%) and how likely it is to cash (40 points:
+    full marks at 75%). Big edge on a likely winner scores highest.
+    """
+    q = p.win_prob
+    platt = None if p.is_prop else settings.calibration.get(p.sport)
+    if platt:
+        a, b = platt
+        x = math.log(min(max(q, 1e-4), 1 - 1e-4) / (1 - min(max(q, 1e-4), 1 - 1e-4)))
+        q = 1 / (1 + math.exp(-(a + b * x)))
+    dec = american_to_decimal(p.american)
+    ev = q * (1 - p.push_prob) * (dec - 1) - (1 - q) * (1 - p.push_prob)
+    edge_pts = 60 * min(max(ev / 0.10, 0.0), 1.0)
+    sure_pts = 40 * min(max((q - 0.40) / 0.35, 0.0), 1.0)
+    return round(edge_pts + sure_pts, 1), q, ev
 
 
 def best_per_event(picks: list[Pick], settings: Settings) -> list[Pick]:

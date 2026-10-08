@@ -170,6 +170,22 @@ class EspnOdds:
             quotes += parse_provider_odds(o)
         return quotes
 
+    def closing_quotes(self, cfg: SportConfig, event_id: str) -> list[Quote] | None:
+        """Closing pregame lines for a finished game (ESPN keeps them: the top-level
+        prices on a completed game are the close). Cached for good: they never change."""
+        listing = self._get(self._core_base(cfg, event_id), ttl=None)
+        if not listing:
+            return None  # request failed: try again next time
+        quotes: list[Quote] = []
+        for item in listing.get("items", []) or []:
+            ref = item.get("$ref", "")
+            pid = str((item.get("provider") or {}).get("id") or ref.rstrip("/").split("?")[0].rsplit("/", 1)[-1])
+            if pid == LIVE_PROVIDER:
+                continue
+            o = item if "homeTeamOdds" in item else self._get(ref.replace("http://", "https://"), ttl=None) if ref else {}
+            quotes += parse_provider_odds(o)
+        return quotes
+
     def _event(self, cfg: SportConfig, g: GameResult, quotes: list[Quote]) -> Event:
         return Event(id=g.event_id, sport=cfg.key, commence_time=g.date, home=g.home, away=g.away,
                      quotes=quotes, neutral=g.neutral)

@@ -194,7 +194,8 @@ def test_cli_run_demo(tmp_path, capsys):
     assert "dashboard:" in capsys.readouterr().out
 
 
-def test_best_bets_ranked_by_growth():
+def test_best_bets_ranked_by_edge_score():
+    from sportsedge.tiers import BEST_BETS, BEST_MIN_SCORE
     from sportsedge.edge import growth
     safe = make_pick(american=-110, win_prob=0.56, ev=0.07)
     longshot = make_pick(american=450, win_prob=0.20, ev=0.10)
@@ -204,8 +205,11 @@ def test_best_bets_ranked_by_growth():
     scans = [engine.scan(c, props=True) for c in resolve("nba,nhl")]
     cards = build_cards(scans, engine.settings, provider.now)
     ranks = sorted(c.best_rank for c in cards if c.best_rank)
-    assert ranks == list(range(1, len(ranks) + 1)) and len(ranks) <= 5
-    assert len([c for c in build_cards(scans, engine.settings, provider.now, best_taken=5) if c.best_rank]) == 0
+    assert ranks == list(range(1, len(ranks) + 1)) and len(ranks) <= BEST_BETS
+    best = sorted((c for c in cards if c.best_rank), key=lambda c: c.best_rank)
+    assert [c.score for c in best] == sorted((c.score for c in best), reverse=True)
+    assert all(c.score >= BEST_MIN_SCORE and not c.pick.warnings for c in best)
+    assert len([c for c in build_cards(scans, engine.settings, provider.now, best_taken=BEST_BETS) if c.best_rank]) == 0
 
 
 def test_key_numbers_learned_by_brain():

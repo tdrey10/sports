@@ -6,7 +6,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 
-from .edge import Pick, Settings, best_per_event, growth, qualifying
+from .edge import Pick, Settings, best_per_event, edge_score, qualifying
 from .engine import SportScan
 from .insights import reasons
 
@@ -34,7 +34,8 @@ DOG_MAX_ODDS = 350  # past this the variance swamps the edge for a headline pick
 PROP_ODDS_RANGE = (-200, 200)
 EARLY_HOURS = 24  # games further out than this are "early value"
 MAX_UNITS = 3.0
-BEST_BETS = 5  # daily top picks across spreads, totals, moneylines and props
+BEST_BETS = 10  # most daily top picks across spreads, totals, moneylines and props
+BEST_MIN_SCORE = 40  # a best bet needs this edge score (and a positive calibrated edge); fewer is fine
 
 
 @dataclass
@@ -49,6 +50,7 @@ class Card:
     home: str = ""
     away: str = ""
     best_rank: int | None = None  # 1..BEST_BETS for the day's best bets
+    score: float | None = None  # edge score 0-100 (see edge.edge_score)
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -144,18 +146,25 @@ def build_cards(
         best_lean.setdefault(p.event_id, p)
     chosen += [("lean", p) for p in list(best_lean.values())[:max_leans]]
 
-    # Best bets: today's unit plays with the fastest bankroll growth.
+    # Best bets: today's unit plays ranked by edge score, only those that clear the bar.
+    scores = {id(p): edge_score(p, settings) for _, p in chosen}
     slots = max(BEST_BETS - best_taken, 0)
-    ranked = sorted(
-        (p for tier, p in chosen if tier in UNIT_TIERS and p.commence_time <= soon_cut),
-        key=growth, reverse=True,
-    )[:slots]
+    contenders = [
+        p for tier, p in chosen
+        if tier in UNIT_TIERS and p.commence_time <= soon_cut and not p.warnings
+        and scores[id(p)][0] >= BEST_MIN_SCORE and scores[id(p)][2] > 0
+    ]
+    ranked = sorted(contenders, key=lambda p: scores[id(p)][0], reverse=True)[:slots]
     best_rank = {id(p): best_taken + i + 1 for i, p in enumerate(ranked)}
 
     cards = []
     for tier, pick in chosen:
         scan = by_event.get(pick.event_id)
         headline, bullets = reasons(pick, scan) if scan else ("", [])
+        if best_rank.get(id(pick)):
+            sc, cq, cev = scores[id(pick)]
+            bullets.insert(0, f"Edge score {sc:.0f}/100: {cev:+.1%} edge after the studies' calibration, "
+                              f"cashes {cq:.0%} of the time.")
         if tier == "lock":
             bullets.insert(0, f"Passed every Lock check: our model ({pick.model_prob:.0%}) and the market "
                               f"({pick.market_prob:.0%}) agree, no data warnings, and both teams have "
@@ -173,6 +182,7 @@ def build_cards(
                 home=ctx.home if ctx else "",
                 away=ctx.away if ctx else "",
                 best_rank=best_rank.get(id(pick)),
+                score=scores[id(pick)][0],
             )
         )
     return cards

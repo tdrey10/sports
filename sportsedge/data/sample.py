@@ -236,6 +236,17 @@ class SampleProvider:
                 out.append(ev)
         return out
 
+    def closing_quotes(self, cfg: SportConfig, game: GameResult) -> list[Quote]:
+        """One book's lines as they stood just before a past game started."""
+        world = self._world(cfg)
+        ev = Event(id=game.event_id, sport=cfg.key, commence_time=game.date, home=game.home, away=game.away)
+        saved, self.clock = self.clock, game.date - timedelta(minutes=5)
+        try:
+            quotes = self._game_quotes(cfg, world, ev)
+        finally:
+            self.clock = saved
+        return [q for q in quotes if q.book == "draftkings"]
+
     def live_games(self, cfg: SportConfig) -> list[GameResult]:
         return []  # the demo has no games in progress
 
