@@ -109,3 +109,14 @@ def test_events_and_live_events_pick_the_right_provider():
     live = odds.live_events(SPORTS["nfl"], [pre])
     assert by(live[0].quotes)[("h2h", "home")].american == -900
     assert any(ttl == 0 for url, _, ttl in espn.calls if "/odds/200" in url)  # live odds never cached
+
+
+def test_mlb_inline_odds_are_read_without_following_the_link():
+    now = datetime.now(timezone.utc)
+    pre = GameResult("501", now + timedelta(hours=3), "Los Angeles Dodgers", "Philadelphia Phillies", None, None, state="pre")
+    inline = dict(DK_NHL_HOME_DOG, **{"$ref": "http://core/odds/100?lang=en"})
+    listing = {"items": [inline]}
+    espn = FakeEspn({"/odds": listing}, games=[pre])  # the provider link itself would 404
+    events = EspnOdds(espn).events(SPORTS["mlb"])
+    assert len(events) == 1 and by(events[0].quotes)[("h2h", "home")].american == 114
+    assert not any("/odds/100" in url for url, _, _ in espn.calls)
