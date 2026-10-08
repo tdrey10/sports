@@ -146,3 +146,33 @@ def test_bets_the_blind_study_says_lose_are_flagged():
     small = dict(losing, bets=12)
     assert losing_kind(pick, Settings(track={"nba:spreads": small})) is None  # too few bets to judge
     assert "spreads 58-62 (-3.0%)" in track_line(pick, Settings(track={"nba:spreads": luck}))
+
+
+def test_only_legitimate_edges_get_units():
+    from sportsedge.tiers import not_legit
+
+    ok = make_pick(sport="nfl", market="spreads", american=-110, win_prob=0.55, market_prob=0.52)
+    assert not_legit(ok, Settings()) is None
+    assert "market price" in not_legit(make_pick(market_prob=None), Settings())
+    assert "only 22%" in not_legit(make_pick(american=400, win_prob=0.22, market_prob=0.18), Settings(), min_win=0.45)
+    losing = {"bets": 23, "won": 6, "lost": 17, "roi": -0.5, "se": 0.2}
+    assert "lost in the blind study" in not_legit(ok, Settings(track={"nfl:all": losing}))
+
+
+def test_open_picks_that_fail_the_bar_are_withdrawn():
+    from datetime import timedelta
+
+    from sportsedge.ledger import Ledger
+    from tests.test_ledger import NOW, card
+
+    led = Ledger()
+    good = make_pick(event_id="1", win_prob=0.55, market_prob=0.52)
+    longshot = make_pick(event_id="2", market="h2h", side="away", point=None, american=425, win_prob=0.2, market_prob=0.18)
+    nomarket = make_pick(event_id="3", market_prob=None)
+    led.publish([card(good, tier="early"), card(longshot, tier="early"), card(nomarket, tier="value")], NOW)
+    dup = make_pick(event_id="abcdef0123456789abcdef0123456789", win_prob=0.55, market_prob=0.52)  # same game, other source
+    led.publish([card(dup, tier="early")], NOW)
+    pulled = led.withdraw(Settings(), NOW - timedelta(hours=1))
+    assert {e.event_id for e in pulled} == {"2", "3", "abcdef0123456789abcdef0123456789"}
+    assert all(e.status == "void" and e.reasons[0].startswith("Withdrawn") for e in pulled)
+    assert next(e for e in led.entries.values() if e.event_id == "1").status == "pending"

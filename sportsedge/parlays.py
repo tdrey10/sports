@@ -4,10 +4,8 @@ Each parlay is posted once a day and never changes after that. Legs come from
 different games (no same-game parlays): today's unit plays, most likely to win
 first. The 2-leg is the top two, the 3-leg the top three, and so on.
 
-When the board is short of unit plays, a size waits until mid-morning (or until
-its first leg is close to starting), then fills the missing legs with the day's
-most likely winners (the Lock, the Dog, leans) and posts with no units, tracked
-like the daily Lock.
+Only unit plays (legitimate edges) become legs: a short board means fewer
+parlays, never filler.
 
 A parlay multiplies the book's edge on every leg, so even strong legs make a
 long shot: the page shows each parlay's real chance to hit (our win chances
@@ -26,11 +24,7 @@ from .odds import american_to_decimal
 SIZES = (2, 3, 4, 8)
 STAKE = {2: 0.5, 3: 0.25, 4: 0.25, 8: 0.1}  # units: small on purpose, every leg has to win
 LEG_TIERS = ("lock", "dog", "value", "prop")  # unit plays
-FILL_TIERS = ("lock", "dog", "lean", "value")  # no-unit fill, most likely winners first
-FILL_HOUR = 10  # local time: by then, fill a short board
-FILL_LEAD = timedelta(hours=2)  # or as soon as the first leg is two hours from starting
 LEG_HOURS = 24  # legs start within a day of posting (today's slate, not next week's)
-MAX_FAVORITE = -150  # the blueprint's price floor holds for parlay legs too
 # What one unit of a leg returns (stake included) once it settles.
 _RETURN = {"lost": 0.0, "half_lost": 0.5, "push": 1.0, "void": 1.0}
 
@@ -43,7 +37,7 @@ class Parlay:
     size: int
     legs: list[str]  # ledger entry ids
     leg_odds: list[float]  # each leg's price when the parlay was posted
-    units: float  # 0 = posted with no units (filled with no-unit legs), tracked anyway
+    units: float
     decimal: float = 0.0
     hit_prob: float = 0.0  # our win chances multiplied together
     extra: dict = field(default_factory=dict)
@@ -59,18 +53,15 @@ class Parlay:
         return d
 
 
-def leg_pool(entries, now: datetime, today: str, fill: bool = False) -> list:
-    """Today's open picks, one per game, best first: unit plays by rank and edge score,
-    then (with ``fill``) the most likely winners among the no-unit picks."""
+def leg_pool(entries, now: datetime, today: str) -> list:
+    """Today's open unit plays, one per game, most likely to win first."""
     cut = now + timedelta(hours=LEG_HOURS)
     open_today = [e for e in entries if e.day == today and e.status == "pending" and now < e.start <= cut]
     # Most likely to win first; edge score breaks ties.
     strong = sorted((e for e in open_today if e.tier in LEG_TIERS and e.units > 0),
                     key=lambda e: (-e.win_prob, -(e.score or 0)))
-    rest = sorted((e for e in open_today if fill and e.tier in FILL_TIERS and e.units <= 0
-                   and e.player is None and e.odds >= MAX_FAVORITE), key=lambda e: -e.win_prob)
     out, games = [], set()
-    for e in strong + rest:
+    for e in strong:
         if e.event_id not in games:
             games.add(e.event_id)
             out.append(e)
@@ -81,20 +72,13 @@ def build(entries, existing: list[Parlay], now: datetime, today: str, local_hour
     """New parlays for sizes not yet posted today (once posted, a parlay never changes)."""
     entries = list(entries)
     posted = {p.size for p in existing if p.day == today}
+    # Only legitimate unit plays make a leg: no filler. A short board means fewer parlays.
     strong = leg_pool(entries, now, today)
-    full = leg_pool(entries, now, today, fill=True)
-    soon = bool(full) and min(e.start for e in full) - now <= FILL_LEAD
-    fill = local_hour >= FILL_HOUR or soon
     out = []
     for size in SIZES:
-        if size in posted:
+        if size in posted or len(strong) < size:
             continue
-        if len(strong) >= size:
-            legs = strong[:size]
-        elif fill and len(full) >= size:
-            legs = full[:size]
-        else:
-            continue
+        legs = strong[:size]
         prices = [e.current_odds if e.current_odds is not None else e.odds for e in legs]
         dec, hit = 1.0, 1.0
         for e, a in zip(legs, prices):

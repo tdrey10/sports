@@ -234,6 +234,10 @@ class Workspace:
                 track={
                     f"{k}:{r.label}": {"bets": r.bets, "won": r.won, "lost": r.lost, "roi": r.roi, "se": r.se}
                     for k, s in self.studies.items() for r in s.by_market + s.by_band
+                } | {
+                    f"{k}:all": {"bets": s.blind.bets, "won": s.blind.won, "lost": s.blind.lost,
+                                 "roi": s.blind.roi, "se": s.blind.se}
+                    for k, s in self.studies.items() if s.blind
                 },
                 spot_weights={
                     f"{k}:{r['key']}": r["excess_win"]

@@ -236,6 +236,40 @@ class Ledger:
             added.append(e)
         return added
 
+    def withdraw(self, settings, now: datetime) -> list[Entry]:
+        """Pull open unit plays that no longer meet the bar before their game starts: no market
+        price to check against, a kind of bet losing in the blind study, a value or early play
+        that isn't a realistic winner, or the same bet posted twice (two odds sources)."""
+        from types import SimpleNamespace
+
+        from .tiers import LEGIT_MIN_WIN, losing_kind
+
+        pulled = []
+        seen: dict[tuple, Entry] = {}
+        for e in sorted(self.entries.values(), key=lambda e: (not e.event_id.isdigit(), e.created_at)):
+            if e.status != "pending" or e.start <= now or e.units <= 0 or e.tier in LIVE_TIERS:
+                continue
+            why = None
+            key = (e.sport, e.home, e.away, e.start.date().isoformat(), e.market, e.side, e.player)
+            if key in seen:
+                why = "the same bet was already posted"
+            elif e.odds < -150:
+                why = f"{e.odds:+.0f} is worse than the -150 limit"
+            elif e.player is None and e.market_prob is None:
+                why = "no market price to check our number against"
+            elif e.tier in ("value", "early") and e.win_prob < LEGIT_MIN_WIN:
+                why = f"wins only {e.win_prob:.0%} of the time on our numbers"
+            else:
+                pick = SimpleNamespace(sport=e.sport, market=e.market, american=e.odds, is_prop=e.player is not None)
+                if kind := losing_kind(pick, settings):
+                    why = f"this kind of bet ({kind}) lost in the blind study by more than luck"
+            seen.setdefault(key, e)
+            if why:
+                e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
+                e.reasons = [f"Withdrawn before the game: {why}."] + list(e.reasons)
+                pulled.append(e)
+        return pulled
+
     def post_parlays(self, now: datetime) -> list[Parlay]:
         """Today's 2-, 3-, 4- and 8-leg parlays, each posted once when enough legs are on the board."""
         new = build_parlays(self.entries.values(), self.parlays, now, self.day_of(now),
