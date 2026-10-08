@@ -14,8 +14,12 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
+
+# Publishing to GitHub Pages is OFF unless you set the repository variable
+# PUBLISH_PAGES=true. Leave it off if this GitHub account hosts any other site
+# (for example a business site with a custom domain): project pages inherit
+# that domain. Without Pages, open the dashboard from the uploaded artifact or
+# run `funky serve` locally.
 
 concurrency:
   group: sportsedge
@@ -24,9 +28,6 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -61,9 +62,29 @@ jobs:
           git diff --cached --quiet || git commit -m "Update pick ledger"
           git pull --rebase --autostash && git push
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Keep the dashboard as a private download
+        uses: actions/upload-artifact@v4
+        with:
+          name: funky-buttlovin-dashboard
+          path: site
+          retention-days: 7
+
+      - name: Package for GitHub Pages
+        if: vars.PUBLISH_PAGES == 'true'
+        uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
+  publish:
+    needs: run
+    if: vars.PUBLISH_PAGES == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
       - id: deploy
         uses: actions/deploy-pages@v4

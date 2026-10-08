@@ -73,13 +73,14 @@ sportsedge run all --scores-only     # live scores + grading only (ESPN, no odds
 sportsedge serve nba nfl             # keep running: scores every 2 min, odds every hour, http://127.0.0.1:8000
 ```
 
-### Host it for free on GitHub Pages
+### Run it on a schedule with GitHub Actions
 
-`.github/workflows/sportsedge.yml` runs a full cycle every 3 hours and live scores every 20 minutes. It commits the ledger and publishes the dashboard to GitHub Pages.
+`.github/workflows/sportsedge.yml` runs a full cycle every 3 hours and live scores every 20 minutes. It commits the ledger and saves the dashboard as a private download on each run (Actions tab → the run → **Artifacts**).
 
 1. Add your key under **Settings → Secrets and variables → Actions** as `ODDS_API_KEY`.
-2. Under **Settings → Pages**, set the source to **GitHub Actions**.
-3. Merge to the default branch. Run it once by hand from the **Actions** tab, using `props` if you want props.
+2. Merge to the default branch. Run it once by hand from the **Actions** tab, using `props` if you want props.
+
+**Publishing to GitHub Pages is off by default.** Project pages inherit the account's Pages custom domain. If this GitHub account also hosts another site, such as a business site on its own domain, the dashboard would appear under that domain. Only turn it on in a repo under an account with no other Pages site: add the repository variable `PUBLISH_PAGES` = `true` and set **Settings → Pages** to **GitHub Actions**.
 
 The free Odds API tier has 500 credits a month, and a full cycle costs about 3 credits per in-season sport. Out-of-season sports are skipped automatically. At 8 cycles a day with 4 sports in season that's about 2,900 credits a month, so either pick a paid tier or slow the schedule in the workflow file.
 
