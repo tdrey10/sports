@@ -202,3 +202,11 @@ def test_espn_month_falls_back_to_days_when_truncated(tmp_path):
     client = EspnClient(cache=JsonCache(tmp_path), session=session)
     client.game_results(SPORTS["mlb"], datetime(2026, 8, 1, tzinfo=timezone.utc), datetime(2026, 8, 31, tzinfo=timezone.utc))
     assert len([1 for _, p in session.calls if len(p["dates"]) == 8]) == 31
+
+
+def test_preseason_games_are_ignored():
+    from sportsedge.data.espn import _parse_event
+    ev = espn_event("9", "Boston Celtics", "Miami Heat", 100, 90)
+    assert _parse_event(ev) is not None
+    ev["season"] = {"year": 2026, "type": 1, "slug": "preseason"}
+    assert _parse_event(ev) is None

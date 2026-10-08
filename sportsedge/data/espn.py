@@ -135,6 +135,10 @@ class EspnClient:
 
 
 def _parse_event(ev: dict) -> GameResult | None:
+    # Preseason games (season type 1) are mostly backups and say little about real strength.
+    season = ev.get("season") or {}
+    if season.get("type") == 1 or season.get("slug") == "preseason":
+        return None
     try:
         comp = ev["competitions"][0]
         teams = {c["homeAway"]: c for c in comp["competitors"]}
