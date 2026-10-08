@@ -118,7 +118,13 @@ def cmd_study(args) -> int:
     )
     names = args.sports if args.sports != ["all"] or not args.demo else [DEMO_SPORTS]
     games_dir = data_dir / ("demo-games" if args.demo else "games")
-    studies = study.run_studies(resolve(names), provider.game_results, history, now, days=args.days, games_folder=games_dir)
+    weather = None
+    if not args.demo:
+        from .weather import WeatherClient
+
+        weather = WeatherClient()
+    studies = study.run_studies(resolve(names), provider.game_results, history, now, days=args.days,
+                                games_folder=games_dir, weather=weather)
     history.save()
     out = data_dir / ("demo-studies.json" if args.demo else "studies.json")
     study.save(out, studies, now)
@@ -221,6 +227,11 @@ class Workspace:
                 },
             )
 
+    def _weather(self):
+        from .weather import WeatherClient
+
+        return WeatherClient()
+
     def _load_studies(self, data_dir):
         from .study import load
 
@@ -260,6 +271,7 @@ class Workspace:
             self.provider, sports, self.ledger, self.settings, now,
             props=self.args.props, hours_ahead=self.args.hours,
             props_sports=props_sports, props_hours=self.args.props_hours, prop_markets=prop_markets,
+            weather=None if self.demo else self._weather(),
         )
         self.brains.update(res.brains)
         self.weights = res.weights
