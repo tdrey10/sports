@@ -1,19 +1,20 @@
 <title>Funky Buttlovin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-/* Layout: a scoreboard strip, sticky tabs (Today · Live · Props · Early · Results · Model), picks grouped
-   by game like a sportsbook board, and a parlay slip docked to the bottom of the screen. */
+/* Layout: the photo is the cover. A scoreboard-sized title, then today's #1 pick as a betting ticket,
+   then a ranked Top 10 with an edge meter on every pick, then the board by game. Parlay slip docked below. */
 :root {
-  /* Trail Blazers-inspired dark palette: black, Blazers red, silver. One committed dark look. */
-  --bg: #0b0b0c; --surface: #17171a; --surface-2: #202024; --line: #2c2c31; --line-2: #3a3a40;
-  --fg: #f4f4f5; --muted: #a2aaad; --accent: #e03a3e; --accent-soft: #3a1618;
-  --win: #e8eaeb; --win-soft: #2a2b2e; --loss: #ff6b6e; --loss-soft: #3a1a1c;
+  /* Trail Blazers night: black, Blazers red, silver. One committed dark look. */
+  --bg: #0b0b0c; --surface: #161618; --surface-2: #1f1f22; --line: #2b2b30; --line-2: #3b3b41;
+  --fg: #f4f4f5; --muted: #a3a9ac; --silver: #c4cacd; --accent: #e03a3e; --accent-2: #ff5a5e; --accent-soft: #3a1618;
+  --win: #e9ecee; --win-soft: #2a2c2f; --loss: #ff6b6e; --loss-soft: #3a1a1c;
   --live: #e03a3e; --live-soft: #3a1618; --info: #c4cacd; --info-soft: #26272b;
+  --ticket: #f2f0ec; --ticket-ink: #121214; --ticket-muted: #5d5f63;
   --tint: 11, 11, 12;
-  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "Big Shoulders Display", "Oswald", "Arial Narrow", Impact, sans-serif;
+  --body: "Barlow", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
   color-scheme: dark;
 }
@@ -25,94 +26,154 @@ body { margin: 0; background: transparent; color: var(--fg); font: 16px/1.45 var
    and fades into the black page below it (the photo is 3:4, hence the 4 / 3 height).
    A fixed layer (not background-attachment) so it also stays put on phones. */
 .photo-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(var(--tint), .5) 0%, rgba(var(--tint), .4) 30%, rgba(var(--tint), .6) 55%, rgba(var(--tint), .88) 80%, rgba(var(--tint), .95) 100%),
+  background: linear-gradient(180deg, rgba(var(--tint), .45) 0%, rgba(var(--tint), .3) 28%, rgba(var(--tint), .62) 52%, rgba(var(--tint), .9) 78%, rgba(var(--tint), .96) 100%),
     linear-gradient(180deg, transparent 70%, var(--bg)) 50% 0% / max(100vw, 520px) calc(max(100vw, 520px) * 4 / 3) no-repeat,
     var(--mascot) 50% 0% / max(100vw, 520px) auto no-repeat, var(--bg); }
-/* Wide screens (and the gallery thumbnail): a full-width photo would show only the wall, so frame the
-   portrait by height, centered on the face, and fade its sides and bottom into the page. */
+/* Wide screens (and the gallery thumbnail): frame the portrait by height, centered on the face. */
 @media (min-width: 761px) {
   .photo-bg { --ph: max(110vh, 720px); --pw: calc(var(--ph) * 3 / 4); --py: calc(var(--ph) * -0.12);
-    background: linear-gradient(180deg, rgba(var(--tint), .45) 0%, rgba(var(--tint), .35) 35%, rgba(var(--tint), .7) 60%, rgba(var(--tint), .92) 85%),
-      linear-gradient(90deg, var(--bg), transparent 28%, transparent 72%, var(--bg)) 50% var(--py) / var(--pw) var(--ph) no-repeat,
+    background: linear-gradient(180deg, rgba(var(--tint), .4) 0%, rgba(var(--tint), .3) 35%, rgba(var(--tint), .7) 60%, rgba(var(--tint), .93) 85%),
+      linear-gradient(90deg, var(--bg) 2%, transparent 34%, transparent 66%, var(--bg) 98%) 50% var(--py) / var(--pw) var(--ph) no-repeat,
       linear-gradient(180deg, transparent 60%, var(--bg)) 50% var(--py) / var(--pw) var(--ph) no-repeat,
       var(--mascot) 50% var(--py) / var(--pw) var(--ph) no-repeat, var(--bg); }
 }
-/* The page opens on the photo: the name sits at the bottom of a tall header, then the picks scroll up over it. */
-.mast { min-height: clamp(260px, 52vh, 560px); display: flex; flex-direction: column; justify-content: flex-end; }
-.mast h1 { font-size: 38px; text-shadow: 0 2px 12px rgba(0, 0, 0, .6); }
-.mast p { color: #e6eaee; text-shadow: 0 1px 6px rgba(0, 0, 0, .7); }
-.panel, .board { background: color-mix(in srgb, var(--surface) 80%, transparent); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-.tabs { background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 120px; display: grid;
-  grid-template-columns: minmax(0, 1fr); gap: 16px; }
+
+.wrap { max-width: 820px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 128px; display: grid;
+  grid-template-columns: minmax(0, 1fr); gap: 18px; }
 .wrap > *, .panel > *, .grid > * { min-width: 0; }
-h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
 button, select { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 .num { font-variant-numeric: tabular-nums; font-family: var(--mono); }
 .muted { color: var(--muted); }
 .small { font-size: 14px; }
+.pos { color: var(--win) !important; } .neg { color: var(--loss) !important; }
 
-/* masthead */
-.mast h1 { font-size: 30px; font-weight: 800; letter-spacing: -.01em; }
-.mast h1 span { color: var(--accent); }
-.mast p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+/* ---------- cover ---------- */
+.mast { min-height: clamp(230px, 40vh, 430px); display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; }
+.eyebrow { margin: 0; font: 700 13px/1.4 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--silver);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .8); }
+.eyebrow .dot { display: inline-block; width: 8px; height: 8px; margin-right: 8px; vertical-align: 1px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(224, 58, 62, .25); }
+.mast h1 { font: 900 clamp(58px, 15vw, 128px)/.82 var(--display); letter-spacing: -.005em; text-transform: uppercase;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, .55); }
+.mast h1 span { display: block; color: var(--accent); }
+/* Pinwheel stripes: five bars, the way the Blazers mark splits red and white. */
+.stripes { display: flex; gap: 4px; height: 6px; width: min(260px, 60%); }
+.stripes i { flex: 1; background: var(--fg); border-radius: 1px; transform: skewX(-24deg); }
+.stripes i:nth-child(odd) { background: var(--accent); }
 .demo { background: var(--accent-soft); color: var(--fg); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
 
-/* scoreboard strip */
-.board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--line);
-  border-radius: 14px; overflow: hidden; }
-.board div { padding: 12px 14px; border-left: 1px solid var(--line); display: grid; gap: 2px; }
+/* ---------- today's #1: a betting ticket ---------- */
+.ticket { position: relative; background: var(--ticket); color: var(--ticket-ink); border-radius: 14px; padding: 18px 20px 16px;
+  display: grid; gap: 10px; box-shadow: 0 18px 48px rgba(0, 0, 0, .55); }
+.ticket .t-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ticket .t-kind { font: 800 15px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.ticket .t-sport { font: 700 12px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--ticket-muted); }
+.ticket h2 { font: 800 clamp(30px, 7vw, 44px)/.95 var(--display); text-transform: uppercase; overflow-wrap: anywhere; }
+.ticket .t-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.ticket .t-odds { font: 700 clamp(34px, 8vw, 48px)/1 var(--mono); letter-spacing: -.02em; }
+.ticket .t-pay { font-size: 15px; color: var(--ticket-muted); text-align: right; }
+.ticket .t-pay b { color: var(--ticket-ink); font-weight: 700; }
+.ticket p { margin: 0; font-size: 15px; color: #2c2d31; max-width: 62ch; }
+.ticket .t-stub { border-top: 2px dashed #c9c6c0; margin: 6px -20px 0; padding: 12px 20px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; position: relative; }
+/* perforation notches where the stub tears off */
+.ticket .t-stub::before, .ticket .t-stub::after { content: ""; position: absolute; top: -10px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); }
+.ticket .t-stub::before { left: -9px; } .ticket .t-stub::after { right: -9px; }
+.ticket .t-stub .meter { --track: #d9d6d0; }
+.ticket .add { border-color: var(--ticket-ink); color: var(--ticket-ink); }
+.ticket .add[aria-pressed="true"] { background: var(--ticket-ink); color: var(--ticket); }
+.ticket .muted, .ticket .move-bad { color: var(--ticket-muted); }
+.ticket .move-good { color: #1d6b3a; }
+.ticket-empty { background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1px dashed var(--line-2); border-radius: 14px; padding: 18px 20px; display: grid; gap: 6px; }
+.ticket-empty b { font: 800 22px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; }
+@media (prefers-reduced-motion: no-preference) {
+  .ticket { animation: deal .5s cubic-bezier(.2, .8, .2, 1) both; }
+  @keyframes deal { from { transform: translateY(14px) rotate(-.6deg); } to { transform: none; } }
+}
+
+/* ---------- edge meter ---------- */
+.meter { --v: 0; --track: var(--line); display: inline-grid; grid-template-columns: auto 120px; align-items: center; gap: 8px; font: 700 13px/1 var(--mono); }
+.meter .bar { height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
+.meter .bar i { display: block; height: 100%; width: calc(var(--v) * 1%); border-radius: 4px;
+  background: linear-gradient(90deg, var(--silver), var(--accent) 70%, var(--accent-2)); }
+.meter .lbl { letter-spacing: .02em; }
+.meter .lbl small { font: 600 11px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; margin-right: 4px; opacity: .75; }
+
+/* ---------- season strip ---------- */
+.board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 82%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.board div { padding: 12px 14px; border-left: 1px solid var(--line); display: grid; gap: 3px; }
 .board div:first-child { border-left: 0; }
-.board span { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.board span { font: 700 11px/1.2 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .board b { font: 700 22px/1.1 var(--mono); }
 .board small { color: var(--muted); font-size: 13px; }
 @media (max-width: 560px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .board div:nth-child(3) { border-left: 0; } .board div:nth-child(n+3) { border-top: 1px solid var(--line); } }
 
-/* tabs + filters */
-.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 6px;
-  display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
-.tabs button { flex: none; background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; cursor: pointer;
-  font-weight: 700; color: var(--muted); }
+/* ---------- tabs + filters ---------- */
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; padding-block: 4px;
+  display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.tabs button { flex: none; background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 12px 8px; cursor: pointer;
+  font: 800 17px/1 var(--display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.tabs button:hover { color: var(--fg); }
 .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
-.seg button[aria-pressed="true"] { background: var(--accent) !important; color: #fff !important; }
-.tabs .count { font: 600 12px var(--mono); margin-left: 4px; color: var(--muted); }
+.tabs .count { font: 700 11px var(--mono); margin-left: 5px; padding: 2px 5px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-2); vertical-align: 2px; }
 .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; overflow-x: auto; max-width: 100%; }
-.seg button { flex: none; background: none; border: 0; border-radius: 7px; padding: 6px 10px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
-.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.seg { display: inline-flex; background: color-mix(in srgb, var(--surface) 90%, transparent); border: 1px solid var(--line); border-radius: 999px; padding: 3px; overflow-x: auto; max-width: 100%; }
+.seg button { flex: none; background: none; border: 0; border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
+.seg button:hover { color: var(--fg); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
 
-/* panels */
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
-.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.panel-head h2 { font-size: 18px; font-weight: 800; }
+/* ---------- sections ---------- */
+.panel { background: color-mix(in srgb, var(--surface) 86%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+.panel-head h2 { font: 800 24px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; }
 .panel-head .muted { font-size: 14px; }
 .empty { color: var(--muted); font-size: 15px; margin: 0; }
-.grid { display: grid; gap: 12px; }
+.grid { display: grid; gap: 14px; }
 .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .grid.two { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-@media (max-width: 640px) { .grid.three { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 680px) { .grid.three { grid-template-columns: minmax(0, 1fr); } }
 
-/* pick of the day tiles */
-.potd { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 6px; background: var(--surface-2); align-content: start; }
-.potd .kind { font: 700 12px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
-.potd h3 { font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
+/* ---------- top 10 ---------- */
+.top { display: grid; }
+.bet { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 4px 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+.bet:first-child { border-top: 0; padding-top: 4px; }
+.bet .rk { grid-row: span 3; font: 900 44px/.9 var(--display); color: var(--line-2); text-align: center; }
+.bet:nth-child(-n+3) .rk { color: var(--accent); }
+.bet .sel { display: flex; gap: 6px 8px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.bet .sel strong { font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
+.bet .price { text-align: right; grid-row: span 2; }
+.bet .price b { font: 700 20px/1.1 var(--mono); display: block; }
+.bet .price small { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.bet .sub { font-size: 14px; color: var(--muted); }
+.bet .gauge { grid-column: 2 / -1; display: flex; gap: 8px 16px; align-items: center; flex-wrap: wrap; }
+.bet .why, .bet .meta, .bet details.more { grid-column: 2 / -1; }
+@media (max-width: 520px) { .bet { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 4px 10px; } .bet .rk { font-size: 32px; } }
+
+/* ---------- picks of the day ---------- */
+.potd { position: relative; border-radius: 12px; padding: 14px; display: grid; gap: 6px; align-content: start;
+  background: var(--surface-2); border: 1px solid var(--line); }
+.potd .kind { font: 800 15px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-2); }
+.potd h3 { font: 700 19px/1.15 var(--body); overflow-wrap: anywhere; }
 .potd .price { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.potd .price b { font: 700 26px/1 var(--mono); }
+.potd .price b { font: 700 28px/1 var(--mono); }
 .potd p { margin: 0; font-size: 14px; color: var(--muted); }
 
-/* tags */
-.tag { display: inline-block; font: 700 11px/1 var(--body); letter-spacing: .06em; text-transform: uppercase; border-radius: 6px;
+/* ---------- tags ---------- */
+.tag { display: inline-block; font: 700 11px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; border-radius: 6px;
   padding: 4px 6px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); white-space: nowrap; }
 .tag.lock { background: var(--win-soft); color: var(--win); border-color: transparent; }
-.tag.dog, .tag.early { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.tag.dog, .tag.early { background: var(--accent-soft); color: var(--accent-2); border-color: transparent; }
 .tag.prop { background: var(--info-soft); color: var(--info); border-color: transparent; }
-.tag.live, .tag.live_win, .tag.live_plus { background: var(--live-soft); color: var(--live); border-color: transparent; }
+.tag.live, .tag.live_win, .tag.live_plus { background: var(--live-soft); color: var(--accent-2); border-color: transparent; }
 .tag.won { background: var(--win-soft); color: var(--win); border-color: transparent; }
 .tag.lost { background: var(--loss-soft); color: var(--loss); border-color: transparent; }
+.tag.sport { background: none; }
 
-/* game groups and pick rows */
+/* ---------- board rows ---------- */
 .game { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
 .game:first-child { border-top: 0; padding-top: 0; }
 .game-head { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--muted); font-weight: 600; flex-wrap: wrap; }
@@ -124,50 +185,53 @@ button, select { font: inherit; color: inherit; }
 .row .odds { text-align: right; }
 .row .odds b { font: 700 18px/1.2 var(--mono); display: block; }
 .row .odds small { color: var(--muted); font-size: 13px; }
-.row .why { grid-column: 1 / -1; font-size: 14px; color: var(--muted); margin: 0; }
-.row .meta { grid-column: 1 / -1; display: flex; gap: 6px 14px; flex-wrap: wrap; align-items: center; font-size: 14px; }
+.row .why, .row .meta, .row details.more { grid-column: 1 / -1; }
+.why { font-size: 14px; color: var(--muted); margin: 0; max-width: 70ch; }
+.meta { display: flex; gap: 6px 14px; flex-wrap: wrap; align-items: center; font-size: 14px; }
 .move-good { color: var(--win); font-weight: 600; } .move-bad { color: var(--muted); }
-.live-dot { color: var(--live); font-weight: 700; }
+.live-dot { color: var(--accent-2); font-weight: 700; }
 .live-dot::before { content: "● "; }
-.rank { font: 700 15px var(--mono); color: var(--accent); min-width: 1.6ch; }
-details.more { grid-column: 1 / -1; }
-details.more summary { cursor: pointer; color: var(--info); font-size: 14px; font-weight: 600; list-style: none; }
+details.more summary { cursor: pointer; color: var(--silver); font-size: 14px; font-weight: 700; list-style: none; }
 details.more summary::-webkit-details-marker { display: none; }
 details.more summary::after { content: " ›"; }
 details.more[open] summary::after { content: " ‹"; }
-details.more ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; display: grid; gap: 3px; }
-.add { background: none; border: 1px solid var(--line-2); border-radius: 8px; padding: 2px 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+details.more ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; display: grid; gap: 3px; color: var(--silver); }
+.add { background: none; border: 1px solid var(--line-2); border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.add:hover { border-color: var(--fg); }
 .add[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 
-/* live slots */
-.slot { border: 1px solid var(--line); border-left: 4px solid var(--live); border-radius: 12px; padding: 12px; background: var(--surface-2); display: grid; gap: 4px; }
-.slot.plus { border-left-color: var(--accent); }
-.slot .kind { font: 700 12px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+/* ---------- live ---------- */
+.slot { border: 1px solid var(--line); border-top: 3px solid var(--live); border-radius: 12px; padding: 12px; background: var(--surface-2); display: grid; gap: 4px; }
+.slot.plus { border-top-color: var(--silver); }
+.slot .kind { font: 800 14px/1 var(--display); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .steps { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
 
-/* results */
+/* ---------- results + model ---------- */
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 @media (max-width: 560px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .stat { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; }
-.stat span { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.stat span { font: 700 11px/1.2 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .stat b { font: 700 20px/1.15 var(--mono); }
 .stat small { font-size: 13px; color: var(--muted); }
-.pos { color: var(--win) !important; } .neg { color: var(--loss) !important; }
 .chart { width: 100%; height: 110px; display: block; }
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 15px; }
 th, td { padding: 8px 8px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
 th:first-child, td:first-child { text-align: left; }
-th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+th { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 td { font-variant-numeric: tabular-nums; }
 .model ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.pill { display: inline-block; font: 700 11px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; border-radius: 999px; padding: 4px 8px; }
+.pill.ok { background: var(--win-soft); color: var(--win); }
+.pill.wait { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+.calib { width: 100%; max-width: 360px; height: auto; display: block; }
 
-/* docked parlay slip */
+/* ---------- parlay slip ---------- */
 .slip { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: var(--surface); border-top: 1px solid var(--line-2); box-shadow: 0 -6px 20px rgba(0, 0, 0, .35); }
-.slip-in { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: grid; gap: 8px; }
+  background: var(--surface); border-top: 2px solid var(--accent); box-shadow: 0 -8px 24px rgba(0, 0, 0, .45); }
+.slip-in { max-width: 820px; margin: 0 auto; padding: 10px 16px; display: grid; gap: 8px; }
 .slip-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
-.slip-bar button { background: none; border: 0; cursor: pointer; font-weight: 700; padding: 4px 0; }
+.slip-bar button { background: none; border: 0; cursor: pointer; font: 800 17px/1 var(--display); letter-spacing: .06em; text-transform: uppercase; padding: 4px 0; }
 .slip-body { display: grid; gap: 8px; max-height: 45vh; overflow-y: auto; }
 .slip-body ol { margin: 0; padding-left: 20px; font-size: 15px; }
 .slip-body .stake { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -177,8 +241,13 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 
 <div class="photo-bg" aria-hidden="true" style="--mascot: url('__MASCOT__')"></div>
 <main class="wrap">
-  <header class="mast"><h1>Funky <span>Buttlovin</span></h1><p id="updated">Loading…</p></header>
+  <header class="mast">
+    <p class="eyebrow" id="updated"><span class="dot"></span>Loading…</p>
+    <h1>Funky <span>Buttlovin</span></h1>
+    <div class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+  </header>
   <div id="demo"></div>
+  <section id="hero" aria-label="Today's number one pick"></section>
   <section class="board" id="scoreboard" aria-label="Season record"></section>
   <nav class="tabs" id="tabs" role="tablist" aria-label="Sections"></nav>
   <div class="filters"><div class="seg" id="sports" aria-label="Sport"></div><div class="seg" id="markets" aria-label="Bet type"></div></div>
@@ -230,7 +299,19 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const rec = (s) => `${s.won}-${s.lost}${s.push ? "-" + s.push : ""}`;
   const units = (e) => (e.units > 0 ? `${e.units === 0.5 ? "½" : e.units}u` : "lean");
   const timeOf = (e) => fmt(e.commence_time, { weekday: "short", hour: "numeric", minute: "2-digit" });
+  const wins = (e) => `$100 wins $${(100 * (dec(e.odds) - 1)).toFixed(0)}`;
   const SETTLED = { won: "Won", lost: "Lost", push: "Push", void: "Void", half_won: "Half won", half_lost: "Half lost" };
+  const LABEL = { h2h: "Moneyline", spreads: "Spread", totals: "Total" };
+
+  // Edge score 0-100: 60 points of edge (full at +10% EV), 40 of chance to cash (full at 75%).
+  // Picks published before scores existed get the same formula on their stored numbers.
+  function score(e) {
+    if (e.score != null) return e.score;
+    const q = e.win_prob, ev = q * (dec(e.odds) - 1) - (1 - q);
+    return Math.round(10 * (60 * Math.min(Math.max(ev / 0.1, 0), 1) * Math.min(q / 0.45, 1) + 40 * Math.min(Math.max((q - 0.4) / 0.35, 0), 1))) / 10;
+  }
+  const meter = (e) => { const v = Math.round(score(e));
+    return `<span class="meter" style="--v:${v}" role="img" aria-label="Edge score ${v} out of 100"><span class="lbl"><small>Edge</small>${v}</span><span class="bar"><i></i></span></span>`; };
 
   function moveText(e) {
     if (e.current_odds == null || e.settled || isLive(e)) return "";
@@ -253,14 +334,26 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     if (!isOpen(e)) return "";
     return `<button class="add" data-add="${e.id}" aria-pressed="${slip.has(e.id)}">${slip.has(e.id) ? "In slip" : "+ Slip"}</button>`;
   }
+  const more = (e) => (e.reasons && e.reasons.length ? `<details class="more"><summary>Stats &amp; why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "");
   function row(e, opts = {}) {
-    const more = e.reasons && e.reasons.length ? `<details class="more"><summary>Stats &amp; why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "";
     return `<div class="row">
-      <div class="sel">${opts.rank ? `<span class="rank">${e.best_rank}</span>` : ""}<span class="tag ${e.tier}">${TIER[e.tier] || e.tier}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
+      <div class="sel"><span class="tag ${e.tier}">${TIER[e.tier] || e.tier}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
       <div class="odds"><b>${odds(e.odds)}</b><small>${units(e)} · ${signed(e.ev * 100, 1)}% EV</small></div>
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${opts.matchup ? `<span class="muted">${esc(e.matchup)} · ${timeOf(e)}</span>` : ""}${moveText(e)}${statusText(e)}${addBtn(e)}</div>
-      ${more}</div>`;
+      ${more(e)}</div>`;
+  }
+  function bet(e) {
+    const kind = e.player ? "Prop" : LABEL[e.market] || e.market_label;
+    return `<article class="bet">
+      <div class="rk" aria-label="Rank ${e.rank}">${e.rank}</div>
+      <div class="sel"><strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${TIER[e.tier]}</span>` : ""}</div>
+      <div class="price"><b>${odds(e.odds)}</b><small>${units(e)} · ${signed(e.ev * 100, 1)}% EV</small></div>
+      <div class="sub">${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}</div>
+      <div class="gauge">${meter(e)}<span class="small muted">cashes ${pct(e.win_prob)}</span></div>
+      <p class="why">${esc(e.headline)}</p>
+      <div class="meta">${moveText(e)}${statusText(e)}${addBtn(e)}</div>
+      ${more(e)}</article>`;
   }
   const empty = (msg) => `<p class="empty">${msg}</p>`;
   const panel = (title, aside, body) => `<section class="panel"><div class="panel-head"><h2>${title}</h2><span class="muted">${aside || ""}</span></div>${body}</section>`;
@@ -275,23 +368,44 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     }).join("");
   }
 
+  // Picks join the top bets across the day's scans; show them ordered by edge score, numbered by that order.
+  const bestToday = () => DATA.entries.filter((e) => e.best_rank && e.day === today() && visible(e))
+    .sort((a, b) => score(b) - score(a) || a.best_rank - b.best_rank).map((e, i) => Object.assign({}, e, { rank: i + 1 }));
+
+  function renderHero() {
+    const pool = DATA.entries.filter((e) => e.day === today() && !isLive(e));
+    const e = bestToday()[0] || pool.find((x) => x.tier === "lock");
+    if (!e) {
+      $("hero").innerHTML = `<div class="ticket-empty"><b>Today's #1 posts with the next scan</b><span class="muted">Picks run at 7:17 AM, 12:17 PM and 4:17 PM Pacific. Only picks that clear every check make the top 10.</span></div>`;
+      return;
+    }
+    const kind = e.best_rank ? "Today's #1 best bet" : "Lock of the day";
+    $("hero").innerHTML = `<div class="ticket">
+      <div class="t-head"><span class="t-kind">${kind}</span><span class="t-sport">${esc(e.sport_name)} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)} · ${timeOf(e)}</span></div>
+      <h2>${esc(e.selection)}</h2>
+      <div class="t-row"><span class="t-odds">${odds(e.odds)}</span><span class="t-pay">${units(e)} · ${wins(e)}<br><b>cashes ${pct(e.win_prob)}</b> on our numbers</span></div>
+      <p>${esc(e.headline)}</p>
+      <div class="t-stub">${meter(e)}<span class="small muted">${esc(e.matchup)}</span><span>${statusText(e)} ${moveText(e)}</span>${addBtn(e)}</div>
+    </div>`;
+  }
+
   function viewToday() {
     const items = DATA.entries.filter(onBoard);
     const potd = ["lock", "dog", "prop"].map((t) => {
       const e = items.find((x) => x.tier === t);
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t];
-      const photo = "";
-      if (!e) return `<div class="potd${photo}"><span class="kind">${label}</span><p>Posts once a game clears the bar.</p></div>`;
-      return `<div class="potd${photo}"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
-        <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · $100 wins $${(100 * (dec(e.odds) - 1)).toFixed(0)}</span></div>
-        <p>${esc(e.matchup)} · ${timeOf(e)}</p><p>${esc(e.headline)}</p><div>${statusText(e)} ${moveText(e)}</div></div>`;
+      if (!e) return `<div class="potd"><span class="kind">${label}</span><p>${t === "lock" ? "Posts only when a pick passes every Lock check." : "Posts once a game clears the bar."}</p></div>`;
+      return `<div class="potd"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
+        <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · ${wins(e)}</span></div>
+        <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${more(e)}</div>`;
     }).join("");
-    const best = items.filter((e) => e.best_rank).sort((a, b) => a.best_rank - b.best_rank);
-    const rest = items.filter((e) => !isLive(e) && !["early", "lean"].includes(e.tier) && !e.player);
+    const best = bestToday();
+    const rest = items.filter((e) => !isLive(e) && !["early", "lean"].includes(e.tier) && !e.player && !e.best_rank);
     const leans = items.filter((e) => e.tier === "lean");
-    return panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
-      + panel("Best bets", "Top 5 by bankroll growth", best.length ? best.map((e) => row(e, { rank: true, matchup: true })).join("") : empty("Best bets post with the next scan."))
-      + panel("The board", "Today's game-line plays, by game", rest.length ? byGame(rest) : empty("No game-line plays on today's board."))
+    const topNote = best.length ? `${best.length} of 10 cleared the bar · ranked by edge score` : "Ranked by edge score";
+    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("No pick has cleared the bar yet today. A short list beats a forced one; the next scan may add some."))
+      + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
+      + panel("The board", "Every other game-line play today, by game", rest.length ? byGame(rest) : empty("No other game-line plays on today's board."))
       + panel("Leans", "No units, tracked anyway", leans.length ? byGame(leans) : empty("No leans right now."));
   }
 
@@ -299,19 +413,19 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const items = DATA.entries.filter((e) => isLive(e) && onBoard(e)).sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     const latest = (t) => items.find((e) => e.tier === t);
     const slot = (t, title, extra) => { const e = latest(t);
-      return `<div class="slot ${extra}"><span class="kind">${title}</span>${e ? row(e, { matchup: true }) : `<p class="empty">None yet in this session.</p>`}</div>`; };
+      return `<div class="slot ${extra}"><span class="kind">${title}</span>${e ? row(e, { matchup: true }) : `<p class="empty">None yet. Live games are checked every hour from 4:41 AM to 11:41 PM Pacific.</p>`}</div>`; };
     const shown = new Set([latest("live_win"), latest("live_plus")].filter(Boolean).map((e) => e.id));
     const earlier = items.filter((e) => !shown.has(e.id));
     const howto = `<ol class="steps"><li>Open the GitHub app on your phone.</li><li>Go to <b>tdrey10/sports → Actions → Live session</b>.</li><li>Tap <b>Run workflow</b>, pick sports and hours.</li></ol>
-      <p class="empty">Each new live bet shows up here and as a notification on the “Funky Buttlovin live bets” issue.</p>`;
+      <p class="empty">A session checks every few minutes instead of every hour. Each new live bet shows up here and as a notification on the “Funky Buttlovin live bets” issue.</p>`;
     return panel("Live right now", items.length ? `${items.length} live bets today` : "",
         `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money", "plus")}</div>`)
       + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "")
-      + panel("Start a live session", "Free · up to 5 hours", howto);
+      + panel("Watch closer", "Free · up to 5 hours", howto);
   }
 
   function viewList(filter, title, aside, msg) {
-    const items = DATA.entries.filter((e) => onBoard(e) && filter(e)).sort((a, b) => b.ev - a.ev);
+    const items = DATA.entries.filter((e) => onBoard(e) && filter(e)).sort((a, b) => score(b) - score(a));
     return panel(title, aside, items.length ? items.map((e) => row(e, { matchup: true })).join("") : empty(msg));
   }
 
@@ -334,28 +448,51 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const typeRows = [["spreads", "Spreads"], ["totals", "Over/Under"], ["props", "Props"], ["moneyline", "Moneyline"]]
       .map(([k, n]) => { const s = st.by_market[k]; return `<tr><td>${n}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`; }).join("");
     const sportRows = Object.entries(st.by_sport).map(([k, s]) => `<tr><td>${esc(s.name)}</td><td>${rec(s)}</td><td>${pct(s.win_pct)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td></tr>`).join("");
+    const b = st.best || { won: 0, lost: 0, units: 0 };
     const recent = DATA.entries.filter((e) => e.settled && e.status !== "void" && visible(e)).sort((a, b) => (b.graded_at || "").localeCompare(a.graded_at || "")).slice(0, 15);
     return panel("Bankroll", `Started at ${money(st.start_bankroll)} · 1 unit = ${money(st.unit_value)}`,
         `<div class="stats"><div class="stat"><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b></div>
-         <div class="stat"><span>Last 7 days</span><b class="${cls(st.last7.units)}">${signed(st.last7.units, 1)}u</b><small>${rec(st.last7)}</small></div>
-         <div class="stat"><span>Leans</span><b>${st.leans.won}-${st.leans.lost}</b><small>no units</small></div></div>${chart(st.curve, st.start_bankroll)}`)
+         <div class="stat"><span>Top bets</span><b class="${cls(b.units)}">${rec(b)}</b><small>${signed(b.units || 0, 1)}u</small></div>
+         <div class="stat"><span>Last 7 days</span><b class="${cls(st.last7.units)}">${signed(st.last7.units, 1)}u</b><small>${rec(st.last7)}</small></div></div>${chart(st.curve, st.start_bankroll)}`)
       + panel("By pick type", "", `<div class="table-wrap"><table><thead><tr><th>Pick</th><th>W-L</th><th>Units</th><th>ROI</th></tr></thead><tbody>${tierRows}</tbody></table></div>`)
       + panel("By bet type", "CLV: our price vs the closing line", `<div class="table-wrap"><table><thead><tr><th>Bet</th><th>W-L</th><th>Units</th><th>CLV</th></tr></thead><tbody>${typeRows}</tbody></table></div>`)
       + (sportRows ? panel("By sport", "", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>W-L</th><th>Win</th><th>Units</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
       + panel("Latest graded", "", recent.length ? recent.map((e) => row(e, { matchup: true })).join("") : empty("Results appear after games finish."));
   }
 
+  // Calibration chart: what the engine said (x) against how often it won (y), to scale, 0-100% both ways.
+  function calibChart(points) {
+    if (!points || points.length < 3) return "";
+    const W = 320, H = 220, L = 40, B = 30, T = 10, R = 10, x = (p) => L + p * (W - L - R), y = (p) => H - B - p * (H - B - T);
+    const ticks = [0, 0.25, 0.5, 0.75, 1];
+    const grid = ticks.map((t) => `<line x1="${x(0)}" x2="${x(1)}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)"/><text x="${L - 6}" y="${y(t) + 4}" text-anchor="end" fill="var(--muted)" font-size="11">${t * 100}%</text><text x="${x(t)}" y="${H - B + 16}" text-anchor="middle" fill="var(--muted)" font-size="11">${t * 100}%</text>`).join("");
+    const maxN = Math.max(...points.map((p) => p[2]));
+    const dots = points.map(([said, won, n]) => `<circle cx="${x(said).toFixed(1)}" cy="${y(won).toFixed(1)}" r="${(3 + 5 * Math.sqrt(n / maxN)).toFixed(1)}" fill="var(--accent)" fill-opacity=".85"><title>said ${pct(said)}, won ${pct(won)} of ${n}</title></circle>`).join("");
+    return `<svg class="calib" viewBox="0 0 ${W} ${H}" role="img" aria-label="Calibration: predicted against actual win rate">${grid}
+      <line x1="${x(0)}" y1="${y(0)}" x2="${x(1)}" y2="${y(1)}" stroke="var(--silver)" stroke-dasharray="4 4"/>${dots}
+      <text x="${x(0.5)}" y="${H - 2}" text-anchor="middle" fill="var(--muted)" font-size="11">we said</text></svg>`;
+  }
   function viewModel() {
     const b = (DATA.brains || []).filter((x) => x.games);
     const all = b.reduce((a, x) => ({ g: a.g + x.games, w: a.w + x.accuracy * x.games }), { g: 0, w: 0 });
     const keys = (b.find((x) => x.sport === "nfl") || {}).key_numbers || [];
     const rows = b.map((x) => `<tr><td>${esc(x.name)}</td><td>${x.games}</td><td>${pct(x.accuracy, 1)}</td><td class="${x.log_loss <= x.baseline_log_loss ? "pos" : "neg"}">${signed((1 - x.log_loss / x.baseline_log_loss) * 100, 1)}%</td></tr>`).join("");
     const weights = Object.entries(DATA.weights || {}).map(([k, w]) => `${esc(k.replace(":", " "))} ${(100 - w * 100).toFixed(0)}% model`).join(" · ");
-    return panel("How the model is doing", b[0] ? "Retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
+    const studies = (DATA.studies || []).filter((s) => s.games);
+    const sRows = studies.map((s) => { const r = s.best || {};
+      return `<tr><td>${esc(s.name)}</td><td>${s.games.toLocaleString()}</td><td>${(s.weight * 100).toFixed(0)}%</td><td>${(s.min_ev * 100).toFixed(0)}%+</td><td>${r.bets ? `${Math.round(r.won)}-${Math.round(r.lost)}` : "–"}</td><td class="${cls(r.roi)}">${r.roi == null ? "–" : signed(r.roi * 100, 1) + "%"}</td><td>${s.proven ? `<span class="pill ok">Beat the close</span>` : `<span class="pill wait">Still proving</span>`}</td></tr>`; }).join("");
+    const big = studies.slice().sort((a, b) => b.sides - a.sides)[0];
+    const studyPanel = studies.length ? panel("Studies", `Replayed against real closing odds${big && big.window ? " · " + esc(big.window) : ""}`,
+        `<p class="empty">Every finished game is re-priced the way the engine prices today's games, using only what was known before it, then graded. The studies pick how much to trust the market, which edge size actually paid, and how honest our win odds are. Closing lines are the sharpest prices of the day, so beating them is the hardest test there is.</p>
+         <div class="table-wrap"><table><thead><tr><th>Sport</th><th>Games</th><th>Market trust</th><th>Edge needed</th><th>Record</th><th>ROI</th><th>Status</th></tr></thead><tbody>${sRows}</tbody></table></div>
+         ${big && big.calibration && big.calibration.length >= 3 ? `<div class="grid two"><div>${calibChart(big.calibration)}</div><p class="empty">${esc(big.name)}: each dot is a group of past lines. Dots on the dashed line mean that when the engine said 60%, those bets won 60% of the time. The edge score uses this to correct its win odds before ranking.</p></div>` : ""}`)
+      : panel("Studies", "", empty("The first study runs on the next daily cycle (8:47 AM Pacific) and fills this in."));
+    return studyPanel + panel("How the model is doing", b[0] ? "Retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
       `<div class="model"><ul>
         ${all.g ? `<li>Picks the straight-up winner <b>${pct(all.w / all.g, 0)}</b> of the time on ${all.g.toLocaleString()} recent games it never saw.</li>` : ""}
         ${keys.length ? `<li>Learned NFL key numbers from real scores: ${keys.map((k) => k[0]).join(", ")}.</li>` : ""}
-        <li>Prices blend our numbers with the market's no-vig odds. ${weights ? "Learned trust: " + weights + "." : "Trust is re-learned once a sport has 60 graded picks."}</li>
+        <li>Top bets are ranked by edge score: 60 points for the size of the edge, 40 for how likely it is to cash. Only picks with a real edge and no warnings make the list.</li>
+        <li>Prices blend our numbers with the market's no-vig odds. ${weights ? "Current trust: " + weights + "." : "Trust is set by the studies and re-learned from graded picks."}</li>
         <li>Live picks need the model to agree with the market's direction; a "likely winner" needs 60%+ on our numbers.</li></ul></div>
        ${rows ? `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Games</th><th>Winner</th><th>vs coin flip</th></tr></thead><tbody>${rows}</tbody></table></div>` : ""}`);
   }
@@ -378,13 +515,13 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 
   function renderTop() {
     const st = DATA.stats, o = st.overall;
-    $("updated").textContent = "Sports picks engine · updated " + fmt(DATA.generated_at, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+    $("updated").innerHTML = `<span class="dot"></span>Sports picks engine · updated ${esc(fmt(DATA.generated_at, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}`;
     $("demo").innerHTML = DATA.demo ? `<div class="demo">Demo data: made-up teams and odds so you can see how it works. Nothing here is a real bet.</div>` : "";
     $("scoreboard").innerHTML = `<div><span>Record</span><b>${rec(o)}</b><small>${pct(o.win_pct)} unit plays</small></div>
       <div><span>Profit</span><b class="${cls(o.units)}">${signed(o.units, 1)}u</b><small>${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
       <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b><small>from ${money(st.start_bankroll)}</small></div>
       <div><span>Beat the close</span><b>${pct(o.beat_close)}</b><small>avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</small></div>`;
-    const counts = { live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
+    const counts = { today: bestToday().length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
       early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length };
     $("tabs").innerHTML = TABS.map(([k, n]) => `<button role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${n}${counts[k] ? `<span class="count">${counts[k]}</span>` : ""}</button>`).join("");
     $("sports").innerHTML = SPORTS.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${state.sport === k}">${n}</button>`).join("");
@@ -393,9 +530,10 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 
   function render() {
     renderTop();
+    renderHero();
     const views = {
       today: viewToday, live: viewLive, results: viewResults, model: viewModel,
-      props: () => viewList((e) => e.player, "Player props", "Priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
+      props: () => viewList((e) => e.player, "Player props", "Best edge first · priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
       early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves", "Nothing early yet."),
     };
     $("view").innerHTML = (views[state.tab] || viewToday)();

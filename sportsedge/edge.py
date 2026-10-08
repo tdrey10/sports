@@ -229,7 +229,9 @@ def edge_score(p: Pick, settings: Settings) -> tuple[float, float, float]:
     The win probability is first corrected by what the studies measured (when we
     said 60%, how often did it really win?), then the score weighs edge (60 points:
     calibrated EV, full marks at +10%) and how likely it is to cash (40 points:
-    full marks at 75%). Big edge on a likely winner scores highest.
+    full marks at 75%). Edge points shrink for bets that cash less than 45% of the
+    time, so a long shot's big EV can't outrank a likely winner. Big edge on a
+    likely winner scores highest.
     """
     q = p.win_prob
     platt = None if p.is_prop else settings.calibration.get(p.sport)
@@ -239,7 +241,7 @@ def edge_score(p: Pick, settings: Settings) -> tuple[float, float, float]:
         q = 1 / (1 + math.exp(-(a + b * x)))
     dec = american_to_decimal(p.american)
     ev = q * (1 - p.push_prob) * (dec - 1) - (1 - q) * (1 - p.push_prob)
-    edge_pts = 60 * min(max(ev / 0.10, 0.0), 1.0)
+    edge_pts = 60 * min(max(ev / 0.10, 0.0), 1.0) * min(q / 0.45, 1.0)
     sure_pts = 40 * min(max((q - 0.40) / 0.35, 0.0), 1.0)
     return round(edge_pts + sure_pts, 1), q, ev
 
