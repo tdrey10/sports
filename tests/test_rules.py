@@ -118,7 +118,9 @@ def test_lock_and_dog_even_when_no_side_shows_an_edge():
     assert set(heads) == {"lock", "dog"} and all(c.units == 0 for c in heads.values())
     # By default nothing unbacked is posted: no maybes on the board.
     plain = Settings(min_ev=0.5)
-    assert not [c for c in build_cards(scans, plain, provider.now) if c.units == 0]
+    no_units = [c for c in build_cards(scans, plain, provider.now) if c.units == 0]
+    assert [c.tier for c in no_units] == ["lock"]  # except the daily Lock, which is always posted
+    assert not [c for c in build_cards(scans, Settings(min_ev=0.5, daily_lock=False), provider.now) if c.units == 0]
 
 
 def test_only_bets_backed_by_a_blind_test_are_posted():
@@ -126,8 +128,9 @@ def test_only_bets_backed_by_a_blind_test_are_posted():
     engine = Engine(provider, Settings(), now=provider.now)
     scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
     assert build_cards(scans, Settings(), provider.now)  # no studies loaded: open
-    assert build_cards(scans, Settings(proven=set()), provider.now) == []  # studies loaded, nothing proven
-    only = build_cards(scans, Settings(proven={"nba:spreads"}), provider.now)
+    nothing = build_cards(scans, Settings(proven=set()), provider.now)  # studies loaded, nothing proven
+    assert [(c.tier, c.units) for c in nothing] == [("lock", 0.0)]  # only the daily Lock, no units
+    only = [c for c in build_cards(scans, Settings(proven={"nba:spreads"}), provider.now) if c.units > 0]
     assert only and all(c.pick.sport == "nba" and c.pick.market == "spreads" for c in only)
 
 
@@ -188,3 +191,20 @@ def test_open_picks_that_fail_the_bar_are_withdrawn():
     assert {e.event_id for e in pulled} == {"2", "3", "abcdef0123456789abcdef0123456789"}
     assert all(e.status == "void" and e.reasons[0].startswith("Withdrawn") for e in pulled)
     assert next(e for e in led.entries.values() if e.event_id == "1").status == "pending"
+
+
+def test_a_withdrawn_pick_can_come_back_as_the_daily_lock():
+    from datetime import timedelta
+
+    from sportsedge.ledger import Ledger
+    from tests.test_ledger import NOW, card
+
+    led = Ledger()
+    p = make_pick(event_id="9", market_prob=None)
+    led.publish([card(p, tier="value")], NOW)
+    led.withdraw(Settings(), NOW - timedelta(hours=1))
+    e = next(iter(led.entries.values()))
+    assert e.status == "void" and "lock_lean" not in led.taken_today(NOW)
+    led.publish([card(p, tier="lock", units=0.0)], NOW)
+    assert e.status == "pending" and e.tier == "lock" and e.units == 0.0
+    assert "lock_lean" in led.taken_today(NOW)
