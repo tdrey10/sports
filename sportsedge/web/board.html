@@ -4,27 +4,18 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
 /* Layout: a scoreboard strip, sticky tabs (Today · Live · Props · Early · Results · Model), picks grouped
-   by game like a sportsbook board, and a parlay slip docked to the bottom of the screen. Calm, muted palette. */
+   by game like a sportsbook board, and a parlay slip docked to the bottom of the screen. */
 :root {
-  --bg: #f1f3f5; --surface: #ffffff; --surface-2: #f6f7f9; --line: #dde1e6; --line-2: #c9cfd6;
-  --fg: #1b1f24; --muted: #5d6671; --accent: #9a6b12; --accent-soft: #f3e8d2;
-  --win: #2f7a50; --win-soft: #e1efe6; --loss: #b0463b; --loss-soft: #f5e1de;
-  --live: #b4532f; --live-soft: #f6e4dc; --info: #3e6a8a; --info-soft: #e1ebf2;
+  /* Seahawks-inspired dark palette: College Navy, Action Green, Wolf Gray. One committed dark look. */
+  --bg: #00152e; --surface: #002244; --surface-2: #0a2d52; --line: #1b3d63; --line-2: #2c5179;
+  --fg: #f1f4f7; --muted: #a5acaf; --accent: #69be28; --accent-soft: #163f2c;
+  --win: #7fd13b; --win-soft: #15402b; --loss: #f07a6a; --loss-soft: #3e2233;
+  --live: #69be28; --live-soft: #163f2c; --info: #9cc7e8; --info-soft: #12355a;
   --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
-  color-scheme: light;
+  color-scheme: dark;
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #15181d; --surface: #1d2127; --surface-2: #23282f; --line: #2f353e; --line-2: #3b424d;
-  --fg: #e7e5e0; --muted: #9ba2ab; --accent: #d6a24a; --accent-soft: #3a3020;
-  --win: #74bd90; --win-soft: #1f3328; --loss: #d6786c; --loss-soft: #3a2422;
-  --live: #e08a68; --live-soft: #3b2820; --info: #86afcb; --info-soft: #1f2d38; color-scheme: dark; } }
-:root[data-theme="dark"] {
-  --bg: #15181d; --surface: #1d2127; --surface-2: #23282f; --line: #2f353e; --line-2: #3b424d;
-  --fg: #e7e5e0; --muted: #9ba2ab; --accent: #d6a24a; --accent-soft: #3a3020;
-  --win: #74bd90; --win-soft: #1f3328; --loss: #d6786c; --loss-soft: #3a2422;
-  --live: #e08a68; --live-soft: #3b2820; --info: #86afcb; --info-soft: #1f2d38; color-scheme: dark; }
 
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.45 var(--body); }
@@ -61,6 +52,7 @@ button, select { font: inherit; color: inherit; }
 .tabs button { flex: none; background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; cursor: pointer;
   font-weight: 700; color: var(--muted); }
 .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.seg button[aria-pressed="true"] { background: var(--accent) !important; color: #00152e !important; }
 .tabs .count { font: 600 12px var(--mono); margin-left: 4px; color: var(--muted); }
 .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; overflow-x: auto; max-width: 100%; }
@@ -87,9 +79,9 @@ button, select { font: inherit; color: inherit; }
 .potd p { margin: 0; font-size: 14px; color: var(--muted); }
 /* Dog of the day wears the Funky Buttlovin mascot photo, faded so the pick stays readable. */
 .potd.photo { position: relative; overflow: hidden; min-height: 230px; align-content: end; border-color: transparent;
-  background: linear-gradient(180deg, rgba(12, 14, 18, .15) 0%, rgba(12, 14, 18, .55) 45%, rgba(12, 14, 18, .92) 100%),
+  background: linear-gradient(180deg, rgba(0, 21, 46, .1) 0%, rgba(0, 21, 46, .55) 45%, rgba(0, 21, 46, .94) 100%),
     var(--mascot) center 20% / cover no-repeat, #2a2f36; color: #f4f2ee; }
-.potd.photo .kind { color: #f3c46b; }
+.potd.photo .kind { color: var(--accent); }
 .potd.photo p, .potd.photo .muted { color: #e2ded7; }
 .potd.photo .tag { background: rgba(255, 255, 255, .14); color: #fff; border-color: transparent; }
 
@@ -155,7 +147,7 @@ td { font-variant-numeric: tabular-nums; }
 
 /* docked parlay slip */
 .slip { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding-bottom: env(safe-area-inset-bottom, 0px);
-  background: var(--surface); border-top: 1px solid var(--line-2); box-shadow: 0 -6px 20px rgba(0, 0, 0, .08); }
+  background: var(--surface); border-top: 1px solid var(--line-2); box-shadow: 0 -6px 20px rgba(0, 0, 0, .35); }
 .slip-in { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: grid; gap: 8px; }
 .slip-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 .slip-bar button { background: none; border: 0; cursor: pointer; font-weight: 700; padding: 4px 0; }
