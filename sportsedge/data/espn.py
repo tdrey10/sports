@@ -123,16 +123,19 @@ class EspnClient:
             log.warning("ESPN summary %s failed: %s", game.event_id, exc)
             return []
 
-    def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
-        """team display name -> [(player, status)] from ESPN's league injury report."""
+    def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str, str]]] | None:
+        """team display name -> [(player, status, position)] from ESPN's league injury report.
+
+        None when there is no report (no feed for the sport, or the request failed):
+        that means injuries are UNKNOWN, not that everyone is healthy."""
         if not cfg.has_injury_feed:
-            return {}
+            return None
         try:
             data = self._get(f"{BASE}/{cfg.espn_path}/injuries", {}, ttl=1800)
         except requests.RequestException as exc:
             log.warning("ESPN injuries %s failed: %s", cfg.key, exc)
-            return {}
-        return parse_injuries(data)
+            return None
+        return parse_injuries(data) or None
 
     def player_games(self, cfg: SportConfig, results: list[GameResult], team: str) -> list[PlayerGame]:
         team_games = [g for g in results if g.completed and team in (g.home, g.away)]
@@ -215,17 +218,21 @@ def _probable(competitor: dict) -> tuple[str, float | None, int]:
     return "", None, 0
 
 
-def parse_injuries(data: dict) -> dict[str, list[tuple[str, str]]]:
-    out: dict[str, list[tuple[str, str]]] = {}
+def parse_injuries(data: dict) -> dict[str, list[tuple[str, str, str]]]:
+    """Every team listed in the report, even with no injuries (listed = known)."""
+    out: dict[str, list[tuple[str, str, str]]] = {}
     for block in data.get("injuries", []) or []:
         team = block.get("displayName") or (block.get("team") or {}).get("displayName")
         if not team:
             continue
+        players = out.setdefault(team, [])
         for item in block.get("injuries", []) or []:
-            name = (item.get("athlete") or {}).get("displayName")
+            athlete = item.get("athlete") or {}
+            name = athlete.get("displayName")
             status = item.get("status") or (item.get("type") or {}).get("description") or ""
+            position = (athlete.get("position") or {}).get("abbreviation") or ""
             if name:
-                out.setdefault(team, []).append((name, status))
+                players.append((name, status, position))
     return out
 
 

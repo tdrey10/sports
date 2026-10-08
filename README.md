@@ -246,3 +246,11 @@ sportsedge/
   data/sample.py     synthetic provider for demo/tests
   report.py, cli.py  terminal output and CLI
 ```
+
+## Money rules (always on)
+
+- Never bet a price worse than **-150**, live bets included. Big favorites kill ROI.
+- **Straight bets only.** No parlays are posted or built.
+- **Unknown injuries = no bet.** A team with no injury report (feed down, or no feed, as in soccer) is unknown, not healthy. Its games show as leans only.
+- **Injuries are weighed, not a hard rule.** NFL: QB out is about -8 points of win chance, RB or WR -3. College QB is -3.
+- **No forced picks.** If nothing beats the price, there is no bet that day.

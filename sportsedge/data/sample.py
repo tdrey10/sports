@@ -250,8 +250,11 @@ class SampleProvider:
     def live_games(self, cfg: SportConfig) -> list[GameResult]:
         return []  # the demo has no games in progress
 
-    def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
-        return {team: [(p, "Out") for p in sorted(names)] for team, names in self._world(cfg)["out"].items() if names}
+    def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str, str]]] | None:
+        """Like ESPN: a report listing every team (most with nobody out), none for soccer."""
+        if not cfg.has_injury_feed:
+            return None
+        return {team: [(p, "Out", "") for p in sorted(names)] for team, names in self._world(cfg)["out"].items()}
 
     def box_score(self, cfg: SportConfig, game: GameResult) -> list[PlayerGame]:
         world = self._world(cfg)
