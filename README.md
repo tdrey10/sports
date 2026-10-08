@@ -75,7 +75,7 @@ sportsedge serve nba nfl             # keep running: scores every 2 min, odds ev
 
 ### Run it on a schedule with GitHub Actions
 
-`.github/workflows/sportsedge.yml` runs a full cycle every 3 hours and live scores every 20 minutes. It commits the ledger and saves the dashboard as a private download on each run (Actions tab → the run → **Artifacts**).
+`.github/workflows/sportsedge.yml` runs a full cycle every 3 hours, live scores every hour (inside the free 2,000 Actions minutes a month for private repos), and NFL + NBA player props once a day at 8:47 AM Pacific for games in the next 30 hours. It commits the ledger and saves the dashboard as a private download on each run (Actions tab → the run → **Artifacts**).
 
 1. Add your key under **Settings → Secrets and variables → Actions** as `ODDS_API_KEY`.
 2. Merge to the default branch. Run it once by hand from the **Actions** tab, using `props` if you want props.

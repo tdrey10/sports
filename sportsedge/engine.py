@@ -75,7 +75,9 @@ class Engine:
         props: bool = False,
         prop_markets: list[str] | None = None,
         hours_ahead: float | None = None,
+        props_hours: float | None = None,
     ) -> SportScan:
+        """``props_hours`` limits prop pricing (billed per game) to games starting that soon."""
         scan = SportScan(cfg)
         events = [e for e in self.provider.events(cfg) if e.commence_time > self.now]
         if hours_ahead is not None:
@@ -143,9 +145,11 @@ class Engine:
             scan.predictions[event.id] = pred
             scan.picks.extend(self._game_picks(cfg, event, pred))
 
-            if props and cfg.props:
+            props_window = props_hours is None or event.commence_time <= self.now + timedelta(hours=props_hours)
+            if props and cfg.props and props_window:
                 markets = [m for m in (prop_markets or cfg.props) if m in cfg.props]
-                scan.picks.extend(self._prop_picks(cfg, event, pred, ratings, results, markets, scan, ctx))
+                if markets:
+                    scan.picks.extend(self._prop_picks(cfg, event, pred, ratings, results, markets, scan, ctx))
 
         scan.picks.sort(key=lambda p: p.ev, reverse=True)
         return scan

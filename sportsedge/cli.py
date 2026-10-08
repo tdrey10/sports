@@ -173,15 +173,21 @@ class Workspace:
                 days=self.args.history_days, runs_per_day=1, props=self.args.props,
             ))
         sports = self.sports if self.demo else _in_season(self.provider, self.sports)
+        props_sports = set(self.args.props_sports.split(",")) if self.args.props_sports else None
+        prop_markets = self.args.prop_markets.split(",") if self.args.prop_markets else None
         res = run_cycle(
             self.provider, sports, self.ledger, self.settings, now,
             props=self.args.props, hours_ahead=self.args.hours,
+            props_sports=props_sports, props_hours=self.args.props_hours, prop_markets=prop_markets,
         )
         self.brains.update(res.brains)
         self.weights = res.weights
         for w in dict.fromkeys(res.warnings):
             print("warning:", w)
         print(f"published {res.published} new picks, graded {res.graded}")
+        remaining = getattr(getattr(self.provider, "odds", None), "requests_remaining", None)
+        if remaining is not None:
+            print(f"The Odds API credits remaining: {remaining}")
         self.save(now)
 
     def scores(self):
@@ -301,6 +307,9 @@ def build_parser() -> argparse.ArgumentParser:
     def board_opts(sp):
         common(sp)
         sp.add_argument("--props", action="store_true", help="also price player props")
+        sp.add_argument("--props-sports", help="only price props for these sports, e.g. nfl,nba")
+        sp.add_argument("--props-hours", type=float, help="only price props for games starting within this many hours")
+        sp.add_argument("--prop-markets", help="comma separated prop market keys (default: all for each sport)")
         sp.add_argument("--min-ev", type=float, default=0.02)
         sp.add_argument("--max-ev", type=float, default=0.30)
         sp.add_argument("--market-weight", type=float, default=0.75)

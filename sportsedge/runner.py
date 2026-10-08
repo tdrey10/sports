@@ -45,7 +45,10 @@ def run_cycle(
     prop_markets: list[str] | None = None,
     hours_ahead: float | None = None,
     learn: bool = True,
+    props_sports: set[str] | None = None,
+    props_hours: float | None = None,
 ) -> CycleResult:
+    """``props_sports`` limits player props to those sport keys (None = every sport)."""
     out = CycleResult()
     if learn:
         settings = replace(settings, weight_overrides={**ledger.learn_weights(), **settings.weight_overrides})
@@ -53,7 +56,11 @@ def run_cycle(
     engine = Engine(provider, settings, now=now, calibrate=True)
     for cfg in sports:
         try:
-            scan = engine.scan(cfg, props=props, prop_markets=prop_markets, hours_ahead=hours_ahead)
+            want_props = props and (props_sports is None or cfg.key in props_sports)
+            scan = engine.scan(
+                cfg, props=want_props, prop_markets=prop_markets,
+                hours_ahead=hours_ahead, props_hours=props_hours,
+            )
         except Exception as exc:  # one sport failing should not stop the others
             log.warning("%s scan failed: %s", cfg.key, exc, exc_info=log.isEnabledFor(logging.DEBUG))
             out.warnings.append(f"{cfg.name}: {exc}")
