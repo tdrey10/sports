@@ -1,14 +1,14 @@
 name: SportsEdge
 
 # Everything runs on free ESPN data (stats plus DraftKings lines). No API key or paid plan needed.
-# GitHub's free plan gives private repos 2,000 Actions minutes a month; this schedule uses about 1,100,
-# which leaves room for a few hand-started live sessions.
+# GitHub's free plan gives private repos 2,000 Actions minutes a month. The hourly run takes about a
+# minute and the daily study up to 30, so this schedule stays inside it.
 on:
   schedule:
-    - cron: "5 13 * * *"       # morning picks: Lock and Dog on the page by 8 AM Pacific (6:05 AM PDT / 5:05 AM PST)
-    - cron: "17 19,23 * * *"   # midday and afternoon picks (12:17 PM, 4:17 PM Pacific): odds, picks, line tracking
-    - cron: "47 15 * * *"    # daily NFL + NBA player props (8:47 AM Pacific)
-    - cron: "41 0-6,11-23 * * *" # hourly during game hours: one live-bet check, then scores + grading
+    # Every hour, 4 AM to midnight Pacific: live-bet check, fresh odds, new picks, line tracking,
+    # scores and grading. The 13:15 UTC run puts the Lock and Dog on the page by 8 AM Pacific.
+    - cron: "15 0-6,11-23 * * *"
+    - cron: "47 15 * * *"      # daily studies + NFL and NBA player props (8:47 AM Pacific)
   workflow_dispatch:
     inputs:
       props:
@@ -54,7 +54,7 @@ jobs:
       - run: pip install -e .
 
       - name: Live bets, scores and grading
-        if: github.event.schedule == '41 0-6,11-23 * * *'
+        if: github.event.schedule == '15 0-6,11-23 * * *'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: hambino live nfl,nba,mlb,nhl,soccer --once --notify
@@ -64,11 +64,10 @@ jobs:
       # calibration per sport, and save each game's closing line so it is downloaded once.
       - name: Studies
         if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
-        run: hambino study nfl,ncaaf,nba,ncaab,mlb,nhl,soccer --budget 12000 --minutes 35
-        timeout-minutes: 50
+        run: hambino study nfl,ncaaf,nba,ncaab,mlb,nhl,soccer --budget 12000 --minutes 20
+        timeout-minutes: 30
 
       - name: Full engine cycle
-        if: github.event.schedule != '41 0-6,11-23 * * *'
         env:
           # NFL + NBA props, most popular markets, games in the next 30 hours, once a day
           # (or when run by hand with props ticked).

@@ -91,22 +91,42 @@ def _append(path: Path, fields: list[str], rows: list[dict]) -> None:
         w.writerows(rows)
 
 
+def _last_lines(path: Path) -> dict[tuple, tuple]:
+    """(event, market, side, book) -> (point, price) as last logged in this month's file."""
+    last: dict[tuple, tuple] = {}
+    if path.exists():
+        for r in csv.DictReader(open(path)):
+            last[(r["event_id"], r["market"], r["side"], r["book"])] = (r["point"], float(r["price"]))
+    return last
+
+
 def log_snapshots(folder: Path, scans, now: datetime) -> int:
-    """Append every game line from this scan. Returns rows written."""
+    """Append each game line that is new or has moved since it was last logged. Returns rows written.
+
+    The engine scans every hour; logging only changes keeps the files small while the
+    first price (the open) and every move after it stay on record.
+    """
     total = 0
     for scan in scans:
+        path = Path(folder) / scan.sport.key / f"{_month(now)}.csv"
+        last = _last_lines(path)
         rows = []
         for ctx in scan.contexts.values():
             ev = ctx.event
             for q in ev.quotes:
                 if q.market not in ("h2h", "spreads", "totals"):
                     continue
+                point = "" if q.point is None else q.point
+                key = (ev.id, q.market, q.side, q.book)
+                if last.get(key) == (str(point), float(q.american)):
+                    continue
+                last[key] = (str(point), float(q.american))
                 rows.append({
                     "seen_at": now.isoformat(), "event_id": ev.id, "start": ev.commence_time.isoformat(),
                     "home": ev.home, "away": ev.away, "market": q.market, "side": q.side,
-                    "point": "" if q.point is None else q.point, "book": q.book, "price": q.american,
+                    "point": point, "book": q.book, "price": q.american,
                 })
-        _append(Path(folder) / scan.sport.key / f"{_month(now)}.csv", SNAPSHOT_FIELDS, rows)
+        _append(path, SNAPSHOT_FIELDS, rows)
         total += len(rows)
     return total
 

@@ -39,8 +39,8 @@ def test_scan_snapshots_and_prop_lines_are_logged(tmp_path):
     assert len(snaps) == n and {r["market"] for r in snaps} >= {"h2h", "totals"}
     props = list(csv.DictReader(open(next((tmp_path / "props" / "nba").glob("*.csv")))))
     assert len(props) == p and all(r["over_price"] and r["under_price"] for r in props)
-    # Appending a second scan keeps one header.
-    archive.log_snapshots(tmp_path / "odds", scans, provider.now)
+    # A second scan with the same lines adds nothing (only moves are logged) and keeps one header.
+    assert archive.log_snapshots(tmp_path / "odds", scans, provider.now) == 0
     text = open(next((tmp_path / "odds" / "nba").glob("*.csv"))).read()
     assert text.count("seen_at") == 1
 
