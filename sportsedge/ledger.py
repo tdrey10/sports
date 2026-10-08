@@ -242,12 +242,18 @@ class Ledger:
         that isn't a realistic winner, or the same bet posted twice (two odds sources)."""
         from types import SimpleNamespace
 
-        from .tiers import LEGIT_MIN_WIN, losing_kind
+        from .tiers import LEGIT_MIN_WIN, backed, losing_kind
 
         pulled = []
         seen: dict[tuple, Entry] = {}
         for e in sorted(self.entries.values(), key=lambda e: (not e.event_id.isdigit(), e.created_at)):
-            if e.status != "pending" or e.start <= now or e.units <= 0 or e.tier in LIVE_TIERS:
+            if e.status != "pending" or e.start <= now or e.tier in LIVE_TIERS:
+                continue
+            if e.units <= 0:
+                if not getattr(settings, "fill", False):  # no maybes: no-unit posts come off the board
+                    e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
+                    e.reasons = ["Withdrawn before the game: only bets backed by the data are posted."] + list(e.reasons)
+                    pulled.append(e)
                 continue
             why = None
             key = (e.sport, e.home, e.away, e.start.date().isoformat(), e.market, e.side, e.player)
@@ -261,13 +267,24 @@ class Ledger:
                 why = f"wins only {e.win_prob:.0%} of the time on our numbers"
             else:
                 pick = SimpleNamespace(sport=e.sport, market=e.market, american=e.odds, is_prop=e.player is not None)
-                if kind := losing_kind(pick, settings):
+                if not backed(pick, settings):
+                    why = "this kind of bet hasn't beaten the closing line in a blind test yet"
+                elif kind := losing_kind(pick, settings):
                     why = f"this kind of bet ({kind}) lost in the blind study by more than luck"
             seen.setdefault(key, e)
             if why:
                 e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
                 e.reasons = [f"Withdrawn before the game: {why}."] + list(e.reasons)
                 pulled.append(e)
+        # A parlay that hasn't started and has a withdrawn leg (or no units) comes off too.
+        keep = []
+        for p in self.parlays:
+            legs = [self.entries.get(i) for i in p.legs]
+            started = any(e is None or e.start <= now or e.status not in ("pending", "void") for e in legs)
+            if not started and (p.units <= 0 or any(e.status == "void" for e in legs)):
+                continue
+            keep.append(p)
+        self.parlays = keep
         return pulled
 
     def post_parlays(self, now: datetime) -> list[Parlay]:

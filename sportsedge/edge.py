@@ -43,6 +43,8 @@ class Settings:
     # Blind study records: "sport:moneyline" / "sport:coin flips (-149 to +149)" ->
     # {"bets", "won", "lost", "roi", "se"}. Best bets skip a kind of bet that lost beyond luck.
     track: dict[str, dict] = field(default_factory=dict)
+    # No-unit posts (a daily Lock/Dog when nothing qualifies, leans). Off: only backed bets are posted.
+    fill: bool = False
 
     def min_ev_for(self, pick: "Pick") -> float:
         if pick.is_prop:

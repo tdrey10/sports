@@ -85,7 +85,7 @@ def test_a_lock_and_a_dog_every_morning():
     from sportsedge.tiers import DOG_MAX_ODDS, DOG_MIN_ODDS
 
     provider = SampleProvider(seed=5)
-    strict = Settings(min_ev=0.5)  # nothing can clear this bar
+    strict = Settings(min_ev=0.5, fill=True)  # nothing can clear this bar; no-unit fill switched on
     engine = Engine(provider, strict, now=provider.now)
     scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
     cards = build_cards(scans, strict, provider.now)
@@ -108,7 +108,7 @@ def test_a_lock_and_a_dog_every_morning():
 
 def test_lock_and_dog_even_when_no_side_shows_an_edge():
     provider = SampleProvider(seed=5)
-    strict = Settings(min_ev=0.5)
+    strict = Settings(min_ev=0.5, fill=True)
     engine = Engine(provider, strict, now=provider.now)
     scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
     for scan in scans:
@@ -116,7 +116,19 @@ def test_lock_and_dog_even_when_no_side_shows_an_edge():
             p.ev = -0.02  # the market is right about everything today
     heads = {c.tier: c for c in build_cards(scans, strict, provider.now) if c.tier in ("lock", "dog")}
     assert set(heads) == {"lock", "dog"} and all(c.units == 0 for c in heads.values())
+    # By default nothing unbacked is posted: no maybes on the board.
+    plain = Settings(min_ev=0.5)
+    assert not [c for c in build_cards(scans, plain, provider.now) if c.units == 0]
 
+
+def test_only_bets_backed_by_a_blind_test_are_posted():
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    assert build_cards(scans, Settings(), provider.now)  # no studies loaded: open
+    assert build_cards(scans, Settings(proven=set()), provider.now) == []  # studies loaded, nothing proven
+    only = build_cards(scans, Settings(proven={"nba:spreads"}), provider.now)
+    assert only and all(c.pick.sport == "nba" and c.pick.market == "spreads" for c in only)
 
 
 def test_a_lock_must_pass_every_strict_check():

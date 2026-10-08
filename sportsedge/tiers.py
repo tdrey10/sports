@@ -75,6 +75,12 @@ def market_key(pick: Pick) -> str:
     return f"{pick.sport}:{'props' if pick.is_prop else STUDY_MARKET.get(pick.market, pick.market)}"
 
 
+def backed(pick: Pick, settings: Settings | None) -> bool:
+    """Posted at all only when its sport and bet type beat the closing line in the blind study.
+    (No studies loaded at all, as in the demo and tests, leaves everything open.)"""
+    return settings is None or settings.proven is None or market_key(pick) in settings.proven
+
+
 def is_proven(pick: Pick, settings: Settings | None) -> bool:
     """True when this sport and bet type beat the close in the blind study (or no studies are loaded)."""
     return settings is None or settings.proven is None or market_key(pick) in settings.proven
@@ -169,8 +175,9 @@ def build_cards(
     for scan in scans:
         for ev_id in scan.contexts:
             by_event[ev_id] = scan
-        game.extend(p for p in scan.picks if not p.is_prop)
-        props.extend(p for p in scan.picks if p.is_prop)
+        # Only bets backed by a blind test: no maybes on the board.
+        game.extend(p for p in scan.picks if not p.is_prop and backed(p, settings))
+        props.extend(p for p in scan.picks if p.is_prop and backed(p, settings))
 
     # No bet on a game where either team's injury report is unknown; those picks can
     # still show as leans (no units), so they are tracked.
@@ -230,7 +237,7 @@ def build_cards(
         locks = [p for p in soon if p.american >= LOCK_MIN_ODDS and solid(p)]
         if locks:
             chosen.append(("lock", max(locks, key=lambda p: (p.win_prob, p.ev))))
-        elif "lock_lean" not in taken:
+        elif settings.fill and "lock_lean" not in taken:
             # A Lock every day: the most likely winner on today's board (-150 or better, injuries
             # known, our model and the market agreeing first). With no real edge it carries no
             # units, and every daily Lock keeps its own record.
@@ -247,7 +254,7 @@ def build_cards(
         dogs = [p for p in soon if DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS and id(p) not in used_now]
         if dogs:
             chosen.append(("dog", max(dogs, key=lambda p: p.ev)))
-        elif "dog_lean" not in taken:
+        elif settings.fill and "dog_lean" not in taken:
             near = lean_pool(lambda p: p.market == "h2h" and DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS
                              and id(p) not in used_now)
             if near:
@@ -279,7 +286,8 @@ def build_cards(
     best_lean: dict[str, Pick] = {}
     for p in sorted(leans, key=lambda p: p.ev, reverse=True):
         best_lean.setdefault(p.event_id, p)
-    chosen += [("lean", p) for p in list(best_lean.values())[:max_leans]]
+    if settings.fill:
+        chosen += [("lean", p) for p in list(best_lean.values())[:max_leans]]
 
     # Best bets: today's unit plays ranked by edge score, only those that clear the bar.
     scores = {id(p): edge_score(p, settings) for _, p in chosen}

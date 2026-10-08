@@ -290,7 +290,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const isOpen = (e) => e.status === "pending" && new Date(e.commence_time) > new Date();
   const visible = (e) => (state.sport === "all" || sportGroup(e.sport) === state.sport) && (state.market === "all" || groupOf(e) === state.market);
   const today = () => dayOf(DATA.generated_at);
-  const onBoard = (e) => visible(e) && (!e.settled || e.day === today());
+  const onBoard = (e) => visible(e) && e.status !== "void" && (!e.settled || e.day === today());
   const cls = (x) => (x == null ? "" : x >= 0 ? "pos" : "neg");
   const rec = (s) => `${s.won}-${s.lost}${s.push ? "-" + s.push : ""}`;
   const units = (e) => (e.units > 0 ? `${e.units === 0.5 ? "½" : e.units}u` : "lean");
@@ -368,7 +368,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function renderHero() {
     const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
     if (!e) {
-      $("hero").innerHTML = `<div class="ticket-empty"><b>Today's #1 posts with the next scan</b><span class="muted">Picks refresh every 30 minutes through the day. Only picks that clear every check make the top 10.</span></div>`;
+      $("hero").innerHTML = `<div class="ticket-empty"><b>No pick today: nothing is backed by the data yet</b><span class="muted">A bet posts only when its kind of bet has beaten the closing line in a blind test (60+ bets it was never tuned on). No maybes, no filler. Lines are checked every 30 minutes.</span></div>`;
       return;
     }
     const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
@@ -388,7 +388,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const e = items.filter((x) => x.tier === t).sort((a, b) => b.units - a.units)[0];
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
-      if (!e) return `<div class="potd"><span class="kind">${label}</span><p>${t === "lock" ? "Posts only when a pick passes every Lock check." : "Posts once a game clears the bar."}</p></div>`;
+      if (!e) return `<div class="potd"><span class="kind">${label}</span><p>${t === "lock" ? "Posts only when a backed pick passes every Lock check." : "Posts only when a backed pick clears the bar."}</p></div>`;
       return `<div class="potd"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · ${wins(e)}</span></div>
         <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${more(e)}</div>`;
@@ -397,10 +397,10 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const rest = items.filter((e) => !isLive(e) && !["early", "lean"].includes(e.tier) && !e.player && !e.best_rank);
     const leans = items.filter((e) => e.tier === "lean");
     const topNote = best.length ? `${best.length} of 10 cleared the bar · ranked by edge score` : "Ranked by edge score";
-    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("No pick has cleared the bar yet today. A short list beats a forced one; the next scan may add some."))
+    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("No pick is backed by the data today. Bets post only when their kind of bet has passed a blind test; see the Model tab for what is being tested."))
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
       + panel("The board", "Every other game-line play today, by game", rest.length ? byGame(rest) : empty("No other game-line plays on today's board."))
-      + panel("Leans", "No units, tracked anyway", leans.length ? byGame(leans) : empty("No leans right now."));
+      + (leans.length ? panel("Leans", "No units, tracked anyway", byGame(leans)) : "");
   }
 
   // Parlays of the day: posted once, from the best bets, one leg per game.
