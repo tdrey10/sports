@@ -80,7 +80,8 @@ def is_proven(pick: Pick, settings: Settings | None) -> bool:
     return settings is None or settings.proven is None or market_key(pick) in settings.proven
 
 
-TRACK_MIN_BETS = 30
+TRACK_MIN_BETS = 20
+LEGIT_MIN_WIN = 0.45  # value and early plays: a realistic winner, not a long shot dressed up as value
 
 
 def price_band(american: float) -> str:
@@ -96,7 +97,8 @@ def track_records(pick: Pick, settings: Settings | None) -> list[tuple[str, dict
     """Blind study records for bets like this one: same sport and bet type, same price band."""
     if settings is None or pick.is_prop:
         return []
-    keys = [(STUDY_MARKET.get(pick.market, pick.market), market_key(pick)),
+    keys = [("all", f"{pick.sport}:all"),
+            (STUDY_MARKET.get(pick.market, pick.market), market_key(pick)),
             (price_band(pick.american).split(" (")[0], f"{pick.sport}:{price_band(pick.american)}")]
     return [(label, settings.track[k]) for label, k in keys
             if k in settings.track and (settings.track[k].get("bets") or 0) >= TRACK_MIN_BETS]
@@ -107,6 +109,21 @@ def losing_kind(pick: Pick, settings: Settings | None) -> str | None:
     for label, r in track_records(pick, settings):
         if r.get("roi") is not None and r["roi"] + (r.get("se") or 0.0) < 0:
             return label
+    return None
+
+
+def not_legit(pick: Pick, settings: Settings | None, min_win: float = 0.0) -> str | None:
+    """Why a pick can't be posted with units, or None. Every unit play needs a market price
+    to check our number against, a kind of bet that isn't losing in the blind study, a
+    positive edge after the studies' calibration and (value/early) a realistic chance to win."""
+    if not pick.is_prop and pick.market_prob is None:
+        return "no market price to check our number against"
+    if kind := losing_kind(pick, settings):
+        return f"{pick.sport.upper()} {kind if kind != 'all' else ''} bets lost in the blind study by more than luck".replace("  ", " ")
+    if settings is not None and edge_score(pick, settings)[2] <= 0:
+        return "no edge left after the studies' calibration"
+    if pick.win_prob < min_win:
+        return f"wins only {pick.win_prob:.0%} of the time on our numbers"
     return None
 
 
@@ -165,7 +182,9 @@ def build_cards(
     props = [p for p in props if p.event_id not in unknown]
 
     soon_cut = now + timedelta(hours=EARLY_HOURS)
-    candidates = best_per_event(game, settings)
+    # Only legitimate edges: a market price, a kind of bet that isn't losing blind, a
+    # calibrated edge. Value and early plays must also be realistic winners.
+    candidates = [p for p in best_per_event(game, settings) if not not_legit(p, settings)]
     soon = [p for p in candidates if p.commence_time <= soon_cut]
     later = [p for p in candidates if p.commence_time > soon_cut]
     chosen: list[tuple[str, Pick]] = []
@@ -236,8 +255,8 @@ def build_cards(
                 chosen.append(("dog", dog))
                 lean_ids.add(id(dog))
     used = {id(p) for _, p in chosen}
-    chosen += [("value", p) for p in soon if id(p) not in used][:max_value]
-    chosen += [("early", p) for p in later][:max_early]
+    chosen += [("value", p) for p in soon if id(p) not in used and p.win_prob >= LEGIT_MIN_WIN][:max_value]
+    chosen += [("early", p) for p in later if p.win_prob >= LEGIT_MIN_WIN][:max_early]
 
     prop_picks = qualifying(props, settings)
     lo, hi = PROP_ODDS_RANGE

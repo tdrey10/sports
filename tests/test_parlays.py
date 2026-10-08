@@ -49,16 +49,11 @@ def test_parlay_settles_from_its_legs(tmp_path):
     assert again.stats(START)["parlays"]["2"]["won"] == 1
 
 
-def test_short_board_fills_with_likely_winners_from_mid_morning():
+def test_no_filler_legs_on_a_short_board():
     from sportsedge.parlays import build
 
     now = START - timedelta(hours=6)
     led = Ledger()
     picks = [make_pick(event_id=f"g{i}", american=-120, win_prob=0.55 + i * 0.01) for i in range(9)]
     led.publish([card(p, tier="lean", units=0.0) for p in picks], now)
-    today = led.day_of(now)
-    assert build(led.entries.values(), [], now, today, local_hour=6) == []  # early: wait for unit plays
-    made = build(led.entries.values(), [], now, today, local_hour=10)
-    assert [p.size for p in made] == [2, 3, 4, 8] and all(p.units == 0 for p in made)
-    top = [led.entries[i].win_prob for i in made[0].legs]
-    assert [round(x, 2) for x in top] == [0.63, 0.62]  # the most likely winners first
+    assert build(led.entries.values(), [], now, led.day_of(now), local_hour=12) == []
