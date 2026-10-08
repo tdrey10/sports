@@ -82,8 +82,13 @@ def test_study_on_demo_history(tmp_path):
         assert st.in_sample is not None and st.blind is not None
         assert st.tune_window and st.blind_window and st.tune_window != st.blind_window
         assert st.early_blind is not None  # the same read against opening lines
-    saved = json.loads((tmp_path / "history" / "nba.json").read_text())
+    months = sorted((tmp_path / "history" / "nba").glob("*.json"))
+    assert len(months) > 1  # one file per month, so finished months never change
+    saved = {}
+    for m in months:
+        saved.update(json.loads(m.read_text()))
     assert saved and all(isinstance(v, list) for v in saved.values())
+    assert not (tmp_path / "history" / "nba.json").exists()
     # A second run reuses the saved lines instead of downloading them again.
     again = ClosingHistory(tmp_path / "history", provider.closing_quotes, budget=400)
     run_studies(resolve("nba"), provider.game_results, again, provider.now, days=90)
@@ -154,3 +159,18 @@ def test_soccer_opening_moneyline_without_a_draw_is_left_out(tmp_path):
     history = ClosingHistory(tmp_path, lambda cfg, g: None)
     game = GameResult("g", datetime(2026, 6, 1, tzinfo=timezone.utc), "A", "B", 1, 1)
     assert {q.market for q in history.open_quotes(SPORTS["epl"], game)} == {"spreads"}
+
+
+def test_swapped_opening_lines_are_left_out(tmp_path):
+    from sportsedge.models.ratings import GameResult
+
+    (tmp_path / "ncaaf.json").write_text(json.dumps({
+        "swapped": [["spreads", "home", 7.5, "draftkings", -115], ["spreads", "away", -7.5, "draftkings", -105],
+                    ["spreads", "home", -6.5, "draftkings_open", -110], ["spreads", "away", 6.5, "draftkings_open", -110]],
+        "moved": [["spreads", "home", -3.0, "draftkings", -110], ["spreads", "away", 3.0, "draftkings", -110],
+                  ["spreads", "home", 1.5, "draftkings_open", -110], ["spreads", "away", -1.5, "draftkings_open", -110]],
+    }))
+    history = ClosingHistory(tmp_path, lambda cfg, g: None)
+    day = datetime(2026, 9, 1, tzinfo=timezone.utc)
+    assert history.open_quotes(SPORTS["ncaaf"], GameResult("swapped", day, "A", "B", 1, 0)) == []
+    assert len(history.open_quotes(SPORTS["ncaaf"], GameResult("moved", day, "A", "B", 1, 0))) == 2  # a real move
