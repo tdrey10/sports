@@ -30,6 +30,8 @@ class EventContext:
     home_pitcher_era: float | None = None
     away_pitcher: str = ""
     away_pitcher_era: float | None = None
+    home_pitcher_decisions: int = 0
+    away_pitcher_decisions: int = 0
 
     @property
     def home_b2b(self) -> bool:
@@ -122,6 +124,8 @@ class Engine:
             if sched:
                 ctx.home_pitcher, ctx.home_pitcher_era = sched.home_pitcher, sched.home_pitcher_era
                 ctx.away_pitcher, ctx.away_pitcher_era = sched.away_pitcher, sched.away_pitcher_era
+                ctx.home_pitcher_decisions = sched.home_pitcher_decisions
+                ctx.away_pitcher_decisions = sched.away_pitcher_decisions
             if injury_matcher:
                 for team in (home, away):
                     key = injury_matcher.match(team)
@@ -133,8 +137,8 @@ class Engine:
                 cfg, ratings, home, away, neutral,
                 home_b2b=use_rest and ctx.home_b2b, away_b2b=use_rest and ctx.away_b2b,
                 # The away starter limits the home offence and vice versa.
-                home_factor=pitcher_factor(ctx.away_pitcher_era),
-                away_factor=pitcher_factor(ctx.home_pitcher_era),
+                home_factor=pitcher_factor(ctx.away_pitcher_era, ctx.away_pitcher_decisions),
+                away_factor=pitcher_factor(ctx.home_pitcher_era, ctx.home_pitcher_decisions),
             )
             scan.predictions[event.id] = pred
             scan.picks.extend(self._game_picks(cfg, event, pred))

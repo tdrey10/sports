@@ -46,35 +46,56 @@ class EspnClient:
         return data
 
     # ------------------------------------------------------------------ games
-    def scoreboard(self, cfg: SportConfig, start: datetime, end: datetime) -> list[dict]:
-        params: dict[str, Any] = {
-            "dates": f"{start:%Y%m%d}-{end:%Y%m%d}",
-            "limit": 1000,
-        }
+    # ESPN rejects date ranges (dates=YYYYMMDD-YYYYMMDD returns 400). A single
+    # day always works; a whole month (dates=YYYYMM) works for the pro leagues
+    # and soccer with limit=1000, but college month queries are truncated, so
+    # college sports are fetched one day at a time.
+    MONTH_LIMIT = 1000
+
+    def scoreboard(self, cfg: SportConfig, dates: str, final: bool) -> list[dict]:
+        """Raw events for one day (YYYYMMDD) or month (YYYYMM). ``final`` periods are cached forever."""
+        params: dict[str, Any] = {"dates": dates, "limit": self.MONTH_LIMIT if len(dates) == 6 else 500}
         if cfg.espn_groups:
             params["groups"] = cfg.espn_groups
-        # Past ranges never change; anything touching the last two days is refreshed hourly.
-        recent = end > datetime.now(timezone.utc) - timedelta(days=2)
-        data = self._get(f"{BASE}/{cfg.espn_path}/scoreboard", params, ttl=3600 if recent else None)
+        data = self._get(f"{BASE}/{cfg.espn_path}/scoreboard", params, ttl=None if final else 600)
         return data.get("events", [])
 
     def game_results(self, cfg: SportConfig, start: datetime, end: datetime) -> list[GameResult]:
         out: dict[str, GameResult] = {}
-        cursor = start
-        # NCAAB/NCAAF have thousands of games, keep chunks small enough for limit=1000.
-        step = timedelta(days=7 if cfg.espn_groups else 30)
-        while cursor <= end:
-            chunk_end = min(cursor + step - timedelta(days=1), end)
-            try:
-                events = self.scoreboard(cfg, cursor, chunk_end)
-            except requests.RequestException as exc:
-                log.warning("ESPN scoreboard %s %s failed: %s", cfg.key, cursor.date(), exc)
-                events = []
+        settled_before = datetime.now(timezone.utc) - timedelta(days=2)
+
+        def add(events: list[dict]) -> None:
             for ev in events:
                 g = _parse_event(ev)
-                if g is not None:
+                if g is not None and start <= g.date <= end + timedelta(days=1):
                     out[g.event_id] = g
-            cursor = chunk_end + timedelta(days=1)
+
+        def fetch(dates: str, final: bool) -> list[dict] | None:
+            try:
+                return self.scoreboard(cfg, dates, final)
+            except requests.RequestException as exc:
+                log.warning("ESPN scoreboard %s %s failed: %s", cfg.key, dates, exc)
+                return None
+
+        def days(first: datetime, last: datetime) -> None:
+            d = first
+            while d.date() <= last.date():
+                events = fetch(f"{d:%Y%m%d}", final=d < settled_before)
+                add(events or [])
+                d += timedelta(days=1)
+
+        if cfg.espn_groups:  # college: day by day
+            days(start, end)
+        else:
+            month = datetime(start.year, start.month, 1, tzinfo=timezone.utc)
+            while month <= end:
+                nxt = datetime(month.year + month.month // 12, month.month % 12 + 1, 1, tzinfo=timezone.utc)
+                events = fetch(f"{month:%Y%m}", final=nxt < settled_before)
+                if events is None or len(events) >= self.MONTH_LIMIT:
+                    days(max(month, start), min(nxt - timedelta(days=1), end))  # truncated: go daily
+                else:
+                    add(events)
+                month = nxt
         return sorted(out.values(), key=lambda g: g.date)
 
     # -------------------------------------------------------------- box scores
@@ -131,8 +152,8 @@ def _parse_event(ev: dict) -> GameResult | None:
             return None
 
     hs, as_ = score(home), score(away)
-    hp, hp_era = _probable(home)
-    ap, ap_era = _probable(away)
+    hp, hp_era, hp_dec = _probable(home)
+    ap, ap_era, ap_dec = _probable(away)
     final = completed and hs is not None and as_ is not None
     live = state == "in" and hs is not None and as_ is not None
     return GameResult(
@@ -149,26 +170,29 @@ def _parse_event(ev: dict) -> GameResult | None:
         live_away=as_ if live else None,
         home_pitcher=hp,
         home_pitcher_era=hp_era,
+        home_pitcher_decisions=hp_dec,
         away_pitcher=ap,
         away_pitcher_era=ap_era,
+        away_pitcher_decisions=ap_dec,
     )
 
 
-def _probable(competitor: dict) -> tuple[str, float | None]:
-    """(name, ERA) of a team's probable starting pitcher, when ESPN lists one."""
+def _probable(competitor: dict) -> tuple[str, float | None, int]:
+    """(name, ERA, decisions) of a team's probable starter, when ESPN lists one."""
     for prob in competitor.get("probables", []) or []:
         athlete = prob.get("athlete") or {}
         name = athlete.get("displayName") or athlete.get("fullName") or ""
-        era = None
+        stats = {}
         for stat in prob.get("statistics", []) or []:
-            if (stat.get("abbreviation") or stat.get("name") or "").upper() == "ERA":
-                try:
-                    era = float(stat.get("displayValue"))
-                except (TypeError, ValueError):
-                    era = None
+            key = (stat.get("abbreviation") or stat.get("name") or "").upper()
+            try:
+                stats[key] = float(stat.get("displayValue"))
+            except (TypeError, ValueError):
+                pass
         if name:
-            return name, era
-    return "", None
+            decisions = int(stats.get("W", 0) + stats.get("L", 0))
+            return name, stats.get("ERA"), decisions
+    return "", None, 0
 
 
 def parse_injuries(data: dict) -> dict[str, list[tuple[str, str]]]:

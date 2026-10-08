@@ -38,6 +38,8 @@ class GameResult:
     home_pitcher_era: float | None = None
     away_pitcher: str = ""
     away_pitcher_era: float | None = None
+    home_pitcher_decisions: int = 0  # wins + losses, a proxy for how much the ERA can be trusted
+    away_pitcher_decisions: int = 0
 
     @property
     def completed(self) -> bool:

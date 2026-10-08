@@ -127,13 +127,24 @@ def baseline_team_score(ratings: TeamRatings, team: str) -> float:
 
 LEAGUE_ERA = 4.20
 STARTER_SHARE = 0.6  # starters cover roughly 5.5 of 9 innings
-ERA_SHRINK = 0.5  # a season ERA is noisy: move halfway back to league average
+ERA_TRUST_MAX = 0.5  # even a full season's ERA only moves halfway from league average
+ERA_PRIOR_DECISIONS = 6  # decisions (W+L) at which the ERA gets half of that trust
 
 
-def pitcher_factor(era: float | None, league_era: float = LEAGUE_ERA) -> float:
-    """Multiplier on the *opposing* team's expected runs for a starting pitcher."""
-    if era is None or era <= 0:
+def pitcher_factor(era: float | None, decisions: int | None = None, league_era: float = LEAGUE_ERA) -> float:
+    """Multiplier on the *opposing* team's expected runs for a starting pitcher.
+
+    ESPN lists a season ERA, which is meaningless after one start (0-0, 6.00),
+    so it is trusted in proportion to the pitcher's decisions so far.
+    ``decisions=None`` means unknown and uses full trust.
+    """
+    if era is None or era < 0:
         return 1.0
-    shrunk = league_era + ERA_SHRINK * (era - league_era)
+    trust = ERA_TRUST_MAX
+    if decisions is not None:
+        trust *= decisions / (decisions + ERA_PRIOR_DECISIONS)
+    if trust <= 0:
+        return 1.0
+    shrunk = league_era + trust * (era - league_era)
     factor = 1 + STARTER_SHARE * (shrunk / league_era - 1)
     return min(max(factor, 0.85), 1.2)
