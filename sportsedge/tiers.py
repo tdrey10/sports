@@ -200,6 +200,11 @@ def build_cards(
         in_spots = []
         if ctx and pick.market == "h2h" and is_dog_price(pick.american):
             in_spots = list(ctx.spots.get(pick.side, []))
+        elif ctx and pick.market == "totals" and pick.side == "under":
+            in_spots = list(ctx.spots.get("under", []))
+        if ctx and ctx.wind_mph is not None and pick.market == "totals":
+            bullets.append(f"Wind forecast at kickoff: {ctx.wind_mph:.0f} mph (outdoor stadium).")
+        if in_spots:
             for key in in_spots:
                 proven = f"{pick.sport}:{key}" in settings.spot_weights
                 bullets.append(f"Spot: {SPOTS[key].label}"

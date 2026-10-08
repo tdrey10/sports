@@ -13,6 +13,7 @@ from .models.game import GamePrediction, baseline_team_score, pitcher_factor, pr
 from .models.props import PlayerGame, PropProjection, matchup_factor, project_prop, usage_factor
 from .models.ratings import GameResult, TeamRatings, fit_ratings, is_b2b
 from .spots import capped_bump, is_dog_price, team_spots
+from .weather import WINDY_MPH, outdoor
 from .sports import SportConfig
 
 log = logging.getLogger(__name__)
@@ -29,7 +30,8 @@ class EventContext:
     injuries: dict[str, list[str]] = field(default_factory=dict)  # team -> players out
     injuries_unknown: list[str] = field(default_factory=list)  # teams with no injury report: no bet on this game
     injury_notes: list[str] = field(default_factory=list)  # weighted absences, for display
-    spots: dict[str, list[str]] = field(default_factory=dict)  # side -> early-bet spots it is in as the dog
+    spots: dict[str, list[str]] = field(default_factory=dict)  # side ("home"/"away"/"under") -> spots it is in
+    wind_mph: float | None = None  # forecast wind at kickoff, outdoor NFL/MLB stadiums only
     home_pitcher: str = ""
     home_pitcher_era: float | None = None
     away_pitcher: str = ""
@@ -88,11 +90,13 @@ class Engine:
         settings: Settings | None = None,
         now: datetime | None = None,
         calibrate: bool = False,
+        weather=None,
     ):
         self.provider = provider
         self.settings = settings or Settings()
         self.now = now or datetime.now(timezone.utc)
         self.calibrate = calibrate
+        self.weather = weather  # a weather.WeatherClient, or None (no wind)
 
     # ------------------------------------------------------------------ public
     def scan(
@@ -170,6 +174,11 @@ class Engine:
                         win_hit[team] += hit
                         ctx.injury_notes.append(f"{team} without {p} ({pos}): -{hit:.0%} win chance")
             ctx.spots = team_spots(cfg.key, home, away, event.commence_time, results, neutral)
+            spot_at = None if neutral else outdoor(cfg.key, home)
+            if self.weather is not None and spot_at:
+                ctx.wind_mph = self.weather.forecast_wind(*spot_at, event.commence_time)
+                if ctx.wind_mph is not None and ctx.wind_mph >= WINDY_MPH:
+                    ctx.spots["under"] = ["wind_under"]
             scan.contexts[event.id] = ctx
             use_rest = cfg.rest_effects
             eh, ea = ratings.expected_scores(home, away, neutral)
@@ -223,8 +232,8 @@ class Engine:
         quotes = [q for q in event.quotes if q.market in ("h2h", "spreads", "totals")]
 
         def spot_bump(q: Quote) -> float:
-            """Proven early-bet spots add a capped weight to a +100..+220 dog's moneyline."""
-            if not spots or not is_dog_price(q.american):
+            """Proven spots add a capped weight: to a +100..+220 dog's moneyline, or to a windy under."""
+            if not spots or (q.market == "h2h" and not is_dog_price(q.american)):
                 return 0.0
             bumps = [self.settings.spot_weights.get(f"{cfg.key}:{k}", 0.0) for k in spots.get(q.side, [])]
             return capped_bump(bumps, q.american)
@@ -244,7 +253,12 @@ class Engine:
             if q.market == "spreads" and q.side in ("home", "away"):
                 return pred.spread(q.side, q.point)
             if q.market == "totals" and q.side in ("over", "under"):
-                return pred.total(q.side, q.point)
+                w, p, l = pred.total(q.side, q.point)
+                bump = spot_bump(q) if q.side == "under" else 0.0
+                if bump:
+                    w = min(max(w + bump * (1 - p), 0.01), 0.99 - p)
+                    l = 1 - p - w
+                return w, p, l
             return None
 
         def describe(q: Quote) -> tuple[str, str]:

@@ -75,6 +75,7 @@ class Spot:
     key: str
     label: str
     sports: tuple[str, ...]
+    market: str = "h2h"  # h2h spots bet the dog; the totals spot bets the under
 
 
 SPOTS = {
@@ -84,6 +85,7 @@ SPOTS = {
         Spot("east_traveler_dog", "East Coast team flying West (as the dog)", ("nfl", "nba", "nhl", "mlb")),
         Spot("west_host_dog", "West Coast home dog vs a team flying in from the East", ("nfl", "nba", "nhl", "mlb")),
         Spot("blowout_dog", "Dog that blew someone out last game", ("nfl", "ncaaf", "nba", "ncaab", "mlb", "nhl")),
+        Spot("wind_under", "Wind 15+ mph at an outdoor stadium: under", ("nfl", "mlb"), market="totals"),
     )
 }
 
@@ -135,7 +137,7 @@ def team_spots(sport: str, home: str, away: str, start: datetime, results: list[
 
 
 def _active(sport: str) -> set[str]:
-    return {k for k, s in SPOTS.items() if sport in s.sports}
+    return {k for k, s in SPOTS.items() if sport in s.sports and s.market == "h2h"}
 
 
 def is_dog_price(american: float) -> bool:

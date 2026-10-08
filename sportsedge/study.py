@@ -377,6 +377,41 @@ def spot_bets(cfg: SportConfig, results: list[GameResult], close_for, open_for, 
     return out
 
 
+def wind_bets(cfg: SportConfig, results: list[GameResult], close_for, weather, start: datetime,
+              end: datetime) -> list[tuple[str, str, Side]]:
+    """('wind_under', 'close', bet): the under at the closing total for every outdoor game
+    with 15+ mph wind at kickoff. Wind history comes in one request per stadium."""
+    from .ledger import _settle
+    from .odds import no_vig
+    from .weather import WINDY_MPH, outdoor, wind_at
+
+    if weather is None or cfg.key not in ("nfl", "mlb"):
+        return []
+    out: list[tuple[str, str, Side]] = []
+    done = [g for g in results if g.completed and start <= g.date < end and not g.neutral]
+    by_home: dict[tuple[float, float], list[GameResult]] = defaultdict(list)
+    for g in done:
+        spot_at = outdoor(cfg.key, g.home)
+        if spot_at:
+            by_home[spot_at].append(g)
+    for (lat, lon), games in by_home.items():
+        hours = weather.history(lat, lon, min(g.date for g in games), max(g.date for g in games))
+        for g in games:
+            wind = wind_at(hours, g.date)
+            if wind is None or wind < WINDY_MPH:
+                continue
+            totals = {q.side: q for q in close_for(g) if q.market == "totals"}
+            under, over = totals.get("under"), totals.get("over")
+            if not under or not over or under.point is None:
+                continue
+            fair = no_vig({"over": over.american, "under": under.american})
+            win, push, loss = _settle(-(g.home_score + g.away_score), under.point)
+            out.append(("wind_under", "close", Side(cfg.key, g.event_id, "totals", "under", under.american,
+                                                    fair.get("under", 0.5), fair.get("under"), 0.0,
+                                                    win, push, loss, date=g.date.isoformat(), point=under.point)))
+    return out
+
+
 def study_spots(bets: list[tuple[str, str, Side]]) -> list[dict]:
     from .spots import SPOTS
 
@@ -480,6 +515,7 @@ def run_studies(
     now: datetime,
     days: int = STUDY_DAYS,
     games_folder=None,
+    weather=None,
 ) -> dict[str, SportStudy]:
     """``games_folder``: also write every final score with its lines to monthly CSV files."""
     out: dict[str, SportStudy] = {}
@@ -508,10 +544,11 @@ def run_studies(
         else:
             window = f"{start:%b %-d} - {now:%b %-d, %Y}"
             st = study_sides(sides, cfg, games, window, open_sides)
-            st.spots = study_spots(spot_bets(
-                cfg, results, lambda g, c=cfg: history.quotes(c, g), lambda g, c=cfg: history.open_quotes(c, g),
-                start, now,
-            ))
+            close_for = lambda g, c=cfg: history.quotes(c, g)  # noqa: E731
+            st.spots = study_spots(
+                spot_bets(cfg, results, close_for, lambda g, c=cfg: history.open_quotes(c, g), start, now)
+                + wind_bets(cfg, results, close_for, weather, start, now)
+            )
         out[cfg.key] = st
     return out
 
