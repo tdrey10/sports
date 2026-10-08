@@ -22,7 +22,9 @@ ModelFn = Callable[[str, float | None], Outcome | None]
 @dataclass
 class Settings:
     min_ev: float = 0.02
-    market_weight: float = 0.5  # 0 = trust the model only, 1 = trust the market only
+    market_weight: float = 0.75  # 0 = trust the model only, 1 = trust the market only
+    prop_market_weight: float = 0.8  # props: player samples are small, lean on the market more
+    weight_overrides: dict[str, float] = field(default_factory=dict)  # "sport:game"/"sport:prop" -> learned weight
     kelly_multiplier: float = 0.25
     max_stake: float = 0.03  # cap on fraction of bankroll per bet
     bankroll: float | None = None
@@ -32,6 +34,12 @@ class Settings:
     hide_flagged: bool = True  # leave out picks where model and market disagree by > disagreement_warning
     max_odds: float = 600  # skip extreme longshots (e.g. +1500 props)
     max_ev: float = 0.30  # EV above this is almost always stale data / news the model can't see
+
+    def weight_for(self, sport: str, is_prop: bool) -> float:
+        key = f"{sport}:{'prop' if is_prop else 'game'}"
+        if key in self.weight_overrides:
+            return self.weight_overrides[key]
+        return self.prop_market_weight if is_prop else self.market_weight
 
 
 @dataclass
@@ -139,7 +147,8 @@ def evaluate(
                 continue
             q_model = pw / (pw + pl)
             q_mkt = market_probs.get(side)
-            q = q_model if q_mkt is None else (1 - settings.market_weight) * q_model + settings.market_weight * q_mkt
+            w = settings.weight_for(event.sport, player is not None)
+            q = q_model if q_mkt is None else (1 - w) * q_model + w * q_mkt
             q = min(max(q, 1e-4), 1 - 1e-4)
             win, loss = q * (1 - pp), (1 - q) * (1 - pp)
             dec = american_to_decimal(best.american)

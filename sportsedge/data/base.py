@@ -50,6 +50,20 @@ class DataProvider(Protocol):
     def player_games(self, cfg: SportConfig, results: list[GameResult], team: str) -> list[PlayerGame]:
         """Box-score lines for ``team``'s players from its recent games."""
 
+    def box_score(self, cfg: SportConfig, game: GameResult) -> list[PlayerGame]:
+        """Every player's line from one finished game (used to grade props)."""
+
+    def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
+        """Team -> [(player, status)] from the current injury report."""
+
+
+OUT_STATUSES = ("out", "injured reserve", "suspended", "doubtful", "ir", "day-to-day-out")
+
+
+def is_out(status: str) -> bool:
+    s = status.lower()
+    return any(s.startswith(x) for x in OUT_STATUSES)
+
 
 _SUFFIXES = re.compile(r"\b(jr|sr|ii|iii|iv|v)\b")
 

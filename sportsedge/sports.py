@@ -43,6 +43,8 @@ class SportConfig:
     espn_groups: str | None = None
     unknown_percentile: float = 50.0
     prop_games: int = 12
+    rest_effects: bool = False  # learn a back-to-back penalty (NBA / NHL)
+    has_injury_feed: bool = False  # ESPN publishes a league injury report
     props: dict[str, PropSpec] = field(default_factory=dict)
 
 
@@ -116,7 +118,7 @@ SPORTS: dict[str, SportConfig] = {
     "nfl": SportConfig(
         key="nfl", name="NFL", espn_path="football/nfl", odds_key="americanfootball_nfl",
         scoring="normal", link="identity", half_life_days=150, ridge=3.0, lookback_days=500,
-        margin_sd=13.5, total_sd=13.5, prop_games=10, props=FOOTBALL_PROPS,
+        margin_sd=13.5, total_sd=13.5, prop_games=10, has_injury_feed=True, props=FOOTBALL_PROPS,
     ),
     "ncaaf": SportConfig(
         key="ncaaf", name="College Football", espn_path="football/college-football",
@@ -127,7 +129,7 @@ SPORTS: dict[str, SportConfig] = {
     "nba": SportConfig(
         key="nba", name="NBA", espn_path="basketball/nba", odds_key="basketball_nba",
         scoring="normal", link="identity", half_life_days=60, ridge=6.0, lookback_days=300,
-        margin_sd=12.5, total_sd=18.0, props=BASKETBALL_PROPS,
+        margin_sd=12.5, total_sd=18.0, rest_effects=True, has_injury_feed=True, props=BASKETBALL_PROPS,
     ),
     "ncaab": SportConfig(
         key="ncaab", name="College Basketball", espn_path="basketball/mens-college-basketball",
@@ -138,12 +140,12 @@ SPORTS: dict[str, SportConfig] = {
     "mlb": SportConfig(
         key="mlb", name="MLB", espn_path="baseball/mlb", odds_key="baseball_mlb",
         scoring="count", link="log", half_life_days=90, ridge=25.0, lookback_days=400,
-        dispersion=4.0, max_score=30, prop_games=25, props=MLB_PROPS,
+        dispersion=4.0, max_score=30, prop_games=25, has_injury_feed=True, props=MLB_PROPS,
     ),
     "nhl": SportConfig(
         key="nhl", name="NHL", espn_path="hockey/nhl", odds_key="icehockey_nhl",
         scoring="count", link="log", half_life_days=90, ridge=15.0, lookback_days=400,
-        dispersion=None, max_score=15, props=NHL_PROPS,
+        dispersion=None, max_score=15, rest_effects=True, has_injury_feed=True, props=NHL_PROPS,
     ),
     "epl": SportConfig(key="epl", name="Premier League", espn_path="soccer/eng.1",
                        odds_key="soccer_epl", **_SOCCER_COMMON),

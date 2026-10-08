@@ -22,6 +22,30 @@ Thu 10:00  Mobile Storm @ Houston Titans    Under 236          fanduel     -101 
 ```
 (Output above is from `--demo` mode, which uses made-up teams.)
 
+## The dashboard
+
+`sportsedge run` turns each scan into a phone-friendly dashboard (`site/index.html`):
+
+- **Today's best**: Lock of the Day (highest win probability that still beats the price), Dog of the Day (best plus-money edge up to +350) and Prop of the Day.
+- **The board**: game-line value plays, player props, early value (games more than 24 hours out) and leans (small edges, no units, still tracked).
+- **Every pick explains itself**: projected score, team records, last result, back-to-backs and rest, injuries, model vs. market odds, and the best book.
+- **Line tracking**: "Got it at +215 → now +150 · we beat the line" for every open pick.
+- **Live scores** on open picks, and automatic grading from final scores and box scores.
+- **Parlay slip**: add open picks from different games to see the combined price, the chance it hits and its EV.
+- **The record**: bankroll curve, record, units, ROI and closing-line value, broken down by tier and by sport.
+- **The brain**: accuracy on recent games the model never saw, refreshed every run.
+
+### What makes it sharper than a typical picks app
+
+| | Typical picks app | SportsEdge |
+|---|---|---|
+| Bet size | Fixed ½ or 1 unit | Fractional Kelly from the measured edge (½–3 units) |
+| Who to trust | The model's opinion | A blend of model and no-vig market, **re-learned from graded picks** for each sport |
+| Proof of edge | Win/loss record | Win/loss **plus closing-line value**, which shows skill much sooner than a W-L record |
+| Probabilities | Point estimates | Re-calibrated every run from out-of-sample errors |
+| Prices | One book | Best price across every book in the feed |
+| Bad edges | Posted anyway | Hidden when the model and market disagree by 12+ points (usually injury or lineup news) |
+
 ## Quick start
 
 ```bash
@@ -35,6 +59,27 @@ sportsedge scan nba --props --bankroll 1000 --hours 12
 sportsedge scan soccer --books draftkings,fanduel,betmgm
 sportsedge scan all --json picks.json
 ```
+
+Run the full engine and build the dashboard:
+
+```bash
+sportsedge run --demo --props        # demo: 14 days of simulated history, then today's board
+open site/index.html
+
+sportsedge run nba nfl ncaaf --props # live: picks go into data/ledger.json
+sportsedge run all --scores-only     # live scores + grading only (ESPN, no odds credits)
+sportsedge serve nba nfl             # keep running: scores every 2 min, odds every hour, http://127.0.0.1:8000
+```
+
+### Host it for free on GitHub Pages
+
+`.github/workflows/sportsedge.yml` runs a full cycle every 3 hours and live scores every 20 minutes. It commits the ledger and publishes the dashboard to GitHub Pages.
+
+1. Add your key under **Settings → Secrets and variables → Actions** as `ODDS_API_KEY`.
+2. Under **Settings → Pages**, set the source to **GitHub Actions**.
+3. Merge to the default branch. Run it once by hand from the **Actions** tab, using `props` if you want props.
+
+The free Odds API tier has 500 credits a month, and a full cycle costs about 3 credits per in-season sport. Out-of-season sports are skipped automatically. At 8 cycles a day with 4 sports in season that's about 2,900 credits a month, so either pick a paid tier or slow the schedule in the workflow file.
 
 Other commands (these need no odds key; they only use ESPN):
 
@@ -54,7 +99,8 @@ Aliases: `soccer`, `football`, `basketball`, `college`, `cfb`, `cbb`, `hockey`, 
 | `--props` | off | Also price player props. Each event costs extra Odds API credits. |
 | `--prop-markets` | all | e.g. `player_points,player_rebounds` |
 | `--min-ev` | 0.02 | Only show bets with at least +2% expected return. |
-| `--market-weight` | 0.5 | How much to trust the no-vig market vs. the model (0 = model only). |
+| `--market-weight` | 0.75 | How much to trust the no-vig market vs. the model for game lines (0 = model only). |
+| `--prop-market-weight` | 0.8 | Same, for player props. |
 | `--kelly` | 0.25 | Fraction of full Kelly used for stake sizing. |
 | `--max-stake` | 0.03 | Never stake more than 3% of bankroll on one bet. |
 | `--max-ev` | 0.30 | Hide "too good to be true" edges (usually stale lines or injury news). |
@@ -99,7 +145,9 @@ The Odds API prices ──► no-vig consensus ───────────
 5. **Blend, then price.** The model's probability is blended with the market's
    (`--market-weight`). EV is computed at the **best available price** across
    books, with pushes handled exactly. Stakes use fractional Kelly with a cap.
-6. **Sanity filters.** Some edges are almost always data problems rather than
+6. **Rest and injuries.** NBA/NHL back-to-back effects are fitted from the data. ESPN's injury report is shown on each pick, and props for players listed out are skipped.
+7. **Self-tuning.** Every run re-tests the model on recent games it never saw ("the brain"). It re-tunes each sport's score spread so a 60% call really wins 60%. Once a sport has 60 graded picks, it also re-learns how much to trust the model vs. the market.
+8. **Sanity filters.** Some edges are almost always data problems rather than
    real value: huge EVs, or big model-vs-market disagreements (injuries,
    suspensions, a starter resting, a goalie or pitcher change). These are
    hidden by default and counted in the output.
@@ -136,8 +184,14 @@ is overconfident: raise `margin_sd` (or the ridge) for that sport.
 - The model does not know about injuries, lineups, rest, travel, weather,
   starting pitchers or starting goalies. Check the news on every pick,
   especially MLB (starting pitcher) and NHL (goalie).
-- Track your results against the **closing line** (CLV). Beating the close
-  over hundreds of bets is the best evidence of a real edge.
+- Track your results against the **closing line** (CLV). The dashboard does
+  this for you. Beating the close over hundreds of bets is the best evidence
+  of a real edge, and it shows up much sooner than a win/loss record. A 19-10
+  record over 29 bets can easily be luck.
+- In simulation, trusting the market more (0.75 instead of 0.5) turned a
+  losing strategy into a winning one when the books were sharper than the
+  model. That's why the defaults lean on the market and the weights are
+  re-learned from results.
 - Bet responsibly, and only where sports betting is legal for you.
 
 ## Development
@@ -162,6 +216,12 @@ sportsedge/
   models/props.py    player stat projections
   edge.py            market consensus, blending, EV, ranking
   engine.py          scan pipeline
+  brain.py           walk-forward retraining + calibration
+  tiers.py           Lock / Dog / Prop of the Day, value, early, leans, unit sizing
+  insights.py        the written reasons on each pick
+  ledger.py          published picks, line movement, CLV, grading, bankroll stats
+  runner.py          one engine cycle; demo history simulation
+  site.py, web/      the dashboard
   backtest.py        walk-forward model evaluation
   data/espn.py       ESPN client + box-score parser
   data/oddsapi.py    The Odds API client

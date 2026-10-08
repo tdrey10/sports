@@ -21,7 +21,7 @@ def _provider(args):
         return SampleProvider(seed=args.seed)
     from .data.espn import EspnClient
 
-    if args.command in ("ratings", "backtest"):
+    if args.command in ("ratings", "backtest") or getattr(args, "scores_only", False):
         return EspnClient()  # stats only, no odds key needed
     from .data.live import LiveProvider
     from .data.oddsapi import OddsApiClient
@@ -39,6 +39,7 @@ def cmd_scan(args) -> int:
         min_ev=args.min_ev,
         max_ev=args.max_ev,
         market_weight=args.market_weight,
+        prop_market_weight=args.prop_market_weight,
         kelly_multiplier=args.kelly,
         max_stake=args.max_stake,
         bankroll=args.bankroll,
@@ -95,6 +96,157 @@ def cmd_backtest(args) -> int:
     return 0
 
 
+DEMO_SPORTS = "nfl,ncaaf,nba,ncaab,mlb,nhl,epl"
+
+
+def _settings(args) -> Settings:
+    return Settings(
+        min_ev=args.min_ev,
+        max_ev=args.max_ev,
+        market_weight=args.market_weight,
+        prop_market_weight=args.prop_market_weight,
+        kelly_multiplier=args.kelly,
+        max_stake=args.max_stake,
+        hide_flagged=not args.show_flagged,
+    )
+
+
+def _in_season(provider, sports):
+    odds = getattr(provider, "odds", None)
+    if odds is None:
+        return sports
+    try:
+        active = odds.active_keys()
+    except Exception as exc:
+        print(f"could not check which sports are in season ({exc}); scanning all requested")
+        return sports
+    keep = [c for c in sports if c.odds_key in active]
+    skipped = [c.name for c in sports if c.odds_key not in active]
+    if skipped:
+        print("out of season, skipped: " + ", ".join(skipped))
+    return keep
+
+
+class Workspace:
+    """Ledger + brain cache + site output for the run/serve commands."""
+
+    def __init__(self, args):
+        from pathlib import Path
+
+        from .ledger import Ledger
+
+        self.args = args
+        self.demo = args.demo
+        data_dir = Path(args.data_dir)
+        self.ledger_path = data_dir / ("demo-ledger.json" if self.demo else "ledger.json")
+        self.brain_path = data_dir / ("demo-brain.json" if self.demo else "brain.json")
+        self.site_dir = Path(args.site)
+        self.ledger = Ledger.load(self.ledger_path, tz=args.tz, start_bankroll=args.start_bankroll)
+        self.brains, self.weights = self._load_brain()
+        self.provider = _provider(args)
+        names = args.sports if args.sports != ["all"] or not self.demo else [DEMO_SPORTS]
+        self.sports = resolve(names)
+        self.settings = _settings(args)
+
+    def _load_brain(self):
+        import json
+
+        from .brain import BrainReport
+
+        try:
+            raw = json.loads(self.brain_path.read_text())
+            return {k: BrainReport(**v) for k, v in raw["brains"].items()}, raw.get("weights", {})
+        except (OSError, ValueError, KeyError, TypeError):
+            return {}, {}
+
+    def now(self):
+        return _now(self.provider)
+
+    def cycle(self):
+        from .runner import run_cycle, simulate_history
+
+        now = self.now()
+        if self.demo and not self.ledger.entries and self.args.history_days:
+            print(f"building {self.args.history_days} days of demo history (one-time)...")
+            self.brains.update(simulate_history(
+                self.provider, self.sports, self.ledger, self.settings,
+                days=self.args.history_days, runs_per_day=1, props=self.args.props,
+            ))
+        sports = self.sports if self.demo else _in_season(self.provider, self.sports)
+        res = run_cycle(
+            self.provider, sports, self.ledger, self.settings, now,
+            props=self.args.props, hours_ahead=self.args.hours,
+        )
+        self.brains.update(res.brains)
+        self.weights = res.weights
+        for w in dict.fromkeys(res.warnings):
+            print("warning:", w)
+        print(f"published {res.published} new picks, graded {res.graded}")
+        self.save(now)
+
+    def scores(self):
+        from .runner import refresh_scores
+
+        now = self.now()
+        graded = refresh_scores(self.provider, self.ledger, now)
+        if graded:
+            print(f"graded {graded} picks")
+        self.save(now)
+
+    def save(self, now):
+        import json
+        from dataclasses import asdict
+
+        from .site import build_data, write_site
+
+        self.ledger.save(self.ledger_path)
+        self.brain_path.write_text(json.dumps(
+            {"brains": {k: asdict(v) for k, v in self.brains.items()}, "weights": self.weights}, indent=1))
+        data = build_data(self.ledger, self.brains, self.weights, self.sports, now, demo=self.demo)
+        path = write_site(self.site_dir, data)
+        o = data["stats"]["overall"]
+        print(f"dashboard: {path}  (record {o['won']}-{o['lost']}, {o['units']:+.1f}u, bankroll ${data['stats']['bankroll']:,.2f})")
+
+
+def cmd_run(args) -> int:
+    ws = Workspace(args)
+    if args.scores_only:
+        ws.scores()
+    else:
+        ws.cycle()
+    return 0
+
+
+def cmd_serve(args) -> int:
+    import functools
+    import threading
+    import time
+    from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+
+    ws = Workspace(args)
+    ws.cycle()
+    handler = functools.partial(SimpleHTTPRequestHandler, directory=str(ws.site_dir))
+    handler.log_message = lambda *a, **k: None
+    server = ThreadingHTTPServer((args.host, args.port), handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    print(f"serving http://{args.host}:{args.port}  (scores every {args.scores_every} min, odds every {args.odds_every} min; Ctrl+C to stop)")
+    last_odds = time.monotonic()
+    try:
+        while True:
+            time.sleep(args.scores_every * 60)
+            try:
+                if not ws.demo and time.monotonic() - last_odds >= args.odds_every * 60:
+                    ws.cycle()
+                    last_odds = time.monotonic()
+                else:
+                    ws.scores()
+            except Exception as exc:  # keep serving through a bad refresh
+                print("refresh failed:", exc)
+    except KeyboardInterrupt:
+        server.shutdown()
+    return 0
+
+
 def cmd_sports(_args) -> int:
     rows = [[k, c.name, c.odds_key, c.espn_path, len(c.props)] for k, c in SPORTS.items()]
     print(report.table(["Key", "Name", "Odds API key", "ESPN path", "Prop markets"], rows, "llllr"))
@@ -118,8 +270,9 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--prop-markets", help="comma separated prop market keys (default: all for the sport)")
     s.add_argument("--min-ev", type=float, default=0.02, help="minimum EV per unit staked (default 0.02)")
     s.add_argument("--max-ev", type=float, default=0.30, help="hide picks above this EV as suspect (default 0.30)")
-    s.add_argument("--market-weight", type=float, default=0.5,
-                   help="0..1 weight on the no-vig market probability vs the model (default 0.5)")
+    s.add_argument("--market-weight", type=float, default=0.75,
+                   help="0..1 weight on the no-vig market probability vs the model for game lines (default 0.75)")
+    s.add_argument("--prop-market-weight", type=float, default=0.8, help="same for player props (default 0.8)")
     s.add_argument("--kelly", type=float, default=0.25, help="Kelly multiplier (default 0.25 = quarter Kelly)")
     s.add_argument("--max-stake", type=float, default=0.03, help="max bankroll fraction per bet (default 0.03)")
     s.add_argument("--bankroll", type=float, help="show stakes in dollars")
@@ -144,6 +297,39 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--days", type=int, default=60, help="days of games to test on")
     b.add_argument("--refit-days", type=int, default=7)
     b.set_defaults(func=cmd_backtest)
+
+    def board_opts(sp):
+        common(sp)
+        sp.add_argument("--props", action="store_true", help="also price player props")
+        sp.add_argument("--min-ev", type=float, default=0.02)
+        sp.add_argument("--max-ev", type=float, default=0.30)
+        sp.add_argument("--market-weight", type=float, default=0.75)
+        sp.add_argument("--prop-market-weight", type=float, default=0.8)
+        sp.add_argument("--kelly", type=float, default=0.25)
+        sp.add_argument("--max-stake", type=float, default=0.03)
+        sp.add_argument("--show-flagged", action="store_true")
+        sp.add_argument("--hours", type=float, default=72, help="only events within this many hours (default 72)")
+        sp.add_argument("--books", help="comma separated bookmaker keys")
+        sp.add_argument("--regions", default="us")
+        sp.add_argument("--data-dir", default="data", help="where the pick ledger lives (default ./data)")
+        sp.add_argument("--site", default="site", help="where the dashboard is written (default ./site)")
+        sp.add_argument("--tz", default="America/Los_Angeles", help="time zone for 'today' (default Pacific)")
+        sp.add_argument("--start-bankroll", type=float, default=1000.0)
+        sp.add_argument("--history-days", type=int, default=14, help="demo only: days of simulated history")
+
+    rn = sub.add_parser("run", help="one cycle: scan, publish picks, track lines, grade, build the dashboard")
+    board_opts(rn)
+    rn.add_argument("--scores-only", action="store_true",
+                    help="only update live scores and grade (ESPN only, no odds credits)")
+    rn.set_defaults(func=cmd_run)
+
+    sv = sub.add_parser("serve", help="run the engine continuously and serve the dashboard")
+    board_opts(sv)
+    sv.add_argument("--host", default="127.0.0.1")
+    sv.add_argument("--port", type=int, default=8000)
+    sv.add_argument("--scores-every", type=float, default=2, help="minutes between live score updates")
+    sv.add_argument("--odds-every", type=float, default=60, help="minutes between odds scans")
+    sv.set_defaults(func=cmd_serve)
 
     sub.add_parser("sports", help="list supported sports").set_defaults(func=cmd_sports)
     return p

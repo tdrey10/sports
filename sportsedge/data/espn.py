@@ -81,6 +81,24 @@ class EspnClient:
     def summary(self, cfg: SportConfig, event_id: str) -> dict:
         return self._get(f"{BASE}/{cfg.espn_path}/summary", {"event": event_id}, ttl=None)
 
+    def box_score(self, cfg: SportConfig, game: GameResult) -> list[PlayerGame]:
+        try:
+            return parse_box_score(self.summary(cfg, game.event_id), game.event_id, game.date)
+        except requests.RequestException as exc:
+            log.warning("ESPN summary %s failed: %s", game.event_id, exc)
+            return []
+
+    def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
+        """team display name -> [(player, status)] from ESPN's league injury report."""
+        if not cfg.has_injury_feed:
+            return {}
+        try:
+            data = self._get(f"{BASE}/{cfg.espn_path}/injuries", {}, ttl=1800)
+        except requests.RequestException as exc:
+            log.warning("ESPN injuries %s failed: %s", cfg.key, exc)
+            return {}
+        return parse_injuries(data)
+
     def player_games(self, cfg: SportConfig, results: list[GameResult], team: str) -> list[PlayerGame]:
         team_games = [g for g in results if g.completed and team in (g.home, g.away)]
         team_games = sorted(team_games, key=lambda g: g.date)[-cfg.prop_games:]
@@ -102,26 +120,46 @@ def _parse_event(ev: dict) -> GameResult | None:
         home, away = teams["home"], teams["away"]
     except (KeyError, IndexError):
         return None
-    completed = bool(ev.get("status", {}).get("type", {}).get("completed"))
+    status = ev.get("status", {}).get("type", {})
+    completed = bool(status.get("completed"))
+    state = status.get("state", "")
 
     def score(c: dict) -> float | None:
-        if not completed:
-            return None
         try:
             return float(c.get("score"))
         except (TypeError, ValueError):
             return None
 
     hs, as_ = score(home), score(away)
+    final = completed and hs is not None and as_ is not None
+    live = state == "in" and hs is not None and as_ is not None
     return GameResult(
         event_id=str(ev["id"]),
         date=parse_date(ev["date"]),
         home=home["team"]["displayName"],
         away=away["team"]["displayName"],
-        home_score=hs if as_ is not None else None,
-        away_score=as_ if hs is not None else None,
+        home_score=hs if final else None,
+        away_score=as_ if final else None,
         neutral=bool(comp.get("neutralSite", False)),
+        state="post" if completed else state,
+        detail=status.get("shortDetail") or status.get("detail") or "",
+        live_home=hs if live else None,
+        live_away=as_ if live else None,
     )
+
+
+def parse_injuries(data: dict) -> dict[str, list[tuple[str, str]]]:
+    out: dict[str, list[tuple[str, str]]] = {}
+    for block in data.get("injuries", []) or []:
+        team = block.get("displayName") or (block.get("team") or {}).get("displayName")
+        if not team:
+            continue
+        for item in block.get("injuries", []) or []:
+            name = (item.get("athlete") or {}).get("displayName")
+            status = item.get("status") or (item.get("type") or {}).get("description") or ""
+            if name:
+                out.setdefault(team, []).append((name, status))
+    return out
 
 
 def _parse_stat(raw: str) -> list[float] | None:

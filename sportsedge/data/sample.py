@@ -103,6 +103,7 @@ class SampleProvider:
         self.seed = seed
         self.now = now or datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
         self.book_noise = book_noise  # book rating error, as a fraction of the team spread
+        self.clock = self.now  # "current time" for events/odds; move it to replay past days
         self._worlds: dict[str, dict] = {}
 
     # --------------------------------------------------------------- world gen
@@ -143,14 +144,10 @@ class SampleProvider:
         # Upcoming slate (each team at most once)
         order = names[:]
         rng.shuffle(order)
-        events: list[Event] = []
         for i in range(min(_EVENTS[fam], n // 2)):
             h, a = order[2 * i], order[2 * i + 1]
             start = self.now + timedelta(hours=3 + i)
-            ev = Event(id=f"{cfg.key}-e{i}", sport=cfg.key, commence_time=start, home=h, away=a)
-            ev.quotes = self._game_quotes(cfg, book_view, ev, rng)
-            events.append(ev)
-            results.append(GameResult(ev.id, start, h, a, None, None))
+            results.append(GameResult(f"{cfg.key}-e{i}", start, h, a, None, None, state="pre"))
 
         # Rosters
         players: dict[str, list[tuple[str, dict[str, tuple[float, str]]]]] = {}
@@ -167,7 +164,10 @@ class SampleProvider:
                     roster.append((pname, {k: (rng.uniform(lo, hi), kind) for k, (lo, hi, kind) in stats.items()}))
             players[team] = roster
 
-        world = {"truth": truth, "book": book_view, "results": results, "events": events, "players": players}
+        out_players = {
+            team: {p for p, _ in roster if rng.random() < 0.04} for team, roster in players.items()
+        }
+        world = {"truth": truth, "book": book_view, "results": results, "players": players, "out": out_players}
         self._worlds[cfg.key] = world
         return world
 
@@ -176,10 +176,22 @@ class SampleProvider:
         if cfg.scoring == "normal":
             sd = cfg.margin_sd / math.sqrt(2)
             return max(0, round(rng.gauss(eh, sd))), max(0, round(rng.gauss(ea, sd)))
-        return _draw_count(rng, eh, cfg.dispersion), _draw_count(rng, ea, cfg.dispersion)
+        hs, as_ = _draw_count(rng, eh, cfg.dispersion), _draw_count(rng, ea, cfg.dispersion)
+        if hs == as_ and not cfg.draws:  # overtime / extra innings
+            if rng.random() < eh / (eh + ea):
+                hs += 1
+            else:
+                as_ += 1
+        return hs, as_
 
-    def _game_quotes(self, cfg: SportConfig, book_view: TeamRatings, ev: Event, rng: random.Random) -> list[Quote]:
-        pred = predict_game(cfg, book_view, ev.home, ev.away)
+    def _game_quotes(self, cfg: SportConfig, world: dict, ev: Event) -> list[Quote]:
+        """Opening lines come from the books' noisy ratings; prices then drift
+        toward the true odds as kick-off approaches (sharp money moving them)."""
+        rng = random.Random(_seed(self.seed, ev.id, "lines"))
+        pred = predict_game(cfg, world["book"], ev.home, ev.away)
+        true = predict_game(cfg, world["truth"], ev.home, ev.away)
+        hours = (ev.commence_time - self.clock).total_seconds() / 3600
+        drift = min(max(1 - hours / 48, 0.0), 1.0) * 0.6
         quotes: list[Quote] = []
         if cfg.scoring == "normal":
             spread_line = -round(pred.exp_margin * 2) / 2
@@ -193,17 +205,17 @@ class SampleProvider:
             vig = 0.025 if book == "pinnacle" else 0.045
             jitter = rng.gauss(0, 0.012)
             sides = ["home", "away"] + (["draw"] if cfg.draws else [])
-            probs = [pred.moneyline(s)[0] for s in sides]
+            probs = [_mix(pred.moneyline(s)[0], true.moneyline(s)[0], drift) for s in sides]
             probs[0] += jitter
             probs[1] -= jitter
             quotes += [Quote("h2h", s, None, book, _price(p, vig, len(sides))) for s, p in zip(sides, probs)]
             if not cfg.draws:
-                win, push, loss = pred.spread("home", spread_line)
-                p = win / (win + loss) + rng.gauss(0, 0.01)
+                p = _mix(_cond(pred.spread("home", spread_line)), _cond(true.spread("home", spread_line)), drift)
+                p += rng.gauss(0, 0.01)
                 quotes.append(Quote("spreads", "home", spread_line, book, _price(p, vig)))
                 quotes.append(Quote("spreads", "away", -spread_line, book, _price(1 - p, vig)))
-            win, push, loss = pred.total("over", total_line)
-            p = win / (win + loss) + rng.gauss(0, 0.01)
+            p = _mix(_cond(pred.total("over", total_line)), _cond(true.total("over", total_line)), drift)
+            p += rng.gauss(0, 0.01)
             quotes.append(Quote("totals", "over", total_line, book, _price(p, vig)))
             quotes.append(Quote("totals", "under", total_line, book, _price(1 - p, vig)))
         return quotes
@@ -212,8 +224,42 @@ class SampleProvider:
     def game_results(self, cfg: SportConfig, start: datetime, end: datetime) -> list[GameResult]:
         return [g for g in self._world(cfg)["results"] if start <= g.date <= end]
 
-    def events(self, cfg: SportConfig) -> list[Event]:
-        return list(self._world(cfg)["events"])
+    def events(self, cfg: SportConfig, horizon_hours: float = 36) -> list[Event]:
+        """Games starting within ``horizon_hours`` of the clock, priced as of the clock."""
+        world = self._world(cfg)
+        out = []
+        for g in world["results"]:
+            hours = (g.date - self.clock).total_seconds() / 3600
+            if 0 < hours <= horizon_hours:
+                ev = Event(id=g.event_id, sport=cfg.key, commence_time=g.date, home=g.home, away=g.away)
+                ev.quotes = self._game_quotes(cfg, world, ev)
+                out.append(ev)
+        return out
+
+    def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
+        return {team: [(p, "Out") for p in sorted(names)] for team, names in self._world(cfg)["out"].items() if names}
+
+    def box_score(self, cfg: SportConfig, game: GameResult) -> list[PlayerGame]:
+        world = self._world(cfg)
+        out = []
+        for team in (game.home, game.away):
+            for pname, stats in world["players"].get(team, []):
+                line = self._player_line(game.event_id, pname, stats)
+                if line is not None:
+                    out.append(PlayerGame(game.event_id, game.date, pname, team, line))
+        return out
+
+    def _player_line(self, event_id: str, pname: str, stats: dict) -> dict[str, float] | None:
+        rng = random.Random(_seed(self.seed, event_id, pname))
+        if rng.random() < 0.05:
+            return None  # rest day / injury
+        line = {}
+        for key, (mean, kind) in stats.items():
+            if kind == "normal":
+                line[key] = max(0.0, round(rng.gauss(mean, 0.4 * mean)))
+            else:
+                line[key] = float(_draw_count(rng, mean, _prop_dispersion(mean)))
+        return line
 
     def prop_quotes(self, cfg: SportConfig, event: Event, markets: list[str]) -> list[Quote]:
         world = self._world(cfg)
@@ -221,6 +267,8 @@ class SampleProvider:
         quotes: list[Quote] = []
         for team in (event.home, event.away):
             for pname, stats in world["players"].get(team, []):
+                if pname in world["out"].get(team, ()):
+                    continue  # books pull props for players ruled out
                 for market in markets:
                     spec = cfg.props.get(market)
                     if spec is None:
@@ -245,22 +293,24 @@ class SampleProvider:
 
     def player_games(self, cfg: SportConfig, results: list[GameResult], team: str) -> list[PlayerGame]:
         world = self._world(cfg)
-        games = [g for g in world["results"] if g.completed and team in (g.home, g.away)]
+        games = [g for g in world["results"] if g.completed and team in (g.home, g.away) and g.date < self.clock]
         games = sorted(games, key=lambda g: g.date)[-cfg.prop_games:]
         out = []
         for g in games:
             for pname, stats in world["players"].get(team, []):
-                rng = random.Random(_seed(self.seed, g.event_id, pname))
-                if rng.random() < 0.05:
-                    continue  # rest day / injury
-                line = {}
-                for key, (mean, kind) in stats.items():
-                    if kind == "normal":
-                        line[key] = max(0.0, round(rng.gauss(mean, 0.4 * mean)))
-                    else:
-                        line[key] = float(_draw_count(rng, mean, _prop_dispersion(mean)))
-                out.append(PlayerGame(g.event_id, g.date, pname, team, line))
+                line = self._player_line(g.event_id, pname, stats)
+                if line is not None:
+                    out.append(PlayerGame(g.event_id, g.date, pname, team, line))
         return out
+
+
+def _mix(a: float, b: float, w: float) -> float:
+    return a + (b - a) * w
+
+
+def _cond(outcome: tuple[float, float, float]) -> float:
+    win, _, loss = outcome
+    return win / (win + loss) if win + loss > 0 else 0.5
 
 
 def _stat_pmf(mean: float, kind: str):

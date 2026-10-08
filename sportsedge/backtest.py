@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
 from .models.game import predict_game
-from .models.ratings import GameResult, fit_ratings
+from .models.ratings import GameResult, fit_ratings, is_b2b, rest_days
 from .sports import SportConfig
 
 
@@ -26,6 +26,8 @@ class BacktestReport:
     accuracy: float = 0.0
     margin_mae: float = 0.0
     total_mae: float = 0.0
+    margin_rmse: float = 0.0
+    total_rmse: float = 0.0
     baseline_log_loss: float = 0.0  # always predicting the home-win base rate
     calibration: list[tuple[float, float, int]] = field(default_factory=list)  # (pred, actual, n)
 
@@ -40,6 +42,7 @@ def backtest(
 ) -> BacktestReport:
     completed = sorted((g for g in results if g.completed), key=lambda g: g.date)
     rows: list[tuple[float, float, float, float, float, float]] = []  # p_home, outcome, pm, am, pt, at
+    rest = rest_days(results) if cfg.rest_effects else {}
     cursor = start
     while cursor < end:
         nxt = min(cursor + timedelta(days=refit_days), end)
@@ -48,9 +51,18 @@ def backtest(
         cursor = nxt
         if len(train) < min_train_games or not test:
             continue
-        ratings = fit_ratings(train, cursor, cfg.half_life_days, cfg.ridge, cfg.link, cfg.unknown_percentile)
+        # Fit as of the start of the test window so no test game leaks into training.
+        as_of = test[0].date
+        ratings = fit_ratings(
+            train, as_of, cfg.half_life_days, cfg.ridge, cfg.link, cfg.unknown_percentile,
+            rest_effects=cfg.rest_effects,
+        )
         for g in test:
-            pred = predict_game(cfg, ratings, g.home, g.away, g.neutral)
+            pred = predict_game(
+                cfg, ratings, g.home, g.away, g.neutral,
+                home_b2b=is_b2b(rest.get((g.event_id, g.home))),
+                away_b2b=is_b2b(rest.get((g.event_id, g.away))),
+            )
             margin = g.home_score - g.away_score
             if cfg.draws:
                 # Score the 3-way market as home-win vs not.
@@ -73,6 +85,8 @@ def backtest(
     report.accuracy = sum((p > 0.5) == (o == 1.0) for p, o, *_ in rows) / n
     report.margin_mae = sum(abs(pm - am) for _, _, pm, am, _, _ in rows) / n
     report.total_mae = sum(abs(pt - at) for *_, pt, at in rows) / n
+    report.margin_rmse = math.sqrt(sum((pm - am) ** 2 for _, _, pm, am, _, _ in rows) / n)
+    report.total_rmse = math.sqrt(sum((pt - at) ** 2 for *_, pt, at in rows) / n)
     base = sum(o for _, o, *_ in rows) / n
     base = min(max(base, eps), 1 - eps)
     report.baseline_log_loss = -(base * math.log(base) + (1 - base) * math.log(1 - base))

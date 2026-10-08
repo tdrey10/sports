@@ -6,14 +6,34 @@ import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 
-from .data.base import DataProvider, Event, NameMatcher, Quote
+from .brain import BrainReport, train
+from .data.base import DataProvider, Event, NameMatcher, Quote, is_out
 from .edge import Pick, Settings, evaluate, fmt_point
 from .models.game import GamePrediction, baseline_team_score, predict_game
 from .models.props import PlayerGame, PropProjection, project_prop
-from .models.ratings import GameResult, TeamRatings, fit_ratings
+from .models.ratings import GameResult, TeamRatings, fit_ratings, is_b2b
 from .sports import SportConfig
 
 log = logging.getLogger(__name__)
+
+
+@dataclass
+class EventContext:
+    event: Event
+    home: str  # stats-source (ESPN) team names
+    away: str
+    neutral: bool
+    home_rest: float | None
+    away_rest: float | None
+    injuries: dict[str, list[str]] = field(default_factory=dict)  # team -> players out
+
+    @property
+    def home_b2b(self) -> bool:
+        return is_b2b(self.home_rest)
+
+    @property
+    def away_b2b(self) -> bool:
+        return is_b2b(self.away_rest)
 
 
 @dataclass
@@ -21,16 +41,26 @@ class SportScan:
     sport: SportConfig
     picks: list[Pick] = field(default_factory=list)
     predictions: dict[str, GamePrediction] = field(default_factory=dict)
+    contexts: dict[str, EventContext] = field(default_factory=dict)
+    results: list[GameResult] = field(default_factory=list)
     ratings: TeamRatings | None = None
+    brain: BrainReport | None = None
     warnings: list[str] = field(default_factory=list)
     events: int = 0
 
 
 class Engine:
-    def __init__(self, provider: DataProvider, settings: Settings | None = None, now: datetime | None = None):
+    def __init__(
+        self,
+        provider: DataProvider,
+        settings: Settings | None = None,
+        now: datetime | None = None,
+        calibrate: bool = False,
+    ):
         self.provider = provider
         self.settings = settings or Settings()
         self.now = now or datetime.now(timezone.utc)
+        self.calibrate = calibrate
 
     # ------------------------------------------------------------------ public
     def scan(
@@ -53,6 +83,10 @@ class Engine:
         results = self.provider.game_results(
             cfg, self.now - timedelta(days=cfg.lookback_days), self.now + timedelta(days=10)
         )
+        scan.results = results
+        if self.calibrate:
+            cfg, scan.brain = train(cfg, results, self.now)
+        injuries = self._injuries(cfg)
         try:
             ratings = self.fit(cfg, results)
         except ValueError as exc:
@@ -63,6 +97,7 @@ class Engine:
         teams = set(ratings.off) | {g.home for g in results} | {g.away for g in results}
         matcher = NameMatcher(teams)
         scheduled = [g for g in results if not g.completed]
+        injury_matcher = NameMatcher(injuries) if injuries else None
 
         for event in events:
             home = matcher.match(event.home) or event.home
@@ -74,13 +109,28 @@ class Engine:
                         f"{ratings.unknown_percentile:.0f}th-percentile team"
                     )
             neutral = event.neutral or _is_neutral(scheduled, home, away, event.commence_time)
-            pred = predict_game(cfg, ratings, home, away, neutral)
+            ctx = EventContext(
+                event, home, away, neutral,
+                _rest_before(results, home, event.commence_time),
+                _rest_before(results, away, event.commence_time),
+            )
+            if injury_matcher:
+                for team in (home, away):
+                    key = injury_matcher.match(team)
+                    if key:
+                        ctx.injuries[team] = [p for p, status in injuries[key] if is_out(status)]
+            scan.contexts[event.id] = ctx
+            use_rest = cfg.rest_effects
+            pred = predict_game(
+                cfg, ratings, home, away, neutral,
+                home_b2b=use_rest and ctx.home_b2b, away_b2b=use_rest and ctx.away_b2b,
+            )
             scan.predictions[event.id] = pred
             scan.picks.extend(self._game_picks(cfg, event, pred))
 
             if props and cfg.props:
                 markets = [m for m in (prop_markets or cfg.props) if m in cfg.props]
-                scan.picks.extend(self._prop_picks(cfg, event, pred, ratings, results, markets, scan))
+                scan.picks.extend(self._prop_picks(cfg, event, pred, ratings, results, markets, scan, ctx))
 
         scan.picks.sort(key=lambda p: p.ev, reverse=True)
         return scan
@@ -93,7 +143,18 @@ class Engine:
             ridge=cfg.ridge,
             link=cfg.link,
             unknown_percentile=cfg.unknown_percentile,
+            rest_effects=cfg.rest_effects,
         )
+
+    def _injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
+        getter = getattr(self.provider, "injuries", None)
+        if getter is None:
+            return {}
+        try:
+            return getter(cfg) or {}
+        except Exception as exc:  # injury feeds are best effort
+            log.warning("injuries for %s unavailable: %s", cfg.key, exc)
+            return {}
 
     # --------------------------------------------------------------- internals
     def _game_picks(self, cfg: SportConfig, event: Event, pred: GamePrediction) -> list[Pick]:
@@ -140,6 +201,7 @@ class Engine:
         results: list[GameResult],
         markets: list[str],
         scan: SportScan,
+        ctx: EventContext,
     ) -> list[Pick]:
         quotes = self.provider.prop_quotes(cfg, event, markets)
         if not quotes:
@@ -154,10 +216,14 @@ class Engine:
             scan.warnings.append(f"{event.away} @ {event.home}: no player box scores for props")
             return []
         players = NameMatcher(logs, threshold=0.88)
+        ruled_out = {p for names in ctx.injuries.values() for p in names}
+        out_matcher = NameMatcher(ruled_out, threshold=0.9)
         cache: dict[tuple[str, str], PropProjection | None] = {}
         missing: set[str] = set()
 
         def projection(q: Quote) -> PropProjection | None:
+            if ruled_out and out_matcher.match(q.player or ""):
+                return None  # listed out: the prop will be voided or pulled
             name = players.match(q.player or "")
             if name is None:
                 missing.add(q.player or "?")
@@ -177,13 +243,20 @@ class Engine:
             proj = projection(q)
             spec = cfg.props[q.market]
             sel = f"{q.player} {q.side.title()} {fmt_point(q.point, signed=False)} {spec.label}"
-            desc = f"proj {proj.mean:.1f} ± {proj.sd:.1f} over {proj.games} games" if proj else ""
+            desc = f"projects {proj.mean:.1f} ± {proj.sd:.1f} (last {proj.games} games)" if proj else ""
             return sel, desc
 
         picks = evaluate(event, quotes, model, describe, self.settings, lambda m: 2)
         if missing:
             log.info("no box scores matched for %d players: %s", len(missing), ", ".join(sorted(missing)[:10]))
         return picks
+
+
+def _rest_before(results: list[GameResult], team: str, when: datetime) -> float | None:
+    prev = [g.date for g in results if team in (g.home, g.away) and g.date < when - timedelta(hours=3)]
+    if not prev:
+        return None
+    return (when - max(prev)).total_seconds() / 86400.0
 
 
 def _is_neutral(scheduled: list[GameResult], home: str, away: str, when: datetime) -> bool:

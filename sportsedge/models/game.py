@@ -53,9 +53,15 @@ class GamePrediction:
 
 
 def predict_game(
-    cfg: SportConfig, ratings: TeamRatings, home: str, away: str, neutral: bool = False
+    cfg: SportConfig,
+    ratings: TeamRatings,
+    home: str,
+    away: str,
+    neutral: bool = False,
+    home_b2b: bool = False,
+    away_b2b: bool = False,
 ) -> GamePrediction:
-    eh, ea = ratings.expected_scores(home, away, neutral)
+    eh, ea = ratings.expected_scores(home, away, neutral, home_b2b, away_b2b)
     if cfg.scoring == "normal":
         return _predict_normal(cfg, home, away, eh, ea)
     return _predict_count(cfg, home, away, eh, ea)

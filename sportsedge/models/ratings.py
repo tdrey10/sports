@@ -30,10 +30,33 @@ class GameResult:
     home_score: float | None
     away_score: float | None
     neutral: bool = False
+    state: str = ""  # "pre", "in" or "post" when known
+    detail: str = ""  # e.g. "1:28 - 3rd" for games in progress
+    live_home: float | None = None
+    live_away: float | None = None
 
     @property
     def completed(self) -> bool:
         return self.home_score is not None and self.away_score is not None
+
+
+B2B_HOURS = 36.0
+
+
+def rest_days(games: Iterable[GameResult]) -> dict[tuple[str, str], float]:
+    """Days since each team's previous game, keyed by (event_id, team)."""
+    last: dict[str, datetime] = {}
+    out: dict[tuple[str, str], float] = {}
+    for g in sorted(games, key=lambda g: g.date):
+        for team in (g.home, g.away):
+            prev = last.get(team)
+            out[(g.event_id, team)] = (g.date - prev).total_seconds() / 86400.0 if prev else 7.0
+            last[team] = g.date
+    return out
+
+
+def is_b2b(days: float | None) -> bool:
+    return days is not None and days * 24 <= B2B_HOURS
 
 
 @dataclass
@@ -45,6 +68,8 @@ class TeamRatings:
     deff: dict[str, float]
     games_played: dict[str, float] = field(default_factory=dict)
     unknown_percentile: float = 50.0
+    b2b_off: float = 0.0  # change to a team's own score when on a back-to-back
+    b2b_def: float = 0.0  # change to a team's score when its opponent is on a back-to-back
 
     def _rating(self, table: dict[str, float], team: str) -> float:
         if team in table:
@@ -56,10 +81,14 @@ class TeamRatings:
     def knows(self, team: str) -> bool:
         return team in self.off
 
-    def expected_scores(self, home: str, away: str, neutral: bool = False) -> tuple[float, float]:
+    def expected_scores(
+        self, home: str, away: str, neutral: bool = False, home_b2b: bool = False, away_b2b: bool = False
+    ) -> tuple[float, float]:
         h = 0.0 if neutral else self.hfa
         eta_home = self.mu + h + self._rating(self.off, home) - self._rating(self.deff, away)
         eta_away = self.mu + self._rating(self.off, away) - self._rating(self.deff, home)
+        eta_home += self.b2b_off * home_b2b + self.b2b_def * away_b2b
+        eta_away += self.b2b_off * away_b2b + self.b2b_def * home_b2b
         if self.link == "log":
             return math.exp(eta_home), math.exp(eta_away)
         return max(eta_home, 0.1), max(eta_away, 0.1)
@@ -87,14 +116,20 @@ def fit_ratings(
     link: str = "identity",
     unknown_percentile: float = 50.0,
     max_iter: int = 50,
+    rest_effects: bool = False,
 ) -> TeamRatings:
+    """Fit ratings. With ``rest_effects`` two extra coefficients learn how much
+    a back-to-back changes a team's own scoring and what it concedes."""
     games = [g for g in results if g.completed and g.date < as_of]
     if not games:
         raise ValueError("no completed games to fit ratings on")
     teams = sorted({g.home for g in games} | {g.away for g in games})
     idx = {t: i for i, t in enumerate(teams)}
     n = len(teams)
-    n_params = 2 + 2 * n  # mu, hfa, off..., def...
+    extra = 2 if rest_effects else 0
+    n_params = 2 + extra + 2 * n  # mu, hfa, [b2b_off, b2b_def], off..., def...
+    base = 2 + extra
+    rest = rest_days(results) if rest_effects else {}
 
     rows, ys, ws = [], [], []
     games_played: dict[str, float] = {t: 0.0 for t in teams}
@@ -106,7 +141,9 @@ def fit_ratings(
             (g.home, g.away, g.home_score, home_flag),
             (g.away, g.home, g.away_score, 0.0),
         ):
-            rows.append((flag, idx[team], idx[opp]))
+            own = is_b2b(rest.get((g.event_id, team)))
+            other = is_b2b(rest.get((g.event_id, opp)))
+            rows.append((flag, idx[team], idx[opp], own, other))
             ys.append(float(score))
             ws.append(w)
         games_played[g.home] += w
@@ -114,15 +151,20 @@ def fit_ratings(
 
     m = len(rows)
     X = np.zeros((m, n_params))
-    for r, (flag, ti, oi) in enumerate(rows):
+    for r, (flag, ti, oi, own, other) in enumerate(rows):
         X[r, 0] = 1.0
         X[r, 1] = flag
-        X[r, 2 + ti] = 1.0
-        X[r, 2 + n + oi] = -1.0
+        if rest_effects:
+            X[r, 2] = float(own)
+            X[r, 3] = float(other)
+        X[r, base + ti] = 1.0
+        X[r, base + n + oi] = -1.0
     y = np.asarray(ys)
     w = np.asarray(ws)
     penalty = np.full(n_params, ridge)
     penalty[:2] = 1e-6
+    if rest_effects:
+        penalty[2:4] = 1.0  # mild shrinkage: few back-to-backs early in a season
 
     if link == "identity":
         beta = _weighted_ridge(X, y, w, penalty)
@@ -143,8 +185,8 @@ def fit_ratings(
     else:
         raise ValueError(f"unknown link {link!r}")
 
-    off = {t: float(beta[2 + i]) for t, i in idx.items()}
-    deff = {t: float(beta[2 + n + i]) for t, i in idx.items()}
+    off = {t: float(beta[base + i]) for t, i in idx.items()}
+    deff = {t: float(beta[base + n + i]) for t, i in idx.items()}
     return TeamRatings(
         link=link,
         mu=float(beta[0]),
@@ -153,6 +195,8 @@ def fit_ratings(
         deff=deff,
         games_played=games_played,
         unknown_percentile=unknown_percentile,
+        b2b_off=float(beta[2]) if rest_effects else 0.0,
+        b2b_def=float(beta[3]) if rest_effects else 0.0,
     )
 
 

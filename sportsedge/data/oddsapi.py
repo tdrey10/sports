@@ -52,6 +52,12 @@ class OddsApiClient:
         resp.raise_for_status()
         return resp.json()
 
+    def active_keys(self) -> set[str]:
+        """Sport keys currently in season (this endpoint costs no credits)."""
+        resp = self.session.get(f"{BASE}/sports", params={"apiKey": self.api_key}, timeout=self.timeout)
+        resp.raise_for_status()
+        return {s["key"] for s in resp.json() if s.get("active")}
+
     def events(self, cfg: SportConfig) -> list[Event]:
         data = self._get(f"/sports/{cfg.odds_key}/odds", {"markets": ",".join(GAME_MARKETS)})
         return [parse_event(cfg, ev) for ev in data]
