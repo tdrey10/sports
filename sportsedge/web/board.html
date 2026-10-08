@@ -429,6 +429,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       .map(([k, n]) => { const s = st.by_market[k]; return `<tr><td>${n}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`; }).join("");
     const sportRows = Object.entries(st.by_sport).map(([k, s]) => `<tr><td>${esc(s.name)}</td><td>${rec(s)}</td><td>${pct(s.win_pct)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td></tr>`).join("");
     const b = st.best || { won: 0, lost: 0, units: 0 };
+    const labels = DATA.spot_labels || {};
+    const spotRows = Object.entries(st.by_spot || {}).map(([k, s]) => `<tr><td>${esc(labels[k] || k)}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`).join("");
     const recent = DATA.entries.filter((e) => e.settled && e.status !== "void" && visible(e)).sort((a, b) => (b.graded_at || "").localeCompare(a.graded_at || "")).slice(0, 15);
     return panel("Bankroll", `Started at ${money(st.start_bankroll)} · 1 unit = ${money(st.unit_value)}`,
         `<div class="stats"><div class="stat"><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b></div>
@@ -437,6 +439,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + panel("By pick type", "", `<div class="table-wrap"><table><thead><tr><th>Pick</th><th>W-L</th><th>Units</th><th>ROI</th></tr></thead><tbody>${tierRows}</tbody></table></div>`)
       + panel("By bet type", "CLV: our price vs the closing line", `<div class="table-wrap"><table><thead><tr><th>Bet</th><th>W-L</th><th>Units</th><th>CLV</th></tr></thead><tbody>${typeRows}</tbody></table></div>`)
       + (sportRows ? panel("By sport", "", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>W-L</th><th>Win</th><th>Units</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
+      + panel("By early-bet spot", "Each spot keeps its own record · leans count as 1u", spotRows
+          ? `<div class="table-wrap"><table><thead><tr><th>Spot</th><th>W-L</th><th>Units</th><th>CLV</th></tr></thead><tbody>${spotRows}</tbody></table></div>`
+          : empty("No graded picks in a spot yet."))
       + panel("Latest graded", "", recent.length ? recent.map((e) => row(e, { matchup: true })).join("") : empty("Results appear after games finish."));
   }
 
@@ -470,7 +475,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
          <div class="table-wrap"><table><thead><tr><th>Sport</th><th>Games</th><th>Trust · edge</th><th>Tuned W-L</th><th>Tuned ROI</th><th>Blind W-L</th><th>Blind ROI</th><th>Early ROI</th><th>Status</th></tr></thead><tbody>${sRows}</tbody></table></div>
          ${big && big.calibration && big.calibration.length >= 3 ? `<div class="grid two"><div>${calibChart(big.calibration)}</div><p class="empty">${esc(big.name)}: each dot is a group of past lines. Dots on the dashed line mean that when the engine said 60%, those bets won 60% of the time. The edge score uses this to correct its win odds before ranking.</p></div>` : ""}`)
       : panel("Studies", "", empty("The first study runs on the next daily cycle (8:47 AM Pacific) and fills this in."));
-    return studyPanel + panel("How the model is doing", b[0] ? "Retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
+    const spotStudy = [];
+    studies.forEach((s) => (s.spots || []).forEach((r) => spotStudy.push(`<tr><td>${esc(s.name)}</td><td>${esc(r.label)}</td><td>${wl(r.open_blind)}</td>${roiCell(r.open_blind)}<td>${wl(r.close_blind)}</td>${roiCell(r.close_blind)}<td class="${cls(r.open_clv)}">${r.open_clv == null ? "–" : signed(r.open_clv * 100, 1) + "%"}</td><td>${r.proven ? `<span class="pill ok">Proven blind</span>` : `<span class="pill wait">Not yet</span>`}</td></tr>`)));
+    const spotPanel = spotStudy.length ? panel("Early-bet spots", "Dogs +100 to +220 · blind games only",
+        `<p class="empty">Each spot is judged on its own: bet every dog in that spot, at the opening line and at the close, on games the settings never saw. A spot adds weight to a pick only after it holds up blind, and all spots together are capped at 6 points of win chance on a dog.</p>
+         <div class="table-wrap"><table><thead><tr><th>Sport</th><th>Spot</th><th>Open W-L</th><th>Open ROI</th><th>Close W-L</th><th>Close ROI</th><th>Open CLV</th><th>Status</th></tr></thead><tbody>${spotStudy.join("")}</tbody></table></div>`) : "";
+    return studyPanel + spotPanel + panel("How the model is doing", b[0] ? "Retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
       `<div class="model"><ul>
         ${all.g ? `<li>Picks the straight-up winner <b>${pct(all.w / all.g, 0)}</b> of the time on ${all.g.toLocaleString()} recent games it never saw.</li>` : ""}
         ${keys.length ? `<li>Learned NFL key numbers from real scores: ${keys.map((k) => k[0]).join(", ")}.</li>` : ""}

@@ -61,6 +61,7 @@ class Entry:
     market_prob: float | None = None
     best_rank: int | None = None
     score: float | None = None  # edge score 0-100 when published
+    spots: list[str] = field(default_factory=list)  # early-bet spots, each with its own record
     current_odds: float | None = None
     current_point: float | None = None
     current_book: str | None = None
@@ -210,6 +211,7 @@ class Ledger:
                 market_prob=p.market_prob,
                 best_rank=None,
                 score=card.score,
+                spots=list(card.spots),
                 win_prob=p.win_prob,
                 ev=p.ev,
                 current_odds=p.american,
@@ -373,6 +375,11 @@ class Ledger:
                 for m in ("spreads", "totals", "props", "moneyline")
             },
             "by_sport": by_sport,
+            # Each early-bet spot's own record (leans count as 1 unit), kept apart from everything else.
+            "by_spot": {
+                k: summary([e for e in settled if k in (e.spots or [])])
+                for k in sorted({k for e in settled for k in (e.spots or [])})
+            },
             "leans": {"won": lean_won, "lost": lean_lost,
                       "win_pct": lean_won / (lean_won + lean_lost) if lean_won + lean_lost else None},
             "curve": curve,

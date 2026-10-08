@@ -113,7 +113,8 @@ def cmd_study(args) -> int:
     now = _now(provider)
     data_dir = Path(args.data_dir)
     history = study.ClosingHistory(
-        data_dir / ("demo-history" if args.demo else "history"), provider.closing_quotes, budget=args.budget
+        data_dir / ("demo-history" if args.demo else "history"), provider.closing_quotes, budget=args.budget,
+        minutes=args.minutes,
     )
     names = args.sports if args.sports != ["all"] or not args.demo else [DEMO_SPORTS]
     games_dir = data_dir / ("demo-games" if args.demo else "games")
@@ -208,6 +209,12 @@ class Workspace:
                 weight_overrides={**learned_settings(self.studies), **self.settings.weight_overrides},
                 min_ev_overrides={k: s.min_ev for k, s in self.studies.items() if s.best and s.best.bets >= 30},
                 calibration={k: s.platt for k, s in self.studies.items() if s.platt},
+                # Only spots proven blind add weight: how much more often they won than the close said.
+                spot_weights={
+                    f"{k}:{r['key']}": r["excess_win"]
+                    for k, s in self.studies.items() for r in s.spots
+                    if r.get("proven") and r.get("excess_win")
+                },
             )
 
     def _load_studies(self, data_dir):
@@ -484,8 +491,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     st = sub.add_parser("study", help="test settings on past games at their closing odds and learn pick weights")
     common(st)
-    st.add_argument("--days", type=int, default=180, help="days of finished games to study")
-    st.add_argument("--budget", type=int, default=1500, help="most new games to download closing odds for per run")
+    st.add_argument("--days", type=int, default=730, help="days of finished games to study (about two seasons)")
+    st.add_argument("--budget", type=int, default=5000, help="most new games to download closing odds for per run")
+    st.add_argument("--minutes", type=float, default=None, help="stop downloading after this many minutes")
     st.add_argument("--data-dir", default="data")
     st.set_defaults(func=cmd_study)
 

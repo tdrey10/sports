@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from .edge import Pick, Settings, best_per_event, edge_score, qualifying
 from .engine import SportScan
 from .insights import reasons
+from .spots import SPOTS, is_dog_price
 
 TIER_LABELS = {
     "lock": "Lock of the Day",
@@ -51,6 +52,7 @@ class Card:
     away: str = ""
     best_rank: int | None = None  # 1..BEST_BETS for the day's best bets
     score: float | None = None  # edge score 0-100 (see edge.edge_score)
+    spots: list[str] = field(default_factory=list)  # early-bet spots this pick is in (tracked separately)
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -179,6 +181,14 @@ def build_cards(
             bullets.insert(0, f"Edge score {sc:.0f}/100: {cev:+.1%} edge after the studies' calibration, "
                               f"cashes {cq:.0%} of the time.")
         ctx = scan.contexts.get(pick.event_id) if scan else None
+        in_spots = []
+        if ctx and pick.market == "h2h" and is_dog_price(pick.american):
+            in_spots = list(ctx.spots.get(pick.side, []))
+            for key in in_spots:
+                proven = f"{pick.sport}:{key}" in settings.spot_weights
+                bullets.append(f"Spot: {SPOTS[key].label}"
+                               + (" (proven blind: weighted into the read)." if proven
+                                  else " (tracked; not proven blind yet, so it adds nothing to the read)."))
         if ctx and ctx.injuries_unknown:
             bullets.insert(0, f"No bet: no injury report for {', '.join(ctx.injuries_unknown)}, "
                               "so injuries are unknown. Tracked as a lean only.")
@@ -200,6 +210,7 @@ def build_cards(
                 away=ctx.away if ctx else "",
                 best_rank=best_rank.get(id(pick)),
                 score=scores[id(pick)][0],
+                spots=in_spots,
             )
         )
     return cards

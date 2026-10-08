@@ -12,6 +12,7 @@ from .edge import Pick, Settings, evaluate, fmt_point
 from .models.game import GamePrediction, baseline_team_score, pitcher_factor, predict_game
 from .models.props import PlayerGame, PropProjection, matchup_factor, project_prop, usage_factor
 from .models.ratings import GameResult, TeamRatings, fit_ratings, is_b2b
+from .spots import capped_bump, is_dog_price, team_spots
 from .sports import SportConfig
 
 log = logging.getLogger(__name__)
@@ -28,6 +29,7 @@ class EventContext:
     injuries: dict[str, list[str]] = field(default_factory=dict)  # team -> players out
     injuries_unknown: list[str] = field(default_factory=list)  # teams with no injury report: no bet on this game
     injury_notes: list[str] = field(default_factory=list)  # weighted absences, for display
+    spots: dict[str, list[str]] = field(default_factory=dict)  # side -> early-bet spots it is in as the dog
     home_pitcher: str = ""
     home_pitcher_era: float | None = None
     away_pitcher: str = ""
@@ -167,6 +169,7 @@ class Engine:
                     if hit:
                         win_hit[team] += hit
                         ctx.injury_notes.append(f"{team} without {p} ({pos}): -{hit:.0%} win chance")
+            ctx.spots = team_spots(cfg.key, home, away, event.commence_time, results, neutral)
             scan.contexts[event.id] = ctx
             use_rest = cfg.rest_effects
             eh, ea = ratings.expected_scores(home, away, neutral)
@@ -180,7 +183,7 @@ class Engine:
                 * injury_factor(cfg, win_hit[away], ea),
             )
             scan.predictions[event.id] = pred
-            scan.picks.extend(self._game_picks(cfg, event, pred))
+            scan.picks.extend(self._game_picks(cfg, event, pred, ctx.spots))
 
             props_window = props_hours is None or event.commence_time <= self.now + timedelta(hours=props_hours)
             if props and cfg.props and props_window:
@@ -215,14 +218,27 @@ class Engine:
         return {t: [tuple(x) + ("",) * (3 - len(x)) for x in v] for t, v in report.items()} if report else None
 
     # --------------------------------------------------------------- internals
-    def _game_picks(self, cfg: SportConfig, event: Event, pred: GamePrediction) -> list[Pick]:
+    def _game_picks(self, cfg: SportConfig, event: Event, pred: GamePrediction,
+                    spots: dict[str, list[str]] | None = None) -> list[Pick]:
         quotes = [q for q in event.quotes if q.market in ("h2h", "spreads", "totals")]
+
+        def spot_bump(q: Quote) -> float:
+            """Proven early-bet spots add a capped weight to a +100..+220 dog's moneyline."""
+            if not spots or not is_dog_price(q.american):
+                return 0.0
+            bumps = [self.settings.spot_weights.get(f"{cfg.key}:{k}", 0.0) for k in spots.get(q.side, [])]
+            return capped_bump(bumps, q.american)
 
         def model(q: Quote):
             if q.market == "h2h":
                 if q.side == "draw" and not cfg.draws:
                     return None
-                return pred.moneyline(q.side)
+                w, p, l = pred.moneyline(q.side)
+                bump = spot_bump(q)
+                if bump:
+                    w = min(max(w + bump, 0.01), 0.99 - p)
+                    l = 1 - p - w
+                return w, p, l
             if q.point is None:
                 return None
             if q.market == "spreads" and q.side in ("home", "away"):

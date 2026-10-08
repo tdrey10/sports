@@ -209,18 +209,20 @@ class EspnOdds:
         Only the DraftKings pregame provider is used. Other providers on a finished
         game (bet365 on soccer, live odds) hold the final in-game prices, e.g. +50000
         on the side that lost, which would wreck any study."""
-        listing = self._get(self._core_base(cfg, event_id), ttl=None)
-        if not listing:
-            return None  # request failed: try again next time
-        quotes: list[Quote] = []
-        for item in listing.get("items", []) or []:
-            ref = item.get("$ref", "")
-            pid = str((item.get("provider") or {}).get("id") or ref.rstrip("/").split("?")[0].rsplit("/", 1)[-1])
-            if pid != PREGAME_PROVIDER:
-                continue
-            o = item if "homeTeamOdds" in item else self._get(ref.replace("http://", "https://"), ttl=None) if ref else {}
-            quotes += parse_provider_odds(o) + parse_open_odds(o)
-        return quotes
+        # One request: the DraftKings pregame object directly. 404 = ESPN has no odds
+        # for that game (saved as none, never asked again); other errors = try later.
+        url = f"{self._core_base(cfg, event_id)}/{PREGAME_PROVIDER}"
+        try:
+            o = self.espn._get(url, {}, ttl=None)
+        except requests.HTTPError as exc:
+            if exc.response is not None and exc.response.status_code == 404:
+                return []
+            log.info("ESPN closing odds %s unavailable: %s", event_id, exc)
+            return None
+        except requests.RequestException as exc:
+            log.info("ESPN closing odds %s unavailable: %s", event_id, exc)
+            return None
+        return parse_provider_odds(o, book="draftkings") + parse_open_odds(o)
 
     def _event(self, cfg: SportConfig, g: GameResult, quotes: list[Quote]) -> Event:
         return Event(id=g.event_id, sport=cfg.key, commence_time=g.date, home=g.home, away=g.away,
