@@ -195,10 +195,11 @@ class EspnOdds:
         quotes: list[Quote] = []
         for item in listing.get("items", []) or []:
             ref = item.get("$ref", "")
-            pid = ref.rstrip("/").split("?")[0].rsplit("/", 1)[-1]
+            pid = str((item.get("provider") or {}).get("id") or ref.rstrip("/").split("?")[0].rsplit("/", 1)[-1])
             if (pid == LIVE_PROVIDER) != live:
                 continue
-            o = self._get(ref.replace("http://", "https://"), ttl=0 if live else 600)
+            # Some leagues (MLB) list the prices inline and their links 404: use the inline copy.
+            o = item if "homeTeamOdds" in item else self._get(ref.replace("http://", "https://"), ttl=0 if live else 600)
             quotes += parse_provider_odds(o)
         return quotes
 
