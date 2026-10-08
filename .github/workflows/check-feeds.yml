@@ -1,0 +1,23 @@
+name: Check data feeds
+
+# Manual check that ESPN data downloads and parses for every sport.
+# Uses no Odds API credits.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: Ratings from ESPN results
+        run: sportsedge ratings nfl ncaaf nba ncaab mlb nhl epl --top 5
+      - name: Walk-forward accuracy
+        run: sportsedge backtest nfl nba mlb nhl epl --days 45
