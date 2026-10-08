@@ -1,13 +1,13 @@
 name: SportsEdge
 
 # Everything runs on free ESPN data (stats plus DraftKings lines). No API key or paid plan needed.
-# GitHub's free plan gives private repos 2,000 Actions minutes a month; this schedule uses about 700,
-# which leaves room for live sessions.
+# GitHub's free plan gives private repos 2,000 Actions minutes a month; this schedule uses about 1,100,
+# which leaves room for a few hand-started live sessions.
 on:
   schedule:
     - cron: "17 14,19,23 * * *" # full cycle 3x a day (7:17 AM, 12:17 PM, 4:17 PM Pacific): odds, picks, line tracking
     - cron: "47 15 * * *"    # daily NFL + NBA player props (8:47 AM Pacific)
-    - cron: "41 */2 * * *"   # scores + grading only, every 2 hours
+    - cron: "41 0-6,11-23 * * *" # hourly during game hours: one live-bet check, then scores + grading
   workflow_dispatch:
     inputs:
       props:
@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: write
+  issues: write # live bets are also posted to the "Funky Buttlovin live bets" issue
 
 # Publishing to GitHub Pages is OFF unless you set the repository variable
 # PUBLISH_PAGES=true. Leave it off if this GitHub account hosts any other site
@@ -47,12 +48,14 @@ jobs:
 
       - run: pip install -e .
 
-      - name: Live scores and grading
-        if: github.event.schedule == '41 */2 * * *'
-        run: sportsedge run nfl,nba,mlb,nhl,soccer --scores-only
+      - name: Live bets, scores and grading
+        if: github.event.schedule == '41 0-6,11-23 * * *'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: funky live nfl,nba,mlb,nhl,soccer --once --notify
 
       - name: Full engine cycle
-        if: github.event.schedule != '41 */2 * * *'
+        if: github.event.schedule != '41 0-6,11-23 * * *'
         env:
           # NFL + NBA props, most popular markets, games in the next 30 hours, once a day
           # (or when run by hand with props ticked).
