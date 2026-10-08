@@ -30,12 +30,14 @@ body { margin: 0; background: transparent; color: var(--fg); font: 16px/1.45 var
     linear-gradient(180deg, transparent 70%, var(--bg)) 50% 0% / max(100vw, 520px) calc(max(100vw, 520px) * 4 / 3) no-repeat,
     var(--mascot) 50% 0% / max(100vw, 520px) auto no-repeat, var(--bg); }
 /* Wide screens (and the gallery thumbnail): frame the portrait by height, centered on the face. */
+/* Wide screens (and the gallery thumbnail): the Hambino duck in his smoking jacket stands to
+   the right of the title, on his red damask wall, fading into the black page. Phones keep the photo. */
 @media (min-width: 761px) {
-  .photo-bg { --ph: max(110vh, 720px); --pw: calc(var(--ph) * 3 / 4); --py: calc(var(--ph) * -0.12);
-    background: linear-gradient(180deg, rgba(var(--tint), .4) 0%, rgba(var(--tint), .3) 35%, rgba(var(--tint), .7) 60%, rgba(var(--tint), .93) 85%),
-      linear-gradient(90deg, var(--bg) 2%, transparent 34%, transparent 66%, var(--bg) 98%) 50% var(--py) / var(--pw) var(--ph) no-repeat,
-      linear-gradient(180deg, transparent 60%, var(--bg)) 50% var(--py) / var(--pw) var(--ph) no-repeat,
-      var(--mascot) 50% var(--py) / var(--pw) var(--ph) no-repeat, var(--bg); }
+  .photo-bg { --ph: max(100vh, 680px); --pw: calc(var(--ph) * 0.7); --px: calc(50% + min(24vw, 300px));
+    background: linear-gradient(180deg, rgba(var(--tint), .05) 0%, rgba(var(--tint), .1) 40%, rgba(var(--tint), .7) 70%, rgba(var(--tint), .95) 90%),
+      linear-gradient(90deg, var(--bg), transparent 22%, transparent 85%, var(--bg)) var(--px) 0 / var(--pw) var(--ph) no-repeat,
+      linear-gradient(180deg, transparent 55%, var(--bg)) var(--px) 0 / var(--pw) var(--ph) no-repeat,
+      var(--thumb) var(--px) 0 / var(--pw) var(--ph) no-repeat, var(--bg); }
 }
 
 .wrap { max-width: 820px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 64px; display: grid;
@@ -226,7 +228,7 @@ td { font-variant-numeric: tabular-nums; }
 footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 12px; }
 </style>
 
-<div class="photo-bg" aria-hidden="true" style="--mascot: url('__MASCOT__')"></div>
+<div class="photo-bg" aria-hidden="true" style="--mascot: url('__MASCOT__'); --thumb: url('__THUMB__')"></div>
 <main class="wrap">
   <header class="mast">
     <p class="eyebrow" id="updated"><span class="dot"></span>Loading…</p>
