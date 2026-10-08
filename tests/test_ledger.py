@@ -265,3 +265,15 @@ def test_best_rank_promotes_existing_and_numbers_without_gaps():
     L.publish([c2, c1], NOW)
     ranks = sorted((e.event_id, e.best_rank) for e in L.entries.values())
     assert ranks == [("a", 1), ("b", 2)]
+
+
+def test_spread_headline_wording():
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(SPORTS["nfl"])]
+    from sportsedge.insights import reasons
+    spreads = [p for p in scans[0].picks if p.market == "spreads"]
+    for p in spreads[:6]:
+        headline, _ = reasons(p, scans[0])
+        assert ("laying" in headline) == (p.point < 0)
+        assert "to win by" in headline or "to lose by" in headline
