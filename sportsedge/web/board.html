@@ -359,7 +359,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       $("hero").innerHTML = `<div class="ticket-empty"><b>Today's #1 posts with the next scan</b><span class="muted">Picks run at 7:17 AM, 12:17 PM and 4:17 PM Pacific. Only picks that clear every check make the top 10.</span></div>`;
       return;
     }
-    const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · lean, no units";
+    const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
     $("hero").innerHTML = `<div class="ticket">
       <div class="t-head"><span class="t-kind">${kind}</span><span class="t-sport">${esc(e.sport_name)} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)} · ${timeOf(e)}</span></div>
       <h2>${esc(e.selection)}</h2>
@@ -374,7 +374,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const potd = ["lock", "dog", "prop"].map((t) => {
       // A real (units) pick beats a lean one posted earlier the same day.
       const e = items.filter((x) => x.tier === t).sort((a, b) => b.units - a.units)[0];
-      const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t] + (e && !(e.units > 0) ? " · lean, no units" : "");
+      const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
+        + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
       if (!e) return `<div class="potd"><span class="kind">${label}</span><p>${t === "lock" ? "Posts only when a pick passes every Lock check." : "Posts once a game clears the bar."}</p></div>`;
       return `<div class="potd"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · ${wins(e)}</span></div>
@@ -425,7 +426,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function viewResults() {
     const st = DATA.stats;
     const tierRows = [["lock", "Lock of the day"], ["dog", "Dog of the day"], ["prop", "Prop of the day"], ["value", "Value plays"], ["early", "Early value"], ["live_win", "Live · likely winner"], ["live_plus", "Live · plus money"]]
-      .map(([k, n]) => { const s = st.by_tier[k] || { won: 0, lost: 0, units: 0 }; return `<tr><td>${n}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("");
+      .map(([k, n]) => { const s = st.by_tier[k] || { won: 0, lost: 0, units: 0 }; return `<tr><td>${n}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("")
+      + (st.lock_all ? `<tr><td>Lock of the day, every day (bet or not)</td><td>${rec(st.lock_all)}</td><td class="${cls(st.lock_all.units)}">${signed(st.lock_all.units, 1)}u</td><td>${st.lock_all.roi == null ? "–" : signed(st.lock_all.roi * 100, 0) + "%"}</td></tr>` : "");
     const typeRows = [["spreads", "Spreads"], ["totals", "Over/Under"], ["props", "Props"], ["moneyline", "Moneyline"]]
       .map(([k, n]) => { const s = st.by_market[k]; return `<tr><td>${n}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`; }).join("");
     const sportRows = Object.entries(st.by_sport).map(([k, s]) => `<tr><td>${esc(s.name)}</td><td>${rec(s)}</td><td>${pct(s.win_pct)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td></tr>`).join("");
