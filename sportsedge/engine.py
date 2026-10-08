@@ -1,0 +1,193 @@
+"""The scan pipeline: data -> ratings -> predictions -> priced edges."""
+
+from __future__ import annotations
+
+import logging
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+
+from .data.base import DataProvider, Event, NameMatcher, Quote
+from .edge import Pick, Settings, evaluate, fmt_point
+from .models.game import GamePrediction, baseline_team_score, predict_game
+from .models.props import PlayerGame, PropProjection, project_prop
+from .models.ratings import GameResult, TeamRatings, fit_ratings
+from .sports import SportConfig
+
+log = logging.getLogger(__name__)
+
+
+@dataclass
+class SportScan:
+    sport: SportConfig
+    picks: list[Pick] = field(default_factory=list)
+    predictions: dict[str, GamePrediction] = field(default_factory=dict)
+    ratings: TeamRatings | None = None
+    warnings: list[str] = field(default_factory=list)
+    events: int = 0
+
+
+class Engine:
+    def __init__(self, provider: DataProvider, settings: Settings | None = None, now: datetime | None = None):
+        self.provider = provider
+        self.settings = settings or Settings()
+        self.now = now or datetime.now(timezone.utc)
+
+    # ------------------------------------------------------------------ public
+    def scan(
+        self,
+        cfg: SportConfig,
+        props: bool = False,
+        prop_markets: list[str] | None = None,
+        hours_ahead: float | None = None,
+    ) -> SportScan:
+        scan = SportScan(cfg)
+        events = [e for e in self.provider.events(cfg) if e.commence_time > self.now]
+        if hours_ahead is not None:
+            horizon = self.now + timedelta(hours=hours_ahead)
+            events = [e for e in events if e.commence_time <= horizon]
+        scan.events = len(events)
+        if not events:
+            scan.warnings.append(f"{cfg.name}: no upcoming events with odds")
+            return scan
+
+        results = self.provider.game_results(
+            cfg, self.now - timedelta(days=cfg.lookback_days), self.now + timedelta(days=10)
+        )
+        try:
+            ratings = self.fit(cfg, results)
+        except ValueError as exc:
+            scan.warnings.append(f"{cfg.name}: {exc}")
+            return scan
+        scan.ratings = ratings
+
+        teams = set(ratings.off) | {g.home for g in results} | {g.away for g in results}
+        matcher = NameMatcher(teams)
+        scheduled = [g for g in results if not g.completed]
+
+        for event in events:
+            home = matcher.match(event.home) or event.home
+            away = matcher.match(event.away) or event.away
+            for odds_name, name in ((event.home, home), (event.away, away)):
+                if not ratings.knows(name):
+                    scan.warnings.append(
+                        f"{cfg.name}: no rating for {odds_name!r}; using a "
+                        f"{ratings.unknown_percentile:.0f}th-percentile team"
+                    )
+            neutral = event.neutral or _is_neutral(scheduled, home, away, event.commence_time)
+            pred = predict_game(cfg, ratings, home, away, neutral)
+            scan.predictions[event.id] = pred
+            scan.picks.extend(self._game_picks(cfg, event, pred))
+
+            if props and cfg.props:
+                markets = [m for m in (prop_markets or cfg.props) if m in cfg.props]
+                scan.picks.extend(self._prop_picks(cfg, event, pred, ratings, results, markets, scan))
+
+        scan.picks.sort(key=lambda p: p.ev, reverse=True)
+        return scan
+
+    def fit(self, cfg: SportConfig, results: list[GameResult]) -> TeamRatings:
+        return fit_ratings(
+            results,
+            as_of=self.now,
+            half_life_days=cfg.half_life_days,
+            ridge=cfg.ridge,
+            link=cfg.link,
+            unknown_percentile=cfg.unknown_percentile,
+        )
+
+    # --------------------------------------------------------------- internals
+    def _game_picks(self, cfg: SportConfig, event: Event, pred: GamePrediction) -> list[Pick]:
+        quotes = [q for q in event.quotes if q.market in ("h2h", "spreads", "totals")]
+
+        def model(q: Quote):
+            if q.market == "h2h":
+                if q.side == "draw" and not cfg.draws:
+                    return None
+                return pred.moneyline(q.side)
+            if q.point is None:
+                return None
+            if q.market == "spreads" and q.side in ("home", "away"):
+                return pred.spread(q.side, q.point)
+            if q.market == "totals" and q.side in ("over", "under"):
+                return pred.total(q.side, q.point)
+            return None
+
+        def describe(q: Quote) -> tuple[str, str]:
+            team = {"home": event.home, "away": event.away, "draw": "Draw"}.get(q.side, q.side.title())
+            if q.market == "h2h":
+                sel = f"{team} ML" if q.side != "draw" else "Draw"
+            elif q.market == "spreads":
+                sel = f"{team} {fmt_point(q.point)}"
+            else:
+                sel = f"{q.side.title()} {fmt_point(q.point, signed=False)}"
+            proj = (
+                f"{event.away} {pred.exp_away:.1f} - {event.home} {pred.exp_home:.1f} "
+                f"(margin {pred.exp_margin:+.1f}, total {pred.exp_total:.1f})"
+            )
+            return sel, proj
+
+        def n_sides(market: str) -> int:
+            return 3 if market == "h2h" and cfg.draws else 2
+
+        return evaluate(event, quotes, model, describe, self.settings, n_sides)
+
+    def _prop_picks(
+        self,
+        cfg: SportConfig,
+        event: Event,
+        pred: GamePrediction,
+        ratings: TeamRatings,
+        results: list[GameResult],
+        markets: list[str],
+        scan: SportScan,
+    ) -> list[Pick]:
+        quotes = self.provider.prop_quotes(cfg, event, markets)
+        if not quotes:
+            return []
+        logs: dict[str, list[PlayerGame]] = {}
+        team_factor: dict[str, float] = {}
+        for team, exp in ((pred.home, pred.exp_home), (pred.away, pred.exp_away)):
+            for pg in self.provider.player_games(cfg, results, team):
+                logs.setdefault(pg.player, []).append(pg)
+                team_factor[pg.player] = exp / baseline_team_score(ratings, team)
+        if not logs:
+            scan.warnings.append(f"{event.away} @ {event.home}: no player box scores for props")
+            return []
+        players = NameMatcher(logs, threshold=0.88)
+        cache: dict[tuple[str, str], PropProjection | None] = {}
+        missing: set[str] = set()
+
+        def projection(q: Quote) -> PropProjection | None:
+            name = players.match(q.player or "")
+            if name is None:
+                missing.add(q.player or "?")
+                return None
+            key = (name, q.market)
+            if key not in cache:
+                cache[key] = project_prop(cfg.props[q.market], q.market, name, logs[name], team_factor.get(name, 1.0))
+            return cache[key]
+
+        def model(q: Quote):
+            proj = projection(q)
+            if proj is None or q.point is None:
+                return None
+            return proj.probs(q.side, q.point)
+
+        def describe(q: Quote) -> tuple[str, str]:
+            proj = projection(q)
+            spec = cfg.props[q.market]
+            sel = f"{q.player} {q.side.title()} {fmt_point(q.point, signed=False)} {spec.label}"
+            desc = f"proj {proj.mean:.1f} ± {proj.sd:.1f} over {proj.games} games" if proj else ""
+            return sel, desc
+
+        picks = evaluate(event, quotes, model, describe, self.settings, lambda m: 2)
+        if missing:
+            log.info("no box scores matched for %d players: %s", len(missing), ", ".join(sorted(missing)[:10]))
+        return picks
+
+
+def _is_neutral(scheduled: list[GameResult], home: str, away: str, when: datetime) -> bool:
+    for g in scheduled:
+        if g.home == home and g.away == away and abs((g.date - when).total_seconds()) < 36 * 3600:
+            return g.neutral
+    return False
