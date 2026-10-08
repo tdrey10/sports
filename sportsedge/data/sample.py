@@ -236,6 +236,9 @@ class SampleProvider:
                 out.append(ev)
         return out
 
+    def live_games(self, cfg: SportConfig) -> list[GameResult]:
+        return []  # the demo has no games in progress
+
     def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
         return {team: [(p, "Out") for p in sorted(names)] for team, names in self._world(cfg)["out"].items() if names}
 

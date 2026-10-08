@@ -1,0 +1,56 @@
+name: Live session
+
+# Start this from the GitHub app before games: Actions -> Live session -> Run workflow.
+# It checks in-play games every few minutes and posts each new live bet as a comment
+# on the "Funky Buttlovin live bets" issue, so the GitHub app notifies your phone.
+# Every check of a sport with games in progress costs 3 Odds API credits.
+on:
+  workflow_dispatch:
+    inputs:
+      sports:
+        description: "Sports to watch (comma separated: nfl, ncaaf, nba, ncaab, mlb, nhl, epl...)"
+        default: "nfl,nba"
+      hours:
+        description: "How many hours to watch (max 5)"
+        default: "3"
+      every:
+        description: "Minutes between checks"
+        default: "5"
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: sportsedge
+  cancel-in-progress: false
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Cache ESPN downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/sportsedge
+          key: espn-live-${{ github.run_id }}
+          restore-keys: espn-
+      - run: pip install -e .
+      - name: Watch live games
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: funky live ${{ inputs.sports }} --hours ${{ inputs.hours }} --every ${{ inputs.every }} --notify
+      - name: Save the ledger
+        if: always()
+        run: |
+          git config user.name "sportsedge-bot"
+          git config user.email "sportsedge-bot@users.noreply.github.com"
+          git add data/ledger.json data/brain.json
+          git diff --cached --quiet || git commit -m "Update pick ledger (live session)"
+          git pull --rebase --autostash && git push

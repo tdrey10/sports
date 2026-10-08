@@ -76,6 +76,28 @@ def normalise_name(name: str) -> str:
     return " ".join(name.split())
 
 
+# Odds-feed name -> ESPN name, for teams the fuzzy match can't bridge (normalised forms).
+ALIASES = {
+    "athletic bilbao": "athletic club",
+    "inter milan": "internazionale",
+    "new york red bulls": "red bull new york",
+    "los angeles fc": "lafc",
+    "umass minutemen": "massachusetts minutemen",
+    "southern mississippi golden eagles": "southern miss golden eagles",
+    "louisiana monroe warhawks": "ul monroe warhawks",
+    "sam houston state bearkats": "sam houston bearkats",
+    "hawaii rainbow warriors": "hawai i rainbow warriors",
+    "paris saint germain": "paris saint germain",
+    "bayern munich": "bayern munich",
+    "fc st pauli": "state pauli",
+    "1 fc heidenheim": "1 fc heidenheim 1846",
+    "utsa roadrunners": "utsa roadrunners",
+    "app state mountaineers": "appalachian state mountaineers",
+    "ole miss rebels": "ole miss rebels",
+    "miami fl hurricanes": "miami hurricanes",
+}
+
+
 class NameMatcher:
     """Map names from one source (odds) onto names from another (stats)."""
 
@@ -89,7 +111,7 @@ class NameMatcher:
         if name in self._cache:
             return self._cache[name]
         key = normalise_name(name)
-        result = self.norm.get(key)
+        result = self.norm.get(key) or self.norm.get(ALIASES.get(key, ""))
         if result is None:
             best, best_score = None, 0.0
             for norm, original in self.norm.items():
