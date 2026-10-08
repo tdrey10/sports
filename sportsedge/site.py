@@ -50,6 +50,7 @@ def build_data(
         "studies": [s.to_dict() for s in (studies or {}).values()],
         "spot_labels": {k: s.label for k, s in SPOTS.items()},
         "props": props or {},
+        "parlays": [v for v in ledger.parlay_views() if v["created_at"] >= cutoff.isoformat()],
     }
 
 
@@ -84,13 +85,15 @@ def write_app(out_dir: str | Path, data: dict) -> Path:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     (out / "index.html").write_text(render_html(data, standalone=True, app=True))
+    (out / "data.json").write_text(json.dumps(data, default=str))  # an open page re-reads this every minute
     app = resources.files("sportsedge").joinpath("web", "app")
     for name in ("apple-touch-icon.png", "icon-192.png", "icon-512.png"):
         (out / name).write_bytes(app.joinpath(name).read_bytes())
     (out / "favicon.ico").write_bytes(app.joinpath("icon-192.png").read_bytes())
     (out / "manifest.webmanifest").write_text(json.dumps(APP_MANIFEST, indent=2))
     # Always fetch the newest picks: the page changes every 30 minutes.
-    (out / "_headers").write_text("/\n  Cache-Control: no-cache\n/index.html\n  Cache-Control: no-cache\n")
+    (out / "_headers").write_text("/\n  Cache-Control: no-cache\n/index.html\n  Cache-Control: no-cache\n"
+                                  "/data.json\n  Cache-Control: no-cache\n")
     return out / "index.html"
 
 

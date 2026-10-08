@@ -25,6 +25,7 @@ from .models.props import PlayerGame, stat_value
 from .models.ratings import GameResult
 from .odds import american_to_decimal
 from .sports import SPORTS
+from .parlays import SIZES as PARLAY_SIZES, Parlay, build as build_parlays, settle
 from .tiers import BEST_BETS, LIVE_TIERS, Card
 
 DAY_TIERS = ("lock", "dog", "prop")
@@ -109,6 +110,7 @@ def entry_id(pick: Pick, live: bool = False) -> str:
 class Ledger:
     def __init__(self, entries: Iterable[Entry] = (), tz: str = "America/Los_Angeles", start_bankroll: float = 1000.0):
         self.entries: dict[str, Entry] = {e.id: e for e in entries}
+        self.parlays: list[Parlay] = []
         self.tz = ZoneInfo(tz)
         self.start_bankroll = start_bankroll
 
@@ -122,7 +124,10 @@ class Ledger:
         names = {f.name for f in fields(Entry)}
         entries = [Entry(**{k: v for k, v in e.items() if k in names}) for e in data.get("entries", [])]
         kw.setdefault("start_bankroll", data.get("start_bankroll", 1000.0))
-        return cls(entries, **kw)
+        ledger = cls(entries, **kw)
+        pnames = {f.name for f in fields(Parlay)}
+        ledger.parlays = [Parlay(**{k: v for k, v in p.items() if k in pnames}) for p in data.get("parlays", [])]
+        return ledger
 
     def save(self, path: str | os.PathLike) -> None:
         path = Path(path)
@@ -130,6 +135,7 @@ class Ledger:
         data = {
             "start_bankroll": self.start_bankroll,
             "entries": [asdict(e) for e in sorted(self.entries.values(), key=lambda e: (e.commence_time, e.id))],
+            "parlays": [asdict(p) for p in sorted(self.parlays, key=lambda p: (p.day, p.size))],
         }
         tmp = path.with_suffix(".tmp")
         tmp.write_text(json.dumps(data, indent=1))
@@ -229,6 +235,21 @@ class Ledger:
             self.entries[eid] = e
             added.append(e)
         return added
+
+    def post_parlays(self, now: datetime) -> list[Parlay]:
+        """Today's 2-, 3-, 4- and 8-leg parlays, each posted once when enough legs are on the board."""
+        new = build_parlays(self.entries.values(), self.parlays, now, self.day_of(now),
+                            local_hour=now.astimezone(self.tz).hour)
+        self.parlays.extend(new)
+        return new
+
+    def parlay_views(self) -> list[dict]:
+        out = []
+        for p in self.parlays:
+            d = p.to_dict()
+            d.update(settle(p, self.entries))
+            out.append(d)
+        return out
 
     # -------------------------------------------------------- line movement
     def update_prices(self, scans: list[SportScan], now: datetime) -> None:
@@ -387,7 +408,25 @@ class Ledger:
             "leans": {"won": lean_won, "lost": lean_lost,
                       "win_pct": lean_won / (lean_won + lean_lost) if lean_won + lean_lost else None},
             "curve": curve,
+            # Parlays keep their own record, apart from the straight-bet money above.
+            "parlays": self._parlay_stats(),
         }
+
+    def _parlay_stats(self) -> dict:
+        views = [v for v in self.parlay_views() if v["status"] in ("won", "lost", "push")]
+        out = {}
+        for size in PARLAY_SIZES:
+            vs = [v for v in views if v["size"] == size]
+            risked = sum(v["units"] or 1.0 for v in vs)  # no-unit parlays count as 1 unit
+            profit = sum(v["profit"] for v in vs)
+            out[str(size)] = {
+                "won": sum(1 for v in vs if v["status"] == "won"),
+                "lost": sum(1 for v in vs if v["status"] == "lost"),
+                "push": sum(1 for v in vs if v["status"] == "push"),
+                "units": round(profit, 2),
+                "roi": profit / risked if risked else None,
+            }
+        return out
 
 
 def _market_group(e: "Entry") -> str:
