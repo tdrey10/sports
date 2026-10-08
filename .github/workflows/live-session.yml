@@ -2,7 +2,7 @@ name: Live session
 
 # Start this from the GitHub app before games: Actions -> Live session -> Run workflow.
 # It checks in-play games every few minutes and posts each new live bet as a comment
-# on the "Funky Buttlovin live bets" issue, so the GitHub app notifies your phone.
+# on the "The Great Hambino live bets" issue, so the GitHub app notifies your phone.
 # Free: live odds come from ESPN (DraftKings live lines). Each session hour uses ~60 of the
 # 2,000 free Actions minutes a month, so roughly 20 hours of live sessions fit each month.
 on:
@@ -45,7 +45,7 @@ jobs:
       - name: Watch live games
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: funky live ${{ inputs.sports }} --hours ${{ inputs.hours }} --every ${{ inputs.every }} --notify
+        run: hambino live ${{ inputs.sports }} --hours ${{ inputs.hours }} --every ${{ inputs.every }} --notify
       - name: Save the ledger
         if: always()
         run: |

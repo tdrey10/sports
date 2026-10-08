@@ -1,4 +1,4 @@
-<title>Funky Buttlovin</title>
+<title>The Great Hambino</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -22,7 +22,7 @@
 * { box-sizing: border-box; }
 html { background: var(--bg); }
 body { margin: 0; background: transparent; color: var(--fg); font: 16px/1.45 var(--body); }
-/* The Funky Buttlovin photo sits behind the whole engine, tinted black so the picks stay readable,
+/* The Great Hambino photo sits behind the whole engine, tinted black so the picks stay readable,
    and fades into the black page below it (the photo is 3:4, hence the 4 / 3 height).
    A fixed layer (not background-attachment) so it also stays put on phones. */
 .photo-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none;
@@ -56,6 +56,7 @@ button, select { font: inherit; color: inherit; }
 .eyebrow .dot { display: inline-block; width: 8px; height: 8px; margin-right: 8px; vertical-align: 1px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(224, 58, 62, .25); }
 .mast h1 { font: 900 clamp(58px, 15vw, 128px)/.82 var(--display); letter-spacing: -.005em; text-transform: uppercase;
   text-shadow: 0 4px 24px rgba(0, 0, 0, .55); }
+.mast h1 small { display: block; font-size: .42em; line-height: 1; letter-spacing: .04em; color: var(--fg); margin-bottom: .08em; }
 .mast h1 span { display: block; color: var(--accent); }
 /* Pinwheel stripes: five bars, the way the Blazers mark splits red and white. */
 .stripes { display: flex; gap: 4px; height: 6px; width: min(260px, 60%); }
@@ -243,7 +244,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 <main class="wrap">
   <header class="mast">
     <p class="eyebrow" id="updated"><span class="dot"></span>Loading…</p>
-    <h1>Funky <span>Buttlovin</span></h1>
+    <h1><small>The Great</small><span>Hambino</span></h1>
     <div class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   </header>
   <div id="demo"></div>
@@ -417,7 +418,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const shown = new Set([latest("live_win"), latest("live_plus")].filter(Boolean).map((e) => e.id));
     const earlier = items.filter((e) => !shown.has(e.id));
     const howto = `<ol class="steps"><li>Open the GitHub app on your phone.</li><li>Go to <b>tdrey10/sports → Actions → Live session</b>.</li><li>Tap <b>Run workflow</b>, pick sports and hours.</li></ol>
-      <p class="empty">A session checks every few minutes instead of every hour. Each new live bet shows up here and as a notification on the “Funky Buttlovin live bets” issue.</p>`;
+      <p class="empty">A session checks every few minutes instead of every hour. Each new live bet shows up here and as a notification on the “The Great Hambino live bets” issue.</p>`;
     return panel("Live right now", items.length ? `${items.length} live bets today` : "",
         `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money", "plus")}</div>`)
       + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "")

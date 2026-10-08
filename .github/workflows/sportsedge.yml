@@ -21,13 +21,13 @@ on:
 
 permissions:
   contents: write
-  issues: write # live bets are also posted to the "Funky Buttlovin live bets" issue
+  issues: write # live bets are also posted to the "The Great Hambino live bets" issue
 
 # Publishing to GitHub Pages is OFF unless you set the repository variable
 # PUBLISH_PAGES=true. Leave it off if this GitHub account hosts any other site
 # (for example a business site with a custom domain): project pages inherit
 # that domain. Without Pages, open the dashboard from the uploaded artifact or
-# run `funky serve` locally.
+# run `hambino serve` locally.
 
 concurrency:
   group: sportsedge
@@ -56,14 +56,14 @@ jobs:
         if: github.event.schedule == '41 0-6,11-23 * * *'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: funky live nfl,nba,mlb,nhl,soccer --once --notify
+        run: hambino live nfl,nba,mlb,nhl,soccer --once --notify
 
       # Once a day (and on hand-started runs): replay the last 180 days of finished games
       # against their real closing odds, learn the market weight, edge threshold and
       # calibration per sport, and save each game's closing line so it is downloaded once.
       - name: Studies
         if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
-        run: funky study nfl,nba,mlb,nhl,soccer
+        run: hambino study nfl,nba,mlb,nhl,soccer
 
       - name: Full engine cycle
         if: github.event.schedule != '41 0-6,11-23 * * *'
@@ -87,7 +87,7 @@ jobs:
       - name: Keep the dashboard as a private download
         uses: actions/upload-artifact@v4
         with:
-          name: funky-buttlovin-dashboard
+          name: great-hambino-dashboard
           path: site
           retention-days: 7
 
