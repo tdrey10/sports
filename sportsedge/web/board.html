@@ -6,10 +6,13 @@
 /* Layout: one phone-width column of glowing pick cards. Live first, then the day's headliners,
    the board, early plays, leans, the slip, the record and the model. One committed dark look. */
 :root {
-  --bg: #07080c; --panel: #11131b; --panel-2: #181b26; --line: #262a38;
-  --fg: #f3f4f8; --muted: #9aa0b4; --dim: #6b7186;
-  --live: #ff3d5a; --lock: #2fe39a; --dog: #ff7a3d; --board: #ffd23f; --prop: #b18cff; --early: #ff5a3d;
-  --best: #44d7ff; --lean: #ffd23f; --win: #2fe39a; --loss: #ff3d5a;
+  --bg: #040609; --panel: #0b0f17; --panel-2: #101723; --line: #1b2433;
+  --fg: #f2f5fb; --muted: #9aa6bb; --dim: #6b7790;
+  --live: #ff3b3b; --lock: #22e39a; --dog: #ff7a00; --board: #ffc233; --prop: #b36bff; --early: #ff5a1f;
+  --best: #22d3ee; --lean: #ffc233; --win: #22e39a; --loss: #ff3b3b;
+  /* second colour of each card's gradient edge */
+  --live-2: #ff2a8a; --lock-2: #0fb87a; --dog-2: #ff2a2a; --board-2: #ff8a00; --prop-2: #2f8bff; --early-2: #ffc233;
+  --best-2: #2f8bff; --lean-2: #e8c77a;
   --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -60,18 +63,22 @@ button { font: inherit; color: inherit; }
 .stack { display: grid; gap: 14px; }
 
 /* glowing card */
-.card { --c: var(--board); background: linear-gradient(180deg, color-mix(in srgb, var(--c) 7%, var(--panel)), var(--panel) 120px);
-  border: 1px solid color-mix(in srgb, var(--c) 55%, var(--line)); border-radius: 18px; overflow: hidden; position: relative;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 12%, transparent), 0 0 26px -6px color-mix(in srgb, var(--c) 55%, transparent); }
-.card.live { --c: var(--live); } .card.lock { --c: var(--lock); } .card.dog { --c: var(--dog); } .card.prop { --c: var(--prop); }
-.card.early { --c: var(--early); } .card.value { --c: var(--board); } .card.lean { --c: var(--lean); } .card.best { --c: var(--best); }
+.card { --c: var(--board); --c2: var(--board-2); border: 1.5px solid transparent; border-radius: 18px; overflow: hidden; position: relative;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--c) 8%, var(--panel)), var(--panel) 140px) padding-box,
+    linear-gradient(135deg, var(--c), var(--c2)) border-box;
+  box-shadow: 0 0 28px -8px color-mix(in srgb, var(--c) 70%, transparent), 0 0 46px -18px color-mix(in srgb, var(--c2) 60%, transparent); }
+.card.live { --c: var(--live); --c2: var(--live-2); } .card.lock { --c: var(--lock); --c2: var(--lock-2); }
+.card.dog { --c: var(--dog); --c2: var(--dog-2); } .card.prop { --c: var(--prop); --c2: var(--prop-2); }
+.card.early { --c: var(--early); --c2: var(--early-2); } .card.value { --c: var(--board); --c2: var(--board-2); }
+.card.lean { --c: var(--lean); --c2: var(--lean-2); } .card.best { --c: var(--best); --c2: var(--best-2); }
 .card-in { padding: 16px; display: grid; gap: 8px; }
 .card-head { display: flex; align-items: center; gap: 10px; }
 .icon { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 20px; flex: none;
-  background: color-mix(in srgb, var(--c) 85%, #000); box-shadow: 0 0 14px -2px var(--c); }
+  background: linear-gradient(135deg, var(--c), var(--c2)); box-shadow: 0 0 14px -2px var(--c); }
 .card-head h3 { font: 800 20px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--c); flex: 1; min-width: 0; }
 .badge { font: 800 11px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; border-radius: 999px; padding: 5px 9px;
-  background: var(--c); color: #0b0b0f; white-space: nowrap; }
+  background: linear-gradient(135deg, var(--c), var(--c2)); color: #fff; white-space: nowrap; text-shadow: 0 1px 1px rgba(0,0,0,.35); }
 .odds-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
 .big { font: 800 58px/0.95 var(--display); letter-spacing: -.01em; }
 .wins { color: var(--muted); font-size: 15px; text-align: right; }
@@ -117,7 +124,7 @@ details ul { margin: 0; padding: 0 16px 14px 34px; display: grid; gap: 5px; font
 .play .pick h4 { font-size: 20px; }
 .rank { font: 800 30px/1 var(--display); color: var(--best); margin-right: 6px; }
 .banner { margin: 0 16px 4px; border-radius: 12px; padding: 10px; text-align: center; font: 800 14px/1.2 var(--body); letter-spacing: .08em;
-  text-transform: uppercase; background: color-mix(in srgb, var(--c) 85%, #000); color: #fff; box-shadow: 0 0 16px -4px var(--c); }
+  text-transform: uppercase; background: linear-gradient(90deg, var(--c), var(--c2)); color: #fff; box-shadow: 0 0 16px -4px var(--c); }
 
 /* slip */
 .slip-legs { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
