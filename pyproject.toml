@@ -22,4 +22,4 @@ hambino = "sportsedge.cli:main"
 include = ["sportsedge*"]
 
 [tool.setuptools.package-data]
-sportsedge = ["web/*.html", "web/*.jpg"]
+sportsedge = ["web/*.html", "web/*.jpg", "web/app/*.png"]
