@@ -10,7 +10,7 @@ from sportsedge.study import (
 )
 from sportsedge.sports import SPORTS
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from sportsedge.edge import Pick
 
@@ -24,9 +24,10 @@ def make_pick(american=-110, win_prob=0.55, ev=0.0, sport="nba"):
     )
 
 
-def side(eid, model, market, american=-110, won=True, market_name="spreads"):
+def side(eid, model, market, american=-110, won=True, market_name="spreads", day=0):
+    date = (datetime(2025, 1, 1, tzinfo=timezone.utc) + timedelta(hours=6 * day)).isoformat()
     return Side("nba", eid, market_name, "home", american, model, market, 0.0,
-                1.0 if won else 0.0, 0.0, 0.0 if won else 1.0)
+                1.0 if won else 0.0, 0.0, 0.0 if won else 1.0, date=date)
 
 
 def test_select_takes_best_qualifying_side_per_game():
@@ -77,6 +78,10 @@ def test_study_on_demo_history(tmp_path):
         assert st.games > 0 and st.sides > st.games
         assert 0.6 <= st.weight <= 0.8 and st.min_ev >= 0.02 or st.proven
         assert st.by_min_ev and st.weight_log_loss
+        # Tuned on older games, judged on newer ones it never saw.
+        assert st.in_sample is not None and st.blind is not None
+        assert st.tune_window and st.blind_window and st.tune_window != st.blind_window
+        assert st.early_blind is not None  # the same read against opening lines
     saved = json.loads((tmp_path / "history" / "nba.json").read_text())
     assert saved and all(isinstance(v, list) for v in saved.values())
     # A second run reuses the saved lines instead of downloading them again.
@@ -87,7 +92,7 @@ def test_study_on_demo_history(tmp_path):
 
 def test_unproven_sport_never_loosens_the_threshold():
     rng = random.Random(2)
-    sides = [side(f"g{i}", 0.6, 0.5, american=-110, won=rng.random() < 0.45) for i in range(400)]
+    sides = [side(f"g{i}", 0.6, 0.5, american=-110, won=rng.random() < 0.45, day=i) for i in range(400)]
     st = study_sides(sides, SPORTS["nba"], games=400, window="test")
     assert not st.proven and st.min_ev >= 0.02
 

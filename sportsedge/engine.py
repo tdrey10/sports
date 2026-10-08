@@ -55,6 +55,7 @@ class SportScan:
     brain: BrainReport | None = None
     warnings: list[str] = field(default_factory=list)
     events: int = 0
+    prop_lines: list[tuple[Event, list[Quote]]] = field(default_factory=list)  # every prop line seen, for the daily log
 
 
 # Key players out, as win-chance points (the blueprint's weights). Weighed into the
@@ -261,6 +262,8 @@ class Engine:
         ctx: EventContext,
     ) -> list[Pick]:
         quotes = self.provider.prop_quotes(cfg, event, markets)
+        if quotes:
+            scan.prop_lines.append((event, quotes))  # logged even when the model can't price them
         if not quotes:
             return []
         lines: list[PlayerGame] = []

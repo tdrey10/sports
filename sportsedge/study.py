@@ -42,8 +42,11 @@ MIN_EVS = (0.0, 0.01, 0.02, 0.03, 0.05, 0.08)
 MIN_BETS = 30  # a setting needs at least this many bets before its result counts
 PROVEN_BETS = 60  # and a sport needs this many before it counts as beating the close
 STUDY_BOOK = "draftkings"
+OPEN_BOOK = "draftkings_open"
 MIN_CALIBRATION_SIDES = 300
-STUDY_DAYS = 180
+STUDY_DAYS = 730  # about two seasons: judge a sport on thousands of games, never a few nights
+BLIND_SHARE = 0.4
+MAX_FAVORITE = -150  # the newest 40% of games are kept blind: settings are tuned on the older 60% only
 DEFAULT_WEIGHT = 0.75
 # Closing lines are sharper than the lines we actually bet hours earlier, so the
 # weight they favor is an upper bound on how much to trust the market. Keep the
@@ -65,6 +68,8 @@ class Side:
     win: float  # graded (win, push, loss) shares; quarter lines split
     push: float
     loss: float
+    date: str = ""  # game start (ISO), for splitting tuning games from blind ones
+    point: float | None = None
 
     def blended(self, w: float) -> float:
         if self.market_prob is None:
@@ -119,6 +124,8 @@ def select(sides: list[Side], w: float, min_ev: float, max_ev: float = 0.20, gap
     """The bets the engine would have made: best qualifying side per game."""
     best: dict[str, tuple[float, Side]] = {}
     for s in sides:
+        if s.american < MAX_FAVORITE:
+            continue  # never bet worse than -150, in the backtest as live
         if s.market_prob is not None and abs(s.model_prob - s.market_prob) > gap:
             continue  # the live engine hides these too
         ev = s.ev(w)
@@ -190,7 +197,14 @@ class SportStudy:
     window: str = ""
     weight: float = DEFAULT_WEIGHT  # chosen market weight
     min_ev: float = 0.02  # chosen EV threshold
-    proven: bool = False  # some edge threshold beat the closing line by more than luck
+    proven: bool = False  # the blind test beat the closing line by more than luck over 60+ bets
+    tune_window: str = ""
+    blind_window: str = ""
+    in_sample: Result | None = None  # chosen settings on the games they were tuned on
+    blind: Result | None = None  # the same settings on newer games they never saw
+    early_in_sample: Result | None = None  # betting the opening line instead of the close
+    early_blind: Result | None = None
+    early_clv: float | None = None  # average value of the opening price against the closing no-vig line
     weight_log_loss: list[tuple[float, float]] = field(default_factory=list)  # (weight, log loss per side)
     platt: tuple[float, float] | None = None
     best: Result | None = None  # the chosen setting's record
@@ -209,8 +223,9 @@ class SportStudy:
         d = dict(d)
         for key in ("by_weight", "by_min_ev", "by_market", "by_band"):
             d[key] = [Result(**r) for r in d.get(key, [])]
-        if d.get("best"):
-            d["best"] = Result(**d["best"])
+        for key in ("best", "in_sample", "blind", "early_in_sample", "early_blind"):
+            if d.get(key):
+                d[key] = Result(**d[key])
         if d.get("platt"):
             d["platt"] = tuple(d["platt"])
         d["calibration"] = [tuple(c) for c in d.get("calibration", [])]
@@ -218,16 +233,37 @@ class SportStudy:
         return cls(**d)
 
 
-def study_sides(sides: list[Side], cfg: SportConfig, games: int, window: str) -> SportStudy:
+def split_blind(sides: list[Side]) -> tuple[list[Side], list[Side]]:
+    """(tuning, blind): whole games, split by start time, newest BLIND_SHARE kept blind."""
+    dates = sorted({(s.date, s.event_id) for s in sides})
+    if not dates:
+        return [], []
+    cut = dates[int(len(dates) * (1 - BLIND_SHARE))][0] if len(dates) > 1 else dates[-1][0] + "~"
+    return [s for s in sides if s.date < cut], [s for s in sides if s.date >= cut]
+
+
+def _window(sides: list[Side]) -> str:
+    dates = [s.date for s in sides if s.date]
+    if not dates:
+        return ""
+    lo, hi = min(dates), max(dates)
+    fmt = lambda iso: datetime.fromisoformat(iso).strftime("%b %-d, %Y")  # noqa: E731
+    return f"{fmt(lo)} - {fmt(hi)}"
+
+
+def study_sides(sides: list[Side], cfg: SportConfig, games: int, window: str,
+                open_sides: list[Side] | None = None) -> SportStudy:
+    """Tune on the older games, then judge the same settings on newer games they never saw."""
     st = SportStudy(cfg.key, cfg.name, games=games, sides=len(sides), window=window)
     if not sides:
         st.note = "No finished games with closing odds in the study window yet."
         return st
+    tune, blind = split_blind(sides)
+    st.tune_window, st.blind_window = _window(tune), _window(blind)
 
-    # 1. Market weight: the blend whose probabilities best predicted what happened
-    # on every side of every closing line (log loss, a proper score; far steadier
-    # than picking whichever weight had the luckiest ROI).
-    graded = [s for s in sides if s.market_prob is not None and s.push < 1 and s.win + s.loss > 0]
+    # 1. Market weight, on the tuning games only: the blend whose probabilities best
+    # predicted what happened (log loss, a proper score; far steadier than ROI).
+    graded = [s for s in tune if s.market_prob is not None and s.push < 1 and s.win + s.loss > 0]
     if len(graded) >= MIN_CALIBRATION_SIDES:
         for w in WEIGHTS:
             ll = 0.0
@@ -239,56 +275,71 @@ def study_sides(sides: list[Side], cfg: SportConfig, games: int, window: str) ->
         allowed = [t for t in st.weight_log_loss if WEIGHT_RANGE[0] <= t[0] <= WEIGHT_RANGE[1]]
         st.weight = min(allowed, key=lambda t: (t[1], -t[0]))[0]
     else:
-        st.note = f"Only {len(graded)} graded lines so far; keeping the default {DEFAULT_WEIGHT:.0%} market weight."
-    st.by_weight = [summarize(f"{w:.0%} market", select(sides, w, 0.02)) for w in WEIGHTS]
+        st.note = f"Only {len(graded)} graded lines to tune on; keeping the default {DEFAULT_WEIGHT:.0%} market weight."
+    st.by_weight = [summarize(f"{w:.0%} market", select(tune, w, 0.02)) for w in WEIGHTS]
 
-    # 2. Edge threshold, at the chosen weight: the one that made the most beyond luck
-    # over a real sample. If none did, the strictest threshold that still has a
-    # sample, never looser than 2%; with no sample at all the default stays.
-    st.by_min_ev = [summarize(f"{m:.0%}+ edge", select(sides, st.weight, m)) for m in MIN_EVS]
-    proven_at = [(r.score, m) for r, m in zip(st.by_min_ev, MIN_EVS) if r.bets >= PROVEN_BETS and r.score > 0]
-    st.proven = bool(proven_at)
-    if st.proven:
-        st.min_ev = max(proven_at)[1]
+    # 2. Edge threshold, on the tuning games: the one that made the most beyond luck,
+    # else the strictest one with a sample, never looser than 2%.
+    st.by_min_ev = [summarize(f"{m:.0%}+ edge", select(tune, st.weight, m)) for m in MIN_EVS]
+    scored = [(r.score, m) for r, m in zip(st.by_min_ev, MIN_EVS) if r.score > 0]
+    if scored:
+        st.min_ev = max(max(scored)[1], 0.01)
     else:
         sampled = [m for r, m in zip(st.by_min_ev, MIN_EVS) if r.bets >= MIN_BETS]
         st.min_ev = max(max(sampled), 0.02) if sampled else 0.02
-        st.note = st.note or (
-            f"Not yet beating the closing line by more than luck over {PROVEN_BETS}+ bets; "
-            "using the strictest threshold with a sample (2% at least)."
-            if sampled else f"Fewer than {MIN_BETS} bets cleared any threshold at the closing line; keeping the 2% default.")
 
-    picked = select(sides, st.weight, st.min_ev)
-    st.best = summarize(f"{st.weight:.0%} market, {st.min_ev:.0%}+ edge", picked)
+    # 3. The honest test: the chosen settings on games they never saw.
+    label = f"{st.weight:.0%} market, {st.min_ev:.0%}+ edge"
+    st.in_sample = summarize(label + " (tuning games)", select(tune, st.weight, st.min_ev))
+    blind_picks = select(blind, st.weight, st.min_ev)
+    st.blind = summarize(label + " (blind games)", blind_picks)
+    st.best = st.blind
+    st.proven = st.blind.bets >= PROVEN_BETS and st.blind.score > 0
+    if not st.proven and not st.note:
+        st.note = (f"Blind test: {st.blind.bets} bets" + (f", ROI {st.blind.roi:+.1%}" if st.blind.roi is not None else "")
+                   + f". Not proven until it beats the close by more than luck over {PROVEN_BETS}+ blind bets.")
 
-    # 3. Where it worked: bet type and price band.
+    # 4. Where the blind bets came from: bet type and price band.
     names = {"h2h": "moneyline", "spreads": "spreads", "totals": "over/under"}
     by_market: dict[str, list[Side]] = defaultdict(list)
     by_band: dict[str, list[Side]] = defaultdict(list)
-    for s in picked:
+    for s in blind_picks:
         by_market[names.get(s.market, s.market)].append(s)
         by_band[band(s.american)].append(s)
     st.by_market = [summarize(k, v) for k, v in sorted(by_market.items())]
     st.by_band = [summarize(k, v) for k, v in sorted(by_band.items())]
 
-    # 4. Calibration of the blended probability, on every side (both sides of
-    # every line, so it is balanced), pushes left out.
-    xs, ys = [], []
+    # 5. Calibration: fitted on tuning games, checked on blind games (both sides of
+    # every line, so it is balanced; pushes left out).
+    def points(group):
+        for s in group:
+            if s.push >= 1 or s.win + s.loss <= 0:
+                continue
+            yield s.blended(st.weight), s.win / (s.win + s.loss)
+    fit = list(points(tune))
+    if len(fit) >= MIN_CALIBRATION_SIDES:
+        st.platt = fit_platt([logit(q) for q, _ in fit], [y for _, y in fit])
     buckets: dict[int, list[tuple[float, float]]] = defaultdict(list)
-    for s in sides:
-        if s.push >= 1:
-            continue
-        q = s.blended(st.weight)
-        y = s.win / (s.win + s.loss) if s.win + s.loss else 0.0
-        xs.append(logit(q))
-        ys.append(y)
+    for q, y in points(blind):
         buckets[min(int(q * 10), 9)].append((q, y))
-    if len(xs) >= MIN_CALIBRATION_SIDES:
-        st.platt = fit_platt(xs, ys)
     st.calibration = [
         (sum(q for q, _ in v) / len(v), sum(y for _, y in v) / len(v), len(v))
         for _, v in sorted(buckets.items()) if len(v) >= 10
     ]
+
+    # 6. Early bets: the same read against the OPENING line, before the market moved.
+    if open_sides:
+        o_tune, o_blind = split_blind(open_sides)
+        st.early_in_sample = summarize("opening lines (tuning games)", select(o_tune, st.weight, st.min_ev))
+        early_blind = select(o_blind, st.weight, st.min_ev)
+        st.early_blind = summarize("opening lines (blind games)", early_blind)
+        close_fair = {(s.event_id, s.market, s.side, s.point): s.market_prob for s in sides}
+        clv = [
+            close_fair[k] * american_to_decimal(s.american) - 1
+            for s in early_blind
+            if (k := (s.event_id, s.market, s.side, s.point)) in close_fair and close_fair[k] is not None
+        ]
+        st.early_clv = sum(clv) / len(clv) if clv else None
     return st
 
 
@@ -301,8 +352,11 @@ def replay(
     end: datetime,
     refit_days: int = 7,
     min_train_games: int = 50,
-) -> tuple[list[Side], int]:
-    """Price and grade every side of every closing line between ``start`` and ``end``."""
+    opening: Callable[[GameResult], list[Quote]] | None = None,
+) -> tuple[list[Side], int, list[Side]]:
+    """Price and grade every side of every closing (and opening) line between ``start`` and ``end``.
+
+    Returns (closing sides, games, opening sides)."""
     from .ledger import _settle
 
     completed = sorted((g for g in results if g.completed), key=lambda g: g.date)
@@ -310,6 +364,7 @@ def replay(
     cfg = with_shapes(cfg, results, before=start) if cfg.scoring == "normal" else cfg
     engine = Engine(provider=None, settings=Settings(market_weight=0.0, prop_market_weight=0.0, max_odds=10_000))
     sides: list[Side] = []
+    open_sides: list[Side] = []
     games = 0
     cursor = start
     while cursor < end:
@@ -333,22 +388,25 @@ def replay(
                 home_b2b=cfg.rest_effects and is_b2b(rest.get((g.event_id, g.home))),
                 away_b2b=cfg.rest_effects and is_b2b(rest.get((g.event_id, g.away))),
             )
-            event = Event(id=g.event_id, sport=cfg.key, commence_time=g.date, home=g.home, away=g.away,
-                          quotes=quotes, neutral=g.neutral)
             hs, as_ = g.home_score, g.away_score
-            for p in engine._game_picks(cfg, event, pred):
-                if p.market == "h2h":
-                    winner = "home" if hs > as_ else "away" if as_ > hs else "draw"
-                    out = (1.0, 0.0, 0.0) if winner == p.side else (0.0, 0.0, 1.0)
-                elif p.market == "spreads":
-                    out = _settle(hs - as_ if p.side == "home" else as_ - hs, p.point)
-                else:
-                    out = _settle(hs + as_, -p.point) if p.side == "over" else _settle(-(hs + as_), p.point)
-                sides.append(Side(
-                    cfg.key, g.event_id, p.market, p.side, p.american, p.model_prob, p.market_prob,
-                    p.push_prob, *out,
-                ))
-    return sides, games
+            for line_quotes, bucket in ((quotes, sides), (opening(g) if opening else [], open_sides)):
+                if not line_quotes:
+                    continue
+                event = Event(id=g.event_id, sport=cfg.key, commence_time=g.date, home=g.home, away=g.away,
+                              quotes=line_quotes, neutral=g.neutral)
+                for p in engine._game_picks(cfg, event, pred):
+                    if p.market == "h2h":
+                        winner = "home" if hs > as_ else "away" if as_ > hs else "draw"
+                        out = (1.0, 0.0, 0.0) if winner == p.side else (0.0, 0.0, 1.0)
+                    elif p.market == "spreads":
+                        out = _settle(hs - as_ if p.side == "home" else as_ - hs, p.point)
+                    else:
+                        out = _settle(hs + as_, -p.point) if p.side == "over" else _settle(-(hs + as_), p.point)
+                    bucket.append(Side(
+                        cfg.key, g.event_id, p.market, p.side, p.american, p.model_prob, p.market_prob,
+                        p.push_prob, *out, date=g.date.isoformat(), point=p.point,
+                    ))
+    return sides, games, open_sides
 
 
 def run_studies(
@@ -357,7 +415,9 @@ def run_studies(
     history: "ClosingHistory",
     now: datetime,
     days: int = STUDY_DAYS,
+    games_folder=None,
 ) -> dict[str, SportStudy]:
+    """``games_folder``: also write every final score with its lines to monthly CSV files."""
     out: dict[str, SportStudy] = {}
     start = now - timedelta(days=days)
     for i, cfg in enumerate(sports):
@@ -366,13 +426,23 @@ def run_studies(
             # Share the download budget fairly so every sport gets studied each run.
             share = (history.budget - history.fetched) // (len(sports) - i)
             history.prefetch(cfg, [g for g in results if start <= g.date < now], limit=share)
-            sides, games = replay(cfg, results, lambda g, c=cfg: history.quotes(c, g), start, now)
+            sides, games, open_sides = replay(
+                cfg, results, lambda g, c=cfg: history.quotes(c, g), start, now,
+                opening=lambda g, c=cfg: history.open_quotes(c, g),
+            )
+            if games_folder is not None:
+                from .archive import write_games
+
+                done = [g for g in results if g.completed and start <= g.date < now]
+                write_games(games_folder, cfg.key, done,
+                            {g.event_id: history.quotes(cfg, g) for g in done},
+                            {g.event_id: history.open_quotes(cfg, g) for g in done})
         except Exception as exc:  # one sport failing should not stop the others
             log.warning("%s study failed: %s", cfg.key, exc)
             st = SportStudy(cfg.key, cfg.name, note=f"Study failed: {exc}")
         else:
             window = f"{start:%b %-d} - {now:%b %-d, %Y}"
-            st = study_sides(sides, cfg, games, window)
+            st = study_sides(sides, cfg, games, window, open_sides)
         out[cfg.key] = st
     return out
 
@@ -439,7 +509,12 @@ class ClosingHistory:
         """Download missing closing lines, newest first, within the budget."""
         store = self._sport(cfg.key)
         done = 0
-        for g in sorted((g for g in games if g.completed and g.event_id not in store), key=lambda g: g.date, reverse=True):
+        def missing(g: GameResult) -> bool:
+            # New game, or saved before opening lines were kept (fetched once more for them).
+            rows = store.get(g.event_id)
+            return rows is None or (rows and not any(r[3] == OPEN_BOOK for r in rows))
+
+        for g in sorted((g for g in games if g.completed and missing(g)), key=lambda g: g.date, reverse=True):
             if self.fetched >= self.budget or (limit is not None and done >= limit):
                 return
             self.fetched += 1
@@ -447,13 +522,21 @@ class ClosingHistory:
             quotes = self.fetch(cfg, g)
             if quotes is None:
                 continue
-            store[g.event_id] = [[q.market, q.side, q.point, q.book, q.american] for q in quotes]
+            rows = [[q.market, q.side, q.point, q.book, q.american] for q in quotes]
+            rows.append(["meta", "open-checked", None, OPEN_BOOK, 0])  # don't ask again if ESPN has no open
+            store[g.event_id] = rows
             self._dirty.add(cfg.key)
 
     def quotes(self, cfg: SportConfig, game: GameResult) -> list[Quote]:
         rows = self._sport(cfg.key).get(game.event_id) or []
         # Pregame closing lines only (older saves also kept bet365's final in-game prices).
         return [Quote(m, side, point, book, price) for m, side, point, book, price in rows if book == STUDY_BOOK]
+
+    def open_quotes(self, cfg: SportConfig, game: GameResult) -> list[Quote]:
+        """Opening DraftKings lines (moneyline and spread), where ESPN kept them."""
+        rows = self._sport(cfg.key).get(game.event_id) or []
+        return [Quote(m, side, point, STUDY_BOOK, price) for m, side, point, book, price in rows
+                if book == OPEN_BOOK and m != "meta"]
 
     def save(self) -> None:
         import json

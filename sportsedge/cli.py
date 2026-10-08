@@ -116,20 +116,29 @@ def cmd_study(args) -> int:
         data_dir / ("demo-history" if args.demo else "history"), provider.closing_quotes, budget=args.budget
     )
     names = args.sports if args.sports != ["all"] or not args.demo else [DEMO_SPORTS]
-    studies = study.run_studies(resolve(names), provider.game_results, history, now, days=args.days)
+    games_dir = data_dir / ("demo-games" if args.demo else "games")
+    studies = study.run_studies(resolve(names), provider.game_results, history, now, days=args.days, games_folder=games_dir)
     history.save()
     out = data_dir / ("demo-studies.json" if args.demo else "studies.json")
     study.save(out, studies, now)
     rows = []
+    def rec(r):
+        return f"{r.won:.0f}-{r.lost:.0f} ({r.bets})" if r and r.bets else "-"
+
+    def roi(r):
+        return f"{r.roi:+.1%}" if r and r.roi is not None else "-"
+
     for s in studies.values():
-        b = s.best
         rows.append([
             s.name, s.games, f"{s.weight:.0%}", f"{s.min_ev:.0%}",
-            f"{b.won:.0f}-{b.lost:.0f}" if b and b.bets else "-",
-            f"{b.roi:+.1%}" if b and b.roi is not None else "-",
-            "yes" if s.platt else "-", s.note,
+            rec(s.in_sample), roi(s.in_sample), rec(s.blind), roi(s.blind),
+            roi(s.early_blind), f"{s.early_clv:+.1%}" if s.early_clv is not None else "-",
+            "PROVEN" if s.proven else "not yet",
         ])
-    print(report.table(["Sport", "Games", "Market wt", "Min edge", "Record", "ROI", "Calibrated", "Note"], rows, "lrrrrrll"))
+    print(report.table(
+        ["Sport", "Games", "Mkt wt", "Min edge", "Tuned W-L", "Tuned ROI", "Blind W-L", "Blind ROI",
+         "Early blind ROI", "Early CLV", "Edge"], rows, "lrrrrrrrrrl"))
+    print("Tuned = the games the settings were chosen on (in-sample). Blind = newer games they never saw.")
     print(f"downloaded closing lines for {history.fetched} games; wrote {out}")
     return 0
 
@@ -178,6 +187,7 @@ class Workspace:
         self.args = args
         self.demo = args.demo
         data_dir = Path(args.data_dir)
+        self.data_dir = data_dir
         self.ledger_path = data_dir / ("demo-ledger.json" if self.demo else "ledger.json")
         self.brain_path = data_dir / ("demo-brain.json" if self.demo else "brain.json")
         self.site_dir = Path(args.site)
@@ -245,6 +255,12 @@ class Workspace:
         for w in dict.fromkeys(res.warnings):
             print("warning:", w)
         print(f"published {res.published} new picks, graded {res.graded}")
+        from . import archive
+
+        prefix = "demo-" if self.demo else ""
+        snaps = archive.log_snapshots(self.data_dir / f"{prefix}odds", res.scans, now)
+        props = archive.log_prop_lines(self.data_dir / f"{prefix}props", res.scans, now)
+        print(f"logged {snaps} game-line snapshots and {props} prop lines")
         remaining = getattr(getattr(self.provider, "odds", None), "requests_remaining", None)
         if remaining is not None:
             print(f"The Odds API credits remaining: {remaining}")
