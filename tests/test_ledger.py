@@ -179,7 +179,7 @@ def test_simulated_history_and_dashboard(tmp_path):
     assert stats["overall"]["won"] + stats["overall"]["lost"] > 0
     data = build_data(L, {**brains, **res.brains}, res.weights, sports, provider.now, demo=True)
     html = render_html(data)
-    assert html.startswith("<!doctype html>") and "<title>Funky Buttlovin</title>" in html.split("<body>")[0]
+    assert html.startswith("<!doctype html>") and "<title>The Great Hambino</title>" in html.split("<body>")[0]
     assert "__DATA__" not in html
     json.dumps(data)  # serialisable
 
@@ -302,7 +302,7 @@ def test_cli_page_from_saved_ledger(tmp_path):
     out = tmp_path / "page.html"
     assert main(["page", "--data-dir", str(tmp_path / "data"), "--out", str(out)]) == 0
     html = out.read_text()
-    assert html.startswith("<title>Funky Buttlovin</title>") and "__DATA__" not in html
+    assert html.startswith("<title>The Great Hambino</title>") and "__DATA__" not in html
 
 
 def test_longshots_capped_at_half_unit():

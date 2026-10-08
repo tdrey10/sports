@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "sportsedge"
 version = "0.1.0"
-description = "Funky Buttlovin: stats-driven sports betting edge finder for spreads, totals, moneylines and player props"
+description = "The Great Hambino: stats-driven sports betting edge finder for spreads, totals, moneylines and player props"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "requests>=2.28"]
@@ -16,6 +16,7 @@ dev = ["pytest>=7"]
 [project.scripts]
 sportsedge = "sportsedge.cli:main"
 funky = "sportsedge.cli:main"
+hambino = "sportsedge.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["sportsedge*"]

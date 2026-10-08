@@ -421,7 +421,7 @@ def cmd_sports(_args) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="funky", description="Funky Buttlovin: find +EV bets from team and player stats.")
+    p = argparse.ArgumentParser(prog="hambino", description="The Great Hambino: find +EV bets from team and player stats.")
     p.add_argument("-v", "--verbose", action="store_true")
     sub = p.add_subparsers(dest="command", required=True)
 
@@ -525,7 +525,7 @@ def build_parser() -> argparse.ArgumentParser:
     pg.add_argument("sports", nargs="*", default=["nfl,nba,mlb,nhl,soccer"])
     pg.add_argument("--data-dir", default="data")
     pg.add_argument("--tz", default="America/Los_Angeles")
-    pg.add_argument("--out", default="funky-buttlovin.html")
+    pg.add_argument("--out", default="great-hambino.html")
     pg.add_argument("--standalone", action="store_true", help="full HTML document (default: Artifact body)")
     pg.set_defaults(func=cmd_page)
 

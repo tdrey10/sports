@@ -1,4 +1,4 @@
-# Funky Buttlovin
+# The Great Hambino
 
 **100% free to run:** stats and betting lines come from ESPN (DraftKings lines, plus bet365 for soccer, live in-game lines, and player prop lines), and it runs on GitHub's free plan. No API keys or paid plans.
 
@@ -26,7 +26,7 @@ Thu 10:00  Mobile Storm @ Houston Titans    Under 236          fanduel     -101 
 
 ## The dashboard
 
-`funky run` (or `sportsedge run`, same thing) turns each scan into a phone-friendly dashboard (`site/index.html`):
+`hambino run` (or `funky run`, or `sportsedge run`, same thing) turns each scan into a phone-friendly dashboard (`site/index.html`):
 
 - **Best bets**: the day's top 5 across spreads, over/unders, moneylines and props. They're ranked by expected bankroll growth (Kelly), which weighs edge against risk, so a solid -110 edge outranks a +450 longshot with a slightly bigger EV.
 - **Filter by bet type**: Spreads, Over/Under, Props, Moneyline, plus a record and closing-line value for each type.
@@ -66,7 +66,7 @@ sportsedge scan all --json picks.json
 Run the full engine and build the dashboard:
 
 ```bash
-funky run --demo --props             # demo: 14 days of simulated history, then today's board
+hambino run --demo --props             # demo: 14 days of simulated history, then today's board
 open site/index.html
 
 sportsedge run nba nfl ncaaf --props # live: picks go into data/ledger.json
@@ -80,8 +80,8 @@ Live lines move in seconds, so live betting runs as a session you start before g
 
 - Every check reads the score and clock from ESPN (free). Only sports with games in progress use odds credits: 3 credits per check.
 - In-play games are priced from the current score, the time left and the pregame model. The model doesn't know possession, power plays or pitch counts, and the books' live models do. So live picks lean harder on the market (85%), need at least +3% EV, and are skipped when the model and market disagree by more than 8 points or in the last 5% of a game.
-- Each new live bet (one per game) is posted as a comment on the **Funky Buttlovin live bets** issue, and the GitHub app sends your phone a notification. Live bets are graded and tracked like every other pick.
-- Locally: `funky live nfl nba --hours 3 --every 4`.
+- Each new live bet (one per game) is posted as a comment on the **The Great Hambino live bets** issue, and the GitHub app sends your phone a notification. Live bets are graded and tracked like every other pick.
+- Locally: `hambino live nfl nba --hours 3 --every 4`.
 
 ### Run it on a schedule with GitHub Actions
 

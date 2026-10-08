@@ -111,7 +111,7 @@ class FakeGitHub:
         self.headers, self.posts = {}, []
 
     def get(self, url, params=None):
-        return Resp([{"number": 7, "title": "Funky Buttlovin live bets"}])
+        return Resp([{"number": 7, "title": "The Great Hambino live bets"}])
 
     def post(self, url, json=None):
         self.posts.append((url, json))

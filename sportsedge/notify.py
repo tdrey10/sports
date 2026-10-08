@@ -14,7 +14,8 @@ import requests
 log = logging.getLogger(__name__)
 
 API = "https://api.github.com"
-ISSUE_TITLE = "Funky Buttlovin live bets"
+ISSUE_TITLE = "The Great Hambino live bets"
+OLD_TITLES = ("Funky Buttlovin live bets",)  # the issue keeps working if it was never renamed
 
 
 class GitHubIssueNotifier:
@@ -35,13 +36,13 @@ class GitHubIssueNotifier:
             resp = self.session.get(f"{API}/repos/{self.repo}/issues", params={"state": "open", "per_page": 100})
             resp.raise_for_status()
             for issue in resp.json():
-                if issue.get("title") == ISSUE_TITLE and "pull_request" not in issue:
+                if issue.get("title") in (ISSUE_TITLE, *OLD_TITLES) and "pull_request" not in issue:
                     self._issue = issue["number"]
                     break
             else:
                 resp = self.session.post(f"{API}/repos/{self.repo}/issues", json={
                     "title": ISSUE_TITLE,
-                    "body": "New live bets from Funky Buttlovin are posted here as comments, so the GitHub app "
+                    "body": "New live bets from The Great Hambino are posted here as comments, so the GitHub app "
                             "notifies your phone. Keep this issue open.",
                 })
                 resp.raise_for_status()
