@@ -172,7 +172,11 @@ class EspnOdds:
 
     def closing_quotes(self, cfg: SportConfig, event_id: str) -> list[Quote] | None:
         """Closing pregame lines for a finished game (ESPN keeps them: the top-level
-        prices on a completed game are the close). Cached for good: they never change."""
+        prices on a completed game are the close). Cached for good: they never change.
+
+        Only the DraftKings pregame provider is used. Other providers on a finished
+        game (bet365 on soccer, live odds) hold the final in-game prices, e.g. +50000
+        on the side that lost, which would wreck any study."""
         listing = self._get(self._core_base(cfg, event_id), ttl=None)
         if not listing:
             return None  # request failed: try again next time
@@ -180,7 +184,7 @@ class EspnOdds:
         for item in listing.get("items", []) or []:
             ref = item.get("$ref", "")
             pid = str((item.get("provider") or {}).get("id") or ref.rstrip("/").split("?")[0].rsplit("/", 1)[-1])
-            if pid == LIVE_PROVIDER:
+            if pid != PREGAME_PROVIDER:
                 continue
             o = item if "homeTeamOdds" in item else self._get(ref.replace("http://", "https://"), ttl=None) if ref else {}
             quotes += parse_provider_odds(o)

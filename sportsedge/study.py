@@ -40,6 +40,8 @@ log = logging.getLogger(__name__)
 WEIGHTS = (0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95)
 MIN_EVS = (0.0, 0.01, 0.02, 0.03, 0.05, 0.08)
 MIN_BETS = 30  # a setting needs at least this many bets before its result counts
+PROVEN_BETS = 60  # and a sport needs this many before it counts as beating the close
+STUDY_BOOK = "draftkings"
 MIN_CALIBRATION_SIDES = 300
 STUDY_DAYS = 180
 DEFAULT_WEIGHT = 0.75
@@ -240,20 +242,20 @@ def study_sides(sides: list[Side], cfg: SportConfig, games: int, window: str) ->
         st.note = f"Only {len(graded)} graded lines so far; keeping the default {DEFAULT_WEIGHT:.0%} market weight."
     st.by_weight = [summarize(f"{w:.0%} market", select(sides, w, 0.02)) for w in WEIGHTS]
 
-    # 2. Edge threshold, at the chosen weight: the one that made the most beyond luck.
-    # If none did, the strictest threshold that still has a real sample; with no
-    # sample at all there is no evidence either way, so the default stays.
+    # 2. Edge threshold, at the chosen weight: the one that made the most beyond luck
+    # over a real sample. If none did, the strictest threshold that still has a
+    # sample, never looser than 2%; with no sample at all the default stays.
     st.by_min_ev = [summarize(f"{m:.0%}+ edge", select(sides, st.weight, m)) for m in MIN_EVS]
-    ev_scored = [(r.score, m) for r, m in zip(st.by_min_ev, MIN_EVS)]
-    ev_score, ev_best = max(ev_scored, key=lambda t: (t[0], t[1]))
-    st.proven = ev_score > 0
+    proven_at = [(r.score, m) for r, m in zip(st.by_min_ev, MIN_EVS) if r.bets >= PROVEN_BETS and r.score > 0]
+    st.proven = bool(proven_at)
     if st.proven:
-        st.min_ev = ev_best
+        st.min_ev = max(proven_at)[1]
     else:
         sampled = [m for r, m in zip(st.by_min_ev, MIN_EVS) if r.bets >= MIN_BETS]
-        st.min_ev = max(max(sampled), 0.02) if sampled else 0.02  # never looser than the default without proof
+        st.min_ev = max(max(sampled), 0.02) if sampled else 0.02
         st.note = st.note or (
-            "No edge threshold beat the closing line by more than luck yet; using the strictest one with a sample (2% at least)."
+            f"Not yet beating the closing line by more than luck over {PROVEN_BETS}+ bets; "
+            "using the strictest threshold with a sample (2% at least)."
             if sampled else f"Fewer than {MIN_BETS} bets cleared any threshold at the closing line; keeping the 2% default.")
 
     picked = select(sides, st.weight, st.min_ev)
@@ -450,7 +452,8 @@ class ClosingHistory:
 
     def quotes(self, cfg: SportConfig, game: GameResult) -> list[Quote]:
         rows = self._sport(cfg.key).get(game.event_id) or []
-        return [Quote(m, side, point, book, price) for m, side, point, book, price in rows]
+        # Pregame closing lines only (older saves also kept bet365's final in-game prices).
+        return [Quote(m, side, point, book, price) for m, side, point, book, price in rows if book == STUDY_BOOK]
 
     def save(self) -> None:
         import json

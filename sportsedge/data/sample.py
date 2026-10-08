@@ -245,7 +245,7 @@ class SampleProvider:
             quotes = self._game_quotes(cfg, world, ev)
         finally:
             self.clock = saved
-        return [q for q in quotes if q.book == "draftkings"]
+        return [q for q in quotes if q.book == "draftkings"]  # the studies use one book's close, like ESPN
 
     def live_games(self, cfg: SportConfig) -> list[GameResult]:
         return []  # the demo has no games in progress
