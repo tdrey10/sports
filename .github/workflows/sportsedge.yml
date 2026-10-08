@@ -49,7 +49,7 @@ jobs:
 
       - name: Live scores and grading
         if: github.event.schedule == '41 */2 * * *'
-        run: sportsedge run all --scores-only
+        run: sportsedge run nfl,nba,mlb,nhl,soccer --scores-only
 
       - name: Full engine cycle
         if: github.event.schedule != '41 */2 * * *'
@@ -59,7 +59,7 @@ jobs:
           PROPS_ARGS: >-
             ${{ (inputs.props || github.event.schedule == '47 15 * * *') && '--props --props-sports nfl,nba --props-hours 30
             --prop-markets player_pass_yds,player_rush_yds,player_reception_yds,player_receptions,player_points,player_rebounds,player_assists,player_threes,player_points_rebounds_assists' || '' }}
-        run: sportsedge run all $PROPS_ARGS
+        run: sportsedge run nfl,nba,mlb,nhl,soccer $PROPS_ARGS
 
       - name: Save the ledger
         run: |

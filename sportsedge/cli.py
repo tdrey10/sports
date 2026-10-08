@@ -100,7 +100,7 @@ def cmd_backtest(args) -> int:
     return 0
 
 
-DEMO_SPORTS = "nfl,ncaaf,nba,ncaab,mlb,nhl,epl"
+DEMO_SPORTS = "nfl,nba,mlb,nhl,epl"
 
 
 def _settings(args) -> Settings:

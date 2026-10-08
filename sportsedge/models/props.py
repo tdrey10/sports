@@ -6,7 +6,7 @@ import math
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from ..distributions import Pmf, count_pmf, discrete_normal_pmf, line_probs, negate
+from ..distributions import Pmf, count_pmf, discrete_gamma_pmf, line_probs, negate
 from ..sports import PropSpec
 
 
@@ -87,7 +87,7 @@ def project_prop(
 
     # Shrink the variance toward a prior so a hot/cold streak of near-identical
     # games doesn't produce an overconfident distribution.
-    prior_var = max(mean, 0.25) if spec.dist == "count" else (0.35 * max(mean, 1.0)) ** 2
+    prior_var = max(mean, 0.25) if spec.dist == "count" else (0.45 * max(mean, 1.0)) ** 2
     k = 4.0
     var = (n_eff * var + k * prior_var) / (n_eff + k)
 
@@ -95,7 +95,7 @@ def project_prop(
         var = max(var, mean)
         pmf = count_pmf(max(mean, 0.01), var)
     else:
-        pmf = discrete_normal_pmf(mean, math.sqrt(var), lo=0)
+        pmf = discrete_gamma_pmf(mean, math.sqrt(var))
     return PropProjection(player, market, mean, math.sqrt(var), len(values), pmf, list(notes or []))
 
 
