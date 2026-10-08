@@ -52,7 +52,13 @@ jobs:
         if: github.event.schedule != '*/20 * * * *'
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-        run: sportsedge run all ${{ inputs.props && '--props' || '' }}
+        run: |
+          if [ -z "$ODDS_API_KEY" ]; then
+            echo "::warning::ODDS_API_KEY is not set yet, so no odds scan. Updating scores only."
+            sportsedge run all --scores-only
+          else
+            sportsedge run all ${{ inputs.props && '--props' || '' }}
+          fi
 
       - name: Save the ledger
         run: |
