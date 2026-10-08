@@ -480,7 +480,16 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const spotPanel = spotStudy.length ? panel("Early-bet spots", "Dogs +100 to +220 (wind: the under) · blind games only",
         `<p class="empty">Each spot is judged on its own: bet every dog in that spot, at the opening line and at the close, on games the settings never saw. A spot adds weight to a pick only after it holds up blind, and all spots together are capped at 6 points of win chance on a dog.</p>
          <div class="table-wrap"><table><thead><tr><th>Sport</th><th>Spot</th><th>Open W-L</th><th>Open ROI</th><th>Close W-L</th><th>Close ROI</th><th>Open CLV</th><th>Status</th></tr></thead><tbody>${spotStudy.join("")}</tbody></table></div>`) : "";
-    return studyPanel + spotPanel + panel("How the model is doing", b[0] ? "Retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
+    const propRows = [];
+    Object.entries(DATA.props || {}).forEach(([sport, markets]) => Object.entries(markets).forEach(([m, t]) => {
+      const graded = t.over + t.under;
+      propRows.push(`<tr><td>${esc(sport.toUpperCase())}</td><td>${esc(m.replace(/^player_/, "").replace(/_/g, " "))}</td><td>${t.lines}</td><td>${graded ? pct(t.over / graded) : "–"}</td><td>${t.lines ? pct(t.moved / t.lines) : "–"}</td></tr>`);
+    }));
+    const propPanel = panel("Prop line history", "Logged daily, graded when games end",
+      propRows.length
+        ? `<p class="empty">Every prop line seen is saved and graded against the real stat. Props can't be judged until this history is big enough; until then prop picks stay at half a unit.</p><div class="table-wrap"><table><thead><tr><th>Sport</th><th>Stat</th><th>Lines</th><th>Over hit</th><th>Line moved</th></tr></thead><tbody>${propRows.join("")}</tbody></table></div>`
+        : empty("Prop lines are being logged every day; the first graded ones show up here after those games end."));
+    return studyPanel + spotPanel + propPanel + panel("How the model is doing", b[0] ? "Retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
       `<div class="model"><ul>
         ${all.g ? `<li>Picks the straight-up winner <b>${pct(all.w / all.g, 0)}</b> of the time on ${all.g.toLocaleString()} recent games it never saw.</li>` : ""}
         ${keys.length ? `<li>Learned NFL key numbers from real scores: ${keys.map((k) => k[0]).join(", ")}.</li>` : ""}

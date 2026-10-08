@@ -131,3 +131,90 @@ def log_prop_lines(folder: Path, scans, now: datetime) -> int:
         _append(Path(folder) / scan.sport.key / f"{_month(now)}.csv", PROP_FIELDS, rows)
         total += len(rows)
     return total
+
+
+GRADED_FIELDS = ["event_id", "start", "home", "away", "player", "market", "open_line", "close_line",
+                 "close_over_price", "close_under_price", "actual", "result"]
+
+
+def grade_prop_lines(props_folder: Path, out_folder: Path, sports, results_for, box_for, now: datetime) -> int:
+    """Grade every logged prop line whose game is over: the player's actual stat against
+    the first (open) and last (close) line seen before the start. Writes
+    <out>/<sport>/<YYYY-MM>.csv once per game; returns the number of lines graded.
+
+    This is the prop history the blueprint asks for: no prop idea can be tested without it.
+    """
+    from datetime import timedelta
+
+    from .data.base import NameMatcher
+    from .models.props import stat_value
+
+    total = 0
+    for cfg in sports:
+        folder = Path(props_folder) / cfg.key
+        if not folder.exists() or not cfg.props:
+            continue
+        done_ids: set[str] = set()
+        out_dir = Path(out_folder) / cfg.key
+        for f in out_dir.glob("*.csv") if out_dir.exists() else []:
+            done_ids |= {r["event_id"] for r in csv.DictReader(open(f))}
+        by_event: dict[str, list[dict]] = defaultdict(list)
+        for f in sorted(folder.glob("*.csv")):
+            for r in csv.DictReader(open(f)):
+                if r["event_id"] not in done_ids and r["seen_at"] < r["start"]:
+                    by_event[r["event_id"]].append(r)
+        if not by_event:
+            continue
+        starts = [datetime.fromisoformat(rows[0]["start"]) for rows in by_event.values()]
+        games = {g.event_id: g for g in results_for(cfg, min(starts) - timedelta(days=1), now) if g.completed}
+        for event_id, rows in by_event.items():
+            game = games.get(event_id)
+            if game is None:
+                continue  # not finished (or not found) yet
+            box = box_for(cfg, game)
+            if not box:
+                continue
+            players = NameMatcher({pg.player: pg for pg in box}, threshold=0.88)
+            stats = {pg.player: pg.stats for pg in box}
+            lines: dict[tuple[str, str], list[dict]] = defaultdict(list)
+            for r in sorted(rows, key=lambda r: r["seen_at"]):
+                lines[(r["player"], r["market"])].append(r)
+            out = []
+            for (player, market), seen in lines.items():
+                spec = cfg.props.get(market)
+                name = players.match(player)
+                actual = stat_value(spec, stats[name]) if spec and name else None
+                first, last = seen[0], seen[-1]
+                line = float(last["line"]) if last["line"] else None
+                if actual is None or line is None:
+                    result = "void"
+                else:
+                    result = "over" if actual > line else "under" if actual < line else "push"
+                out.append({
+                    "event_id": event_id, "start": first["start"], "home": first["home"], "away": first["away"],
+                    "player": player, "market": market, "open_line": first["line"], "close_line": last["line"],
+                    "close_over_price": last["over_price"], "close_under_price": last["under_price"],
+                    "actual": "" if actual is None else actual, "result": result,
+                })
+            _append(out_dir / f"{_month(game.date)}.csv", GRADED_FIELDS, out)
+            total += len(out)
+    return total
+
+
+def prop_summary(graded_folder: Path) -> dict[str, dict]:
+    """Per sport and stat: how often the over hit, and how often the line moved before the start."""
+    out: dict[str, dict] = {}
+    for sport_dir in sorted(Path(graded_folder).glob("*")) if Path(graded_folder).exists() else []:
+        tally: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+        for f in sport_dir.glob("*.csv"):
+            for r in csv.DictReader(open(f)):
+                t = tally[r["market"]]
+                t[r["result"]] += 1
+                if r["open_line"] and r["close_line"] and r["open_line"] != r["close_line"]:
+                    t["moved"] += 1
+        out[sport_dir.name] = {
+            m: {"lines": sum(v for k, v in t.items() if k != "moved"), "over": t["over"], "under": t["under"],
+                "push": t["push"], "void": t["void"], "moved": t["moved"]}
+            for m, t in tally.items()
+        }
+    return out
