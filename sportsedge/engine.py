@@ -305,6 +305,10 @@ class Engine:
             if proj:
                 desc = f"projects {proj.mean:.1f} ± {proj.sd:.1f} (last {proj.games} games"
                 desc += "; " + ", ".join(proj.notes) + ")" if proj.notes else ")"
+                if q.point is not None and proj.recent:
+                    hits, n = proj.hit_rate(q.side, q.point)
+                    last5 = ", ".join(f"{v:g}" for v in proj.recent[:5])
+                    desc += f"; {q.side} {fmt_point(q.point, signed=False)} hit in {hits} of the last {n} games (last 5: {last5})"
             return sel, desc
 
         picks = evaluate(event, quotes, model, describe, self.settings, lambda m: 2)

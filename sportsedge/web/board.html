@@ -254,7 +254,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     return `<button class="add" data-add="${e.id}" aria-pressed="${slip.has(e.id)}">${slip.has(e.id) ? "In slip" : "+ Slip"}</button>`;
   }
   function row(e, opts = {}) {
-    const more = e.reasons && e.reasons.length ? `<details class="more"><summary>Why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "";
+    const more = e.reasons && e.reasons.length ? `<details class="more"><summary>Stats &amp; why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "";
     return `<div class="row">
       <div class="sel">${opts.rank ? `<span class="rank">${e.best_rank}</span>` : ""}<span class="tag ${e.tier}">${TIER[e.tier] || e.tier}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
       <div class="odds"><b>${odds(e.odds)}</b><small>${units(e)} · ${signed(e.ev * 100, 1)}% EV</small></div>

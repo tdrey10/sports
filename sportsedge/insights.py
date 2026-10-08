@@ -129,6 +129,9 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
                     f"Starters: {sp(ctx.away_pitcher, ctx.away_pitcher_era)} vs {sp(ctx.home_pitcher, ctx.home_pitcher_era)}."
                 )
 
+        if ctx and pred:
+            bullets.extend(stat_lines(pick, scan, ctx, pred))
+
     if pick.market_prob is not None:
         bullets.append(
             f"Model {pick.model_prob:.0%} · market (no-vig) {pick.market_prob:.0%} · blended {pick.win_prob:.0%} → fair {pick.fair_american:+.0f}."
@@ -140,6 +143,139 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
                 more = f" +{len(players) - 4} more" if len(players) > 4 else ""
                 bullets.append(f"{team} missing: {', '.join(players[:4])}{more}.")
     return headline, bullets
+
+
+FORM_GAMES = 5
+UNIT = {"nfl": "points", "nba": "points", "mlb": "runs", "nhl": "goals"}
+
+
+def _unit(sport: str) -> str:
+    return UNIT.get(sport, "goals")  # every other key is a soccer league
+
+
+def _per_game(games: list[GameResult], team: str) -> tuple[float, float] | None:
+    if not games:
+        return None
+    pf = sum(g.home_score if g.home == team else g.away_score for g in games) / len(games)
+    pa = sum(g.away_score if g.home == team else g.home_score for g in games) / len(games)
+    return pf, pa
+
+
+def _form(games: list[GameResult], team: str) -> str | None:
+    last = games[-FORM_GAMES:]
+    if len(last) < 3:
+        return None
+    pf, pa = _per_game(last, team)
+    return f"{team} {fmt_record(record(last, team))} (avg margin {pf - pa:+.1f})"
+
+
+def power_ranks(scan: SportScan) -> dict[str, int]:
+    r = scan.ratings
+    if r is None:
+        return {}
+    teams = [t for t in r.off if r.games_played.get(t, 0) >= 3]
+    net = sorted(teams, key=lambda t: r.off[t] + r.deff.get(t, 0.0), reverse=True)
+    return {t: i + 1 for i, t in enumerate(net)}
+
+
+def track_record(scan: SportScan, home_prob: float) -> tuple[float, float, int] | None:
+    """The backtest bucket nearest this win probability: (predicted, actual, games)."""
+    cal = [c for c in (scan.brain.calibration if scan.brain else []) if c[2] >= 15]
+    if not cal:
+        return None
+    return min(cal, key=lambda c: abs(c[0] - home_prob))
+
+
+def stat_lines(pick: Pick, scan: SportScan, ctx: EventContext, pred) -> list[str]:
+    """The numbers behind a game pick: scoring, form, venue splits, head-to-head,
+    power rank, the chance of an upset and how the model has done at this confidence."""
+    out: list[str] = []
+    before = ctx.event.commence_time
+    unit = _unit(scan.sport.key)
+    hg = season_games(scan.results, ctx.home, before)
+    ag = season_games(scan.results, ctx.away, before)
+
+    sides = []
+    for team, games in ((ctx.away, ag), (ctx.home, hg)):
+        pg = _per_game(games, team)
+        if pg:
+            sides.append(f"{team} {pg[0]:.1f} scored / {pg[1]:.1f} allowed")
+    if sides:
+        out.append(f"Season {unit} per game: " + "; ".join(sides) + ".")
+
+    forms = [f for f in (_form(ag, ctx.away), _form(hg, ctx.home)) if f]
+    if forms:
+        out.append(f"Last {FORM_GAMES}: " + "; ".join(forms) + ".")
+
+    if not ctx.neutral:
+        home_at_home = [g for g in hg if g.home == ctx.home]
+        away_on_road = [g for g in ag if g.away == ctx.away]
+        if len(home_at_home) >= 2 and len(away_on_road) >= 2:
+            out.append(
+                f"Splits: {ctx.home} {fmt_record(record(home_at_home, ctx.home))} at home; "
+                f"{ctx.away} {fmt_record(record(away_on_road, ctx.away))} on the road."
+            )
+
+    h2h = [g for g in hg if ctx.away in (g.home, g.away)]
+    if h2h:
+        g = h2h[-1]
+        out.append(
+            f"Head to head this season: {ctx.home} {fmt_record(record(h2h, ctx.home))}"
+            f" (last: {g.away} {g.away_score:.0f} - {g.home} {g.home_score:.0f}, {g.date:%-m/%-d})."
+        )
+
+    ranks = power_ranks(scan)
+    if ctx.home in ranks and ctx.away in ranks:
+        n = len(ranks)
+        out.append(f"Power rank: {ctx.away} #{ranks[ctx.away]} vs {ctx.home} #{ranks[ctx.home]} (of {n}).")
+
+    team = pick_team(pick, ctx)
+    if team and pick.market in ("h2h", "spreads"):
+        p_win = pred.p_home if team == ctx.home else pred.p_away
+        p_fav = max(pred.p_home, pred.p_away)
+        if p_win >= p_fav:
+            out.append(f"Upset risk: {1 - p_win - pred.p_draw:.0%} chance {ctx.away if team == ctx.home else ctx.home} wins outright.")
+        else:
+            out.append(f"Upset chance: {team} wins outright {p_win:.0%} of the time on our numbers.")
+        if pick.american > 0 and p_win < p_fav:
+            case = upset_case(team, ctx, hg, ag, ranks)
+            if case:
+                out.append("Upset case: " + "; ".join(case) + ".")
+        home_prob = pred.p_home
+        tr = track_record(scan, home_prob)
+        if tr:
+            pred_p, actual, n = tr
+            if team == ctx.away:
+                pred_p, actual = 1 - pred_p, 1 - actual
+            out.append(
+                f"Track record: teams we gave a {pred_p:.0%} chance to win outright won {actual:.0%} of the time "
+                f"({n} recent games tested)."
+            )
+    return out
+
+
+def upset_case(team: str, ctx: EventContext, hg, ag, ranks: dict[str, int]) -> list[str]:
+    """Where the underdog is actually the better side on paper."""
+    opp = ctx.away if team == ctx.home else ctx.home
+    mine, theirs = (hg, ag) if team == ctx.home else (ag, hg)
+    case = []
+    a, b = mine[-FORM_GAMES:], theirs[-FORM_GAMES:]
+    if len(a) >= 3 and len(b) >= 3:
+        ra, rb = record(a, team), record(b, opp)
+        if ra[0] / len(a) > rb[0] / len(b):
+            case.append(f"hotter lately ({fmt_record(ra)} vs {fmt_record(rb)} in the last {FORM_GAMES})")
+    pa, pb = _per_game(mine, team), _per_game(theirs, opp)
+    if pa and pb and pa[1] < pb[1]:
+        case.append(f"better defense ({pa[1]:.1f} allowed vs {pb[1]:.1f})")
+    if team in ranks and opp in ranks and ranks[team] < ranks[opp]:
+        case.append(f"higher power rank (#{ranks[team]} vs #{ranks[opp]})")
+    rest_mine = ctx.home_rest if team == ctx.home else ctx.away_rest
+    rest_opp = ctx.away_rest if team == ctx.home else ctx.home_rest
+    if rest_mine and rest_opp and rest_mine - rest_opp >= 2 and rest_mine < 20:
+        case.append(f"more rest ({rest_mine:.0f} days vs {rest_opp:.0f})")
+    if team == ctx.home and not ctx.neutral:
+        case.append("home field")
+    return case
 
 
 def _rest_line(ctx: EventContext) -> str | None:
