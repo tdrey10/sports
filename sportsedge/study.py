@@ -416,6 +416,45 @@ def wind_bets(cfg: SportConfig, results: list[GameResult], close_for, weather, s
     return out
 
 
+def steam_bets(cfg: SportConfig, results: list[GameResult], close_for, odds_folder,
+               start: datetime, end: datetime) -> list[tuple[str, str, Side]]:
+    """('steam_dog', 'open', bet at the first look after the money moved) and ('steam_dog', 'close',
+    the same side at the closing price, i.e. betting after the move). Needs the snapshot log, so
+    it only covers games since logging began."""
+    from .archive import moneyline_history
+    from .odds import no_vig
+    from .spots import steamed
+
+    if odds_folder is None or cfg.key not in SPOTS_STEAM:
+        return []
+    hist = moneyline_history(odds_folder, cfg.key)
+    out: list[tuple[str, str, Side]] = []
+    for g in results:
+        if not g.completed or not (start <= g.date < end) or g.event_id not in hist:
+            continue
+        close = {q.side: q.american for q in close_for(g) if q.market == "h2h"}
+        fair = no_vig(close)
+        winner = "home" if g.home_score > g.away_score else "away" if g.away_score > g.home_score else "draw"
+        for side, seen in hist[g.event_id].items():
+            if side not in ("home", "away") or not seen:
+                continue
+            first = seen[0][1]
+            hit = next((price for _, price in seen[1:] if steamed(first, price)), None)
+            if hit is None:
+                continue
+            won = winner == side
+            for at, price in (("open", hit), ("close", close.get(side))):
+                if price is None:
+                    continue
+                out.append(("steam_dog", at, Side(cfg.key, g.event_id, "h2h", side, price, fair.get(side, 0.5),
+                                                  fair.get(side), 0.0, float(won), 0.0, float(not won),
+                                                  date=g.date.isoformat())))
+    return out
+
+
+SPOTS_STEAM = ("nfl", "ncaaf", "nba", "ncaab", "mlb", "nhl")
+
+
 def study_spots(bets: list[tuple[str, str, Side]]) -> list[dict]:
     from .spots import SPOTS
 
@@ -545,6 +584,7 @@ def run_studies(
     days: int = STUDY_DAYS,
     games_folder=None,
     weather=None,
+    odds_folder=None,
 ) -> dict[str, SportStudy]:
     """``games_folder``: also write every final score with its lines to monthly CSV files."""
     out: dict[str, SportStudy] = {}
@@ -580,6 +620,7 @@ def run_studies(
             st.spots = study_spots(
                 spot_bets(cfg, results, close_for, lambda g, c=cfg: history.open_quotes(c, g), start, now)
                 + wind_bets(cfg, results, close_for, weather, start, now)
+                + steam_bets(cfg, results, close_for, odds_folder, start, now)
             )
         out[cfg.key] = st
     return out

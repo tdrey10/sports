@@ -86,6 +86,8 @@ SPOTS = {
         Spot("west_host_dog", "West Coast home dog vs a team flying in from the East", ("nfl", "nba", "nhl", "mlb")),
         Spot("blowout_dog", "Dog that blew someone out last game", ("nfl", "ncaaf", "nba", "ncaab", "mlb", "nhl")),
         Spot("wind_under", "Wind 15+ mph at an outdoor stadium: under", ("nfl", "mlb"), market="totals"),
+        Spot("steam_dog", "Dog the money moved early (bet before the close)",
+             ("nfl", "ncaaf", "nba", "ncaab", "mlb", "nhl"), market="steam"),
     )
 }
 
@@ -138,6 +140,18 @@ def team_spots(sport: str, home: str, away: str, start: datetime, results: list[
 
 def _active(sport: str) -> set[str]:
     return {k for k, s in SPOTS.items() if sport in s.sports and s.market == "h2h"}
+
+
+STEAM_MOVE = 0.03  # the dog's win chance implied by its price rose 3+ points since first seen
+
+
+def steamed(first: float | None, now: float | None) -> bool:
+    """Money hit the dog early: its price shortened by 3+ points of win chance and it is still a +100..+220 dog."""
+    from .odds import implied_prob
+
+    if first is None or now is None or not is_dog_price(now):
+        return False
+    return implied_prob(now) - implied_prob(first) >= STEAM_MOVE
 
 
 def is_dog_price(american: float) -> bool:

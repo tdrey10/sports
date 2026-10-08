@@ -218,3 +218,16 @@ def prop_summary(graded_folder: Path) -> dict[str, dict]:
             for m, t in tally.items()
         }
     return out
+
+
+def moneyline_history(folder: Path, sport: str) -> dict[str, dict[str, list[tuple[str, float]]]]:
+    """event id -> side -> [(seen_at, best moneyline)] from the snapshot log, oldest first."""
+    out: dict[str, dict[str, dict[str, float]]] = defaultdict(lambda: defaultdict(dict))
+    for f in sorted((Path(folder) / sport).glob("*.csv")) if (Path(folder) / sport).exists() else []:
+        for r in csv.DictReader(open(f)):
+            if r["market"] != "h2h" or r["seen_at"] >= r["start"]:
+                continue
+            price = float(r["price"])
+            seen = out[r["event_id"]][r["side"]]
+            seen[r["seen_at"]] = max(seen.get(r["seen_at"], price), price)  # best price at that look
+    return {ev: {side: sorted(t.items()) for side, t in sides.items()} for ev, sides in out.items()}

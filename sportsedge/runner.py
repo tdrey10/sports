@@ -48,6 +48,7 @@ def run_cycle(
     props_sports: set[str] | None = None,
     props_hours: float | None = None,
     weather=None,
+    first_seen=None,
 ) -> CycleResult:
     """``props_sports`` limits player props to those sport keys (None = every sport)."""
     out = CycleResult()
@@ -57,7 +58,7 @@ def run_cycle(
         min_picks = 200 if settings.weight_overrides else 60
         settings = replace(settings, weight_overrides={**settings.weight_overrides, **ledger.learn_weights(min_picks)})
     out.weights = settings.weight_overrides
-    engine = Engine(provider, settings, now=now, calibrate=True, weather=weather)
+    engine = Engine(provider, settings, now=now, calibrate=True, weather=weather, first_seen=first_seen)
     for cfg in sports:
         try:
             want_props = props and (props_sports is None or cfg.key in props_sports)

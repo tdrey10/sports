@@ -124,7 +124,8 @@ def cmd_study(args) -> int:
 
         weather = WeatherClient()
     studies = study.run_studies(resolve(names), provider.game_results, history, now, days=args.days,
-                                games_folder=games_dir, weather=weather)
+                                games_folder=games_dir, weather=weather,
+                                odds_folder=data_dir / ("demo-odds" if args.demo else "odds"))
     history.save()
     from . import archive
 
@@ -237,6 +238,17 @@ class Workspace:
                 },
             )
 
+    def _first_seen(self, sports):
+        """The first moneyline we logged for every upcoming game, to spot early money on a dog."""
+        from .archive import moneyline_history
+
+        folder = self.data_dir / ("demo-odds" if self.demo else "odds")
+        out = {}
+        for cfg in sports:
+            hist = moneyline_history(folder, cfg.key)
+            out[cfg.key] = {ev: {side: seen[0][1] for side, seen in sides.items() if seen} for ev, sides in hist.items()}
+        return out
+
     def _weather(self):
         from .weather import WeatherClient
 
@@ -282,6 +294,7 @@ class Workspace:
             props=self.args.props, hours_ahead=self.args.hours,
             props_sports=props_sports, props_hours=self.args.props_hours, prop_markets=prop_markets,
             weather=None if self.demo else self._weather(),
+            first_seen=self._first_seen(sports),
         )
         self.brains.update(res.brains)
         self.weights = res.weights

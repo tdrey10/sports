@@ -12,7 +12,7 @@ from .edge import Pick, Settings, evaluate, fmt_point
 from .models.game import GamePrediction, baseline_team_score, pitcher_factor, predict_game
 from .models.props import PlayerGame, PropProjection, matchup_factor, project_prop, usage_factor
 from .models.ratings import GameResult, TeamRatings, fit_ratings, is_b2b
-from .spots import capped_bump, is_dog_price, team_spots
+from .spots import SPOTS, capped_bump, is_dog_price, steamed, team_spots
 from .weather import WINDY_MPH, outdoor
 from .sports import SportConfig
 
@@ -91,12 +91,14 @@ class Engine:
         now: datetime | None = None,
         calibrate: bool = False,
         weather=None,
+        first_seen: dict[str, dict[str, dict[str, float]]] | None = None,
     ):
         self.provider = provider
         self.settings = settings or Settings()
         self.now = now or datetime.now(timezone.utc)
         self.calibrate = calibrate
         self.weather = weather  # a weather.WeatherClient, or None (no wind)
+        self.first_seen = first_seen or {}  # sport -> event id -> side -> first moneyline we logged
 
     # ------------------------------------------------------------------ public
     def scan(
@@ -174,6 +176,12 @@ class Engine:
                         win_hit[team] += hit
                         ctx.injury_notes.append(f"{team} without {p} ({pos}): -{hit:.0%} win chance")
             ctx.spots = team_spots(cfg.key, home, away, event.commence_time, results, neutral)
+            first = self.first_seen.get(cfg.key, {}).get(event.id, {})
+            for side in ("home", "away"):
+                prices = [q.american for q in event.quotes if q.market == "h2h" and q.side == side]
+                if "steam_dog" in SPOTS and cfg.key in SPOTS["steam_dog"].sports and prices \
+                        and steamed(first.get(side), max(prices)):
+                    ctx.spots.setdefault(side, []).append("steam_dog")
             spot_at = None if neutral else outdoor(cfg.key, home)
             if self.weather is not None and spot_at:
                 ctx.wind_mph = self.weather.forecast_wind(*spot_at, event.commence_time)
