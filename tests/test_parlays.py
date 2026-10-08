@@ -21,7 +21,11 @@ def test_parlays_post_once_from_the_best_bets_one_leg_per_game():
     assert [p.size for p in new] == [2, 3, 4]  # not enough games for an 8-team yet
     two = new[0]
     assert len(set(led.entries[i].event_id for i in two.legs)) == 2
+    # Most likely to win first (ev0 is 60%, ev1 59%, ...), whatever the rank.
     assert [led.entries[i].event_id for i in new[2].legs] == ["ev0", "ev1", "ev2", "ev3"]
+    likely = board(3, now)
+    likely.entries[[k for k, e in likely.entries.items() if e.event_id == "ev2"][0]].win_prob = 0.7
+    assert [likely.entries[i].event_id for i in likely.post_parlays(now)[0].legs] == ["ev2", "ev0"]
     assert abs(two.decimal - (1 + 100 / 110) ** 2) < 1e-3 and abs(two.hit_prob - 0.6 * 0.59) < 1e-3
     assert led.post_parlays(now + timedelta(minutes=30)) == []  # posted once a day, never reshuffled
 

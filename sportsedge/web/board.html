@@ -430,7 +430,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const st = (DATA.stats && DATA.stats.parlays) || {};
     const rows = [2, 3, 4, 8].map((n) => { const s = st[n] || { won: 0, lost: 0, units: 0 };
       return `<tr><td>${n}-team</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 2)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("");
-    return panel("Parlays of the day", "Top bets first, one leg per game · posted once a day",
+    return panel("Parlays of the day", "Most likely winners first, one leg per game · posted once a day",
         (todays.length ? `<div class="grid two">${todays.map((p) => parlayCard(p, ids)).join("")}</div>` : "") + note
         + `<p class="small muted">Every leg has to win, and the book's edge stacks on every leg, so parlays lose more often than straight bets. Stakes stay small: ½u on a 2-team, ¼u on a 3- or 4-team, 0.1u on an 8-team. On a day without enough unit plays, the legs are filled with the day's most likely winners and the parlay is posted with no units, tracked anyway.</p>`)
       + panel("Parlay record", "Kept apart from the straight-bet record",
