@@ -35,7 +35,7 @@ Thu 10:00  Mobile Storm @ Houston Titans    Under 236          fanduel     -101 
 - **Every pick explains itself**: projected score, team records, last result, back-to-backs and rest, injuries, model vs. market odds, and the best book.
 - **Line tracking**: "Got it at +215 → now +150 · we beat the line" for every open pick.
 - **Live scores** on open picks, and automatic grading from final scores and box scores.
-- **Parlay slip**: add open picks from different games to see the combined price, the chance it hits and its EV.
+- **Parlays of the day**: a 2-, 3-, 4- and 8-team parlay from the day's best bets (one leg per game), each posted once with its real chance to hit, small stakes, and its own record.
 - **The record**: bankroll curve, record, units, ROI and closing-line value, broken down by tier and by sport.
 - **The brain**: accuracy on recent games the model never saw, refreshed every run.
 
@@ -250,7 +250,7 @@ sportsedge/
 ## Money rules (always on)
 
 - Never bet a price worse than **-150**, live bets included. Big favorites kill ROI.
-- **Straight bets only.** No parlays are posted or built.
+- **Straight bets carry the units.** Parlays are posted at small stakes (½u, ¼u, ¼u, 0.1u) with their own record, apart from the money record.
 - **Unknown injuries = no bet.** A team with no injury report (feed down, or no feed, as in soccer) is unknown, not healthy. Its games show as leans only.
 - **Injuries are weighed, not a hard rule.** NFL: QB out is about -8 points of win chance, RB or WR -3. College QB is -3.
 - **No forced picks.** If nothing beats the price, there is no bet that day.

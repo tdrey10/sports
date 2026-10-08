@@ -176,6 +176,13 @@ button, select { font: inherit; color: inherit; }
 .tag.won { background: var(--win-soft); color: var(--win); border-color: transparent; }
 .tag.lost { background: var(--loss-soft); color: var(--loss); border-color: transparent; }
 .tag.sport { background: none; }
+.parlay { border-radius: 12px; padding: 14px; display: grid; gap: 8px; align-content: start; background: var(--surface-2); border: 1px solid var(--line); }
+.parlay .kind { font: 800 15px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-2); }
+.parlay .price { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.parlay .price b { font: 700 28px/1 var(--mono); }
+.parlay ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
+.parlay li small { color: var(--muted); }
+.parlay li.won { color: var(--win); } .parlay li.lost { color: var(--loss); }
 
 /* ---------- board rows ---------- */
 .game { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
@@ -245,7 +252,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   <div class="filters"><div class="seg" id="sports" aria-label="Sport"></div><div class="seg" id="markets" aria-label="Bet type"></div></div>
   <div id="view" class="grid"></div>
   <footer>
-    <span>Free data: ESPN stats and DraftKings lines. Picks only; no bets are placed. Straight bets only: no parlays.</span>
+    <span>Free data: ESPN stats and DraftKings lines. Picks only; no bets are placed. Parlays are posted for fun at small stakes: every leg has to win.</span>
     <span>No model wins every bet. Judge it by the record and the closing-line value over many picks. Bet only what you can afford to lose.</span>
   </footer>
 </main>
@@ -258,7 +265,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
-  const TABS = [["today", "Today"], ["live", "Live"], ["props", "Props"], ["early", "Early"], ["results", "Results"], ["model", "Model"]];
+  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["props", "Props"], ["early", "Early"], ["results", "Results"], ["model", "Model"]];
   const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
     live: "Live", live_win: "Live · likely winner", live_plus: "Live · plus money" };
   const state = { tab: "today", sport: "all", market: "all" };
@@ -396,6 +403,41 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + panel("Leans", "No units, tracked anyway", leans.length ? byGame(leans) : empty("No leans right now."));
   }
 
+  // Parlays of the day: posted once, from the best bets, one leg per game.
+  const byId = () => new Map(DATA.entries.map((e) => [e.id, e]));
+  const PSTATUS = { won: "Won", lost: "Lost", push: "Push", void: "Void", live: "In play", pending: "Open" };
+  function parlayCard(p, ids) {
+    const legs = p.legs.map((id, i) => {
+      const e = ids.get(id);
+      if (!e) return `<li><small>leg no longer shown</small></li>`;
+      const c = SETTLED[e.status] ? e.status.replace("half_", "") : "";
+      return `<li class="${c}"><b>${esc(e.selection)}</b> ${odds(p.leg_odds[i])}<br><small>${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}${SETTLED[e.status] ? " · " + SETTLED[e.status] : ""}</small></li>`;
+    }).join("");
+    const st = PSTATUS[p.status] || p.status;
+    const res = p.profit != null ? ` ${signed(p.profit, 2)}u` : "";
+    return `<div class="parlay"><span class="kind">${p.size}-team parlay</span>
+      <div class="price"><b>${odds(p.american)}</b><span class="muted">${p.units > 0 ? p.units + "u" : "no units, tracked"} · $10 pays $${(10 * p.decimal).toFixed(2)}</span></div>
+      <p class="small"><b>Hits ${pct(p.hit_prob, p.hit_prob < 0.1 ? 1 : 0)}</b> of the time on our numbers <span class="muted">(about 1 in ${Math.max(1, Math.round(1 / p.hit_prob))})</span></p>
+      <ol>${legs}</ol>
+      <div class="meta"><span class="tag ${p.status}">${st}</span><span class="muted">${res}</span></div></div>`;
+  }
+  function viewParlays() {
+    const ps = DATA.parlays || [], ids = byId();
+    const todays = ps.filter((p) => p.day === today()).sort((a, b) => a.size - b.size);
+    const earlier = ps.filter((p) => p.day !== today()).sort((a, b) => b.day.localeCompare(a.day) || a.size - b.size);
+    const missing = [2, 3, 4, 8].filter((n) => !todays.some((p) => p.size === n));
+    const note = missing.length ? `<p class="empty">${missing.map((n) => n + "-team").join(", ")} ${missing.length > 1 ? "post" : "posts"} once there are enough strong legs from different games on today's board.</p>` : "";
+    const st = (DATA.stats && DATA.stats.parlays) || {};
+    const rows = [2, 3, 4, 8].map((n) => { const s = st[n] || { won: 0, lost: 0, units: 0 };
+      return `<tr><td>${n}-team</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 2)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("");
+    return panel("Parlays of the day", "Top bets first, one leg per game · posted once a day",
+        (todays.length ? `<div class="grid two">${todays.map((p) => parlayCard(p, ids)).join("")}</div>` : "") + note
+        + `<p class="small muted">Every leg has to win, and the book's edge stacks on every leg, so parlays lose more often than straight bets. Stakes stay small: ½u on a 2-team, ¼u on a 3- or 4-team, 0.1u on an 8-team. On a day without enough unit plays, the legs are filled with the day's most likely winners and the parlay is posted with no units, tracked anyway.</p>`)
+      + panel("Parlay record", "Kept apart from the straight-bet record",
+        `<div class="table-wrap"><table><thead><tr><th>Parlay</th><th>Record</th><th>Profit</th><th>ROI</th></tr></thead><tbody>${rows}</tbody></table></div>`)
+      + (earlier.length ? panel("Earlier parlays", "Last 7 days", `<div class="grid two">${earlier.map((p) => parlayCard(p, ids)).join("")}</div>`) : "");
+  }
+
   function viewLive() {
     const items = DATA.entries.filter((e) => isLive(e) && onBoard(e)).sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     const latest = (t) => items.find((e) => e.tier === t);
@@ -515,7 +557,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div><span>Profit</span><b class="${cls(o.units)}">${signed(o.units, 1)}u</b><small>${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
       <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b><small>from ${money(st.start_bankroll)}</small></div>
       <div><span>Beat the close</span><b>${pct(o.beat_close)}</b><small>avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</small></div>`;
-    const counts = { today: bestToday().length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
+    const counts = { today: bestToday().length, parlays: (DATA.parlays || []).filter((p) => p.day === today()).length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
       early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length };
     $("tabs").innerHTML = TABS.map(([k, n]) => `<button role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${n}${counts[k] ? `<span class="count">${counts[k]}</span>` : ""}</button>`).join("");
     $("sports").innerHTML = SPORTS.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${state.sport === k}">${n}</button>`).join("");
@@ -526,7 +568,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     renderTop();
     renderHero();
     const views = {
-      today: viewToday, live: viewLive, results: viewResults, model: viewModel,
+      today: viewToday, parlays: viewParlays, live: viewLive, results: viewResults, model: viewModel,
       props: () => viewList((e) => e.player, "Player props", "Best edge first · priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
       early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves", "Nothing early yet."),
     };
