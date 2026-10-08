@@ -146,3 +146,21 @@ def test_team_aliases():
     assert m.match("New York Red Bulls") == "Red Bull New York"
     assert m.match("Los Angeles FC") == "LAFC"
     assert m.match("UMass Minutemen") == "Massachusetts Minutemen"
+
+
+def test_live_cards_reject_stale_line_edges_and_cap_stakes():
+    from tests.test_ledger import make_pick
+
+    class S:
+        settings = Settings(min_ev=0.0, max_ev=1.0, hide_flagged=False)
+        states = {}
+
+    stale = make_pick(event_id="a", american=-407, win_prob=0.83, market_prob=0.84, ev=0.03)
+    stale.model_prob = 0.76  # model below market: edge is only a lagging book
+    good = make_pick(event_id="b", american=+120, win_prob=0.50, market_prob=0.46, ev=0.10, kelly=0.03)
+    good.model_prob = 0.60
+    heavy = make_pick(event_id="c", american=-300, win_prob=0.80, market_prob=0.74, ev=0.06)
+    heavy.model_prob = 0.9
+    cards = live_cards([stale, good, heavy], S(), {"nfl": "NFL"})
+    assert [c.pick.event_id for c in cards] == ["b"]
+    assert cards[0].units == 1.0

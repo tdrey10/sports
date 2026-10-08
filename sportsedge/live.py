@@ -126,6 +126,8 @@ LIVE_SETTINGS = dict(
     max_ev=0.15,
 )
 MIN_FRACTION_TO_BET = 0.05  # skip the last few minutes: prices move faster than our data
+LIVE_MIN_ODDS = -250  # no heavy live favourites: one bad bounce erases many small wins
+LIVE_MAX_UNITS = 1.0  # live edges are the least certain; keep stakes small
 REFIT_EVERY = timedelta(hours=2)
 
 
@@ -231,7 +233,13 @@ from .tiers import Card, units_for  # noqa: E402
 def live_cards(picks: list[Pick], scanner: LiveScanner, sport_names: dict[str, str]) -> list[Card]:
     """The best live edge per game, as cards for the ledger."""
     cards = []
-    for p in best_per_event(picks, scanner.settings):
+    # Live prices across books are rarely in sync, so an "edge" that only comes from one book's
+    # stale price (our model is below the market) is not trusted.
+    trusted = [
+        p for p in picks
+        if p.american >= LIVE_MIN_ODDS and (p.market_prob is None or p.model_prob >= p.market_prob)
+    ]
+    for p in best_per_event(trusted, scanner.settings):
         game = scanner.states.get(p.event_id)
         headline = (
             f"Live: we make {p.selection.replace(' (live)', '')} {p.win_prob:.0%} to cash; "
@@ -245,7 +253,7 @@ def live_cards(picks: list[Pick], scanner: LiveScanner, sport_names: dict[str, s
             "confirm the score and price before betting.",
         ]
         cards.append(Card(
-            tier="live", units=units_for(p), headline=headline, reasons=reasons, sport=p.sport,
+            tier="live", units=min(units_for(p), LIVE_MAX_UNITS), headline=headline, reasons=reasons, sport=p.sport,
             sport_name=sport_names.get(p.sport, p.sport), pick=p,
             home=game.home if game else "", away=game.away if game else "",
         ))
