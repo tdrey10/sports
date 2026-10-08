@@ -78,3 +78,27 @@ def test_unproven_bet_types_are_sized_at_half_a_unit():
     assert units_for(big, Settings(proven=set())) == 0.5
     assert units_for(big, Settings(proven={"nfl:spreads"})) == 3.0
     assert units_for(big, Settings(proven={"nfl:over/under", "nba:spreads"})) == 0.5
+
+
+def test_a_lock_and_a_dog_every_morning_lean_when_nothing_qualifies():
+    from sportsedge.ledger import Ledger
+    from sportsedge.tiers import DOG_MAX_ODDS, DOG_MIN_ODDS
+
+    provider = SampleProvider(seed=5)
+    strict = Settings(min_ev=0.5)  # nothing can clear this bar
+    engine = Engine(provider, strict, now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    cards = build_cards(scans, strict, provider.now)
+    heads = {c.tier: c for c in cards if c.tier in ("lock", "dog")}
+    assert set(heads) == {"lock", "dog"}
+    assert all(c.units == 0 and c.reasons[0].startswith("Lean ") for c in heads.values())
+    assert DOG_MIN_ODDS <= heads["dog"].pick.american <= DOG_MAX_ODDS
+    assert heads["lock"].pick.american >= -150
+
+    # A lean Lock taken this morning doesn't block a real Lock later in the day.
+    ledger = Ledger()
+    ledger.publish(cards, provider.now)
+    assert ledger.taken_today(provider.now) >= {"lock_lean", "dog_lean"}
+    assert "lock" not in ledger.taken_today(provider.now)
+    again = build_cards(scans, strict, provider.now, taken_today=ledger.taken_today(provider.now))
+    assert not [c for c in again if c.tier in ("lock", "dog")]  # no second lean the same day

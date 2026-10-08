@@ -354,12 +354,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     .sort((a, b) => score(b) - score(a) || a.best_rank - b.best_rank).map((e, i) => Object.assign({}, e, { rank: i + 1 }));
 
   function renderHero() {
-    const e = bestToday()[0] || DATA.entries.find((x) => x.tier === "lock" && onBoard(x) && !x.settled);
+    const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
     if (!e) {
       $("hero").innerHTML = `<div class="ticket-empty"><b>Today's #1 posts with the next scan</b><span class="muted">Picks run at 7:17 AM, 12:17 PM and 4:17 PM Pacific. Only picks that clear every check make the top 10.</span></div>`;
       return;
     }
-    const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : "Lock of the day";
+    const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · lean, no units";
     $("hero").innerHTML = `<div class="ticket">
       <div class="t-head"><span class="t-kind">${kind}</span><span class="t-sport">${esc(e.sport_name)} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)} · ${timeOf(e)}</span></div>
       <h2>${esc(e.selection)}</h2>
@@ -372,8 +372,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function viewToday() {
     const items = DATA.entries.filter(onBoard);
     const potd = ["lock", "dog", "prop"].map((t) => {
-      const e = items.find((x) => x.tier === t);
-      const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t];
+      // A real (units) pick beats a lean one posted earlier the same day.
+      const e = items.filter((x) => x.tier === t).sort((a, b) => b.units - a.units)[0];
+      const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t] + (e && !(e.units > 0) ? " · lean, no units" : "");
       if (!e) return `<div class="potd"><span class="kind">${label}</span><p>${t === "lock" ? "Posts only when a pick passes every Lock check." : "Posts once a game clears the bar."}</p></div>`;
       return `<div class="potd"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · ${wins(e)}</span></div>

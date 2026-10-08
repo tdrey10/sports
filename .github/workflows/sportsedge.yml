@@ -5,7 +5,8 @@ name: SportsEdge
 # which leaves room for a few hand-started live sessions.
 on:
   schedule:
-    - cron: "17 14,19,23 * * *" # full cycle 3x a day (7:17 AM, 12:17 PM, 4:17 PM Pacific): odds, picks, line tracking
+    - cron: "5 13 * * *"       # morning picks: Lock and Dog on the page by 8 AM Pacific (6:05 AM PDT / 5:05 AM PST)
+    - cron: "17 19,23 * * *"   # midday and afternoon picks (12:17 PM, 4:17 PM Pacific): odds, picks, line tracking
     - cron: "47 15 * * *"    # daily NFL + NBA player props (8:47 AM Pacific)
     - cron: "41 0-6,11-23 * * *" # hourly during game hours: one live-bet check, then scores + grading
   workflow_dispatch:
