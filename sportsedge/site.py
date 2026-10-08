@@ -62,6 +62,10 @@ def render_html(data: dict, standalone: bool = True) -> str:
     if mascot.is_file():  # Dog of the Day background photo, embedded so the page stays one file
         uri = "data:image/jpeg;base64," + base64.b64encode(mascot.read_bytes()).decode()
         body = body.replace("__MASCOT__", uri)
+    thumb = web.joinpath("thumb.jpg")
+    if thumb.is_file():  # the duck: the wide-screen cover, which is what the gallery thumbnail shows
+        uri = "data:image/jpeg;base64," + base64.b64encode(thumb.read_bytes()).decode()
+        body = body.replace("__THUMB__", uri)
     if not standalone:
         return body
     head, _, rest = body.partition("<main")
