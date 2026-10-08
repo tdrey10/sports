@@ -1,55 +1,311 @@
 {
- "ran_at": "2026-10-08T04:05:03.071599+00:00",
+ "ran_at": "2026-10-08T08:03:49.176653+00:00",
  "studies": {
   "nfl": {
    "sport": "nfl",
    "name": "NFL",
-   "games": 64,
-   "sides": 384,
-   "window": "Apr 11 - Oct 8, 2026",
+   "games": 172,
+   "sides": 994,
+   "window": "Oct 8 - Oct 8, 2026",
    "weight": 0.8,
    "min_ev": 0.02,
    "proven": false,
+   "tune_window": "Nov 25, 2025 - Jan 18, 2026",
+   "blind_window": "Jan 18, 2026 - Oct 6, 2026",
+   "in_sample": {
+    "label": "80% market, 2%+ edge (tuning games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "blind": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_clv": null,
+   "spots": [
+    {
+     "key": "bye_dog",
+     "label": "Dog off a bye vs a team that played",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 1,
+      "won": 0.0,
+      "lost": 1.0,
+      "units": -1.0,
+      "roi": -1.0,
+      "se": null
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 0,
+      "won": 0.0,
+      "lost": 0.0,
+      "units": 0.0,
+      "roi": null,
+      "se": null
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 1,
+      "won": 0.0,
+      "lost": 1.0,
+      "units": -1.0,
+      "roi": -1.0,
+      "se": null
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 0,
+      "won": 0.0,
+      "lost": 0.0,
+      "units": 0.0,
+      "roi": null,
+      "se": null
+     },
+     "open_clv": null,
+     "excess_win": -0.43256346098752146,
+     "proven": false
+    },
+    {
+     "key": "mnf_dog",
+     "label": "Monday night NFL dog",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 3,
+      "won": 1.0,
+      "lost": 2.0,
+      "units": -1.0,
+      "roi": -0.3333333333333333,
+      "se": 0.6666666666666667
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 3,
+      "won": 1.0,
+      "lost": 2.0,
+      "units": -0.45999999999999996,
+      "roi": -0.15333333333333332,
+      "se": 0.8466666666666667
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 3,
+      "won": 1.0,
+      "lost": 2.0,
+      "units": -0.8600000000000003,
+      "roi": -0.2866666666666668,
+      "se": 0.7133333333333333
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 3,
+      "won": 1.0,
+      "lost": 2.0,
+      "units": -0.8600000000000003,
+      "roi": -0.2866666666666668,
+      "se": 0.7133333333333333
+     },
+     "open_clv": -0.03616455838501622,
+     "excess_win": -0.057331401722974906,
+     "proven": false
+    },
+    {
+     "key": "east_traveler_dog",
+     "label": "East Coast team flying West (as the dog)",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 1,
+      "won": 0.0,
+      "lost": 1.0,
+      "units": -1.0,
+      "roi": -1.0,
+      "se": null
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 2,
+      "won": 0.0,
+      "lost": 2.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "se": 0.0
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 2,
+      "won": 0.0,
+      "lost": 2.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "se": 0.0
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 2,
+      "won": 0.0,
+      "lost": 2.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "se": 0.0
+     },
+     "open_clv": -0.061055459488468244,
+     "excess_win": -0.3074887051230519,
+     "proven": false
+    },
+    {
+     "key": "west_host_dog",
+     "label": "West Coast home dog vs a team flying in from the East",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 1,
+      "won": 1.0,
+      "lost": 0.0,
+      "units": 1.0,
+      "roi": 1.0,
+      "se": null
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 1,
+      "won": 0.0,
+      "lost": 1.0,
+      "units": -1.0,
+      "roi": -1.0,
+      "se": null
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 1,
+      "won": 1.0,
+      "lost": 0.0,
+      "units": 1.1399999999999997,
+      "roi": 1.1399999999999997,
+      "se": null
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 1,
+      "won": 0.0,
+      "lost": 1.0,
+      "units": -1.0,
+      "roi": -1.0,
+      "se": null
+     },
+     "open_clv": -0.017013031035126025,
+     "excess_win": 0.5232290461512688,
+     "proven": false
+    },
+    {
+     "key": "blowout_dog",
+     "label": "Dog that blew someone out last game",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 9,
+      "won": 6.0,
+      "lost": 3.0,
+      "units": 5.16,
+      "roi": 0.5733333333333334,
+      "se": 0.409379611933309
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 6,
+      "won": 3.0,
+      "lost": 3.0,
+      "units": 1.44,
+      "roi": 0.24,
+      "se": 0.5595236068895276
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 9,
+      "won": 5.0,
+      "lost": 4.0,
+      "units": 2.59,
+      "roi": 0.28777777777777774,
+      "se": 0.4130502316028409
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 6,
+      "won": 4.0,
+      "lost": 2.0,
+      "units": 2.9199999999999995,
+      "roi": 0.4866666666666666,
+      "se": 0.4746835203000463
+     },
+     "open_clv": -0.08774341375811644,
+     "excess_win": 0.26207288507419174,
+     "proven": false
+    }
+   ],
    "weight_log_loss": [
     [
      0.5,
-     0.6856086714942825
+     0.6752922288234385
     ],
     [
      0.6,
-     0.6831832280482059
+     0.6734654989217365
     ],
     [
      0.7,
-     0.68124474705223
+     0.6721445745220959
     ],
     [
      0.75,
-     0.6804573722582066
+     0.6716705379153634
     ],
     [
      0.8,
-     0.6797914205444944
+     0.6713197939446955
     ],
     [
      0.85,
-     0.6792473968430383
+     0.6710920424984345
     ],
     [
      0.9,
-     0.6788261155790247
+     0.6709873328304004
     ],
     [
      0.95,
-     0.6785287167156426
+     0.671006065624876
     ]
    ],
    "platt": [
-    -3.784802973251334e-17,
-    0.7795963889294745
+    -2.4723681864343186e-17,
+    0.812792050654885
    ],
    "best": {
-    "label": "80% market, 2%+ edge",
+    "label": "80% market, 2%+ edge (blind games)",
     "bets": 0,
     "won": 0.0,
     "lost": 0.0,
@@ -60,30 +316,30 @@
    "by_weight": [
     {
      "label": "50% market",
-     "bets": 35,
-     "won": 13.0,
-     "lost": 22.0,
-     "units": -4.881249272655922,
-     "roi": -0.13946426493302636,
-     "se": 0.2047085760143667
+     "bets": 54,
+     "won": 25.0,
+     "lost": 29.0,
+     "units": 1.964743660146148,
+     "roi": 0.0363841418545583,
+     "se": 0.1633843273139635
     },
     {
      "label": "60% market",
-     "bets": 27,
-     "won": 10.0,
-     "lost": 17.0,
-     "units": -4.581206646909972,
-     "roi": -0.16967432025592488,
-     "se": 0.223068792077129
+     "bets": 33,
+     "won": 13.0,
+     "lost": 20.0,
+     "units": -4.312764850981072,
+     "roi": -0.1306898439691234,
+     "se": 0.1976869426851126
     },
     {
      "label": "70% market",
-     "bets": 8,
-     "won": 4.0,
+     "bets": 7,
+     "won": 3.0,
      "lost": 4.0,
-     "units": 0.19527950310559006,
-     "roi": 0.024409937888198757,
-     "se": 0.3947071887048865
+     "units": -0.04368191721132897,
+     "roi": -0.00624027388733271,
+     "se": 0.4884556570606815
     },
     {
      "label": "75% market",
@@ -134,12 +390,12 @@
    "by_min_ev": [
     {
      "label": "0%+ edge",
-     "bets": 3,
-     "won": 2.0,
-     "lost": 1.0,
-     "units": 0.5740740740740742,
-     "roi": 0.19135802469135807,
-     "se": 0.5962784037394292
+     "bets": 1,
+     "won": 1.0,
+     "lost": 0.0,
+     "units": 0.925925925925926,
+     "roi": 0.925925925925926,
+     "se": null
     },
     {
      "label": "1%+ edge",
@@ -191,121 +447,660 @@
    "by_band": [],
    "calibration": [
     [
-     0.2518062458645221,
-     0.38461538461538464,
-     13
+     0.24801934109153145,
+     0.42857142857142855,
+     14
     ],
     [
-     0.35269161465566246,
-     0.3333333333333333,
-     21
+     0.3541271893915606,
+     0.28,
+     25
     ],
     [
-     0.47618530686766897,
-     0.49324324324324326,
-     148
+     0.47631382072270234,
+     0.48427672955974843,
+     159
     ],
     [
-     0.5238146931323311,
-     0.5067567567567568,
-     148
+     0.5236861792772977,
+     0.5157232704402516,
+     159
     ],
     [
-     0.6473083853443375,
-     0.6666666666666666,
-     21
+     0.6458728106084394,
+     0.72,
+     25
     ],
     [
-     0.748193754135478,
-     0.6153846153846154,
-     13
+     0.7519806589084685,
+     0.5714285714285714,
+     14
     ]
    ],
-   "note": "Fewer than 30 bets cleared any threshold at the closing line; keeping the 2% default."
+   "note": "Blind test: 0 bets. Not proven until it beats the close by more than luck over 60+ blind bets."
+  },
+  "ncaaf": {
+   "sport": "ncaaf",
+   "name": "College Football",
+   "games": 384,
+   "sides": 2170,
+   "window": "Oct 8 - Oct 8, 2026",
+   "weight": 0.8,
+   "min_ev": 0.02,
+   "proven": false,
+   "tune_window": "Sep 3, 2026 - Sep 19, 2026",
+   "blind_window": "Sep 19, 2026 - Oct 8, 2026",
+   "in_sample": {
+    "label": "80% market, 2%+ edge (tuning games)",
+    "bets": 2,
+    "won": 0.0,
+    "lost": 2.0,
+    "units": -2.0,
+    "roi": -1.0,
+    "se": 0.0
+   },
+   "blind": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 2,
+    "won": 0.0,
+    "lost": 2.0,
+    "units": -2.0,
+    "roi": -1.0,
+    "se": 0.0
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_clv": null,
+   "spots": [
+    {
+     "key": "bye_dog",
+     "label": "Dog off a bye vs a team that played",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 1,
+      "won": 1.0,
+      "lost": 0.0,
+      "units": 1.1399999999999997,
+      "roi": 1.1399999999999997,
+      "se": null
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 0,
+      "won": 0.0,
+      "lost": 0.0,
+      "units": 0.0,
+      "roi": null,
+      "se": null
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 1,
+      "won": 1.0,
+      "lost": 0.0,
+      "units": 1.4500000000000002,
+      "roi": 1.4500000000000002,
+      "se": null
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 1,
+      "won": 1.0,
+      "lost": 0.0,
+      "units": 1.5,
+      "roi": 1.5,
+      "se": null
+     },
+     "open_clv": 0.11332380226053362,
+     "excess_win": 0.5546704790957866,
+     "proven": false
+    },
+    {
+     "key": "blowout_dog",
+     "label": "Dog that blew someone out last game",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 17,
+      "won": 3.0,
+      "lost": 14.0,
+      "units": -9.63,
+      "roi": -0.5664705882352942,
+      "se": 0.23854482433704796
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 13,
+      "won": 6.0,
+      "lost": 7.0,
+      "units": 1.0900000000000003,
+      "roi": 0.08384615384615388,
+      "se": 0.3427706463166462
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 13,
+      "won": 1.0,
+      "lost": 12.0,
+      "units": -10.9,
+      "roi": -0.8384615384615385,
+      "se": 0.16153846153846155
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 10,
+      "won": 6.0,
+      "lost": 4.0,
+      "units": 4.74,
+      "roi": 0.47400000000000003,
+      "se": 0.4160774500552084
+     },
+     "open_clv": -0.025749235558989204,
+     "excess_win": -0.22186221479169246,
+     "proven": false
+    }
+   ],
+   "weight_log_loss": [
+    [
+     0.5,
+     0.6551524804677058
+    ],
+    [
+     0.6,
+     0.6362410653132627
+    ],
+    [
+     0.7,
+     0.6204038954163723
+    ],
+    [
+     0.75,
+     0.6135220004009526
+    ],
+    [
+     0.8,
+     0.6072958189811833
+    ],
+    [
+     0.85,
+     0.6017157088062411
+    ],
+    [
+     0.9,
+     0.5967897452565403
+    ],
+    [
+     0.95,
+     0.5925544329199467
+    ]
+   ],
+   "platt": [
+    9.293477188725633e-18,
+    1.1489791672210004
+   ],
+   "best": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "by_weight": [
+    {
+     "label": "50% market",
+     "bets": 73,
+     "won": 28.0,
+     "lost": 45.0,
+     "units": -19.487059139623188,
+     "roi": -0.26694601561127657,
+     "se": 0.10954763903109395
+    },
+    {
+     "label": "60% market",
+     "bets": 52,
+     "won": 16.0,
+     "lost": 36.0,
+     "units": -21.38358990827672,
+     "roi": -0.41122288285147535,
+     "se": 0.12369718358829469
+    },
+    {
+     "label": "70% market",
+     "bets": 13,
+     "won": 3.0,
+     "lost": 10.0,
+     "units": -7.328486730660644,
+     "roi": -0.5637297485123572,
+     "se": 0.22994561570226285
+    },
+    {
+     "label": "75% market",
+     "bets": 1,
+     "won": 0.0,
+     "lost": 1.0,
+     "units": -1.0,
+     "roi": -1.0,
+     "se": null
+    },
+    {
+     "label": "80% market",
+     "bets": 2,
+     "won": 0.0,
+     "lost": 2.0,
+     "units": -2.0,
+     "roi": -1.0,
+     "se": 0.0
+    },
+    {
+     "label": "85% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "90% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "95% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_min_ev": [
+    {
+     "label": "0%+ edge",
+     "bets": 4,
+     "won": 1.0,
+     "lost": 3.0,
+     "units": -2.107142857142857,
+     "roi": -0.5267857142857143,
+     "se": 0.47321428571428575
+    },
+    {
+     "label": "1%+ edge",
+     "bets": 2,
+     "won": 0.0,
+     "lost": 2.0,
+     "units": -2.0,
+     "roi": -1.0,
+     "se": 0.0
+    },
+    {
+     "label": "2%+ edge",
+     "bets": 2,
+     "won": 0.0,
+     "lost": 2.0,
+     "units": -2.0,
+     "roi": -1.0,
+     "se": 0.0
+    },
+    {
+     "label": "3%+ edge",
+     "bets": 2,
+     "won": 0.0,
+     "lost": 2.0,
+     "units": -2.0,
+     "roi": -1.0,
+     "se": 0.0
+    },
+    {
+     "label": "5%+ edge",
+     "bets": 1,
+     "won": 0.0,
+     "lost": 1.0,
+     "units": -1.0,
+     "roi": -1.0,
+     "se": null
+    },
+    {
+     "label": "8%+ edge",
+     "bets": 1,
+     "won": 0.0,
+     "lost": 1.0,
+     "units": -1.0,
+     "roi": -1.0,
+     "se": null
+    }
+   ],
+   "by_market": [],
+   "by_band": [],
+   "calibration": [
+    [
+     0.06041172940330926,
+     0.0,
+     29
+    ],
+    [
+     0.14882327114785818,
+     0.15384615384615385,
+     26
+    ],
+    [
+     0.24721091727763786,
+     0.13333333333333333,
+     30
+    ],
+    [
+     0.3624610481193653,
+     0.2692307692307692,
+     26
+    ],
+    [
+     0.4626676978775316,
+     0.47352941176470587,
+     340
+    ],
+    [
+     0.5373323021224684,
+     0.5264705882352941,
+     340
+    ],
+    [
+     0.6375389518806347,
+     0.7307692307692307,
+     26
+    ],
+    [
+     0.7527890827223621,
+     0.8666666666666667,
+     30
+    ],
+    [
+     0.8511767288521418,
+     0.8461538461538461,
+     26
+    ],
+    [
+     0.9395882705966907,
+     1.0,
+     29
+    ]
+   ],
+   "note": "Blind test: 0 bets. Not proven until it beats the close by more than luck over 60+ blind bets."
   },
   "nba": {
    "sport": "nba",
    "name": "NBA",
-   "games": 106,
-   "sides": 636,
-   "window": "Apr 11 - Oct 8, 2026",
-   "weight": 0.6,
+   "games": 384,
+   "sides": 2304,
+   "window": "Oct 8 - Oct 8, 2026",
+   "weight": 0.8,
    "min_ev": 0.02,
    "proven": false,
+   "tune_window": "Mar 7, 2026 - Apr 5, 2026",
+   "blind_window": "Apr 5, 2026 - Jun 14, 2026",
+   "in_sample": {
+    "label": "80% market, 2%+ edge (tuning games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "blind": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_clv": null,
+   "spots": [
+    {
+     "key": "east_traveler_dog",
+     "label": "East Coast team flying West (as the dog)",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 2,
+      "won": 0.0,
+      "lost": 2.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "se": 0.0
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 2,
+      "won": 0.0,
+      "lost": 2.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "se": 0.0
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 2,
+      "won": 0.0,
+      "lost": 2.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "se": 0.0
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 2,
+      "won": 0.0,
+      "lost": 2.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "se": 0.0
+     },
+     "open_clv": -0.12216217449219188,
+     "excess_win": -0.35171345443442437,
+     "proven": false
+    },
+    {
+     "key": "west_host_dog",
+     "label": "West Coast home dog vs a team flying in from the East",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 2,
+      "won": 2.0,
+      "lost": 0.0,
+      "units": 2.7399999999999998,
+      "roi": 1.3699999999999999,
+      "se": 0.2699999999999998
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 2,
+      "won": 0.0,
+      "lost": 2.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "se": 0.0
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 2,
+      "won": 2.0,
+      "lost": 0.0,
+      "units": 2.4499999999999997,
+      "roi": 1.2249999999999999,
+      "se": 0.17500000000000004
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 2,
+      "won": 0.0,
+      "lost": 2.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "se": 0.0
+     },
+     "open_clv": -0.06810620248427388,
+     "excess_win": 0.5956332981432346,
+     "proven": false
+    },
+    {
+     "key": "blowout_dog",
+     "label": "Dog that blew someone out last game",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 15,
+      "won": 7.0,
+      "lost": 8.0,
+      "units": 1.7299999999999995,
+      "roi": 0.1153333333333333,
+      "se": 0.3240383085328421
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 10,
+      "won": 7.0,
+      "lost": 3.0,
+      "units": 7.35,
+      "roi": 0.735,
+      "se": 0.39245452673597175
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 16,
+      "won": 7.0,
+      "lost": 9.0,
+      "units": 0.36999999999999966,
+      "roi": 0.02312499999999998,
+      "se": 0.3027288648692093
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 11,
+      "won": 8.0,
+      "lost": 3.0,
+      "units": 9.18,
+      "roi": 0.8345454545454545,
+      "se": 0.3646202598379546
+     },
+     "open_clv": -0.07478447145689086,
+     "excess_win": 0.08429431621775624,
+     "proven": false
+    }
+   ],
    "weight_log_loss": [
     [
      0.5,
-     0.66571618378295
+     0.6311470552461036
     ],
     [
      0.6,
-     0.6650558953067897
+     0.6272524854763109
     ],
     [
      0.7,
-     0.6654826818880686
+     0.6239012050103051
     ],
     [
      0.75,
-     0.6661087313841707
+     0.6224286656090848
     ],
     [
      0.8,
-     0.6670175883793225
+     0.6210920918716032
     ],
     [
      0.85,
-     0.6682195311792124
+     0.6198925358562525
     ],
     [
      0.9,
-     0.6697303695915
+     0.6188316239597891
     ],
     [
      0.95,
-     0.6715747677813224
+     0.6179116463987577
     ]
    ],
    "platt": [
-    -2.0411186064576504e-17,
-    0.8716821670863666
+    -2.1166859794118735e-17,
+    1.2995290625765825
    ],
    "best": {
-    "label": "60% market, 2%+ edge",
-    "bets": 25,
-    "won": 15.0,
-    "lost": 10.0,
-    "units": 13.294031021518126,
-    "roi": 0.5317612408607251,
-    "se": 0.3307631587630693
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
    },
    "by_weight": [
     {
      "label": "50% market",
-     "bets": 41,
-     "won": 23.0,
+     "bets": 106,
+     "won": 39.0,
+     "lost": 67.0,
+     "units": -25.14960611086581,
+     "roi": -0.23726043500816804,
+     "se": 0.11022500406414501
+    },
+    {
+     "label": "60% market",
+     "bets": 86,
+     "won": 29.0,
+     "lost": 57.0,
+     "units": -18.662758091025463,
+     "roi": -0.21700881501192398,
+     "se": 0.15289480264262287
+    },
+    {
+     "label": "70% market",
+     "bets": 27,
+     "won": 9.0,
      "lost": 18.0,
-     "units": 14.263608786748065,
-     "roi": 0.3478928972377577,
-     "se": 0.2478448492840365
-    },
-    {
-     "label": "60% market",
-     "bets": 25,
-     "won": 15.0,
-     "lost": 10.0,
-     "units": 13.294031021518126,
-     "roi": 0.5317612408607251,
-     "se": 0.3307631587630693
-    },
-    {
-     "label": "70% market",
-     "bets": 9,
-     "won": 6.0,
-     "lost": 3.0,
-     "units": 5.847439195265283,
-     "roi": 0.649715466140587,
-     "se": 0.49188485220488576
+     "units": -2.7935545935545933,
+     "roi": -0.10346498494646642,
+     "se": 0.34071027639842083
     },
     {
      "label": "75% market",
@@ -356,291 +1151,12 @@
    "by_min_ev": [
     {
      "label": "0%+ edge",
-     "bets": 52,
-     "won": 31.0,
-     "lost": 21.0,
-     "units": 17.774798661440013,
-     "roi": 0.3418230511815387,
-     "se": 0.20202335103112756
-    },
-    {
-     "label": "1%+ edge",
-     "bets": 39,
-     "won": 24.0,
-     "lost": 15.0,
-     "units": 18.215989739129018,
-     "roi": 0.4670766599776671,
-     "se": 0.25331988346559803
-    },
-    {
-     "label": "2%+ edge",
-     "bets": 25,
-     "won": 15.0,
-     "lost": 10.0,
-     "units": 13.294031021518126,
-     "roi": 0.5317612408607251,
-     "se": 0.3307631587630693
-    },
-    {
-     "label": "3%+ edge",
-     "bets": 19,
-     "won": 12.0,
-     "lost": 7.0,
-     "units": 12.092082969570074,
-     "roi": 0.6364254194510565,
-     "se": 0.39967992169798344
-    },
-    {
-     "label": "5%+ edge",
-     "bets": 6,
-     "won": 3.0,
-     "lost": 3.0,
-     "units": 8.0,
-     "roi": 1.3333333333333333,
-     "se": 1.1601484579330545
-    },
-    {
-     "label": "8%+ edge",
-     "bets": 3,
-     "won": 2.0,
-     "lost": 1.0,
-     "units": 8.15,
-     "roi": 2.716666666666667,
-     "se": 1.9782848912912192
-    }
-   ],
-   "by_market": [
-    {
-     "label": "moneyline",
-     "bets": 12,
-     "won": 4.0,
-     "lost": 8.0,
-     "units": 5.4,
-     "roi": 0.45,
-     "se": 0.6706792124858247
-    },
-    {
-     "label": "over/under",
      "bets": 8,
-     "won": 6.0,
-     "lost": 2.0,
-     "units": 3.4156210134471006,
-     "roi": 0.42695262668088757,
-     "se": 0.3114398257829249
-    },
-    {
-     "label": "spreads",
-     "bets": 5,
      "won": 5.0,
-     "lost": 0.0,
-     "units": 4.478410008071025,
-     "roi": 0.895682001614205,
-     "se": 0.016679779366841462
-    }
-   ],
-   "by_band": [
-    {
-     "label": "coin flips (-149 to +149)",
-     "bets": 15,
-     "won": 11.0,
-     "lost": 4.0,
-     "units": 5.894031021518125,
-     "roi": 0.3929354014345417,
-     "se": 0.22457194523814797
-    },
-    {
-     "label": "underdogs (+150 or longer)",
-     "bets": 10,
-     "won": 4.0,
-     "lost": 6.0,
-     "units": 7.4,
-     "roi": 0.74,
-     "se": 0.7769527370152933
-    }
-   ],
-   "calibration": [
-    [
-     0.14856326024458488,
-     0.13333333333333333,
-     15
-    ],
-    [
-     0.24714361238885937,
-     0.23809523809523808,
-     21
-    ],
-    [
-     0.3636669450780692,
-     0.4084507042253521,
-     71
-    ],
-    [
-     0.4517520493582823,
-     0.5,
-     210
-    ],
-    [
-     0.5482479506417177,
-     0.5,
-     210
-    ],
-    [
-     0.6363330549219307,
-     0.5915492957746479,
-     71
-    ],
-    [
-     0.7528563876111407,
-     0.7619047619047619,
-     21
-    ],
-    [
-     0.8514367397554151,
-     0.8666666666666667,
-     15
-    ]
-   ],
-   "note": "Not yet beating the closing line by more than luck over 60+ bets; using the strictest threshold with a sample (2% at least)."
-  },
-  "mlb": {
-   "sport": "mlb",
-   "name": "MLB",
-   "games": 313,
-   "sides": 1252,
-   "window": "Apr 11 - Oct 8, 2026",
-   "weight": 0.8,
-   "min_ev": 0.02,
-   "proven": false,
-   "weight_log_loss": [
-    [
-     0.5,
-     0.6756263917903929
-    ],
-    [
-     0.6,
-     0.6745533469203671
-    ],
-    [
-     0.7,
-     0.673719901522253
-    ],
-    [
-     0.75,
-     0.673392320513344
-    ],
-    [
-     0.8,
-     0.6731239248587311
-    ],
-    [
-     0.85,
-     0.6729146150070479
-    ],
-    [
-     0.9,
-     0.6727643563290673
-    ],
-    [
-     0.95,
-     0.6726731788068253
-    ]
-   ],
-   "platt": [
-    -2.2639956404791046e-17,
-    1.5839050160134376
-   ],
-   "best": {
-    "label": "80% market, 2%+ edge",
-    "bets": 0,
-    "won": 0.0,
-    "lost": 0.0,
-    "units": 0.0,
-    "roi": null,
-    "se": null
-   },
-   "by_weight": [
-    {
-     "label": "50% market",
-     "bets": 145,
-     "won": 60.0,
-     "lost": 84.0,
-     "units": -18.136990906512374,
-     "roi": -0.1250826959069819,
-     "se": 0.0876801018905807
-    },
-    {
-     "label": "60% market",
-     "bets": 94,
-     "won": 34.0,
-     "lost": 59.0,
-     "units": -22.811498735930083,
-     "roi": -0.2426755184673413,
-     "se": 0.10448849294666732
-    },
-    {
-     "label": "70% market",
-     "bets": 24,
-     "won": 9.0,
-     "lost": 15.0,
-     "units": -5.7188303785072065,
-     "roi": -0.23828459910446695,
-     "se": 0.20780521728317264
-    },
-    {
-     "label": "75% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "80% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "85% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "90% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "95% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    }
-   ],
-   "by_min_ev": [
-    {
-     "label": "0%+ edge",
-     "bets": 7,
-     "won": 3.0,
-     "lost": 4.0,
-     "units": -1.419908466819222,
-     "roi": -0.20284406668846028,
-     "se": 0.3758176999961469
+     "lost": 3.0,
+     "units": 1.9352813852813857,
+     "roi": 0.24191017316017321,
+     "se": 0.36596058403975207
     },
     {
      "label": "1%+ edge",
@@ -692,87 +1208,61 @@
    "by_band": [],
    "calibration": [
     [
-     0.28315858645377573,
-     0.0,
-     10
+     0.14591042564695228,
+     0.10714285714285714,
+     28
     ],
     [
-     0.36602138194115397,
-     0.27586206896551724,
-     87
+     0.24635296216714828,
+     0.26666666666666666,
+     30
     ],
     [
-     0.4700298191899272,
-     0.46771037181996084,
-     511
+     0.3508097689142629,
+     0.3829787234042553,
+     47
     ],
     [
-     0.5299701808100729,
-     0.5322896281800391,
-     511
+     0.4692089932699403,
+     0.5056818181818182,
+     352
     ],
     [
-     0.633978618058846,
-     0.7241379310344828,
-     87
+     0.5307910067300597,
+     0.4943181818181818,
+     352
     ],
     [
-     0.7168414135462242,
-     1.0,
-     10
+     0.649190231085737,
+     0.6170212765957447,
+     47
+    ],
+    [
+     0.7536470378328517,
+     0.7333333333333333,
+     30
+    ],
+    [
+     0.8540895743530478,
+     0.8928571428571429,
+     28
     ]
    ],
-   "note": "Fewer than 30 bets cleared any threshold at the closing line; keeping the 2% default."
+   "note": "Blind test: 0 bets. Not proven until it beats the close by more than luck over 60+ blind bets."
   },
-  "nhl": {
-   "sport": "nhl",
-   "name": "NHL",
-   "games": 188,
-   "sides": 1128,
-   "window": "Apr 11 - Oct 8, 2026",
+  "ncaab": {
+   "sport": "ncaab",
+   "name": "College Basketball",
+   "games": 384,
+   "sides": 2302,
+   "window": "Oct 8 - Oct 8, 2026",
    "weight": 0.8,
    "min_ev": 0.02,
    "proven": false,
-   "weight_log_loss": [
-    [
-     0.5,
-     0.6653369874783133
-    ],
-    [
-     0.6,
-     0.6641792305061293
-    ],
-    [
-     0.7,
-     0.6632225378582023
-    ],
-    [
-     0.75,
-     0.6628184711255739
-    ],
-    [
-     0.8,
-     0.6624634559904793
-    ],
-    [
-     0.85,
-     0.6621572184433053
-    ],
-    [
-     0.9,
-     0.6618995446409175
-    ],
-    [
-     0.95,
-     0.661690280269123
-    ]
-   ],
-   "platt": [
-    2.918595917515302e-17,
-    1.1163045150579252
-   ],
-   "best": {
-    "label": "80% market, 2%+ edge",
+   "tune_window": "Mar 7, 2026 - Mar 13, 2026",
+   "blind_window": "Mar 13, 2026 - Apr 7, 2026",
+   "in_sample": {
+    "label": "80% market, 2%+ edge (tuning games)",
     "bets": 0,
     "won": 0.0,
     "lost": 0.0,
@@ -780,533 +1270,180 @@
     "roi": null,
     "se": null
    },
-   "by_weight": [
+   "blind": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 1,
+    "won": 0.0,
+    "lost": 1.0,
+    "units": -1.0,
+    "roi": -1.0,
+    "se": null
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 1,
+    "won": 0.0,
+    "lost": 1.0,
+    "units": -1.0,
+    "roi": -1.0,
+    "se": null
+   },
+   "early_clv": -0.9168491195251824,
+   "spots": [
     {
-     "label": "50% market",
-     "bets": 100,
-     "won": 50.0,
-     "lost": 50.0,
-     "units": -1.916331434939566,
-     "roi": -0.01916331434939566,
-     "se": 0.10269307353545971
-    },
-    {
-     "label": "60% market",
-     "bets": 60,
-     "won": 31.0,
-     "lost": 29.0,
-     "units": 1.830380216420631,
-     "roi": 0.03050633694034385,
-     "se": 0.137242591257802
-    },
-    {
-     "label": "70% market",
-     "bets": 12,
-     "won": 3.0,
-     "lost": 9.0,
-     "units": -4.229166666666666,
-     "roi": -0.3524305555555555,
-     "se": 0.3591159157342403
-    },
-    {
-     "label": "75% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "80% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "85% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "90% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "95% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
+     "key": "blowout_dog",
+     "label": "Dog that blew someone out last game",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 13,
+      "won": 4.0,
+      "lost": 9.0,
+      "units": -3.16,
+      "roi": -0.24307692307692308,
+      "se": 0.3300415370427941
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 9,
+      "won": 3.0,
+      "lost": 6.0,
+      "units": -2.21,
+      "roi": -0.24555555555555555,
+      "se": 0.37821624881038296
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 15,
+      "won": 6.0,
+      "lost": 9.0,
+      "units": -1.2800000000000002,
+      "roi": -0.08533333333333334,
+      "se": 0.3016744802987022
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 10,
+      "won": 5.0,
+      "lost": 5.0,
+      "units": 0.7999999999999998,
+      "roi": 0.07999999999999999,
+      "se": 0.3617119787283185
+     },
+     "open_clv": -0.04599575623490841,
+     "excess_win": -0.07455135738660612,
+     "proven": false
     }
    ],
-   "by_min_ev": [
-    {
-     "label": "0%+ edge",
-     "bets": 14,
-     "won": 9.0,
-     "lost": 5.0,
-     "units": -0.21446237212757957,
-     "roi": -0.015318740866255684,
-     "se": 0.2050944005275828
-    },
-    {
-     "label": "1%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "2%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "3%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "5%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "8%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    }
-   ],
-   "by_market": [],
-   "by_band": [],
-   "calibration": [
-    [
-     0.287556204729595,
-     0.3125,
-     48
-    ],
-    [
-     0.34972939835576394,
-     0.3128834355828221,
-     163
-    ],
-    [
-     0.4539083047074105,
-     0.43059490084985835,
-     353
-    ],
-    [
-     0.5460916952925895,
-     0.5694050991501416,
-     353
-    ],
-    [
-     0.650270601644236,
-     0.6871165644171779,
-     163
-    ],
-    [
-     0.712443795270405,
-     0.6875,
-     48
-    ]
-   ],
-   "note": "Fewer than 30 bets cleared any threshold at the closing line; keeping the 2% default."
-  },
-  "epl": {
-   "sport": "epl",
-   "name": "Premier League",
-   "games": 120,
-   "sides": 840,
-   "window": "Apr 11 - Oct 8, 2026",
-   "weight": 0.6,
-   "min_ev": 0.05,
-   "proven": false,
    "weight_log_loss": [
     [
      0.5,
-     0.6356179919477124
+     0.6631028744613111
     ],
     [
      0.6,
-     0.6352351903367213
+     0.6619361983689533
     ],
     [
      0.7,
-     0.6352449501587993
+     0.661065614615151
     ],
     [
      0.75,
-     0.6354019953419096
+     0.6607401292512325
     ],
     [
      0.8,
-     0.6356641932779932
+     0.6604874722653236
     ],
     [
      0.85,
-     0.6360351828709114
+     0.6603075348242096
     ],
     [
      0.9,
-     0.6365194868561698
+     0.66020034925977
     ],
     [
      0.95,
-     0.6371227580608553
+     0.6601660941700771
     ]
    ],
    "platt": [
-    0.027270916178860648,
-    1.111361823175974
+    -7.122600637443852e-18,
+    0.941430669525621
    ],
    "best": {
-    "label": "60% market, 5%+ edge",
-    "bets": 30,
-    "won": 5.0,
-    "lost": 25.0,
-    "units": -10.15,
-    "roi": -0.3383333333333333,
-    "se": 0.28094343658357096
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 1,
+    "won": 0.0,
+    "lost": 1.0,
+    "units": -1.0,
+    "roi": -1.0,
+    "se": null
    },
    "by_weight": [
     {
      "label": "50% market",
-     "bets": 69,
-     "won": 22.0,
-     "lost": 47.0,
-     "units": -5.230340049755341,
-     "roi": -0.07580202970659915,
-     "se": 0.18214785534179823
+     "bets": 110,
+     "won": 48.0,
+     "lost": 62.0,
+     "units": 1.3579457663982355,
+     "roi": 0.012344961512711233,
+     "se": 0.13546999162424533
     },
     {
      "label": "60% market",
-     "bets": 50,
-     "won": 14.0,
-     "lost": 36.0,
-     "units": -9.190779610194902,
-     "roi": -0.18381559220389804,
-     "se": 0.20617988908764115
-    },
-    {
-     "label": "70% market",
-     "bets": 31,
-     "won": 6.0,
-     "lost": 25.0,
-     "units": -11.15,
-     "roi": -0.3596774193548387,
-     "se": 0.2489053384303616
-    },
-    {
-     "label": "75% market",
-     "bets": 19,
-     "won": 2.0,
-     "lost": 17.0,
-     "units": -10.5,
-     "roi": -0.5526315789473685,
-     "se": 0.3127288328065945
-    },
-    {
-     "label": "80% market",
-     "bets": 7,
-     "won": 1.0,
-     "lost": 6.0,
-     "units": -2.0,
-     "roi": -0.2857142857142857,
-     "se": 0.7142857142857143
-    },
-    {
-     "label": "85% market",
-     "bets": 2,
-     "won": 0.0,
-     "lost": 2.0,
-     "units": -2.0,
-     "roi": -1.0,
-     "se": 0.0
-    },
-    {
-     "label": "90% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "95% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    }
-   ],
-   "by_min_ev": [
-    {
-     "label": "0%+ edge",
-     "bets": 78,
-     "won": 24.0,
-     "lost": 54.0,
-     "units": -12.780340049755342,
-     "roi": -0.16385051345840182,
-     "se": 0.15891497319689443
-    },
-    {
-     "label": "1%+ edge",
-     "bets": 63,
-     "won": 21.0,
-     "lost": 42.0,
-     "units": -3.7636733830886753,
-     "roi": -0.05974084735061389,
-     "se": 0.1883292292193682
-    },
-    {
-     "label": "2%+ edge",
-     "bets": 50,
-     "won": 14.0,
-     "lost": 36.0,
-     "units": -9.190779610194902,
-     "roi": -0.18381559220389804,
-     "se": 0.20617988908764115
-    },
-    {
-     "label": "3%+ edge",
-     "bets": 42,
-     "won": 9.0,
+     "bets": 71,
+     "won": 38.0,
      "lost": 33.0,
-     "units": -10.65,
-     "roi": -0.25357142857142856,
-     "se": 0.23618257604055698
-    },
-    {
-     "label": "5%+ edge",
-     "bets": 30,
-     "won": 5.0,
-     "lost": 25.0,
-     "units": -10.15,
-     "roi": -0.3383333333333333,
-     "se": 0.28094343658357096
-    },
-    {
-     "label": "8%+ edge",
-     "bets": 18,
-     "won": 2.0,
-     "lost": 16.0,
-     "units": -8.2,
-     "roi": -0.4555555555555555,
-     "se": 0.3735732966746694
-    }
-   ],
-   "by_market": [
-    {
-     "label": "moneyline",
-     "bets": 30,
-     "won": 5.0,
-     "lost": 25.0,
-     "units": -10.15,
-     "roi": -0.3383333333333333,
-     "se": 0.28094343658357096
-    }
-   ],
-   "by_band": [
-    {
-     "label": "coin flips (-149 to +149)",
-     "bets": 1,
-     "won": 0.0,
-     "lost": 1.0,
-     "units": -1.0,
-     "roi": -1.0,
-     "se": null
-    },
-    {
-     "label": "underdogs (+150 or longer)",
-     "bets": 29,
-     "won": 5.0,
-     "lost": 24.0,
-     "units": -9.15,
-     "roi": -0.31551724137931036,
-     "se": 0.2898435055101765
-    }
-   ],
-   "calibration": [
-    [
-     0.16499512449933926,
-     0.125,
-     40
-    ],
-    [
-     0.25701163916494324,
-     0.29375,
-     160
-    ],
-    [
-     0.3582364309790355,
-     0.3300970873786408,
-     103
-    ],
-    [
-     0.4506225085469215,
-     0.40329218106995884,
-     243
-    ],
-    [
-     0.5485573323228751,
-     0.579185520361991,
-     221
-    ],
-    [
-     0.6315755131399176,
-     0.6666666666666666,
-     63
-    ]
-   ],
-   "note": "Not yet beating the closing line by more than luck over 60+ bets; using the strictest threshold with a sample (2% at least)."
-  },
-  "laliga": {
-   "sport": "laliga",
-   "name": "La Liga",
-   "games": 148,
-   "sides": 1036,
-   "window": "Apr 11 - Oct 8, 2026",
-   "weight": 0.8,
-   "min_ev": 0.02,
-   "proven": false,
-   "weight_log_loss": [
-    [
-     0.5,
-     0.6357979269473363
-    ],
-    [
-     0.6,
-     0.6335338745832502
-    ],
-    [
-     0.7,
-     0.6315800245840789
-    ],
-    [
-     0.75,
-     0.6307170362281457
-    ],
-    [
-     0.8,
-     0.6299291267255263
-    ],
-    [
-     0.85,
-     0.6292158826875907
-    ],
-    [
-     0.9,
-     0.628577092337563
-    ],
-    [
-     0.95,
-     0.6280127546976292
-    ]
-   ],
-   "platt": [
-    0.03179674331178264,
-    1.1312402165644861
-   ],
-   "best": {
-    "label": "80% market, 2%+ edge",
-    "bets": 9,
-    "won": 2.0,
-    "lost": 7.0,
-    "units": -3.3000000000000003,
-    "roi": -0.3666666666666667,
-    "se": 0.43485310418832496
-   },
-   "by_weight": [
-    {
-     "label": "50% market",
-     "bets": 75,
-     "won": 25.0,
-     "lost": 50.0,
-     "units": -4.555641535234802,
-     "roi": -0.06074188713646402,
-     "se": 0.1773765220118884
-    },
-    {
-     "label": "60% market",
-     "bets": 59,
-     "won": 20.0,
-     "lost": 39.0,
-     "units": 1.3219461697722577,
-     "roi": 0.022405867284275554,
-     "se": 0.21366379469176325
+     "units": 8.513102928077137,
+     "roi": 0.11990285814193151,
+     "se": 0.13206814343791357
     },
     {
      "label": "70% market",
-     "bets": 39,
-     "won": 10.0,
-     "lost": 29.0,
-     "units": -8.764285714285714,
-     "roi": -0.22472527472527473,
-     "se": 0.23653968777359596
+     "bets": 14,
+     "won": 4.0,
+     "lost": 10.0,
+     "units": -5.429437229437229,
+     "roi": -0.38781694495980207,
+     "se": 0.2743052591034559
     },
     {
      "label": "75% market",
-     "bets": 25,
-     "won": 4.0,
-     "lost": 21.0,
-     "units": -13.5,
-     "roi": -0.54,
-     "se": 0.21922210959055508
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "80% market",
-     "bets": 9,
-     "won": 2.0,
-     "lost": 7.0,
-     "units": -3.3000000000000003,
-     "roi": -0.3666666666666667,
-     "se": 0.43485310418832496
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "85% market",
-     "bets": 2,
+     "bets": 0,
      "won": 0.0,
-     "lost": 2.0,
-     "units": -2.0,
-     "roi": -1.0,
-     "se": 0.0
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "90% market",
@@ -1330,51 +1467,62 @@
    "by_min_ev": [
     {
      "label": "0%+ edge",
-     "bets": 31,
-     "won": 8.0,
-     "lost": 23.0,
-     "units": -11.164285714285715,
-     "roi": -0.3601382488479263,
-     "se": 0.20585068086609307
+     "bets": 8,
+     "won": 3.0,
+     "lost": 5.0,
+     "units": -2.3385281385281385,
+     "roi": -0.2923160173160173,
+     "se": 0.34563312836253846
     },
     {
      "label": "1%+ edge",
-     "bets": 15,
-     "won": 4.0,
-     "lost": 11.0,
-     "units": -3.5,
-     "roi": -0.23333333333333334,
-     "se": 0.34715396154425926
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "2%+ edge",
-     "bets": 9,
-     "won": 2.0,
-     "lost": 7.0,
-     "units": -3.3000000000000003,
-     "roi": -0.3666666666666667,
-     "se": 0.43485310418832496
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "3%+ edge",
-     "bets": 4,
+     "bets": 0,
      "won": 0.0,
-     "lost": 4.0,
-     "units": -4.0,
-     "roi": -1.0,
-     "se": 0.0
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "5%+ edge",
-     "bets": 3,
+     "bets": 0,
      "won": 0.0,
-     "lost": 3.0,
-     "units": -3.0,
-     "roi": -1.0,
-     "se": 0.0
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "8%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_market": [
+    {
+     "label": "moneyline",
      "bets": 1,
      "won": 0.0,
      "lost": 1.0,
@@ -1383,868 +1531,317 @@
      "se": null
     }
    ],
-   "by_market": [
-    {
-     "label": "moneyline",
-     "bets": 9,
-     "won": 2.0,
-     "lost": 7.0,
-     "units": -3.3000000000000003,
-     "roi": -0.3666666666666667,
-     "se": 0.43485310418832496
-    }
-   ],
    "by_band": [
     {
-     "label": "coin flips (-149 to +149)",
-     "bets": 1,
-     "won": 1.0,
-     "lost": 0.0,
-     "units": 1.15,
-     "roi": 1.15,
-     "se": null
-    },
-    {
      "label": "underdogs (+150 or longer)",
-     "bets": 8,
-     "won": 1.0,
-     "lost": 7.0,
-     "units": -4.45,
-     "roi": -0.55625,
-     "se": 0.44375
+     "bets": 1,
+     "won": 0.0,
+     "lost": 1.0,
+     "units": -1.0,
+     "roi": -1.0,
+     "se": null
     }
    ],
    "calibration": [
     [
-     0.07180261091823743,
+     0.057167084412680653,
      0.0,
-     15
+     14
     ],
     [
-     0.15427905280154444,
+     0.15176642540426805,
+     0.15,
+     20
+    ],
+    [
+     0.24983771648230602,
      0.14634146341463414,
      41
     ],
     [
-     0.25946718651475614,
-     0.24456521739130435,
-     184
+     0.3455384900231478,
+     0.3142857142857143,
+     35
     ],
     [
-     0.3551464831942828,
-     0.3825503355704698,
-     149
+     0.4736312552199146,
+     0.5284090909090909,
+     352
     ],
     [
-     0.45029363793261273,
-     0.4586206896551724,
-     290
+     0.5263687447800854,
+     0.4715909090909091,
+     352
     ],
     [
-     0.5470982472487361,
-     0.5335820895522388,
-     268
+     0.6544615099768522,
+     0.6857142857142857,
+     35
     ],
     [
-     0.6301256557871807,
-     0.5972222222222222,
-     72
+     0.750162283517694,
+     0.8536585365853658,
+     41
     ],
     [
-     0.7571372808761695,
+     0.848233574595732,
+     0.85,
+     20
+    ],
+    [
+     0.9428329155873193,
      1.0,
-     12
+     14
     ]
    ],
-   "note": "Not yet beating the closing line by more than luck over 60+ bets; using the strictest threshold with a sample (2% at least)."
+   "note": "Blind test: 1 bets, ROI -100.0%. Not proven until it beats the close by more than luck over 60+ blind bets."
   },
-  "bundesliga": {
-   "sport": "bundesliga",
-   "name": "Bundesliga",
-   "games": 86,
-   "sides": 602,
-   "window": "Apr 11 - Oct 8, 2026",
-   "weight": 0.8,
+  "mlb": {
+   "sport": "mlb",
+   "name": "MLB",
+   "games": 0,
+   "sides": 0,
+   "window": "Oct 8 - Oct 8, 2026",
+   "weight": 0.75,
    "min_ev": 0.02,
    "proven": false,
-   "weight_log_loss": [
-    [
-     0.5,
-     0.640874124260924
-    ],
-    [
-     0.6,
-     0.6393401173139718
-    ],
-    [
-     0.7,
-     0.6381332867376389
-    ],
-    [
-     0.75,
-     0.637650951819562
-    ],
-    [
-     0.8,
-     0.6372488425125984
-    ],
-    [
-     0.85,
-     0.6369268074173405
-    ],
-    [
-     0.9,
-     0.6366848686635874
-    ],
-    [
-     0.95,
-     0.6365232225874318
-    ]
-   ],
-   "platt": [
-    -0.009974452591130901,
-    0.9581713779096158
-   ],
-   "best": {
-    "label": "80% market, 2%+ edge",
-    "bets": 0,
-    "won": 0.0,
-    "lost": 0.0,
-    "units": 0.0,
-    "roi": null,
-    "se": null
-   },
-   "by_weight": [
-    {
-     "label": "50% market",
-     "bets": 32,
-     "won": 10.0,
-     "lost": 22.0,
-     "units": -6.581773399014778,
-     "roi": -0.2056804187192118,
-     "se": 0.228097607748885
-    },
-    {
-     "label": "60% market",
-     "bets": 15,
-     "won": 6.0,
-     "lost": 9.0,
-     "units": 2.8396551724137935,
-     "roi": 0.18931034482758624,
-     "se": 0.4145309923329647
-    },
-    {
-     "label": "70% market",
-     "bets": 2,
-     "won": 1.0,
-     "lost": 1.0,
-     "units": 2.4000000000000004,
-     "roi": 1.2000000000000002,
-     "se": 2.2
-    },
-    {
-     "label": "75% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "80% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "85% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "90% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "95% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    }
-   ],
-   "by_min_ev": [
-    {
-     "label": "0%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "1%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "2%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "3%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "5%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "8%+ edge",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    }
-   ],
+   "tune_window": "",
+   "blind_window": "",
+   "in_sample": null,
+   "blind": null,
+   "early_in_sample": null,
+   "early_blind": null,
+   "early_clv": null,
+   "spots": [],
+   "weight_log_loss": [],
+   "platt": null,
+   "best": null,
+   "by_weight": [],
+   "by_min_ev": [],
    "by_market": [],
    "by_band": [],
-   "calibration": [
-    [
-     0.15139000759731677,
-     0.1111111111111111,
-     36
-    ],
-    [
-     0.24689420819428634,
-     0.3163265306122449,
-     98
-    ],
-    [
-     0.36331104436125217,
-     0.3194444444444444,
-     72
-    ],
-    [
-     0.45078978803295433,
-     0.4476744186046512,
-     172
-    ],
-    [
-     0.5478944614728921,
-     0.5403726708074534,
-     161
-    ],
-    [
-     0.6286272298798137,
-     0.6428571428571429,
-     42
-    ]
-   ],
-   "note": "Fewer than 30 bets cleared any threshold at the closing line; keeping the 2% default."
+   "calibration": [],
+   "note": "No finished games with closing odds in the study window yet."
   },
-  "seriea": {
-   "sport": "seriea",
-   "name": "Serie A",
-   "games": 119,
-   "sides": 833,
-   "window": "Apr 11 - Oct 8, 2026",
-   "weight": 0.6,
-   "min_ev": 0.02,
-   "proven": false,
-   "weight_log_loss": [
-    [
-     0.5,
-     0.632965740668857
-    ],
-    [
-     0.6,
-     0.6331059335935132
-    ],
-    [
-     0.7,
-     0.6335924888403736
-    ],
-    [
-     0.75,
-     0.6339664342602357
-    ],
-    [
-     0.8,
-     0.6344283026935901
-    ],
-    [
-     0.85,
-     0.634978956763971
-    ],
-    [
-     0.9,
-     0.6356194724177086
-    ],
-    [
-     0.95,
-     0.6363511508652128
-    ]
-   ],
-   "platt": [
-    0.01195576601492571,
-    1.0497925093139582
-   ],
-   "best": {
-    "label": "60% market, 2%+ edge",
-    "bets": 32,
-    "won": 11.0,
-    "lost": 21.0,
-    "units": 13.189130434782609,
-    "roi": 0.4121603260869565,
-    "se": 0.4192251769944145
-   },
-   "by_weight": [
-    {
-     "label": "50% market",
-     "bets": 53,
-     "won": 19.0,
-     "lost": 34.0,
-     "units": 14.455797101449274,
-     "roi": 0.2727508887065901,
-     "se": 0.28797337521101934
-    },
-    {
-     "label": "60% market",
-     "bets": 32,
-     "won": 11.0,
-     "lost": 21.0,
-     "units": 13.189130434782609,
-     "roi": 0.4121603260869565,
-     "se": 0.4192251769944145
-    },
-    {
-     "label": "70% market",
-     "bets": 6,
-     "won": 2.0,
-     "lost": 4.0,
-     "units": 9.0,
-     "roi": 1.5,
-     "se": 1.6020819787597222
-    },
-    {
-     "label": "75% market",
-     "bets": 2,
-     "won": 0.0,
-     "lost": 2.0,
-     "units": -2.0,
-     "roi": -1.0,
-     "se": 0.0
-    },
-    {
-     "label": "80% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "85% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "90% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "95% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    }
-   ],
-   "by_min_ev": [
-    {
-     "label": "0%+ edge",
-     "bets": 54,
-     "won": 17.0,
-     "lost": 37.0,
-     "units": 5.305797101449275,
-     "roi": 0.09825550187869027,
-     "se": 0.27000686381391814
-    },
-    {
-     "label": "1%+ edge",
-     "bets": 43,
-     "won": 16.0,
-     "lost": 27.0,
-     "units": 13.855797101449275,
-     "roi": 0.3222278395685878,
-     "se": 0.32656854489478004
-    },
-    {
-     "label": "2%+ edge",
-     "bets": 32,
-     "won": 11.0,
-     "lost": 21.0,
-     "units": 13.189130434782609,
-     "roi": 0.4121603260869565,
-     "se": 0.4192251769944145
-    },
-    {
-     "label": "3%+ edge",
-     "bets": 20,
-     "won": 7.0,
-     "lost": 13.0,
-     "units": 10.85,
-     "roi": 0.5425,
-     "se": 0.5767909750918164
-    },
-    {
-     "label": "5%+ edge",
-     "bets": 7,
-     "won": 3.0,
-     "lost": 4.0,
-     "units": 13.75,
-     "roi": 1.9642857142857142,
-     "se": 1.4313960171186482
-    },
-    {
-     "label": "8%+ edge",
-     "bets": 4,
-     "won": 2.0,
-     "lost": 2.0,
-     "units": 11.0,
-     "roi": 2.75,
-     "se": 2.203217344400381
-    }
-   ],
-   "by_market": [
-    {
-     "label": "moneyline",
-     "bets": 22,
-     "won": 6.0,
-     "lost": 16.0,
-     "units": 12.7,
-     "roi": 0.5772727272727273,
-     "se": 0.5907175846852333
-    },
-    {
-     "label": "over/under",
-     "bets": 10,
-     "won": 5.0,
-     "lost": 5.0,
-     "units": 0.4891304347826084,
-     "roi": 0.048913043478260844,
-     "se": 0.3529378679404337
-    }
-   ],
-   "by_band": [
-    {
-     "label": "coin flips (-149 to +149)",
-     "bets": 12,
-     "won": 5.0,
-     "lost": 7.0,
-     "units": -1.5108695652173916,
-     "roi": -0.1259057971014493,
-     "se": 0.3143603425725604
-    },
-    {
-     "label": "favorites (-150 or shorter)",
-     "bets": 1,
-     "won": 0.0,
-     "lost": 1.0,
-     "units": -1.0,
-     "roi": -1.0,
-     "se": null
-    },
-    {
-     "label": "underdogs (+150 or longer)",
-     "bets": 19,
-     "won": 6.0,
-     "lost": 13.0,
-     "units": 15.7,
-     "roi": 0.8263157894736842,
-     "se": 0.6679195291229404
-    }
-   ],
-   "calibration": [
-    [
-     0.08275005063977225,
-     0.0,
-     11
-    ],
-    [
-     0.16275402043782736,
-     0.25,
-     52
-    ],
-    [
-     0.25959174917307476,
-     0.20930232558139536,
-     129
-    ],
-    [
-     0.350334214774581,
-     0.3153846153846154,
-     130
-    ],
-    [
-     0.4513089842327478,
-     0.5023255813953489,
-     215
-    ],
-    [
-     0.5484803642688105,
-     0.5073170731707317,
-     205
-    ],
-    [
-     0.6367994803979707,
-     0.7037037037037037,
-     81
-    ]
-   ],
-   "note": "Not yet beating the closing line by more than luck over 60+ bets; using the strictest threshold with a sample (2% at least)."
-  },
-  "ligue1": {
-   "sport": "ligue1",
-   "name": "Ligue 1",
-   "games": 97,
-   "sides": 679,
-   "window": "Apr 11 - Oct 8, 2026",
-   "weight": 0.6,
-   "min_ev": 0.05,
-   "proven": false,
-   "weight_log_loss": [
-    [
-     0.5,
-     0.6467606281431134
-    ],
-    [
-     0.6,
-     0.6468067985221059
-    ],
-    [
-     0.7,
-     0.6472350463657827
-    ],
-    [
-     0.75,
-     0.6475940460670319
-    ],
-    [
-     0.8,
-     0.648050915600741
-    ],
-    [
-     0.85,
-     0.6486069089937121
-    ],
-    [
-     0.9,
-     0.6492635298903584
-    ],
-    [
-     0.95,
-     0.6500225514601763
-    ]
-   ],
-   "platt": [
-    -0.022003633337015906,
-    0.9114950142848764
-   ],
-   "best": {
-    "label": "60% market, 5%+ edge",
-    "bets": 32,
-    "won": 5.0,
-    "lost": 27.0,
-    "units": -2.5,
-    "roi": -0.078125,
-    "se": 0.4140363465568709
-   },
-   "by_weight": [
-    {
-     "label": "50% market",
-     "bets": 68,
-     "won": 19.0,
-     "lost": 49.0,
-     "units": 9.63084693084693,
-     "roi": 0.14163010192421957,
-     "se": 0.2585176090044353
-    },
-    {
-     "label": "60% market",
-     "bets": 55,
-     "won": 14.0,
-     "lost": 41.0,
-     "units": 3.2747863247863247,
-     "roi": 0.05954156954156954,
-     "se": 0.2878299582390886
-    },
-    {
-     "label": "70% market",
-     "bets": 35,
-     "won": 7.0,
-     "lost": 28.0,
-     "units": -0.19999999999999973,
-     "roi": -0.0057142857142857065,
-     "se": 0.3855301458995897
-    },
-    {
-     "label": "75% market",
-     "bets": 19,
-     "won": 1.0,
-     "lost": 18.0,
-     "units": -15.0,
-     "roi": -0.7894736842105263,
-     "se": 0.21052631578947367
-    },
-    {
-     "label": "80% market",
-     "bets": 2,
-     "won": 0.0,
-     "lost": 2.0,
-     "units": -2.0,
-     "roi": -1.0,
-     "se": 0.0
-    },
-    {
-     "label": "85% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "90% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    },
-    {
-     "label": "95% market",
-     "bets": 0,
-     "won": 0.0,
-     "lost": 0.0,
-     "units": 0.0,
-     "roi": null,
-     "se": null
-    }
-   ],
-   "by_min_ev": [
-    {
-     "label": "0%+ edge",
-     "bets": 71,
-     "won": 21.0,
-     "lost": 50.0,
-     "units": 10.602275502275502,
-     "roi": 0.1493278239757113,
-     "se": 0.2487598954250116
-    },
-    {
-     "label": "1%+ edge",
-     "bets": 61,
-     "won": 15.0,
-     "lost": 46.0,
-     "units": 1.3747863247863246,
-     "roi": 0.02253748073420204,
-     "se": 0.2669535037242198
-    },
-    {
-     "label": "2%+ edge",
-     "bets": 55,
-     "won": 14.0,
-     "lost": 41.0,
-     "units": 3.2747863247863247,
-     "roi": 0.05954156954156954,
-     "se": 0.2878299582390886
-    },
-    {
-     "label": "3%+ edge",
-     "bets": 48,
-     "won": 11.0,
-     "lost": 37.0,
-     "units": 4.95,
-     "roi": 0.10312500000000001,
-     "se": 0.3260532790853436
-    },
-    {
-     "label": "5%+ edge",
-     "bets": 32,
-     "won": 5.0,
-     "lost": 27.0,
-     "units": -2.5,
-     "roi": -0.078125,
-     "se": 0.4140363465568709
-    },
-    {
-     "label": "8%+ edge",
-     "bets": 20,
-     "won": 3.0,
-     "lost": 17.0,
-     "units": 0.5,
-     "roi": 0.025,
-     "se": 0.587674945956745
-    }
-   ],
-   "by_market": [
-    {
-     "label": "moneyline",
-     "bets": 32,
-     "won": 5.0,
-     "lost": 27.0,
-     "units": -2.5,
-     "roi": -0.078125,
-     "se": 0.4140363465568709
-    }
-   ],
-   "by_band": [
-    {
-     "label": "underdogs (+150 or longer)",
-     "bets": 32,
-     "won": 5.0,
-     "lost": 27.0,
-     "units": -2.5,
-     "roi": -0.078125,
-     "se": 0.4140363465568709
-    }
-   ],
-   "calibration": [
-    [
-     0.15608421127561428,
-     0.1891891891891892,
-     37
-    ],
-    [
-     0.25271374456257434,
-     0.27906976744186046,
-     129
-    ],
-    [
-     0.35991404585369224,
-     0.313953488372093,
-     86
-    ],
-    [
-     0.4540801545239899,
-     0.44086021505376344,
-     186
-    ],
-    [
-     0.545649363851474,
-     0.5672514619883041,
-     171
-    ],
-    [
-     0.6330194924642292,
-     0.6065573770491803,
-     61
-    ]
-   ],
-   "note": "Not yet beating the closing line by more than luck over 60+ bets; using the strictest threshold with a sample (2% at least)."
-  },
-  "mls": {
-   "sport": "mls",
-   "name": "MLS",
-   "games": 317,
-   "sides": 2219,
-   "window": "Apr 11 - Oct 8, 2026",
+  "nhl": {
+   "sport": "nhl",
+   "name": "NHL",
+   "games": 385,
+   "sides": 2310,
+   "window": "Oct 8 - Oct 8, 2026",
    "weight": 0.8,
    "min_ev": 0.02,
    "proven": false,
+   "tune_window": "Mar 16, 2026 - Apr 14, 2026",
+   "blind_window": "Apr 15, 2026 - Oct 8, 2026",
+   "in_sample": {
+    "label": "80% market, 2%+ edge (tuning games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "blind": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_clv": null,
+   "spots": [
+    {
+     "key": "east_traveler_dog",
+     "label": "East Coast team flying West (as the dog)",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 4,
+      "won": 4.0,
+      "lost": 0.0,
+      "units": 5.06,
+      "roi": 1.265,
+      "se": 0.12553220038433702
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 4,
+      "won": 2.0,
+      "lost": 2.0,
+      "units": 0.8999999999999999,
+      "roi": 0.22499999999999998,
+      "se": 0.7099002277315689
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 4,
+      "won": 3.0,
+      "lost": 1.0,
+      "units": 2.8,
+      "roi": 0.7,
+      "se": 0.568565446247542
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 4,
+      "won": 2.0,
+      "lost": 2.0,
+      "units": 0.8999999999999999,
+      "roi": 0.22499999999999998,
+      "se": 0.7099002277315689
+     },
+     "open_clv": -0.07684035565108846,
+     "excess_win": 0.5775292698602108,
+     "proven": false
+    },
+    {
+     "key": "west_host_dog",
+     "label": "West Coast home dog vs a team flying in from the East",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 3,
+      "won": 1.0,
+      "lost": 2.0,
+      "units": -0.7000000000000002,
+      "roi": -0.2333333333333334,
+      "se": 0.7666666666666666
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 3,
+      "won": 2.0,
+      "lost": 1.0,
+      "units": 1.4400000000000004,
+      "roi": 0.48000000000000015,
+      "se": 0.7400900846068224
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 3,
+      "won": 1.0,
+      "lost": 2.0,
+      "units": -0.7000000000000002,
+      "roi": -0.2333333333333334,
+      "se": 0.7666666666666666
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 3,
+      "won": 2.0,
+      "lost": 1.0,
+      "units": 1.3000000000000003,
+      "roi": 0.4333333333333334,
+      "se": 0.7172478263783338
+     },
+     "open_clv": -0.0572426344472126,
+     "excess_win": -0.07128198301297956,
+     "proven": false
+    },
+    {
+     "key": "blowout_dog",
+     "label": "Dog that blew someone out last game",
+     "close_tuned": {
+      "label": "close, tuned",
+      "bets": 15,
+      "won": 6.0,
+      "lost": 9.0,
+      "units": -1.8600000000000008,
+      "roi": -0.12400000000000005,
+      "se": 0.2892021866478619
+     },
+     "close_blind": {
+      "label": "close, blind",
+      "bets": 10,
+      "won": 4.0,
+      "lost": 6.0,
+      "units": -1.1599999999999997,
+      "roi": -0.11599999999999996,
+      "se": 0.3623693634339906
+     },
+     "open_tuned": {
+      "label": "open, tuned",
+      "bets": 13,
+      "won": 6.0,
+      "lost": 7.0,
+      "units": 0.31999999999999895,
+      "roi": 0.024615384615384536,
+      "se": 0.3236502848806919
+     },
+     "open_blind": {
+      "label": "open, blind",
+      "bets": 10,
+      "won": 4.0,
+      "lost": 6.0,
+      "units": -0.8999999999999995,
+      "roi": -0.08999999999999994,
+      "se": 0.3737051719678971
+     },
+     "open_clv": -0.046204737230555584,
+     "excess_win": -0.025365811954831896,
+     "proven": false
+    }
+   ],
    "weight_log_loss": [
     [
      0.5,
-     0.6587434183054942
+     0.6688414399122847
     ],
     [
      0.6,
-     0.6571140417312107
+     0.6678270632457467
     ],
     [
      0.7,
-     0.6556552626378489
+     0.666949969377777
     ],
     [
      0.75,
-     0.6549887000804777
+     0.6665624593714684
     ],
     [
      0.8,
-     0.6543635271377112
+     0.6662088015256342
     ],
     [
      0.85,
-     0.653779439193288
+     0.6658889070114747
     ],
     [
      0.9,
-     0.653236181721543
+     0.6656027199779422
     ],
     [
      0.95,
-     0.6527335482232638
+     0.665350218336368
     ]
    ],
    "platt": [
-    -0.03865022086326001,
-    0.8484572980176243
+    -9.697207594970878e-19,
+    1.0381933116951496
    ],
    "best": {
-    "label": "80% market, 2%+ edge",
+    "label": "80% market, 2%+ edge (blind games)",
     "bets": 0,
     "won": 0.0,
     "lost": 0.0,
@@ -2255,24 +1852,80 @@
    "by_weight": [
     {
      "label": "50% market",
-     "bets": 94,
-     "won": 29.0,
-     "lost": 65.0,
-     "units": -25.856484467097495,
-     "roi": -0.2750689836925265,
-     "se": 0.12022242920534344
+     "bets": 77,
+     "won": 33.0,
+     "lost": 44.0,
+     "units": -10.387383652070461,
+     "roi": -0.13490108639052548,
+     "se": 0.11616134755366977
     },
     {
      "label": "60% market",
-     "bets": 46,
-     "won": 13.0,
-     "lost": 33.0,
-     "units": -13.962802584882674,
-     "roi": -0.3035391866278842,
-     "se": 0.1756466714222679
+     "bets": 52,
+     "won": 21.0,
+     "lost": 31.0,
+     "units": -8.179880654567464,
+     "roi": -0.15730539720322045,
+     "se": 0.14536676818982927
     },
     {
      "label": "70% market",
+     "bets": 9,
+     "won": 1.0,
+     "lost": 8.0,
+     "units": -7.0,
+     "roi": -0.7777777777777778,
+     "se": 0.2222222222222222
+    },
+    {
+     "label": "75% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "80% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "85% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "90% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "95% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_min_ev": [
+    {
+     "label": "0%+ edge",
      "bets": 3,
      "won": 0.0,
      "lost": 3.0,
@@ -2281,6 +1934,790 @@
      "se": 0.0
     },
     {
+     "label": "1%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "2%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "3%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "5%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "8%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_market": [],
+   "by_band": [],
+   "calibration": [
+    [
+     0.28701164053108824,
+     0.2926829268292683,
+     41
+    ],
+    [
+     0.34868880274253805,
+     0.2900763358778626,
+     131
+    ],
+    [
+     0.45359419700123227,
+     0.45517241379310347,
+     290
+    ],
+    [
+     0.5464058029987677,
+     0.5448275862068965,
+     290
+    ],
+    [
+     0.651311197257462,
+     0.7099236641221374,
+     131
+    ],
+    [
+     0.7129883594689118,
+     0.7073170731707317,
+     41
+    ]
+   ],
+   "note": "Blind test: 0 bets. Not proven until it beats the close by more than luck over 60+ blind bets."
+  },
+  "epl": {
+   "sport": "epl",
+   "name": "Premier League",
+   "games": 300,
+   "sides": 2100,
+   "window": "Oct 8 - Oct 8, 2026",
+   "weight": 0.7,
+   "min_ev": 0.03,
+   "proven": false,
+   "tune_window": "Dec 2, 2025 - Apr 10, 2026",
+   "blind_window": "Apr 11, 2026 - Sep 20, 2026",
+   "in_sample": {
+    "label": "70% market, 3%+ edge (tuning games)",
+    "bets": 45,
+    "won": 10.0,
+    "lost": 35.0,
+    "units": -2.670689655172414,
+    "roi": -0.05934865900383142,
+    "se": 0.2887453236877221
+   },
+   "blind": {
+    "label": "70% market, 3%+ edge (blind games)",
+    "bets": 23,
+    "won": 3.0,
+    "lost": 20.0,
+    "units": -11.65,
+    "roi": -0.5065217391304347,
+    "se": 0.28035663954015766
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 72,
+    "won": 18.0,
+    "lost": 54.0,
+    "units": -14.3,
+    "roi": -0.19861111111111113,
+    "se": 0.17907990644795926
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 45,
+    "won": 13.0,
+    "lost": 32.0,
+    "units": 1.0999999999999996,
+    "roi": 0.024444444444444435,
+    "se": 0.26568294987465135
+   },
+   "early_clv": -0.10790031872247229,
+   "spots": [],
+   "weight_log_loss": [
+    [
+     0.5,
+     0.6510817631539436
+    ],
+    [
+     0.6,
+     0.650677910446422
+    ],
+    [
+     0.7,
+     0.6505088804529279
+    ],
+    [
+     0.75,
+     0.6505131247136808
+    ],
+    [
+     0.8,
+     0.6505770991892366
+    ],
+    [
+     0.85,
+     0.650701343111305
+    ],
+    [
+     0.9,
+     0.6508864987029488
+    ],
+    [
+     0.95,
+     0.6511333175845332
+    ]
+   ],
+   "platt": [
+    -0.03752327137440104,
+    0.8510804489185356
+   ],
+   "best": {
+    "label": "70% market, 3%+ edge (blind games)",
+    "bets": 23,
+    "won": 3.0,
+    "lost": 20.0,
+    "units": -11.65,
+    "roi": -0.5065217391304347,
+    "se": 0.28035663954015766
+   },
+   "by_weight": [
+    {
+     "label": "50% market",
+     "bets": 118,
+     "won": 26.0,
+     "lost": 92.0,
+     "units": -20.27280275945943,
+     "roi": -0.1718034132157579,
+     "se": 0.1589722390977879
+    },
+    {
+     "label": "60% market",
+     "bets": 94,
+     "won": 21.0,
+     "lost": 73.0,
+     "units": -7.6014588859416445,
+     "roi": -0.08086658389299622,
+     "se": 0.19243314374334464
+    },
+    {
+     "label": "70% market",
+     "bets": 57,
+     "won": 13.0,
+     "lost": 44.0,
+     "units": -2.4706896551724133,
+     "roi": -0.043345432546884444,
+     "se": 0.2526746991133423
+    },
+    {
+     "label": "75% market",
+     "bets": 32,
+     "won": 6.0,
+     "lost": 26.0,
+     "units": -9.220689655172414,
+     "roi": -0.28814655172413794,
+     "se": 0.29339905011070627
+    },
+    {
+     "label": "80% market",
+     "bets": 14,
+     "won": 3.0,
+     "lost": 11.0,
+     "units": -4.620689655172414,
+     "roi": -0.33004926108374383,
+     "se": 0.441190904004495
+    },
+    {
+     "label": "85% market",
+     "bets": 2,
+     "won": 2.0,
+     "lost": 0.0,
+     "units": 1.3793103448275863,
+     "roi": 0.6896551724137931,
+     "se": 0.0
+    },
+    {
+     "label": "90% market",
+     "bets": 2,
+     "won": 2.0,
+     "lost": 0.0,
+     "units": 1.3793103448275863,
+     "roi": 0.6896551724137931,
+     "se": 0.0
+    },
+    {
+     "label": "95% market",
+     "bets": 2,
+     "won": 2.0,
+     "lost": 0.0,
+     "units": 1.3793103448275863,
+     "roi": 0.6896551724137931,
+     "se": 0.0
+    }
+   ],
+   "by_min_ev": [
+    {
+     "label": "0%+ edge",
+     "bets": 93,
+     "won": 23.0,
+     "lost": 70.0,
+     "units": -0.1014588859416441,
+     "roi": -0.0010909557628133774,
+     "se": 0.19837622565576968
+    },
+    {
+     "label": "1%+ edge",
+     "bets": 68,
+     "won": 15.0,
+     "lost": 53.0,
+     "units": -1.7206896551724133,
+     "roi": -0.025304259634888433,
+     "se": 0.2390800831479045
+    },
+    {
+     "label": "2%+ edge",
+     "bets": 57,
+     "won": 13.0,
+     "lost": 44.0,
+     "units": -2.4706896551724133,
+     "roi": -0.043345432546884444,
+     "se": 0.2526746991133423
+    },
+    {
+     "label": "3%+ edge",
+     "bets": 45,
+     "won": 10.0,
+     "lost": 35.0,
+     "units": -2.670689655172414,
+     "roi": -0.05934865900383142,
+     "se": 0.2887453236877221
+    },
+    {
+     "label": "5%+ edge",
+     "bets": 23,
+     "won": 5.0,
+     "lost": 18.0,
+     "units": -4.720689655172414,
+     "roi": -0.2052473763118441,
+     "se": 0.3634277397650955
+    },
+    {
+     "label": "8%+ edge",
+     "bets": 12,
+     "won": 3.0,
+     "lost": 9.0,
+     "units": -2.6206896551724137,
+     "roi": -0.21839080459770113,
+     "se": 0.5103394146210531
+    }
+   ],
+   "by_market": [
+    {
+     "label": "moneyline",
+     "bets": 23,
+     "won": 3.0,
+     "lost": 20.0,
+     "units": -11.65,
+     "roi": -0.5065217391304347,
+     "se": 0.28035663954015766
+    }
+   ],
+   "by_band": [
+    {
+     "label": "coin flips (-149 to +149)",
+     "bets": 1,
+     "won": 0.0,
+     "lost": 1.0,
+     "units": -1.0,
+     "roi": -1.0,
+     "se": null
+    },
+    {
+     "label": "underdogs (+150 or longer)",
+     "bets": 22,
+     "won": 3.0,
+     "lost": 19.0,
+     "units": -10.65,
+     "roi": -0.4840909090909091,
+     "se": 0.2924627915734564
+    }
+   ],
+   "calibration": [
+    [
+     0.16227388289016043,
+     0.16279069767441862,
+     43
+    ],
+    [
+     0.2559885442838188,
+     0.2974683544303797,
+     158
+    ],
+    [
+     0.35904880217910135,
+     0.31521739130434784,
+     92
+    ],
+    [
+     0.45025558405934507,
+     0.39285714285714285,
+     252
+    ],
+    [
+     0.5495239909172913,
+     0.6018099547511312,
+     221
+    ],
+    [
+     0.6286699192096196,
+     0.6190476190476191,
+     63
+    ]
+   ],
+   "note": "Blind test: 23 bets, ROI -50.7%. Not proven until it beats the close by more than luck over 60+ blind bets."
+  },
+  "laliga": {
+   "sport": "laliga",
+   "name": "La Liga",
+   "games": 310,
+   "sides": 2170,
+   "window": "Oct 8 - Oct 8, 2026",
+   "weight": 0.8,
+   "min_ev": 0.02,
+   "proven": false,
+   "tune_window": "Dec 1, 2025 - Apr 25, 2026",
+   "blind_window": "Apr 26, 2026 - Sep 20, 2026",
+   "in_sample": {
+    "label": "80% market, 2%+ edge (tuning games)",
+    "bets": 2,
+    "won": 1.0,
+    "lost": 1.0,
+    "units": 1.35,
+    "roi": 0.675,
+    "se": 1.675
+   },
+   "blind": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 6,
+    "won": 0.0,
+    "lost": 6.0,
+    "units": -6.0,
+    "roi": -1.0,
+    "se": 0.0
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 83,
+    "won": 32.0,
+    "lost": 51.0,
+    "units": 7.735690216274924,
+    "roi": 0.09320108694307137,
+    "se": 0.17554586487626972
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 49,
+    "won": 18.0,
+    "lost": 31.0,
+    "units": 2.785714285714286,
+    "roi": 0.05685131195335277,
+    "se": 0.22311007320736423
+   },
+   "early_clv": -0.07036427587883387,
+   "spots": [],
+   "weight_log_loss": [
+    [
+     0.5,
+     0.6323624372183014
+    ],
+    [
+     0.6,
+     0.6316029273231373
+    ],
+    [
+     0.7,
+     0.6310011111881353
+    ],
+    [
+     0.75,
+     0.6307594397795144
+    ],
+    [
+     0.8,
+     0.6305574140461961
+    ],
+    [
+     0.85,
+     0.6303952166576586
+    ],
+    [
+     0.9,
+     0.6302730874970167
+    ],
+    [
+     0.95,
+     0.6301913278250717
+    ]
+   ],
+   "platt": [
+    0.026616788822882667,
+    1.1092836792160787
+   ],
+   "best": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 6,
+    "won": 0.0,
+    "lost": 6.0,
+    "units": -6.0,
+    "roi": -1.0,
+    "se": 0.0
+   },
+   "by_weight": [
+    {
+     "label": "50% market",
+     "bets": 91,
+     "won": 24.0,
+     "lost": 67.0,
+     "units": -20.939775441949354,
+     "roi": -0.2301074224390039,
+     "se": 0.1640510750493833
+    },
+    {
+     "label": "60% market",
+     "bets": 66,
+     "won": 20.0,
+     "lost": 46.0,
+     "units": -4.409006211180125,
+     "roi": -0.06680312441182007,
+     "se": 0.21520176020187629
+    },
+    {
+     "label": "70% market",
+     "bets": 30,
+     "won": 8.0,
+     "lost": 22.0,
+     "units": 1.404761904761905,
+     "roi": 0.04682539682539684,
+     "se": 0.3987671812653911
+    },
+    {
+     "label": "75% market",
+     "bets": 16,
+     "won": 4.0,
+     "lost": 12.0,
+     "units": -4.2976190476190474,
+     "roi": -0.26860119047619047,
+     "se": 0.33822566361118545
+    },
+    {
+     "label": "80% market",
+     "bets": 2,
+     "won": 1.0,
+     "lost": 1.0,
+     "units": 1.35,
+     "roi": 0.675,
+     "se": 1.675
+    },
+    {
+     "label": "85% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "90% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "95% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_min_ev": [
+    {
+     "label": "0%+ edge",
+     "bets": 23,
+     "won": 6.0,
+     "lost": 17.0,
+     "units": -6.295238095238095,
+     "roi": -0.2737060041407867,
+     "se": 0.27039721364639546
+    },
+    {
+     "label": "1%+ edge",
+     "bets": 12,
+     "won": 3.0,
+     "lost": 9.0,
+     "units": -3.9976190476190476,
+     "roi": -0.3331349206349206,
+     "se": 0.3587413072994035
+    },
+    {
+     "label": "2%+ edge",
+     "bets": 2,
+     "won": 1.0,
+     "lost": 1.0,
+     "units": 1.35,
+     "roi": 0.675,
+     "se": 1.675
+    },
+    {
+     "label": "3%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "5%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "8%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_market": [
+    {
+     "label": "moneyline",
+     "bets": 6,
+     "won": 0.0,
+     "lost": 6.0,
+     "units": -6.0,
+     "roi": -1.0,
+     "se": 0.0
+    }
+   ],
+   "by_band": [
+    {
+     "label": "underdogs (+150 or longer)",
+     "bets": 6,
+     "won": 0.0,
+     "lost": 6.0,
+     "units": -6.0,
+     "roi": -1.0,
+     "se": 0.0
+    }
+   ],
+   "calibration": [
+    [
+     0.06847710889347494,
+     0.0,
+     12
+    ],
+    [
+     0.15559872854744858,
+     0.13513513513513514,
+     37
+    ],
+    [
+     0.25831524515639126,
+     0.2532467532467532,
+     154
+    ],
+    [
+     0.35653492920384866,
+     0.384,
+     125
+    ],
+    [
+     0.4499215711266653,
+     0.4495798319327731,
+     238
+    ],
+    [
+     0.5473253875520677,
+     0.5381165919282511,
+     223
+    ],
+    [
+     0.6291689884703602,
+     0.6,
+     65
+    ]
+   ],
+   "note": "Blind test: 6 bets, ROI -100.0%. Not proven until it beats the close by more than luck over 60+ blind bets."
+  },
+  "bundesliga": {
+   "sport": "bundesliga",
+   "name": "Bundesliga",
+   "games": 222,
+   "sides": 1554,
+   "window": "Oct 8 - Oct 8, 2026",
+   "weight": 0.8,
+   "min_ev": 0.02,
+   "proven": false,
+   "tune_window": "Dec 12, 2025 - Apr 4, 2026",
+   "blind_window": "Apr 5, 2026 - Sep 20, 2026",
+   "in_sample": {
+    "label": "80% market, 2%+ edge (tuning games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "blind": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 43,
+    "won": 5.0,
+    "lost": 38.0,
+    "units": -26.65,
+    "roi": -0.6197674418604651,
+    "se": 0.16941645934441785
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 23,
+    "won": 6.0,
+    "lost": 17.0,
+    "units": -3.5304347826086957,
+    "roi": -0.15349716446124764,
+    "se": 0.31494159047789955
+   },
+   "early_clv": -0.07971043288206203,
+   "spots": [],
+   "weight_log_loss": [
+    [
+     0.5,
+     0.6313014319453294
+    ],
+    [
+     0.6,
+     0.6309209407788456
+    ],
+    [
+     0.7,
+     0.6306714923818738
+    ],
+    [
+     0.75,
+     0.6305964263033912
+    ],
+    [
+     0.8,
+     0.6305548468824135
+    ],
+    [
+     0.85,
+     0.6305471166892231
+    ],
+    [
+     0.9,
+     0.6305736694846577
+    ],
+    [
+     0.95,
+     0.6306350209876722
+    ]
+   ],
+   "platt": [
+    0.01369786365429516,
+    1.057583570799271
+   ],
+   "best": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "by_weight": [
+    {
+     "label": "50% market",
+     "bets": 35,
+     "won": 14.0,
+     "lost": 21.0,
+     "units": -5.899333233815992,
+     "roi": -0.16855237810902834,
+     "se": 0.19070971713795212
+    },
+    {
+     "label": "60% market",
+     "bets": 12,
+     "won": 2.0,
+     "lost": 10.0,
+     "units": -8.15925925925926,
+     "roi": -0.6799382716049384,
+     "se": 0.2169154318992286
+    },
+    {
+     "label": "70% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
      "label": "75% market",
      "bets": 0,
      "won": 0.0,
@@ -2386,108 +2823,179 @@
    "by_band": [],
    "calibration": [
     [
-     0.16740100480819994,
-     0.2376237623762376,
-     101
+     0.1513144632698326,
+     0.1111111111111111,
+     36
     ],
     [
-     0.2446043493808256,
-     0.25853658536585367,
-     410
+     0.24717979256096437,
+     0.32038834951456313,
+     103
     ],
     [
-     0.36773866041039344,
-     0.38513513513513514,
-     296
+     0.36255867134805736,
+     0.3150684931506849,
+     73
     ],
     [
-     0.4472743220553837,
-     0.4292527821939587,
-     629
+     0.45054191976280666,
+     0.4388888888888889,
+     180
     ],
     [
-     0.5513760609722003,
-     0.5631399317406144,
-     586
+     0.5480443635864306,
+     0.5416666666666666,
+     168
     ],
     [
-     0.618683628037327,
-     0.5454545454545454,
-     176
-    ],
-    [
-     0.7335995678127464,
-     0.6428571428571429,
-     14
+     0.6288089191044073,
+     0.6666666666666666,
+     42
     ]
    ],
-   "note": "Fewer than 30 bets cleared any threshold at the closing line; keeping the 2% default."
+   "note": "Blind test: 0 bets. Not proven until it beats the close by more than luck over 60+ blind bets."
   },
-  "ucl": {
-   "sport": "ucl",
-   "name": "Champions League",
-   "games": 27,
-   "sides": 189,
-   "window": "Apr 11 - Oct 8, 2026",
-   "weight": 0.75,
+  "seriea": {
+   "sport": "seriea",
+   "name": "Serie A",
+   "games": 287,
+   "sides": 2005,
+   "window": "Oct 8 - Oct 8, 2026",
+   "weight": 0.8,
    "min_ev": 0.02,
    "proven": false,
-   "weight_log_loss": [],
-   "platt": null,
+   "tune_window": "Dec 12, 2025 - Apr 11, 2026",
+   "blind_window": "Apr 12, 2026 - Sep 20, 2026",
+   "in_sample": {
+    "label": "80% market, 2%+ edge (tuning games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "blind": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 41,
+    "won": 13.0,
+    "lost": 28.0,
+    "units": 0.6000000000000005,
+    "roi": 0.014634146341463428,
+    "se": 0.27807726105741215
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 37,
+    "won": 11.0,
+    "lost": 26.0,
+    "units": 2.65,
+    "roi": 0.07162162162162163,
+    "se": 0.294936882725472
+   },
+   "early_clv": -0.10706155070204387,
+   "spots": [],
+   "weight_log_loss": [
+    [
+     0.5,
+     0.6372150216635856
+    ],
+    [
+     0.6,
+     0.6356943953508133
+    ],
+    [
+     0.7,
+     0.6344151228134305
+    ],
+    [
+     0.75,
+     0.6338656164186448
+    ],
+    [
+     0.8,
+     0.6333762211210828
+    ],
+    [
+     0.85,
+     0.6329470989618659
+    ],
+    [
+     0.9,
+     0.6325785309174504
+    ],
+    [
+     0.95,
+     0.632270922132088
+    ]
+   ],
+   "platt": [
+    0.0045160558335083254,
+    1.0188720930565447
+   ],
    "best": {
-    "label": "75% market, 2%+ edge",
-    "bets": 5,
-    "won": 1.0,
-    "lost": 4.0,
-    "units": -2.6,
-    "roi": -0.52,
-    "se": 0.48
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
    },
    "by_weight": [
     {
      "label": "50% market",
-     "bets": 13,
-     "won": 3.0,
-     "lost": 10.0,
-     "units": -7.253198653198654,
-     "roi": -0.557938357938358,
-     "se": 0.23790173252574703
+     "bets": 71,
+     "won": 24.0,
+     "lost": 47.0,
+     "units": -7.609076109076109,
+     "roi": -0.10717008604332548,
+     "se": 0.173537861329692
     },
     {
      "label": "60% market",
-     "bets": 9,
-     "won": 1.0,
-     "lost": 8.0,
-     "units": -6.6,
-     "roi": -0.7333333333333333,
-     "se": 0.26666666666666666
+     "bets": 40,
+     "won": 11.0,
+     "lost": 29.0,
+     "units": -10.583333333333334,
+     "roi": -0.26458333333333334,
+     "se": 0.21437412006746723
     },
     {
      "label": "70% market",
-     "bets": 8,
-     "won": 1.0,
-     "lost": 7.0,
-     "units": -5.6,
-     "roi": -0.7,
-     "se": 0.29999999999999993
+     "bets": 10,
+     "won": 0.0,
+     "lost": 10.0,
+     "units": -10.0,
+     "roi": -1.0,
+     "se": 0.0
     },
     {
      "label": "75% market",
-     "bets": 5,
-     "won": 1.0,
-     "lost": 4.0,
-     "units": -2.6,
-     "roi": -0.52,
-     "se": 0.48
+     "bets": 1,
+     "won": 0.0,
+     "lost": 1.0,
+     "units": -1.0,
+     "roi": -1.0,
+     "se": null
     },
     {
      "label": "80% market",
-     "bets": 2,
+     "bets": 0,
      "won": 0.0,
-     "lost": 2.0,
-     "units": -2.0,
-     "roi": -1.0,
-     "se": 0.0
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "85% market",
@@ -2520,123 +3028,944 @@
    "by_min_ev": [
     {
      "label": "0%+ edge",
-     "bets": 8,
-     "won": 1.0,
-     "lost": 7.0,
-     "units": -5.6,
-     "roi": -0.7,
-     "se": 0.29999999999999993
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "1%+ edge",
-     "bets": 7,
-     "won": 1.0,
-     "lost": 6.0,
-     "units": -4.6,
-     "roi": -0.6571428571428571,
-     "se": 0.34285714285714286
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "2%+ edge",
-     "bets": 5,
-     "won": 1.0,
-     "lost": 4.0,
-     "units": -2.6,
-     "roi": -0.52,
-     "se": 0.48
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "3%+ edge",
-     "bets": 2,
+     "bets": 0,
      "won": 0.0,
-     "lost": 2.0,
-     "units": -2.0,
-     "roi": -1.0,
-     "se": 0.0
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "5%+ edge",
-     "bets": 2,
+     "bets": 0,
      "won": 0.0,
-     "lost": 2.0,
-     "units": -2.0,
-     "roi": -1.0,
-     "se": 0.0
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     },
     {
      "label": "8%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_market": [],
+   "by_band": [],
+   "calibration": [
+    [
+     0.07487822920394006,
+     0.0,
+     12
+    ],
+    [
+     0.15590866696104128,
+     0.2222222222222222,
+     54
+    ],
+    [
+     0.25641492490255957,
+     0.2457627118644068,
+     118
+    ],
+    [
+     0.35413093638814636,
+     0.3253968253968254,
+     126
+    ],
+    [
+     0.44924863637486584,
+     0.46601941747572817,
+     206
+    ],
+    [
+     0.5490883502692113,
+     0.5340314136125655,
+     191
+    ],
+    [
+     0.6276773290868988,
+     0.6547619047619048,
+     84
+    ],
+    [
+     0.750346406116729,
+     0.75,
+     12
+    ]
+   ],
+   "note": "Blind test: 0 bets. Not proven until it beats the close by more than luck over 60+ blind bets."
+  },
+  "ligue1": {
+   "sport": "ligue1",
+   "name": "Ligue 1",
+   "games": 215,
+   "sides": 1505,
+   "window": "Oct 8 - Oct 8, 2026",
+   "weight": 0.8,
+   "min_ev": 0.02,
+   "proven": false,
+   "tune_window": "Dec 12, 2025 - Apr 19, 2026",
+   "blind_window": "Apr 19, 2026 - Sep 20, 2026",
+   "in_sample": {
+    "label": "80% market, 2%+ edge (tuning games)",
+    "bets": 3,
+    "won": 1.0,
+    "lost": 2.0,
+    "units": 2.0,
+    "roi": 0.6666666666666666,
+    "se": 1.6666666666666667
+   },
+   "blind": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 3,
+    "won": 0.0,
+    "lost": 3.0,
+    "units": -3.0,
+    "roi": -1.0,
+    "se": 0.0
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 56,
+    "won": 15.0,
+    "lost": 41.0,
+    "units": -7.216666666666667,
+    "roi": -0.12886904761904763,
+    "se": 0.20758110563566315
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 36,
+    "won": 12.0,
+    "lost": 24.0,
+    "units": 4.949999999999999,
+    "roi": 0.13749999999999998,
+    "se": 0.304107952584928
+   },
+   "early_clv": -0.1317853881377791,
+   "spots": [],
+   "weight_log_loss": [
+    [
+     0.5,
+     0.6494321922979424
+    ],
+    [
+     0.6,
+     0.6476679413744079
+    ],
+    [
+     0.7,
+     0.6460903480917546
+    ],
+    [
+     0.75,
+     0.6453712459476548
+    ],
+    [
+     0.8,
+     0.6446985597825795
+    ],
+    [
+     0.85,
+     0.6440723258907131
+    ],
+    [
+     0.9,
+     0.6434926386957533
+    ],
+    [
+     0.95,
+     0.6429596520340016
+    ]
+   ],
+   "platt": [
+    -0.022444298158454955,
+    0.9081519435616295
+   ],
+   "best": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 3,
+    "won": 0.0,
+    "lost": 3.0,
+    "units": -3.0,
+    "roi": -1.0,
+    "se": 0.0
+   },
+   "by_weight": [
+    {
+     "label": "50% market",
+     "bets": 64,
+     "won": 15.0,
+     "lost": 49.0,
+     "units": -22.003462157809984,
+     "roi": -0.343804096215781,
+     "se": 0.17550652129645408
+    },
+    {
+     "label": "60% market",
+     "bets": 51,
+     "won": 13.0,
+     "lost": 38.0,
+     "units": -8.778053830227744,
+     "roi": -0.1721187025534852,
+     "se": 0.22976313968234074
+    },
+    {
+     "label": "70% market",
+     "bets": 27,
+     "won": 4.0,
+     "lost": 23.0,
+     "units": -8.647619047619047,
+     "roi": -0.3202821869488536,
+     "se": 0.3536487689269014
+    },
+    {
+     "label": "75% market",
+     "bets": 18,
+     "won": 3.0,
+     "lost": 15.0,
+     "units": -3.5476190476190474,
+     "roi": -0.1970899470899471,
+     "se": 0.4899574125419431
+    },
+    {
+     "label": "80% market",
+     "bets": 3,
+     "won": 1.0,
+     "lost": 2.0,
+     "units": 2.0,
+     "roi": 0.6666666666666666,
+     "se": 1.6666666666666667
+    },
+    {
+     "label": "85% market",
      "bets": 1,
      "won": 0.0,
      "lost": 1.0,
      "units": -1.0,
      "roi": -1.0,
      "se": null
+    },
+    {
+     "label": "90% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "95% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_min_ev": [
+    {
+     "label": "0%+ edge",
+     "bets": 21,
+     "won": 4.0,
+     "lost": 17.0,
+     "units": -4.678053830227744,
+     "roi": -0.22276446810608302,
+     "se": 0.4250240020463061
+    },
+    {
+     "label": "1%+ edge",
+     "bets": 10,
+     "won": 2.0,
+     "lost": 8.0,
+     "units": -3.0476190476190474,
+     "roi": -0.30476190476190473,
+     "se": 0.5161635323607023
+    },
+    {
+     "label": "2%+ edge",
+     "bets": 3,
+     "won": 1.0,
+     "lost": 2.0,
+     "units": 2.0,
+     "roi": 0.6666666666666666,
+     "se": 1.6666666666666667
+    },
+    {
+     "label": "3%+ edge",
+     "bets": 2,
+     "won": 1.0,
+     "lost": 1.0,
+     "units": 3.0,
+     "roi": 1.5,
+     "se": 2.5
+    },
+    {
+     "label": "5%+ edge",
+     "bets": 1,
+     "won": 0.0,
+     "lost": 1.0,
+     "units": -1.0,
+     "roi": -1.0,
+     "se": null
+    },
+    {
+     "label": "8%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
     }
    ],
    "by_market": [
     {
      "label": "moneyline",
-     "bets": 5,
-     "won": 1.0,
-     "lost": 4.0,
-     "units": -2.6,
-     "roi": -0.52,
-     "se": 0.48
+     "bets": 3,
+     "won": 0.0,
+     "lost": 3.0,
+     "units": -3.0,
+     "roi": -1.0,
+     "se": 0.0
     }
    ],
    "by_band": [
     {
-     "label": "coin flips (-149 to +149)",
-     "bets": 1,
-     "won": 1.0,
-     "lost": 0.0,
-     "units": 1.4,
-     "roi": 1.4,
-     "se": null
-    },
-    {
      "label": "underdogs (+150 or longer)",
-     "bets": 4,
+     "bets": 3,
      "won": 0.0,
-     "lost": 4.0,
-     "units": -4.0,
+     "lost": 3.0,
+     "units": -3.0,
      "roi": -1.0,
      "se": 0.0
     }
    ],
    "calibration": [
     [
-     0.1627203383446677,
-     0.09090909090909091,
-     11
+     0.15463437312500575,
+     0.20512820512820512,
+     39
     ],
     [
-     0.23703202188747424,
-     0.20689655172413793,
-     29
+     0.2509734591618442,
+     0.2777777777777778,
+     108
     ],
     [
-     0.36414640737237947,
-     0.45454545454545453,
-     22
+     0.3622189864092823,
+     0.28169014084507044,
+     71
     ],
     [
-     0.44273786781948316,
-     0.3333333333333333,
+     0.4525037843438475,
+     0.46745562130177515,
+     169
+    ],
+    [
+     0.5473230680131103,
+     0.5398773006134969,
+     163
+    ],
+    [
+     0.6294866488387677,
+     0.6666666666666666,
      48
-    ],
-    [
-     0.5567267625837274,
-     0.7,
-     50
-    ],
-    [
-     0.6238273688878224,
-     0.47058823529411764,
-     17
     ]
    ],
-   "note": "Only 189 graded lines so far; keeping the default 75% market weight."
+   "note": "Blind test: 3 bets, ROI -100.0%. Not proven until it beats the close by more than luck over 60+ blind bets."
+  },
+  "mls": {
+   "sport": "mls",
+   "name": "MLS",
+   "games": 385,
+   "sides": 2695,
+   "window": "Oct 8 - Oct 8, 2026",
+   "weight": 0.8,
+   "min_ev": 0.02,
+   "proven": false,
+   "tune_window": "Mar 1, 2026 - Jul 26, 2026",
+   "blind_window": "Jul 26, 2026 - Oct 7, 2026",
+   "in_sample": {
+    "label": "80% market, 2%+ edge (tuning games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "blind": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 77,
+    "won": 30.0,
+    "lost": 47.0,
+    "units": 2.5488755622188908,
+    "roi": 0.033102280028816766,
+    "se": 0.158739317697486
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 53,
+    "won": 16.0,
+    "lost": 37.0,
+    "units": -13.67548972766364,
+    "roi": -0.2580281080691253,
+    "se": 0.1630016793447986
+   },
+   "early_clv": -0.05322112983695289,
+   "spots": [],
+   "weight_log_loss": [
+    [
+     0.5,
+     0.6520355072476448
+    ],
+    [
+     0.6,
+     0.6499594866557308
+    ],
+    [
+     0.7,
+     0.6480583617265242
+    ],
+    [
+     0.75,
+     0.6471724933911943
+    ],
+    [
+     0.8,
+     0.6463293871520382
+    ],
+    [
+     0.85,
+     0.6455288319438989
+    ],
+    [
+     0.9,
+     0.6447706668968185
+    ],
+    [
+     0.95,
+     0.6440547808017065
+    ]
+   ],
+   "platt": [
+    -0.01213394493397846,
+    0.9515097431890468
+   ],
+   "best": {
+    "label": "80% market, 2%+ edge (blind games)",
+    "bets": 0,
+    "won": 0.0,
+    "lost": 0.0,
+    "units": 0.0,
+    "roi": null,
+    "se": null
+   },
+   "by_weight": [
+    {
+     "label": "50% market",
+     "bets": 74,
+     "won": 22.0,
+     "lost": 52.0,
+     "units": -25.700848385331145,
+     "roi": -0.3473087619639344,
+     "se": 0.12325463547015744
+    },
+    {
+     "label": "60% market",
+     "bets": 33,
+     "won": 5.0,
+     "lost": 28.0,
+     "units": -21.307963875205253,
+     "roi": -0.6456958750062198,
+     "se": 0.15333010955611465
+    },
+    {
+     "label": "70% market",
+     "bets": 4,
+     "won": 0.0,
+     "lost": 4.0,
+     "units": -4.0,
+     "roi": -1.0,
+     "se": 0.0
+    },
+    {
+     "label": "75% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "80% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "85% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "90% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "95% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_min_ev": [
+    {
+     "label": "0%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "1%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "2%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "3%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "5%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "8%+ edge",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_market": [],
+   "by_band": [],
+   "calibration": [
+    [
+     0.16861930751622775,
+     0.21568627450980393,
+     51
+    ],
+    [
+     0.24395950121021476,
+     0.2964824120603015,
+     199
+    ],
+    [
+     0.3684975833184295,
+     0.32857142857142857,
+     140
+    ],
+    [
+     0.4455698843772157,
+     0.4391025641025641,
+     312
+    ],
+    [
+     0.5520791449994165,
+     0.55,
+     300
+    ],
+    [
+     0.6172263281377336,
+     0.5657894736842105,
+     76
+    ],
+    [
+     0.735398708927572,
+     0.6,
+     10
+    ]
+   ],
+   "note": "Blind test: 0 bets. Not proven until it beats the close by more than luck over 60+ blind bets."
+  },
+  "ucl": {
+   "sport": "ucl",
+   "name": "Champions League",
+   "games": 117,
+   "sides": 785,
+   "window": "Oct 8 - Oct 8, 2026",
+   "weight": 0.7,
+   "min_ev": 0.02,
+   "proven": false,
+   "tune_window": "Dec 9, 2025 - Feb 25, 2026",
+   "blind_window": "Mar 10, 2026 - Sep 10, 2026",
+   "in_sample": {
+    "label": "70% market, 2%+ edge (tuning games)",
+    "bets": 20,
+    "won": 4.0,
+    "lost": 16.0,
+    "units": -1.8000000000000003,
+    "roi": -0.09000000000000001,
+    "se": 0.4833082268131417
+   },
+   "blind": {
+    "label": "70% market, 2%+ edge (blind games)",
+    "bets": 16,
+    "won": 4.0,
+    "lost": 12.0,
+    "units": -4.397619047619048,
+    "roi": -0.2748511904761905,
+    "se": 0.34743607714201175
+   },
+   "early_in_sample": {
+    "label": "opening lines (tuning games)",
+    "bets": 20,
+    "won": 7.0,
+    "lost": 13.0,
+    "units": 2.1499999999999995,
+    "roi": 0.10749999999999997,
+    "se": 0.36188968586689796
+   },
+   "early_blind": {
+    "label": "opening lines (blind games)",
+    "bets": 15,
+    "won": 7.0,
+    "lost": 8.0,
+    "units": 0.08148148148148149,
+    "roi": 0.0054320987654320994,
+    "se": 0.2959806225521185
+   },
+   "early_clv": -0.06592093041983482,
+   "spots": [],
+   "weight_log_loss": [
+    [
+     0.5,
+     0.6252872023500511
+    ],
+    [
+     0.6,
+     0.6244095898901808
+    ],
+    [
+     0.7,
+     0.6241657142726802
+    ],
+    [
+     0.75,
+     0.624287277475115
+    ],
+    [
+     0.8,
+     0.6245760412047562
+    ],
+    [
+     0.85,
+     0.625036963157536
+    ],
+    [
+     0.9,
+     0.6256762746612501
+    ],
+    [
+     0.95,
+     0.6265017593311395
+    ]
+   ],
+   "platt": [
+    -0.010607628270482252,
+    0.9571624644548173
+   ],
+   "best": {
+    "label": "70% market, 2%+ edge (blind games)",
+    "bets": 16,
+    "won": 4.0,
+    "lost": 12.0,
+    "units": -4.397619047619048,
+    "roi": -0.2748511904761905,
+    "se": 0.34743607714201175
+   },
+   "by_weight": [
+    {
+     "label": "50% market",
+     "bets": 38,
+     "won": 9.0,
+     "lost": 29.0,
+     "units": -13.209259259259259,
+     "roi": -0.3476120857699805,
+     "se": 0.20749556317113893
+    },
+    {
+     "label": "60% market",
+     "bets": 32,
+     "won": 6.0,
+     "lost": 26.0,
+     "units": -10.25925925925926,
+     "roi": -0.32060185185185186,
+     "se": 0.3124186334843558
+    },
+    {
+     "label": "70% market",
+     "bets": 20,
+     "won": 4.0,
+     "lost": 16.0,
+     "units": -1.8000000000000003,
+     "roi": -0.09000000000000001,
+     "se": 0.4833082268131417
+    },
+    {
+     "label": "75% market",
+     "bets": 11,
+     "won": 1.0,
+     "lost": 10.0,
+     "units": -2.5,
+     "roi": -0.22727272727272727,
+     "se": 0.7727272727272728
+    },
+    {
+     "label": "80% market",
+     "bets": 6,
+     "won": 1.0,
+     "lost": 5.0,
+     "units": 2.5,
+     "roi": 0.4166666666666667,
+     "se": 1.4166666666666665
+    },
+    {
+     "label": "85% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "90% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    },
+    {
+     "label": "95% market",
+     "bets": 0,
+     "won": 0.0,
+     "lost": 0.0,
+     "units": 0.0,
+     "roi": null,
+     "se": null
+    }
+   ],
+   "by_min_ev": [
+    {
+     "label": "0%+ edge",
+     "bets": 32,
+     "won": 7.0,
+     "lost": 25.0,
+     "units": -7.109259259259259,
+     "roi": -0.22216435185185185,
+     "se": 0.32090593296480063
+    },
+    {
+     "label": "1%+ edge",
+     "bets": 26,
+     "won": 6.0,
+     "lost": 20.0,
+     "units": -4.2592592592592595,
+     "roi": -0.16381766381766383,
+     "se": 0.37910005771471983
+    },
+    {
+     "label": "2%+ edge",
+     "bets": 20,
+     "won": 4.0,
+     "lost": 16.0,
+     "units": -1.8000000000000003,
+     "roi": -0.09000000000000001,
+     "se": 0.4833082268131417
+    },
+    {
+     "label": "3%+ edge",
+     "bets": 12,
+     "won": 1.0,
+     "lost": 11.0,
+     "units": -3.5,
+     "roi": -0.2916666666666667,
+     "se": 0.7083333333333334
+    },
+    {
+     "label": "5%+ edge",
+     "bets": 9,
+     "won": 1.0,
+     "lost": 8.0,
+     "units": -0.5,
+     "roi": -0.05555555555555555,
+     "se": 0.9444444444444444
+    },
+    {
+     "label": "8%+ edge",
+     "bets": 8,
+     "won": 1.0,
+     "lost": 7.0,
+     "units": 0.5,
+     "roi": 0.0625,
+     "se": 1.0625
+    }
+   ],
+   "by_market": [
+    {
+     "label": "moneyline",
+     "bets": 16,
+     "won": 4.0,
+     "lost": 12.0,
+     "units": -4.397619047619048,
+     "roi": -0.2748511904761905,
+     "se": 0.34743607714201175
+    }
+   ],
+   "by_band": [
+    {
+     "label": "coin flips (-149 to +149)",
+     "bets": 3,
+     "won": 2.0,
+     "lost": 1.0,
+     "units": 1.3523809523809522,
+     "roi": 0.45079365079365075,
+     "se": 0.7368157539564472
+    },
+    {
+     "label": "underdogs (+150 or longer)",
+     "bets": 13,
+     "won": 2.0,
+     "lost": 11.0,
+     "units": -5.75,
+     "roi": -0.4423076923076923,
+     "se": 0.3903419832727777
+    }
+   ],
+   "calibration": [
+    [
+     0.16435560621963502,
+     0.1,
+     20
+    ],
+    [
+     0.23386394108349182,
+     0.19230769230769232,
+     52
+    ],
+    [
+     0.36152359307262605,
+     0.38461538461538464,
+     39
+    ],
+    [
+     0.4462218813225354,
+     0.45348837209302323,
+     86
+    ],
+    [
+     0.5529641756183047,
+     0.5909090909090909,
+     88
+    ],
+    [
+     0.6266666058503967,
+     0.5357142857142857,
+     28
+    ]
+   ],
+   "note": "Blind test: 16 bets, ROI -27.5%. Not proven until it beats the close by more than luck over 60+ blind bets."
   }
  }
 }
