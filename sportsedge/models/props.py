@@ -28,6 +28,13 @@ class PropProjection:
     games: int
     pmf: Pmf
     notes: list[str] = field(default_factory=list)  # adjustments applied, for display
+    recent: list[float] = field(default_factory=list)  # raw game values, newest first
+
+    def hit_rate(self, side: str, point: float, last: int = 10) -> tuple[int, int]:
+        """(games that cleared the line, games counted) over the player's last ``last`` games."""
+        vals = self.recent[:last]
+        hits = sum(v > point if side == "over" else v < point for v in vals)
+        return hits, len(vals)
 
     def probs(self, side: str, point: float) -> tuple[float, float, float]:
         if side == "over":
@@ -96,7 +103,7 @@ def project_prop(
         pmf = count_pmf(max(mean, 0.01), var)
     else:
         pmf = discrete_gamma_pmf(mean, math.sqrt(var))
-    return PropProjection(player, market, mean, math.sqrt(var), len(values), pmf, list(notes or []))
+    return PropProjection(player, market, mean, math.sqrt(var), len(values), pmf, list(notes or []), values[:10])
 
 
 SHRINK_GAMES = 8.0  # pseudo-games of league average behind each matchup factor

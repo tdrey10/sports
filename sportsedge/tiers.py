@@ -25,6 +25,10 @@ LIVE_TIERS = ("live", "live_win", "live_plus")
 UNIT_TIERS = ("lock", "dog", "prop", "value", "early") + LIVE_TIERS
 
 LOCK_MIN_ODDS = -250  # a lock still has to be worth the juice
+# The Lock of the Day is the safest pick, not the biggest edge, so it must clear every check:
+LOCK_MIN_PROB = 0.58  # model alone gives it at least this
+LOCK_MAX_GAP = 0.06  # model and the no-vig market agree to within 6 points
+LOCK_MIN_GAMES = 6  # both teams have enough games this season to trust their ratings
 DOG_MIN_ODDS = 120
 DOG_MAX_ODDS = 350  # past this the variance swamps the edge for a headline pick
 PROP_ODDS_RANGE = (-200, 200)
@@ -96,8 +100,20 @@ def build_cards(
     later = [p for p in candidates if p.commence_time > soon_cut]
     chosen: list[tuple[str, Pick]] = []
 
+    def solid(p: Pick) -> bool:
+        scan = by_event.get(p.event_id)
+        ctx = scan.contexts.get(p.event_id) if scan else None
+        if p.warnings or p.market_prob is None or p.model_prob < LOCK_MIN_PROB:
+            return False
+        if abs(p.model_prob - p.market_prob) > LOCK_MAX_GAP or p.market_prob < 0.5:
+            return False
+        if scan is None or ctx is None or scan.ratings is None:
+            return False
+        played = scan.ratings.games_played
+        return played.get(ctx.home, 0) >= LOCK_MIN_GAMES and played.get(ctx.away, 0) >= LOCK_MIN_GAMES
+
     if "lock" not in taken:
-        locks = [p for p in soon if p.american >= LOCK_MIN_ODDS]
+        locks = [p for p in soon if p.american >= LOCK_MIN_ODDS and solid(p)]
         if locks:
             lock = max(locks, key=lambda p: (p.win_prob, p.ev))
             chosen.append(("lock", lock))
@@ -140,6 +156,10 @@ def build_cards(
     for tier, pick in chosen:
         scan = by_event.get(pick.event_id)
         headline, bullets = reasons(pick, scan) if scan else ("", [])
+        if tier == "lock":
+            bullets.insert(0, f"Passed every Lock check: our model ({pick.model_prob:.0%}) and the market "
+                              f"({pick.market_prob:.0%}) agree, no data warnings, and both teams have "
+                              f"{LOCK_MIN_GAMES}+ games this season.")
         ctx = scan.contexts.get(pick.event_id) if scan else None
         cards.append(
             Card(

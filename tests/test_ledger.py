@@ -304,3 +304,24 @@ def test_cli_page_from_saved_ledger(tmp_path):
 def test_longshots_capped_at_half_unit():
     assert units_for(make_pick(american=600, kelly=0.03)) == 0.5
     assert units_for(make_pick(american=250, kelly=0.03)) == 3.0
+
+
+def test_cards_show_the_numbers_and_locks_pass_every_check():
+    from sportsedge.tiers import LOCK_MAX_GAP, LOCK_MIN_PROB
+
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(c, props=True) for c in resolve("nba,nhl,mlb")]
+    cards = build_cards(scans, engine.settings, provider.now)
+    games = [c for c in cards if not c.pick.is_prop]
+    assert games and all(any(r.startswith("Season ") for r in c.reasons) for c in games)
+    assert all(any(r.startswith("Last 5") for r in c.reasons) for c in games)
+    team_picks = [c for c in games if c.pick.market in ("h2h", "spreads") and c.pick.side in ("home", "away")]
+    assert team_picks and all(any(r.startswith("Upset") for r in c.reasons) for c in team_picks)
+    for c in cards:
+        if c.tier == "lock":
+            p = c.pick
+            assert p.model_prob >= LOCK_MIN_PROB and not p.warnings
+            assert abs(p.model_prob - p.market_prob) <= LOCK_MAX_GAP
+    props = [c for c in cards if c.pick.is_prop]
+    assert props and all("of the last" in c.pick.projection for c in props)
