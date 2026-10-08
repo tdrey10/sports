@@ -252,7 +252,8 @@ class EspnOdds:
     def events(self, cfg: SportConfig, days_ahead: float = 4) -> list[Event]:
         now = datetime.now(timezone.utc)
         games = self.espn.game_results(cfg, now - timedelta(hours=6), now + timedelta(days=days_ahead))
-        upcoming = [g for g in games if not g.completed and g.state in ("", "pre") and g.date > now]
+        # A game with no start time yet waits: its placeholder time would put it on the wrong day.
+        upcoming = [g for g in games if not g.completed and g.state in ("", "pre") and g.date > now and not g.time_tbd]
         out = []
         for g in upcoming:
             quotes = self.game_quotes(cfg, g.event_id)

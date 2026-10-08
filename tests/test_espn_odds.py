@@ -120,3 +120,25 @@ def test_mlb_inline_odds_are_read_without_following_the_link():
     events = EspnOdds(espn).events(SPORTS["mlb"])
     assert len(events) == 1 and by(events[0].quotes)[("h2h", "home")].american == 114
     assert not any("/odds/100" in url for url, _, _ in espn.calls)
+
+
+def test_games_without_a_start_time_wait():
+    now = datetime.now(timezone.utc)
+    tbd = GameResult("601", now + timedelta(days=2), "Milwaukee Brewers", "Los Angeles Dodgers", None, None,
+                     state="pre", time_tbd=True)
+    espn = FakeEspn({"/odds": {"items": [dict(DK_NFL, **{"$ref": "http://core/odds/100"})]}}, games=[tbd])
+    assert EspnOdds(espn).events(SPORTS["mlb"]) == []
+
+
+def test_time_valid_false_marks_tbd():
+    from sportsedge.data.espn import _parse_event
+
+    ev = {"id": "1", "date": "2026-10-11T04:00Z", "status": {"type": {"state": "pre"}},
+          "competitions": [{"timeValid": False, "competitors": [
+              {"homeAway": "home", "team": {"displayName": "Milwaukee Brewers"}},
+              {"homeAway": "away", "team": {"displayName": "Los Angeles Dodgers"}}]}]}
+    assert _parse_event(ev).time_tbd
+    ev["competitions"][0]["timeValid"] = True
+    assert _parse_event(ev).time_tbd  # still midnight Eastern: ESPN's TBD slot
+    ev["date"] = "2026-10-11T20:08Z"
+    assert not _parse_event(ev).time_tbd

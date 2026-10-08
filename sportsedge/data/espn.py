@@ -163,6 +163,14 @@ class EspnClient:
         return out
 
 
+def _midnight_eastern(iso: str) -> bool:
+    """No game in our leagues starts at exactly midnight Eastern: that is ESPN's 'time TBD' slot."""
+    from zoneinfo import ZoneInfo
+
+    t = parse_date(iso).astimezone(ZoneInfo("America/New_York"))
+    return (t.hour, t.minute) == (0, 0)
+
+
 def _parse_event(ev: dict) -> GameResult | None:
     # Preseason games (season type 1) are mostly backups and say little about real strength.
     season = ev.get("season") or {}
@@ -198,6 +206,8 @@ def _parse_event(ev: dict) -> GameResult | None:
         away_score=as_ if final else None,
         neutral=bool(comp.get("neutralSite", False)),
         state="post" if completed else state,
+        # ESPN marks a game with no start time yet as timeValid false and parks it at midnight Eastern.
+        time_tbd=comp.get("timeValid") is False or ev.get("timeValid") is False or _midnight_eastern(ev["date"]),
         detail=status.get("shortDetail") or status.get("detail") or "",
         live_home=hs if live else None,
         live_away=as_ if live else None,
