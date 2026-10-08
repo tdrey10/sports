@@ -1,13 +1,15 @@
 name: SportsEdge
 
 # Everything runs on free ESPN data (stats plus DraftKings lines). No API key or paid plan needed.
-# GitHub's free plan gives private repos 2,000 Actions minutes a month. The hourly run takes about a
-# minute and the daily study up to 30, so this schedule stays inside it.
+# GitHub's free plan gives private repos 2,000 Actions minutes a month. Each refresh takes about a
+# minute (26 a day) and the daily study up to 21, about 1,400 minutes a month in all.
 on:
   schedule:
-    # Every hour, 4 AM to midnight Pacific: live-bet check, fresh odds, new picks, line tracking,
-    # scores and grading. The 13:15 UTC run puts the Lock and Dog on the page by 8 AM Pacific.
-    - cron: "15 0-6,11-23 * * *"
+    # Each refresh: live-bet check, fresh odds and injuries, new picks, line tracking, scores, grading.
+    # Every 30 minutes from 8 AM to 8 PM Pacific, when lines move and games start.
+    - cron: "15,45 0-2,15-23 * * *"
+    # Hourly early morning and late evening. The 13:15 UTC run posts the Lock and Dog by 8 AM Pacific.
+    - cron: "15 3-6,11-14 * * *"
     - cron: "47 15 * * *"      # daily studies + NFL and NBA player props (8:47 AM Pacific)
   workflow_dispatch:
     inputs:
@@ -54,7 +56,7 @@ jobs:
       - run: pip install -e .
 
       - name: Live bets, scores and grading
-        if: github.event.schedule == '15 0-6,11-23 * * *'
+        if: github.event_name == 'schedule' && github.event.schedule != '47 15 * * *'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: hambino live nfl,nba,mlb,nhl,soccer --once --notify

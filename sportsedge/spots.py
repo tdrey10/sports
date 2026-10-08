@@ -16,7 +16,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from .data.base import NameMatcher
-from .models.ratings import GameResult
+from .models.ratings import B2B_HOURS, GameResult
 
 DOG_RANGE = (100, 220)
 MAX_DOG_BUMP = 0.06
@@ -84,6 +84,7 @@ SPOTS = {
         Spot("mnf_dog", "Monday night NFL dog", ("nfl",)),
         Spot("east_traveler_dog", "East Coast team flying West (as the dog)", ("nfl", "nba", "nhl", "mlb")),
         Spot("west_host_dog", "West Coast home dog vs a team flying in from the East", ("nfl", "nba", "nhl", "mlb")),
+        Spot("rested_dog", "Rested dog vs a team on the second night of a back-to-back", ("nba", "ncaab", "nhl")),
         Spot("blowout_dog", "Dog that blew someone out last game", ("nfl", "ncaaf", "nba", "ncaab", "mlb", "nhl")),
         Spot("wind_under", "Wind 15+ mph at an outdoor stadium: under", ("nfl", "mlb"), market="totals"),
         Spot("steam_dog", "Dog the money moved early (bet before the close)",
@@ -125,6 +126,9 @@ def team_spots(sport: str, home: str, away: str, start: datetime, results: list[
         if "bye_dog" in _active(sport) and rest[side] is not None and rest[other] is not None \
                 and rest[side] >= 12 and rest[other] <= 9:
             out[side].append("bye_dog")
+        if "rested_dog" in _active(sport) and rest[side] is not None and rest[other] is not None \
+                and rest[side] >= 1.5 and rest[other] * 24 <= B2B_HOURS:
+            out[side].append("rested_dog")
         if "mnf_dog" in _active(sport) and start.astimezone(EASTERN).weekday() == 0:
             out[side].append("mnf_dog")
         margin = _last_margin(results, team, start)

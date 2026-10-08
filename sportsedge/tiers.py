@@ -80,6 +80,44 @@ def is_proven(pick: Pick, settings: Settings | None) -> bool:
     return settings is None or settings.proven is None or market_key(pick) in settings.proven
 
 
+TRACK_MIN_BETS = 30
+
+
+def price_band(american: float) -> str:
+    """The studies' price bands (see study.band)."""
+    if american <= -150:
+        return "favorites (-150 or shorter)"
+    if american < 150:
+        return "coin flips (-149 to +149)"
+    return "underdogs (+150 or longer)"
+
+
+def track_records(pick: Pick, settings: Settings | None) -> list[tuple[str, dict]]:
+    """Blind study records for bets like this one: same sport and bet type, same price band."""
+    if settings is None or pick.is_prop:
+        return []
+    keys = [(STUDY_MARKET.get(pick.market, pick.market), market_key(pick)),
+            (price_band(pick.american).split(" (")[0], f"{pick.sport}:{price_band(pick.american)}")]
+    return [(label, settings.track[k]) for label, k in keys
+            if k in settings.track and (settings.track[k].get("bets") or 0) >= TRACK_MIN_BETS]
+
+
+def losing_kind(pick: Pick, settings: Settings | None) -> str | None:
+    """The kind of bet (bet type or price band) that lost in the blind study by more than luck, if any."""
+    for label, r in track_records(pick, settings):
+        if r.get("roi") is not None and r["roi"] + (r.get("se") or 0.0) < 0:
+            return label
+    return None
+
+
+def track_line(pick: Pick, settings: Settings | None) -> str | None:
+    recs = track_records(pick, settings)
+    if not recs:
+        return None
+    parts = [f"{label} {r['won']:.0f}-{r['lost']:.0f} ({r['roi']:+.1%})" for label, r in recs if r.get("roi") is not None]
+    return "Blind study, bets like this in " + pick.sport.upper() + ": " + ", ".join(parts) + "." if parts else None
+
+
 def units_for(pick: Pick, settings: Settings | None = None) -> float:
     """Quarter-Kelly stake as units (1 unit = 1% of bankroll), rounded to half units.
 
@@ -137,6 +175,8 @@ def build_cards(
         ctx = scan.contexts.get(p.event_id) if scan else None
         if p.warnings or p.market_prob is None or p.model_prob < LOCK_MIN_PROB:
             return False
+        if losing_kind(p, settings):
+            return False  # the blind study says this kind of bet loses
         if abs(p.model_prob - p.market_prob) > LOCK_MAX_GAP or p.market_prob < LOCK_MIN_MARKET:
             return False
         score, cash, cal_ev = edge_score(p, settings)
@@ -229,6 +269,7 @@ def build_cards(
         p for tier, p in chosen
         if tier in UNIT_TIERS and id(p) not in lean_ids and p.commence_time <= soon_cut and not p.warnings
         and scores[id(p)][0] >= BEST_MIN_SCORE and scores[id(p)][2] > 0
+        and not losing_kind(p, settings)  # the studies say this kind of bet loses: not a best bet
     ]
     ranked = sorted(contenders, key=lambda p: scores[id(p)][0], reverse=True)[:slots]
     best_rank = {id(p): best_taken + i + 1 for i, p in enumerate(ranked)}
@@ -255,6 +296,12 @@ def build_cards(
                 bullets.append(f"Spot: {SPOTS[key].label}"
                                + (" (proven blind: weighted into the read)." if proven
                                   else " (tracked; not proven blind yet, so it adds nothing to the read)."))
+        if tier in UNIT_TIERS and id(pick) not in lean_ids:
+            if line := track_line(pick, settings):
+                bullets.append(line)
+            if (kind := losing_kind(pick, settings)) and not best_rank.get(id(pick)):
+                bullets.append(f"Left out of Top bets: {kind} bets in this sport lost in the blind study "
+                               "by more than luck.")
         if tier in UNIT_TIERS and not is_proven(pick, settings):
             bullets.append("Sized at ½ unit: this sport and bet type hasn't beaten the closing line in a blind test yet.")
         if ctx and ctx.injuries_unknown:

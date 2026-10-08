@@ -130,3 +130,19 @@ def test_a_lock_must_pass_every_strict_check():
             p = c.pick
             assert p.model_prob >= LOCK_MIN_PROB and p.market_prob >= LOCK_MIN_MARKET
             assert p.win_prob >= LOCK_MIN_CASH - 0.05 and p.american >= -150 and not p.warnings
+
+
+def test_bets_the_blind_study_says_lose_are_flagged():
+    from sportsedge.tiers import losing_kind, track_line
+
+    pick = make_pick(sport="nba", market="spreads", american=-110)
+    losing = {"bets": 120, "won": 50, "lost": 70, "roi": -0.12, "se": 0.05}
+    luck = {"bets": 120, "won": 58, "lost": 62, "roi": -0.03, "se": 0.09}
+    assert losing_kind(pick, Settings()) is None  # no studies: nothing to go on
+    assert losing_kind(pick, Settings(track={"nba:spreads": luck})) is None  # within luck
+    assert losing_kind(pick, Settings(track={"nba:spreads": losing})) == "spreads"
+    assert losing_kind(pick, Settings(track={"nba:coin flips (-149 to +149)": losing})) == "coin flips"
+    assert losing_kind(pick, Settings(track={"nfl:spreads": losing})) is None  # other sport
+    small = dict(losing, bets=12)
+    assert losing_kind(pick, Settings(track={"nba:spreads": small})) is None  # too few bets to judge
+    assert "spreads 58-62 (-3.0%)" in track_line(pick, Settings(track={"nba:spreads": luck}))

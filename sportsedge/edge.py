@@ -40,6 +40,9 @@ class Settings:
     max_favorite: float = -150  # never bet a price worse than this: big favorites kill ROI
     spot_weights: dict[str, float] = field(default_factory=dict)  # "sport:spot" -> win-chance bump, proven spots only
     proven: set[str] | None = None  # "sport:market" proven blind; None = no studies loaded (no sizing cap)
+    # Blind study records: "sport:moneyline" / "sport:coin flips (-149 to +149)" ->
+    # {"bets", "won", "lost", "roi", "se"}. Best bets skip a kind of bet that lost beyond luck.
+    track: dict[str, dict] = field(default_factory=dict)
 
     def min_ev_for(self, pick: "Pick") -> float:
         if pick.is_prop:
