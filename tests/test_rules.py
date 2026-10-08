@@ -102,3 +102,15 @@ def test_a_lock_and_a_dog_every_morning_lean_when_nothing_qualifies():
     assert "lock" not in ledger.taken_today(provider.now)
     again = build_cards(scans, strict, provider.now, taken_today=ledger.taken_today(provider.now))
     assert not [c for c in again if c.tier in ("lock", "dog")]  # no second lean the same day
+
+
+def test_lock_and_dog_even_when_no_side_shows_an_edge():
+    provider = SampleProvider(seed=5)
+    strict = Settings(min_ev=0.5)
+    engine = Engine(provider, strict, now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    for scan in scans:
+        for p in scan.picks:
+            p.ev = -0.02  # the market is right about everything today
+    heads = {c.tier: c for c in build_cards(scans, strict, provider.now) if c.tier in ("lock", "dog")}
+    assert set(heads) == {"lock", "dog"} and all(c.units == 0 for c in heads.values())
