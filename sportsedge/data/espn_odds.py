@@ -211,17 +211,37 @@ class EspnOdds:
         on the side that lost, which would wreck any study."""
         # One request: the DraftKings pregame object directly. 404 = ESPN has no odds
         # for that game (saved as none, never asked again); other errors = try later.
-        url = f"{self._core_base(cfg, event_id)}/{PREGAME_PROVIDER}"
+        # Usually one request: the DraftKings pregame object directly. Some leagues (MLB)
+        # only list it inline, so a 404 falls back to the listing. Nothing in either =
+        # ESPN has no odds for that game (saved as none); network errors = try later.
+        base = self._core_base(cfg, event_id)
         try:
-            o = self.espn._get(url, {}, ttl=None)
+            o = self.espn._get(f"{base}/{PREGAME_PROVIDER}", {}, ttl=None)
         except requests.HTTPError as exc:
-            if exc.response is not None and exc.response.status_code == 404:
-                return []
-            log.info("ESPN closing odds %s unavailable: %s", event_id, exc)
-            return None
+            if exc.response is None or exc.response.status_code != 404:
+                log.info("ESPN closing odds %s unavailable: %s", event_id, exc)
+                return None
+            o = None
         except requests.RequestException as exc:
             log.info("ESPN closing odds %s unavailable: %s", event_id, exc)
             return None
+        if o is None:
+            try:
+                listing = self.espn._get(base, {}, ttl=None)
+            except requests.HTTPError as exc:
+                if exc.response is not None and exc.response.status_code == 404:
+                    return []
+                return None
+            except requests.RequestException:
+                return None
+            for item in listing.get("items", []) or []:
+                ref = item.get("$ref", "")
+                pid = str((item.get("provider") or {}).get("id") or ref.rstrip("/").split("?")[0].rsplit("/", 1)[-1])
+                if pid == PREGAME_PROVIDER:
+                    o = item if "homeTeamOdds" in item else None
+                    break
+            if o is None:
+                return []
         return parse_provider_odds(o, book="draftkings") + parse_open_odds(o)
 
     def _event(self, cfg: SportConfig, g: GameResult, quotes: list[Quote]) -> Event:

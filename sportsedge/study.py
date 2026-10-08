@@ -42,6 +42,7 @@ MIN_EVS = (0.0, 0.01, 0.02, 0.03, 0.05, 0.08)
 MIN_BETS = 30  # a setting needs at least this many bets before its result counts
 PROVEN_BETS = 60  # and a sport needs this many before it counts as beating the close
 STUDY_BOOK = "draftkings"
+CHECK_VERSION = "checked-v2"
 OPEN_BOOK = "draftkings_open"
 MIN_CALIBRATION_SIDES = 300
 STUDY_DAYS = 730  # about two seasons: judge a sport on thousands of games, never a few nights
@@ -660,10 +661,17 @@ class ClosingHistory:
         """Download missing closing lines, newest first, within the budget."""
         store = self._sport(cfg.key)
         done = 0
+
         def missing(g: GameResult) -> bool:
-            # New game, or saved before opening lines were kept (fetched once more for them).
+            # New game; or saved before opening lines were kept; or saved with no closing
+            # line by an older version that couldn't read MLB's odds (checked once more).
             rows = store.get(g.event_id)
-            return rows is None or (rows and not any(r[3] == OPEN_BOOK for r in rows))
+            if rows is None:
+                return True
+            checked = {r[1] for r in rows if r[0] == "meta"}
+            has_close = any(r[3] == STUDY_BOOK for r in rows)
+            has_open = any(r[3] == OPEN_BOOK and r[0] != "meta" for r in rows)
+            return CHECK_VERSION not in checked and (not has_close or not has_open)
 
         for g in sorted((g for g in games if g.completed and missing(g)), key=lambda g: g.date, reverse=True):
             if self.fetched >= self.budget or (limit is not None and done >= limit) or self._late():
@@ -674,7 +682,10 @@ class ClosingHistory:
             if quotes is None:
                 continue
             rows = [[q.market, q.side, q.point, q.book, q.american] for q in quotes]
-            rows.append(["meta", "open-checked", None, OPEN_BOOK, 0])  # don't ask again if ESPN has no open
+            old = store.get(g.event_id) or []
+            if not any(r[3] == STUDY_BOOK for r in rows):
+                rows += [r for r in old if r[3] == STUDY_BOOK]  # never lose a close we already had
+            rows.append(["meta", CHECK_VERSION, None, OPEN_BOOK, 0])  # don't ask again
             store[g.event_id] = rows
             self._dirty.add(cfg.key)
 
@@ -689,10 +700,16 @@ class ClosingHistory:
         return [Quote(m, side, point, book, price) for m, side, point, book, price in rows if book == STUDY_BOOK]
 
     def open_quotes(self, cfg: SportConfig, game: GameResult) -> list[Quote]:
-        """Opening DraftKings lines (moneyline and spread), where ESPN kept them."""
+        """Opening DraftKings lines (moneyline and spread), where ESPN kept them.
+
+        A 3-way (soccer) moneyline with no opening draw price can't be devigged, so
+        it is left out rather than priced as if it had two sides."""
         rows = self._sport(cfg.key).get(game.event_id) or []
-        return [Quote(m, side, point, STUDY_BOOK, price) for m, side, point, book, price in rows
-                if book == OPEN_BOOK and m != "meta"]
+        quotes = [Quote(m, side, point, STUDY_BOOK, price) for m, side, point, book, price in rows
+                  if book == OPEN_BOOK and m != "meta"]
+        if cfg.draws and not any(q.market == "h2h" and q.side == "draw" for q in quotes):
+            quotes = [q for q in quotes if q.market != "h2h"]
+        return quotes
 
     def save(self) -> None:
         import json

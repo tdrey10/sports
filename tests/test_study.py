@@ -109,3 +109,48 @@ def test_history_ignores_final_in_game_prices(tmp_path):
     game = GameResult("g1", datetime(2026, 9, 1, tzinfo=timezone.utc), "A", "B", 2, 0)
     quotes = history.quotes(SPORTS["epl"], game)
     assert len(quotes) == 3 and {q.book for q in quotes} == {"draftkings"}
+
+
+def test_mlb_style_inline_odds_and_never_losing_a_saved_close(tmp_path):
+    import requests
+
+    from sportsedge.data.espn_odds import EspnOdds
+    from sportsedge.models.ratings import GameResult
+
+    inline = {"items": [{"provider": {"id": "100"}, "homeTeamOdds": {"moneyLine": -150},
+                         "awayTeamOdds": {"moneyLine": 130}}]}
+
+    class Resp:
+        status_code = 404
+
+    class Espn:
+        def _get(self, url, params, ttl):
+            if url.endswith("/100"):
+                raise requests.HTTPError(response=Resp())
+            return inline
+
+    quotes = EspnOdds(Espn()).closing_quotes(SPORTS["mlb"], "1")
+    assert sorted((q.side, q.american) for q in quotes) == [("away", 130.0), ("home", -150.0)]
+
+    # A game saved earlier with a close but no opening line is checked once more; if the
+    # new answer has no close, the saved one is kept.
+    (tmp_path / "mlb.json").write_text(json.dumps({"g": [
+        ["h2h", "home", None, "draftkings", -150], ["h2h", "away", None, "draftkings", 130],
+        ["meta", "open-checked", None, "draftkings_open", 0]]}))
+    history = ClosingHistory(tmp_path, lambda cfg, g: [], budget=10)
+    game = GameResult("g", datetime(2026, 6, 1, tzinfo=timezone.utc), "A", "B", 3, 2)
+    history.prefetch(SPORTS["mlb"], [game])
+    assert history.fetched == 1 and len(history.quotes(SPORTS["mlb"], game)) == 2
+    history.prefetch(SPORTS["mlb"], [game])
+    assert history.fetched == 1  # checked once, never again
+
+
+def test_soccer_opening_moneyline_without_a_draw_is_left_out(tmp_path):
+    from sportsedge.models.ratings import GameResult
+
+    (tmp_path / "epl.json").write_text(json.dumps({"g": [
+        ["h2h", "home", None, "draftkings_open", 230], ["h2h", "away", None, "draftkings_open", 100],
+        ["spreads", "home", 0.5, "draftkings_open", -135], ["spreads", "away", -0.5, "draftkings_open", -110]]}))
+    history = ClosingHistory(tmp_path, lambda cfg, g: None)
+    game = GameResult("g", datetime(2026, 6, 1, tzinfo=timezone.utc), "A", "B", 1, 1)
+    assert {q.market for q in history.open_quotes(SPORTS["epl"], game)} == {"spreads"}
