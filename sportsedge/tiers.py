@@ -145,16 +145,28 @@ def build_cards(
     # does, the closest one is still posted as a lean: no units, tracked with the leans so
     # the betting record stays honest. A real one later in the day still posts.
     lean_ids: set[int] = set()
-    open_game = [
-        p for p in game
-        if now < p.commence_time <= soon_cut and not p.warnings and p.ev > 0 and p.american >= settings.max_favorite
-    ]
+
+    def lean_pool(extra=lambda p: True) -> list[Pick]:
+        """Today's sides for a lean head pick: a positive edge if any game has one, otherwise
+        the best of what is on the board (still a lean: no units), so there is one every day.
+        Games with unknown injuries are a last resort."""
+        base = [p for p in game + [b for b in blocked if not b.is_prop]
+                if now < p.commence_time <= soon_cut and not p.warnings and p.american >= settings.max_favorite
+                and extra(p)]
+        for tier_pool in (
+            [p for p in base if p.ev > 0 and p.event_id not in unknown],
+            [p for p in base if p.event_id not in unknown],
+            base,
+        ):
+            if tier_pool:
+                return tier_pool
+        return []
     if "lock" not in taken:
         locks = [p for p in soon if p.american >= LOCK_MIN_ODDS and solid(p)]
         if locks:
             chosen.append(("lock", max(locks, key=lambda p: (p.win_prob, p.ev))))
         elif "lock_lean" not in taken:
-            near = [p for p in open_game if p.win_prob >= 0.5 and p.market in ("h2h", "spreads")]
+            near = lean_pool(lambda p: p.win_prob >= 0.5 and p.market in ("h2h", "spreads"))
             if near:
                 lock = max(near, key=lambda p: (p.win_prob, p.ev))
                 chosen.append(("lock", lock))
@@ -165,8 +177,8 @@ def build_cards(
         if dogs:
             chosen.append(("dog", max(dogs, key=lambda p: p.ev)))
         elif "dog_lean" not in taken:
-            near = [p for p in open_game if p.market == "h2h" and DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS
-                    and id(p) not in used_now]
+            near = lean_pool(lambda p: p.market == "h2h" and DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS
+                             and id(p) not in used_now)
             if near:
                 dog = max(near, key=lambda p: p.ev)
                 chosen.append(("dog", dog))
