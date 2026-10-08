@@ -63,7 +63,8 @@ jobs:
       # calibration per sport, and save each game's closing line so it is downloaded once.
       - name: Studies
         if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
-        run: hambino study nfl,nba,mlb,nhl,soccer --budget 3000
+        run: hambino study nfl,ncaaf,nba,ncaab,mlb,nhl,soccer --budget 5000 --minutes 30
+        timeout-minutes: 45
 
       - name: Full engine cycle
         if: github.event.schedule != '41 0-6,11-23 * * *'
@@ -80,7 +81,10 @@ jobs:
           git config user.name "sportsedge-bot"
           git config user.email "sportsedge-bot@users.noreply.github.com"
           git add data/ledger.json data/brain.json
-          git add data/studies.json data/history data/games data/odds data/props 2>/dev/null || true
+          # One path at a time: git add fails as a whole if any path is missing.
+          for p in data/studies.json data/history data/games data/odds data/props; do
+            if [ -e "$p" ]; then git add "$p"; fi
+          done
           git diff --cached --quiet || git commit -m "Update pick ledger"
           git pull --rebase --autostash && git push
 

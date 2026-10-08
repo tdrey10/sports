@@ -9,6 +9,7 @@ from importlib import resources
 from pathlib import Path
 
 from .brain import BrainReport
+from .spots import SPOTS
 from .ledger import Ledger
 from .sports import SportConfig
 
@@ -46,6 +47,7 @@ def build_data(
         "brains": [b.to_dict() for b in brains.values()],
         "weights": weights,
         "studies": [s.to_dict() for s in (studies or {}).values()],
+        "spot_labels": {k: s.label for k, s in SPOTS.items()},
     }
 
 

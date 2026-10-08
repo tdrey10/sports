@@ -78,3 +78,12 @@ def kelly_fraction(p_win: float, p_loss: float, decimal: float) -> float:
         return 0.0
     f = (b * p_win - p_loss) / (b * (p_win + p_loss))
     return max(0.0, f)
+
+
+def no_vig(prices: dict[str, float], method: str = "power") -> dict[str, float]:
+    """{side: American price} for one market -> {side: fair probability}, vig removed."""
+    if len(prices) < 2:
+        return {}
+    sides = list(prices)
+    fair = devig([implied_prob(prices[s]) for s in sides], method)
+    return dict(zip(sides, fair))

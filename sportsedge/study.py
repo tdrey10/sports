@@ -205,6 +205,7 @@ class SportStudy:
     early_in_sample: Result | None = None  # betting the opening line instead of the close
     early_blind: Result | None = None
     early_clv: float | None = None  # average value of the opening price against the closing no-vig line
+    spots: list[dict] = field(default_factory=list)  # one tracked record per early-bet spot (see spots.py)
     weight_log_loss: list[tuple[float, float]] = field(default_factory=list)  # (weight, log loss per side)
     platt: tuple[float, float] | None = None
     best: Result | None = None  # the chosen setting's record
@@ -343,6 +344,69 @@ def study_sides(sides: list[Side], cfg: SportConfig, games: int, window: str,
     return st
 
 
+# ------------------------------------------------------------------- spots
+def spot_bets(cfg: SportConfig, results: list[GameResult], close_for, open_for, start: datetime,
+              end: datetime) -> list[tuple[str, str, Side]]:
+    """(spot key, 'open' or 'close', bet) for every dog (+100 to +220) moneyline in a spot.
+
+    No model involved: each spot is judged purely on what betting it would have done.
+    """
+    from .odds import no_vig
+    from .spots import is_dog_price, team_spots
+
+    out: list[tuple[str, str, Side]] = []
+    done = sorted((g for g in results if g.completed and start <= g.date < end), key=lambda g: g.date)
+    for g in done:
+        spots = team_spots(cfg.key, g.home, g.away, g.date, results, g.neutral)
+        if not spots["home"] and not spots["away"]:
+            continue
+        close = {q.side: q.american for q in close_for(g) if q.market == "h2h"}
+        opened = {q.side: q.american for q in open_for(g) if q.market == "h2h"}
+        fair = no_vig(close)
+        winner = "home" if g.home_score > g.away_score else "away" if g.away_score > g.home_score else "draw"
+        for side in ("home", "away"):
+            for key in spots[side]:
+                for at, prices in (("close", close), ("open", opened)):
+                    price = prices.get(side)
+                    if price is None or not is_dog_price(price):
+                        continue
+                    won = winner == side
+                    out.append((key, at, Side(cfg.key, g.event_id, "h2h", side, price, fair.get(side, 0.5),
+                                              fair.get(side), 0.0, float(won), 0.0, float(not won),
+                                              date=g.date.isoformat())))
+    return out
+
+
+def study_spots(bets: list[tuple[str, str, Side]]) -> list[dict]:
+    from .spots import SPOTS
+
+    rows = []
+    for key, spot in SPOTS.items():
+        close = [s for k, at, s in bets if k == key and at == "close"]
+        opened = [s for k, at, s in bets if k == key and at == "open"]
+        if not close and not opened:
+            continue
+        c_tune, c_blind = split_blind(close)
+        o_tune, o_blind = split_blind(opened)
+        fair = {(s.event_id, s.side): s.market_prob for s in close}
+        clv = [fair[(s.event_id, s.side)] * american_to_decimal(s.american) - 1
+               for s in opened if fair.get((s.event_id, s.side)) is not None]
+        # Weight if it holds up: how much more often the spot won than the close said (tuning games).
+        excess = None
+        if c_tune:
+            excess = sum(s.win for s in c_tune) / len(c_tune) - sum(s.market_prob or 0 for s in c_tune) / len(c_tune)
+        blind_open, blind_close = summarize("open, blind", o_blind), summarize("close, blind", c_blind)
+        proven = any(r.bets >= PROVEN_BETS and r.score > 0 for r in (blind_open, blind_close))
+        rows.append({
+            "key": key, "label": spot.label,
+            "close_tuned": asdict(summarize("close, tuned", c_tune)), "close_blind": asdict(blind_close),
+            "open_tuned": asdict(summarize("open, tuned", o_tune)), "open_blind": asdict(blind_open),
+            "open_clv": sum(clv) / len(clv) if clv else None,
+            "excess_win": excess, "proven": proven,
+        })
+    return rows
+
+
 # ------------------------------------------------------------------ the replay
 def replay(
     cfg: SportConfig,
@@ -426,6 +490,7 @@ def run_studies(
             # Share the download budget fairly so every sport gets studied each run.
             share = (history.budget - history.fetched) // (len(sports) - i)
             history.prefetch(cfg, [g for g in results if start <= g.date < now], limit=share)
+            history.save()  # after each sport, so a long run never loses its downloads
             sides, games, open_sides = replay(
                 cfg, results, lambda g, c=cfg: history.quotes(c, g), start, now,
                 opening=lambda g, c=cfg: history.open_quotes(c, g),
@@ -443,6 +508,10 @@ def run_studies(
         else:
             window = f"{start:%b %-d} - {now:%b %-d, %Y}"
             st = study_sides(sides, cfg, games, window, open_sides)
+            st.spots = study_spots(spot_bets(
+                cfg, results, lambda g, c=cfg: history.quotes(c, g), lambda g, c=cfg: history.open_quotes(c, g),
+                start, now,
+            ))
         out[cfg.key] = st
     return out
 
@@ -485,12 +554,15 @@ class ClosingHistory:
     picked up on later runs.
     """
 
-    def __init__(self, folder, fetch: Callable[[SportConfig, GameResult], list[Quote] | None], budget: int = 1500):
+    def __init__(self, folder, fetch: Callable[[SportConfig, GameResult], list[Quote] | None], budget: int = 1500,
+                 minutes: float | None = None):
+        import time
         from pathlib import Path
 
         self.folder = Path(folder)
         self.fetch = fetch
         self.budget = budget
+        self.deadline = time.monotonic() + minutes * 60 if minutes else None  # stop downloading, keep what we have
         self.fetched = 0
         self._data: dict[str, dict[str, list]] = {}
         self._dirty: set[str] = set()
@@ -515,7 +587,7 @@ class ClosingHistory:
             return rows is None or (rows and not any(r[3] == OPEN_BOOK for r in rows))
 
         for g in sorted((g for g in games if g.completed and missing(g)), key=lambda g: g.date, reverse=True):
-            if self.fetched >= self.budget or (limit is not None and done >= limit):
+            if self.fetched >= self.budget or (limit is not None and done >= limit) or self._late():
                 return
             self.fetched += 1
             done += 1
@@ -526,6 +598,11 @@ class ClosingHistory:
             rows.append(["meta", "open-checked", None, OPEN_BOOK, 0])  # don't ask again if ESPN has no open
             store[g.event_id] = rows
             self._dirty.add(cfg.key)
+
+    def _late(self) -> bool:
+        import time
+
+        return self.deadline is not None and time.monotonic() > self.deadline
 
     def quotes(self, cfg: SportConfig, game: GameResult) -> list[Quote]:
         rows = self._sport(cfg.key).get(game.event_id) or []
