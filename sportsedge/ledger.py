@@ -98,8 +98,9 @@ class Entry:
         return d
 
 
-def entry_id(pick: Pick) -> str:
-    raw = "|".join(map(str, (pick.sport, pick.event_id, pick.market, pick.side, pick.player)))
+def entry_id(pick: Pick, live: bool = False) -> str:
+    parts = (pick.sport, pick.event_id, pick.market, pick.side, pick.player) + (("live",) if live else ())
+    raw = "|".join(map(str, parts))
     return hashlib.sha1(raw.encode()).hexdigest()[:16]
 
 
@@ -149,14 +150,23 @@ class Ledger:
         """Add new cards. A pick already in the ledger keeps its original price,
         and each game gets at most one game-line unit play."""
         added = []
-        unit_events = {e.event_id for e in self.entries.values() if e.is_unit_play and e.player is None}
+        unit_events = {
+            e.event_id for e in self.entries.values() if e.is_unit_play and e.player is None and e.tier != "live"
+        }
+        live_events = {e.event_id for e in self.entries.values() if e.tier == "live"}
         today = self.day_of(now)
         ranked_today = [e for e in self.entries.values() if e.day == today and e.best_rank]
         next_rank = max((e.best_rank for e in ranked_today), default=0) + 1
         for card in sorted(cards, key=lambda c: c.best_rank or 99):
             p = card.pick
-            eid = entry_id(p)
-            if eid in self.entries:
+            live = card.tier == "live"
+            eid = entry_id(p, live=live)
+            if live:
+                # One live bet per game: the first edge found, at the price we got.
+                if eid in self.entries or p.event_id in live_events:
+                    continue
+                live_events.add(p.event_id)
+            elif eid in self.entries:
                 existing = self.entries[eid]
                 # Promote an open unit play that is now one of today's best bets.
                 if card.best_rank and not existing.best_rank and existing.is_unit_play \
@@ -164,7 +174,7 @@ class Ledger:
                     existing.best_rank, existing.day = next_rank, today
                     next_rank += 1
                 continue
-            if p.player is None and card.units > 0:
+            if p.player is None and card.units > 0 and not live:
                 if p.event_id in unit_events:
                     continue
                 unit_events.add(p.event_id)
@@ -330,7 +340,7 @@ class Ledger:
             }
 
         week_ago = now - timedelta(days=7)
-        by_tier = {t: summary([e for e in plays if e.tier == t]) for t in ("lock", "dog", "prop", "value", "early")}
+        by_tier = {t: summary([e for e in plays if e.tier == t]) for t in ("lock", "dog", "prop", "value", "early", "live")}
         by_sport = {}
         for sport in sorted({e.sport for e in plays}):
             by_sport[sport] = {"name": SPORTS[sport].name if sport in SPORTS else sport,

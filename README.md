@@ -73,9 +73,18 @@ sportsedge run all --scores-only     # live scores + grading only (ESPN, no odds
 sportsedge serve nba nfl             # keep running: scores every 2 min, odds every hour, http://127.0.0.1:8000
 ```
 
+### Live bets
+
+Live lines move in seconds, so live betting runs as a session you start before games: in the GitHub app open **Actions → Live session → Run workflow**, pick the sports, hours (up to 5) and minutes between checks.
+
+- Every check reads the score and clock from ESPN (free). Only sports with games in progress use odds credits: 3 credits per check.
+- In-play games are priced from the current score, the time left and the pregame model. The model doesn't know possession, power plays or pitch counts, and the books' live models do. So live picks lean harder on the market (85%), need at least +3% EV, and are skipped when the model and market disagree by more than 8 points or in the last 5% of a game.
+- Each new live bet (one per game) is posted as a comment on the **Funky Buttlovin live bets** issue, and the GitHub app sends your phone a notification. Live bets are graded and tracked like every other pick.
+- Locally: `funky live nfl nba --hours 3 --every 4`.
+
 ### Run it on a schedule with GitHub Actions
 
-`.github/workflows/sportsedge.yml` runs a full cycle every 3 hours, live scores every hour (inside the free 2,000 Actions minutes a month for private repos), and NFL + NBA player props once a day at 8:47 AM Pacific for games in the next 30 hours. It commits the ledger and saves the dashboard as a private download on each run (Actions tab → the run → **Artifacts**).
+`.github/workflows/sportsedge.yml` runs a full cycle twice a day (10:17 AM and 4:17 PM Pacific), live scores every hour (inside the free 2,000 Actions minutes a month for private repos), and NFL + NBA player props once a day at 8:47 AM Pacific for games in the next 30 hours. It commits the ledger and saves the dashboard as a private download on each run (Actions tab → the run → **Artifacts**).
 
 1. Add your key under **Settings → Secrets and variables → Actions** as `ODDS_API_KEY`.
 2. Merge to the default branch. Run it once by hand from the **Actions** tab, using `props` if you want props.
@@ -177,7 +186,7 @@ is overconfident: raise `margin_sd` (or the ridge) for that sport.
   Responses are cached in `~/.cache/sportsedge`, or in `$SPORTSEDGE_CACHE`.
   Completed box scores are cached forever. The first college basketball run
   downloads a full season of scoreboards, so it is slower.
-- **The Odds API**: prices. A game-lines scan costs about 3 credits per sport.
+- **The Odds API**: prices. A game-lines scan costs 3 credits per in-season sport (about 36 for everything in October), and props cost 1 credit per market per game. The free plan's 500 credits a month covers only a couple of full scans a day for about a week, so pick a paid plan for daily use. Every run prints the credits left, and scans are skipped instead of running the balance below `--credit-floor` (default 60).
   Props are fetched per event (`--props`) and cost more, so narrow them with
   `--hours` and `--prop-markets`. Remaining credits are printed after each scan.
 - Soccer player props aren't supported yet: ESPN soccer box scores don't

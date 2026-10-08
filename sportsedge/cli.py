@@ -173,6 +173,9 @@ class Workspace:
                 days=self.args.history_days, runs_per_day=1, props=self.args.props,
             ))
         sports = self.sports if self.demo else _in_season(self.provider, self.sports)
+        if not self.demo and not self._credits_ok(sports):
+            self.scores()
+            return
         props_sports = set(self.args.props_sports.split(",")) if self.args.props_sports else None
         prop_markets = self.args.prop_markets.split(",") if self.args.prop_markets else None
         res = run_cycle(
@@ -189,6 +192,21 @@ class Workspace:
         if remaining is not None:
             print(f"The Odds API credits remaining: {remaining}")
         self.save(now)
+
+    def _credits_ok(self, sports) -> bool:
+        """Skip the odds scan when it would take credits below the floor."""
+        remaining = getattr(getattr(self.provider, "odds", None), "requests_remaining", None)
+        try:
+            remaining = float(remaining)
+        except (TypeError, ValueError):
+            return True  # unknown: go ahead
+        cost = 3 * len(sports)  # h2h + spreads + totals per sport
+        if remaining - cost < self.args.credit_floor:
+            print(f"::warning::Only {remaining:.0f} Odds API credits left (scan needs ~{cost}, floor "
+                  f"{self.args.credit_floor:.0f}). Skipping odds; updating scores only.")
+            return False
+        print(f"Odds API credits before scan: {remaining:.0f}")
+        return True
 
     def scores(self):
         from .runner import refresh_scores
@@ -250,6 +268,56 @@ def cmd_serve(args) -> int:
                 print("refresh failed:", exc)
     except KeyboardInterrupt:
         server.shutdown()
+    return 0
+
+
+def cmd_live(args) -> int:
+    """Poll in-play games, publish live edges, and (optionally) push them to a GitHub issue."""
+    import time
+    from datetime import datetime, timedelta, timezone
+
+    from .live import LiveScanner, live_cards
+    from .notify import GitHubIssueNotifier, format_live_card
+
+    import os
+
+    if os.environ.get("GITHUB_ACTIONS"):
+        args.hours = min(args.hours, 5.0)  # stay inside the job's time limit so the ledger gets saved
+    ws = Workspace(args)
+    sports = resolve(args.sports)
+    names = {c.key: c.name for c in sports}
+    scanner = LiveScanner(ws.provider, ws.settings)
+    notifier = GitHubIssueNotifier() if args.notify else None
+    stop_at = datetime.now(timezone.utc) + timedelta(hours=args.hours)
+    last_save = datetime.now(timezone.utc)
+    print(f"live session: {', '.join(names.values())} for {args.hours:g}h, checking every {args.every:g} min")
+    while datetime.now(timezone.utc) < stop_at:
+        now = datetime.now(timezone.utc)
+        for cfg in sports:
+            try:
+                picks = scanner.scan(cfg, now)
+            except Exception as exc:  # keep the session alive through one bad poll
+                print(f"{cfg.name}: live scan failed: {exc}")
+                continue
+            cards = {c.pick.event_id: c for c in live_cards(picks, scanner, names)}
+            for entry in ws.ledger.publish(list(cards.values()), now):
+                card = cards[entry.event_id]
+                print(f"LIVE {entry.sport_name}: {entry.selection} {entry.odds:+.0f} ({entry.units:g}u, EV {entry.ev:+.1%})")
+                if notifier:
+                    notifier.post(format_live_card(card))
+        remaining = getattr(getattr(ws.provider, "odds", None), "requests_remaining", None)
+        if remaining is not None:
+            try:
+                if float(remaining) < args.min_credits:
+                    print(f"stopping: only {remaining} Odds API credits left (floor {args.min_credits})")
+                    break
+            except ValueError:
+                pass
+        if now - last_save >= timedelta(minutes=15):
+            ws.scores()
+            last_save = now
+        time.sleep(args.every * 60)
+    ws.scores()
     return 0
 
 
@@ -325,6 +393,8 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--tz", default="America/Los_Angeles", help="time zone for 'today' (default Pacific)")
         sp.add_argument("--start-bankroll", type=float, default=1000.0)
         sp.add_argument("--history-days", type=int, default=14, help="demo only: days of simulated history")
+        sp.add_argument("--credit-floor", type=float, default=60,
+                        help="never let an odds scan take The Odds API credits below this (default 60)")
 
     rn = sub.add_parser("run", help="one cycle: scan, publish picks, track lines, grade, build the dashboard")
     board_opts(rn)
@@ -339,6 +409,13 @@ def build_parser() -> argparse.ArgumentParser:
     sv.add_argument("--scores-every", type=float, default=2, help="minutes between live score updates")
     sv.add_argument("--odds-every", type=float, default=60, help="minutes between odds scans")
     sv.set_defaults(func=cmd_serve)
+
+    lv = sub.add_parser("live", help="watch in-play games and post live bets with an edge")
+    board_opts(lv)
+    lv.add_argument("--every", type=float, default=4, help="minutes between checks (default 4)")
+    lv.add_argument("--min-credits", type=float, default=60, help="stop when Odds API credits fall below this")
+    lv.add_argument("--notify", action="store_true", help="post each live bet to a GitHub issue (phone alerts)")
+    lv.set_defaults(func=cmd_live, hours=3)
 
     sub.add_parser("sports", help="list supported sports").set_defaults(func=cmd_sports)
     return p

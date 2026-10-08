@@ -98,6 +98,20 @@ class EspnClient:
                 month = nxt
         return sorted(out.values(), key=lambda g: g.date)
 
+    def live_games(self, cfg: SportConfig) -> list[GameResult]:
+        """Today's scoreboard, always fresh (used for live betting)."""
+        params: dict[str, Any] = {"limit": 500}
+        if cfg.espn_groups:
+            params["groups"] = cfg.espn_groups
+        try:
+            resp = self.session.get(f"{BASE}/{cfg.espn_path}/scoreboard", params=params, timeout=self.timeout)
+            resp.raise_for_status()
+            events = resp.json().get("events", [])
+        except (requests.RequestException, ValueError) as exc:
+            log.warning("ESPN live scoreboard %s failed: %s", cfg.key, exc)
+            return []
+        return [g for g in (_parse_event(ev) for ev in events) if g is not None]
+
     # -------------------------------------------------------------- box scores
     def summary(self, cfg: SportConfig, event_id: str) -> dict:
         return self._get(f"{BASE}/{cfg.espn_path}/summary", {"event": event_id}, ttl=None)
@@ -172,6 +186,8 @@ def _parse_event(ev: dict) -> GameResult | None:
         detail=status.get("shortDetail") or status.get("detail") or "",
         live_home=hs if live else None,
         live_away=as_ if live else None,
+        period=int(ev.get("status", {}).get("period") or 0),
+        clock=str(ev.get("status", {}).get("displayClock") or ""),
         home_pitcher=hp,
         home_pitcher_era=hp_era,
         home_pitcher_decisions=hp_dec,

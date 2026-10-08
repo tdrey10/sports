@@ -34,3 +34,6 @@ class LiveProvider:
 
     def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
         return self.espn.injuries(cfg)
+
+    def live_games(self, cfg: SportConfig) -> list[GameResult]:
+        return self.espn.live_games(cfg)

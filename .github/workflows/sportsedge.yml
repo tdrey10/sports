@@ -3,7 +3,7 @@ name: SportsEdge
 # Odds scans cost The Odds API credits; score updates and grading use ESPN only and are free.
 on:
   schedule:
-    - cron: "17 */3 * * *"   # full cycle: odds, new picks, line tracking, grading
+    - cron: "17 17,23 * * *" # full cycle twice a day (10:17 AM and 4:17 PM Pacific): odds, picks, line tracking
     - cron: "47 15 * * *"    # daily NFL + NBA player props (8:47 AM Pacific)
     - cron: "41 * * * *"     # live scores + grading only (hourly fits the free private-repo Actions minutes)
   workflow_dispatch:

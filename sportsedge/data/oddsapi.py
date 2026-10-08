@@ -55,6 +55,7 @@ class OddsApiClient:
     def active_keys(self) -> set[str]:
         """Sport keys currently in season (this endpoint costs no credits)."""
         resp = self.session.get(f"{BASE}/sports", params={"apiKey": self.api_key}, timeout=self.timeout)
+        self.requests_remaining = resp.headers.get("x-requests-remaining", self.requests_remaining)
         resp.raise_for_status()
         return {s["key"] for s in resp.json() if s.get("active")}
 

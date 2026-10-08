@@ -40,6 +40,8 @@ class GameResult:
     away_pitcher_era: float | None = None
     home_pitcher_decisions: int = 0  # wins + losses, a proxy for how much the ERA can be trusted
     away_pitcher_decisions: int = 0
+    period: int = 0  # live: quarter / period / half / inning
+    clock: str = ""  # live: game clock as ESPN shows it ("7:42", "67'")
 
     @property
     def completed(self) -> bool:
