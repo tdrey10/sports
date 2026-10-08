@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 from datetime import datetime, timedelta
 from importlib import resources
@@ -47,9 +48,14 @@ def build_data(
 
 
 def render_html(data: dict, standalone: bool = True) -> str:
-    template = resources.files("sportsedge").joinpath("web/board.html").read_text()
+    web = resources.files("sportsedge").joinpath("web")
+    template = web.joinpath("board.html").read_text()
     payload = json.dumps(data, default=str).replace("</", "<\\/")
     body = template.replace("__DATA__", payload)
+    mascot = web.joinpath("mascot.jpg")
+    if mascot.is_file():  # Dog of the Day background photo, embedded so the page stays one file
+        uri = "data:image/jpeg;base64," + base64.b64encode(mascot.read_bytes()).decode()
+        body = body.replace("__MASCOT__", uri)
     if not standalone:
         return body
     head, _, rest = body.partition("<main")
