@@ -240,12 +240,21 @@ class SampleProvider:
         """One book's lines as they stood just before a past game started."""
         world = self._world(cfg)
         ev = Event(id=game.event_id, sport=cfg.key, commence_time=game.date, home=game.home, away=game.away)
-        saved, self.clock = self.clock, game.date - timedelta(minutes=5)
+        from .espn_odds import OPEN_BOOK
+
+        saved = self.clock
         try:
-            quotes = self._game_quotes(cfg, world, ev)
+            self.clock = game.date - timedelta(minutes=5)
+            close = self._game_quotes(cfg, world, ev)
+            self.clock = game.date - timedelta(hours=60)  # opening lines, before the market moves
+            opened = self._game_quotes(cfg, world, ev)
         finally:
             self.clock = saved
-        return [q for q in quotes if q.book == "draftkings"]  # the studies use one book's close, like ESPN
+        # One book's close and open, like ESPN keeps for finished games.
+        return [q for q in close if q.book == "draftkings"] + [
+            Quote(q.market, q.side, q.point, OPEN_BOOK, q.american) for q in opened
+            if q.book == "draftkings" and q.market in ("h2h", "spreads")
+        ]
 
     def live_games(self, cfg: SportConfig) -> list[GameResult]:
         return []  # the demo has no games in progress

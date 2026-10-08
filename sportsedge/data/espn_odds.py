@@ -142,6 +142,38 @@ def parse_provider_odds(o: dict, book: str | None = None) -> list[Quote]:
     return quotes
 
 
+OPEN_BOOK = "draftkings_open"
+
+
+def _american(v) -> float | None:
+    """'+114', '-110', 'EVEN' or a number -> American odds."""
+    if isinstance(v, dict):
+        v = v.get("american") or v.get("alternateDisplayValue")
+    if v is None:
+        return None
+    if str(v).strip().upper() in ("EVEN", "EV", "PK"):
+        return 100.0
+    return _num(str(v).replace("+", "").strip())
+
+
+def parse_open_odds(o: dict) -> list[Quote]:
+    """The opening DraftKings prices ESPN keeps next to the close (moneyline and spread)."""
+    home = (o.get("homeTeamOdds") or {}).get("open") or {}
+    away = (o.get("awayTeamOdds") or {}).get("open") or {}
+    quotes: list[Quote] = []
+    hml, aml = _american(home.get("moneyLine")), _american(away.get("moneyLine"))
+    if hml and aml:
+        quotes += [Quote("h2h", "home", None, OPEN_BOOK, hml), Quote("h2h", "away", None, OPEN_BOOK, aml)]
+        dml = _american(((o.get("drawOdds") or {}).get("open") or {}).get("moneyLine"))
+        if dml:
+            quotes.append(Quote("h2h", "draw", None, OPEN_BOOK, dml))
+    hp, ap = _american(home.get("pointSpread")), _american(away.get("pointSpread"))
+    hs, as_ = _american(home.get("spread")), _american(away.get("spread"))
+    if hp is not None and ap is not None and hs and as_:
+        quotes += [Quote("spreads", "home", hp, OPEN_BOOK, hs), Quote("spreads", "away", ap, OPEN_BOOK, as_)]
+    return quotes
+
+
 class EspnOdds:
     def __init__(self, espn: EspnClient, prop_price: float = ASSUMED_PROP_PRICE):
         self.espn = espn
@@ -187,7 +219,7 @@ class EspnOdds:
             if pid != PREGAME_PROVIDER:
                 continue
             o = item if "homeTeamOdds" in item else self._get(ref.replace("http://", "https://"), ttl=None) if ref else {}
-            quotes += parse_provider_odds(o)
+            quotes += parse_provider_odds(o) + parse_open_odds(o)
         return quotes
 
     def _event(self, cfg: SportConfig, g: GameResult, quotes: list[Quote]) -> Event:
