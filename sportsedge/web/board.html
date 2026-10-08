@@ -85,6 +85,13 @@ button, select { font: inherit; color: inherit; }
 .potd .price { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .potd .price b { font: 700 26px/1 var(--mono); }
 .potd p { margin: 0; font-size: 14px; color: var(--muted); }
+/* Dog of the day wears the Funky Buttlovin mascot photo, faded so the pick stays readable. */
+.potd.photo { position: relative; overflow: hidden; min-height: 230px; align-content: end; border-color: transparent;
+  background: linear-gradient(180deg, rgba(12, 14, 18, .15) 0%, rgba(12, 14, 18, .55) 45%, rgba(12, 14, 18, .92) 100%),
+    var(--mascot) center 20% / cover no-repeat, #2a2f36; color: #f4f2ee; }
+.potd.photo .kind { color: #f3c46b; }
+.potd.photo p, .potd.photo .muted { color: #e2ded7; }
+.potd.photo .tag { background: rgba(255, 255, 255, .14); color: #fff; border-color: transparent; }
 
 /* tags */
 .tag { display: inline-block; font: 700 11px/1 var(--body); letter-spacing: .06em; text-transform: uppercase; border-radius: 6px;
@@ -159,7 +166,7 @@ td { font-variant-numeric: tabular-nums; }
 footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 12px; }
 </style>
 
-<main class="wrap">
+<main class="wrap" style="--mascot: url('__MASCOT__')">
   <header class="mast"><h1>Funky <span>Buttlovin</span></h1><p id="updated">Loading…</p></header>
   <div id="demo"></div>
   <section class="board" id="scoreboard" aria-label="Season record"></section>
@@ -178,6 +185,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 (function () {
   "use strict";
   let DATA = JSON.parse(document.getElementById("edge-data").textContent);
+  const MASCOT = !"__MASCOT__".startsWith("__");
   const slip = new Set();
   let slipOpen = false;
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
@@ -263,8 +271,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const potd = ["lock", "dog", "prop"].map((t) => {
       const e = items.find((x) => x.tier === t);
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t];
-      if (!e) return `<div class="potd"><span class="kind">${label}</span><p>Posts once a game clears the bar.</p></div>`;
-      return `<div class="potd"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
+      const photo = t === "dog" && MASCOT ? " photo" : "";
+      if (!e) return `<div class="potd${photo}"><span class="kind">${label}</span><p>Posts once a game clears the bar.</p></div>`;
+      return `<div class="potd${photo}"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · $100 wins $${(100 * (dec(e.odds) - 1)).toFixed(0)}</span></div>
         <p>${esc(e.matchup)} · ${timeOf(e)}</p><p>${esc(e.headline)}</p><div>${statusText(e)} ${moveText(e)}</div></div>`;
     }).join("");

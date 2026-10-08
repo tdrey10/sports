@@ -21,4 +21,4 @@ funky = "sportsedge.cli:main"
 include = ["sportsedge*"]
 
 [tool.setuptools.package-data]
-sportsedge = ["web/*.html"]
+sportsedge = ["web/*.html", "web/*.jpg"]
