@@ -288,3 +288,14 @@ def test_props_limited_by_sport_and_window():
     assert not any(p.is_prop for p in by_sport["nhl"].picks)
     nba_props = [p for p in by_sport["nba"].picks if p.is_prop]
     assert nba_props and all(p.commence_time <= provider.now + timedelta(hours=6) for p in nba_props)
+
+
+def test_cli_page_from_saved_ledger(tmp_path):
+    L = Ledger()
+    L.publish([card(make_pick())], NOW)
+    (tmp_path / "data").mkdir()
+    L.save(tmp_path / "data" / "ledger.json")
+    out = tmp_path / "page.html"
+    assert main(["page", "--data-dir", str(tmp_path / "data"), "--out", str(out)]) == 0
+    html = out.read_text()
+    assert html.startswith("<title>Funky Buttlovin</title>") and "__DATA__" not in html

@@ -330,6 +330,30 @@ def cmd_live(args) -> int:
     return 0
 
 
+def cmd_page(args) -> int:
+    """Write the dashboard as an Artifact-ready page from the saved ledger (no network)."""
+    import json
+    from datetime import datetime, timezone
+    from pathlib import Path
+
+    from .brain import BrainReport
+    from .ledger import Ledger
+    from .site import build_data, render_html
+
+    data_dir = Path(args.data_dir)
+    ledger = Ledger.load(data_dir / "ledger.json", tz=args.tz)
+    try:
+        raw = json.loads((data_dir / "brain.json").read_text())
+        brains = {k: BrainReport(**v) for k, v in raw.get("brains", {}).items()}
+        weights = raw.get("weights", {})
+    except (OSError, ValueError, TypeError):
+        brains, weights = {}, {}
+    data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc))
+    Path(args.out).write_text(render_html(data, standalone=args.standalone))
+    print(f"wrote {args.out} ({len(data['entries'])} picks)")
+    return 0
+
+
 def cmd_sports(_args) -> int:
     rows = [[k, c.name, c.odds_key, c.espn_path, len(c.props)] for k, c in SPORTS.items()]
     print(report.table(["Key", "Name", "Odds API key", "ESPN path", "Prop markets"], rows, "llllr"))
@@ -429,6 +453,14 @@ def build_parser() -> argparse.ArgumentParser:
     lv.add_argument("--min-credits", type=float, default=60, help="stop when Odds API credits fall below this")
     lv.add_argument("--notify", action="store_true", help="post each live bet to a GitHub issue (phone alerts)")
     lv.set_defaults(func=cmd_live, hours=3)
+
+    pg = sub.add_parser("page", help="write the dashboard page from the saved ledger")
+    pg.add_argument("sports", nargs="*", default=["nfl,nba,mlb,nhl,soccer"])
+    pg.add_argument("--data-dir", default="data")
+    pg.add_argument("--tz", default="America/Los_Angeles")
+    pg.add_argument("--out", default="funky-buttlovin.html")
+    pg.add_argument("--standalone", action="store_true", help="full HTML document (default: Artifact body)")
+    pg.set_defaults(func=cmd_page)
 
     sub.add_parser("sports", help="list supported sports").set_defaults(func=cmd_sports)
     return p
