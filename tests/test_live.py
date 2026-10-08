@@ -85,8 +85,9 @@ def test_live_scanner_prices_in_play_games_and_publishes_once():
     cards = live_cards(picks, scanner, {"nfl": "NFL"})
     L = Ledger()
     added = L.publish(cards, NOW)
-    assert len(added) <= 1 and all(e.tier == "live" for e in added)
-    assert L.publish(live_cards(scanner.scan(SPORTS["nfl"], NOW), scanner, {"nfl": "NFL"}), NOW) == []
+    assert len(added) <= 2 and all(e.tier in ("live_win", "live_plus") for e in added)
+    again = live_cards(scanner.scan(SPORTS["nfl"], NOW), scanner, {"nfl": "NFL"}, L.live_taken())
+    assert L.publish(again, NOW) == []
 
 
 def test_live_scanner_skips_garbage_time_and_finished_games():
@@ -101,7 +102,7 @@ def test_live_bet_does_not_block_pregame_and_vice_versa():
     L = Ledger()
     pre = make_pick(event_id="odds1")
     assert len(L.publish([card(pre)], NOW)) == 1
-    live = card(make_pick(event_id="odds1"), tier="live")
+    live = card(make_pick(event_id="odds1"), tier="live_win")
     assert len(L.publish([live], NOW)) == 1
 
 
@@ -159,8 +160,28 @@ def test_live_cards_reject_stale_line_edges_and_cap_stakes():
     stale.model_prob = 0.76  # model below market: edge is only a lagging book
     good = make_pick(event_id="b", american=+120, win_prob=0.50, market_prob=0.46, ev=0.10, kelly=0.03)
     good.model_prob = 0.60
-    heavy = make_pick(event_id="c", american=-300, win_prob=0.80, market_prob=0.74, ev=0.06)
+    heavy = make_pick(event_id="c", american=-350, win_prob=0.80, market_prob=0.74, ev=0.06)
     heavy.model_prob = 0.9
     cards = live_cards([stale, good, heavy], S(), {"nfl": "NFL"})
-    assert [c.pick.event_id for c in cards] == ["b"]
+    assert [c.pick.event_id for c in cards] == ["b"]  # stale-line edge and -350 favourite rejected
     assert cards[0].units == 1.0
+
+
+def test_live_picks_one_likely_winner_and_one_plus_money():
+    from tests.test_ledger import make_pick
+
+    class S:
+        settings = Settings(min_ev=0.03, max_ev=0.15)
+        states = {}
+
+    fav = make_pick(event_id="a", american=-200, win_prob=0.70, market_prob=0.66, ev=0.05)
+    fav.model_prob = 0.75
+    dog = make_pick(event_id="b", american=+180, win_prob=0.40, market_prob=0.35, ev=0.12)
+    dog.model_prob = 0.45
+    small = make_pick(event_id="c", american=+110, win_prob=0.50, market_prob=0.47, ev=0.05)
+    small.model_prob = 0.55
+    cards = live_cards([fav, dog, small], S(), {"nfl": "NFL"})
+    assert [(c.tier, c.pick.event_id) for c in cards] == [("live_win", "a"), ("live_plus", "b")]
+    # Already posted the likely winner for game "a": next best likely winner is chosen instead.
+    cards = live_cards([fav, dog, small], S(), {"nfl": "NFL"}, {("a", "live_win")})
+    assert cards[0].tier == "live_win" and cards[0].pick.event_id == "c"

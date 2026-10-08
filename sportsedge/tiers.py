@@ -18,8 +18,11 @@ TIER_LABELS = {
     "early": "Early Value",
     "lean": "Lean",
     "live": "Live Bet",
+    "live_win": "Live: Most Likely to Win",
+    "live_plus": "Live Plus Money",
 }
-UNIT_TIERS = ("lock", "dog", "prop", "value", "early", "live")
+LIVE_TIERS = ("live", "live_win", "live_plus")
+UNIT_TIERS = ("lock", "dog", "prop", "value", "early") + LIVE_TIERS
 
 LOCK_MIN_ODDS = -250  # a lock still has to be worth the juice
 DOG_MIN_ODDS = 120
