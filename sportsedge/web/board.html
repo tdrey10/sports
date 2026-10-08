@@ -18,12 +18,15 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.45 var(--body); }
-/* The Funky Buttlovin photo sits behind the whole engine, tinted navy so the picks stay readable.
+html { background: var(--bg); }
+body { margin: 0; background: transparent; color: var(--fg); font: 16px/1.45 var(--body); }
+/* The Funky Buttlovin photo sits behind the whole engine, tinted navy so the picks stay readable,
+   and fades into the navy page below it (the photo is 3:4, hence the 4 / 3 height).
    A fixed layer (not background-attachment) so it also stays put on phones. */
 .photo-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(0, 21, 46, .05) 0%, rgba(0, 21, 46, .35) 35%, rgba(0, 21, 46, .75) 70%, rgba(0, 21, 46, .85) 100%),
-    var(--mascot) 50% 0% / max(100%, 520px) auto no-repeat, var(--bg); }
+  background: linear-gradient(180deg, rgba(0, 21, 46, .5) 0%, rgba(0, 21, 46, .4) 30%, rgba(0, 21, 46, .6) 55%, rgba(0, 21, 46, .88) 80%, rgba(0, 21, 46, .95) 100%),
+    linear-gradient(180deg, transparent 70%, var(--bg)) 50% 0% / max(100vw, 520px) calc(max(100vw, 520px) * 4 / 3) no-repeat,
+    var(--mascot) 50% 0% / max(100vw, 520px) auto no-repeat, var(--bg); }
 /* The page opens on the photo: the name sits at the bottom of a tall header, then the picks scroll up over it. */
 .mast { min-height: clamp(260px, 52vh, 560px); display: flex; flex-direction: column; justify-content: flex-end; }
 .mast h1 { font-size: 38px; text-shadow: 0 2px 12px rgba(0, 0, 0, .6); }
