@@ -25,6 +25,7 @@ def build_data(
     demo: bool = False,
     live_note: str = "",
     studies: dict | None = None,
+    props: dict | None = None,
 ) -> dict:
     cutoff = now - timedelta(days=KEEP_DAYS)
     entries = []
@@ -48,6 +49,7 @@ def build_data(
         "weights": weights,
         "studies": [s.to_dict() for s in (studies or {}).values()],
         "spot_labels": {k: s.label for k, s in SPOTS.items()},
+        "props": props or {},
     }
 
 

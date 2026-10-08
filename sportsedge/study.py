@@ -606,12 +606,23 @@ def load(path) -> dict[str, SportStudy]:
     return out
 
 
-def save(path, studies: dict[str, SportStudy], now: datetime) -> None:
+def save(path, studies: dict[str, SportStudy], now: datetime, props: dict | None = None) -> None:
     import json
     from pathlib import Path
 
     Path(path).write_text(json.dumps(
-        {"ran_at": now.isoformat(), "studies": {k: s.to_dict() for k, s in studies.items()}}, indent=1))
+        {"ran_at": now.isoformat(), "studies": {k: s.to_dict() for k, s in studies.items()},
+         "props": props or {}}, indent=1))
+
+
+def load_props(path) -> dict:
+    import json
+    from pathlib import Path
+
+    try:
+        return json.loads(Path(path).read_text()).get("props", {})
+    except (OSError, ValueError):
+        return {}
 
 
 class ClosingHistory:

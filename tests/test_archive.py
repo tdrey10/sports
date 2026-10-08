@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from sportsedge import archive
 from sportsedge.data.base import Event, Quote
@@ -43,3 +43,33 @@ def test_scan_snapshots_and_prop_lines_are_logged(tmp_path):
     archive.log_snapshots(tmp_path / "odds", scans, provider.now)
     text = open(next((tmp_path / "odds" / "nba").glob("*.csv"))).read()
     assert text.count("seen_at") == 1
+
+
+def test_logged_prop_lines_are_graded_once_the_game_is_over(tmp_path):
+    from sportsedge.models.props import PlayerGame
+    from sportsedge.sports import SPORTS
+
+    start = datetime(2026, 10, 1, 0, 0, tzinfo=timezone.utc)
+    ev = Event(id="g1", sport="nba", commence_time=start, home="Home", away="Away")
+
+    class Scan:
+        def __init__(self, line, seen):
+            self.sport = SPORTS["nba"]
+            self.prop_lines = [(ev, [Quote("player_points", "over", line, "draftkings", -115, "Star Player"),
+                                     Quote("player_points", "under", line, "draftkings", -115, "Star Player")])]
+            self.seen = seen
+
+    archive.log_prop_lines(tmp_path / "props", [Scan(24.5, None)], start.replace(hour=0) - timedelta(hours=8))
+    archive.log_prop_lines(tmp_path / "props", [Scan(25.5, None)], start - timedelta(hours=1))
+    game = GameResult("g1", start, "Home", "Away", 110, 100)
+    box = [PlayerGame("g1", start, "Star Player", "Home", {"PTS": 31.0})]
+    n = archive.grade_prop_lines(tmp_path / "props", tmp_path / "graded", [SPORTS["nba"]],
+                                 lambda cfg, a, b: [game], lambda cfg, g: box, start + timedelta(days=1))
+    assert n == 1
+    row = next(csv.DictReader(open(tmp_path / "graded" / "nba" / "2026-10.csv")))
+    assert (row["open_line"], row["close_line"], row["actual"], row["result"]) == ("24.5", "25.5", "31.0", "over")
+    # Never graded twice.
+    assert archive.grade_prop_lines(tmp_path / "props", tmp_path / "graded", [SPORTS["nba"]],
+                                    lambda cfg, a, b: [game], lambda cfg, g: box, start + timedelta(days=1)) == 0
+    summary = archive.prop_summary(tmp_path / "graded")
+    assert summary["nba"]["player_points"] == {"lines": 1, "over": 1, "under": 0, "push": 0, "void": 0, "moved": 1}

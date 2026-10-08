@@ -126,8 +126,15 @@ def cmd_study(args) -> int:
     studies = study.run_studies(resolve(names), provider.game_results, history, now, days=args.days,
                                 games_folder=games_dir, weather=weather)
     history.save()
+    from . import archive
+
+    prefix = "demo-" if args.demo else ""
+    graded = archive.grade_prop_lines(data_dir / f"{prefix}props", data_dir / f"{prefix}props_graded",
+                                      resolve(names), provider.game_results, provider.box_score, now)
+    props = archive.prop_summary(data_dir / f"{prefix}props_graded")
+    print(f"graded {graded} logged prop lines")
     out = data_dir / ("demo-studies.json" if args.demo else "studies.json")
-    study.save(out, studies, now)
+    study.save(out, studies, now, props)
     rows = []
     def rec(r):
         return f"{r.won:.0f}-{r.lost:.0f} ({r.bets})" if r and r.bets else "-"
@@ -325,8 +332,11 @@ class Workspace:
         self.ledger.save(self.ledger_path)
         self.brain_path.write_text(json.dumps(
             {"brains": {k: asdict(v) for k, v in self.brains.items()}, "weights": self.weights}, indent=1))
+        from .study import load_props
+
         data = build_data(self.ledger, self.brains, self.weights, self.sports, now, demo=self.demo,
-                          studies=self.studies)
+                          studies=self.studies,
+                          props=load_props(self.data_dir / ("demo-studies.json" if self.demo else "studies.json")))
         path = write_site(self.site_dir, data)
         o = data["stats"]["overall"]
         print(f"dashboard: {path}  (record {o['won']}-{o['lost']}, {o['units']:+.1f}u, bankroll ${data['stats']['bankroll']:,.2f})")
@@ -444,10 +454,10 @@ def cmd_page(args) -> int:
         weights = raw.get("weights", {})
     except (OSError, ValueError, TypeError):
         brains, weights = {}, {}
-    from .study import load as load_studies
+    from .study import load as load_studies, load_props
 
     data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc),
-                      studies=load_studies(data_dir / "studies.json"))
+                      studies=load_studies(data_dir / "studies.json"), props=load_props(data_dir / "studies.json"))
     Path(args.out).write_text(render_html(data, standalone=args.standalone))
     # Same picks and results -> same fingerprint, so a refresh job can skip republishing an unchanged page.
     fingerprint = hashlib.sha1(json.dumps(data["entries"], sort_keys=True, default=str).encode()).hexdigest()[:12]
