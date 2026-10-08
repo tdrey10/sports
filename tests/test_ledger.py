@@ -331,3 +331,13 @@ def test_cards_show_the_numbers_and_locks_pass_every_check():
             assert abs(p.model_prob - p.market_prob) <= LOCK_MAX_GAP
     props = [c for c in cards if c.pick.is_prop]
     assert props and all("of the last" in c.pick.projection for c in props)
+
+
+def test_a_no_unit_lock_loads_as_a_lean(tmp_path):
+    from sportsedge.ledger import Ledger
+
+    ledger = Ledger()
+    ledger.publish([card(make_pick(), tier="lock", units=0.0)], START)
+    path = tmp_path / "ledger.json"
+    ledger.save(path)
+    assert [e.tier for e in Ledger.load(path).entries.values()] == ["lean"]

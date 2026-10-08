@@ -121,6 +121,9 @@ class Ledger:
         data = json.loads(path.read_text())
         names = {f.name for f in fields(Entry)}
         entries = [Entry(**{k: v for k, v in e.items() if k in names}) for e in data.get("entries", [])]
+        for e in entries:
+            if e.tier == "lock" and e.units <= 0:
+                e.tier = "lean"  # a Lock is only ever a real bet; an old no-unit "lean Lock" is just a lean
         kw.setdefault("start_bankroll", data.get("start_bankroll", 1000.0))
         return cls(entries, **kw)
 
