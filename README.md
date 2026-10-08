@@ -250,6 +250,7 @@ sportsedge/
 ## Money rules (always on)
 
 - Never bet a price worse than **-150**, live bets included. Big favorites kill ROI.
+- **Backed bets only.** A bet is posted (straight, total, prop, live or parlay leg) only when its sport and bet type beat the closing line in a blind test: 60+ bets on games the settings were never tuned on. No maybes, no no-unit filler; open picks that stop qualifying are withdrawn before the game.
 - **Straight bets carry the units.** Parlays are posted at small stakes (½u, ¼u, ¼u, 0.1u) with their own record, apart from the money record.
 - **Unknown injuries = no bet.** A team with no injury report (feed down, or no feed, as in soccer) is unknown, not healthy. Its games show as leans only.
 - **Injuries are weighed, not a hard rule.** NFL: QB out is about -8 points of win chance, RB or WR -3. College QB is -3.

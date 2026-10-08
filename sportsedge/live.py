@@ -251,7 +251,10 @@ def live_cards(
 
     ``taken`` holds (event_id, tier) pairs already posted, so each game gets at most one of each.
     """
-    ok = [p for p in picks if _trusted(p) and p.ev <= scanner.settings.max_ev and not p.warnings]
+    from .tiers import backed
+
+    ok = [p for p in picks if _trusted(p) and p.ev <= scanner.settings.max_ev and not p.warnings
+          and backed(p, scanner.settings)]
     win = [
         p for p in ok
         if p.ev >= 0 and p.win_prob >= LIVE_WIN_MIN_PROB and p.american >= LIVE_WIN_MIN_ODDS
