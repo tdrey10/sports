@@ -109,3 +109,26 @@ def test_carryover_regresses_last_season_to_the_mean():
     half = fit_ratings(games, as_of, half_life_days=365, ridge=1.0, carryover=0.35)
     gap = lambda r: (r.off["A"] + r.deff["A"]) - (r.off["B"] + r.deff["B"])  # noqa: E731
     assert 0 < gap(half) < gap(full)  # still rated better, but pulled toward average
+
+
+def test_goalie_factor_backup_raises_the_other_teams_goals():
+    from sportsedge.models.game import LEAGUE_SAVE_PCT, goalie_factor
+
+    assert goalie_factor(None, None) == 1.0
+    assert goalie_factor(LEAGUE_SAVE_PCT, 10000) == 1.0
+    starter = goalie_factor(0.918, 12000)  # proven good starter: fewer goals against
+    backup = goalie_factor(0.885, 2500)  # weak backup: more goals against
+    assert starter < 0.92 and backup > 1.05
+    assert 0.97 < goalie_factor(0.950, 30) < 1.0  # tiny sample barely counts
+
+
+def test_parse_goalie_stats_and_probable_ids():
+    from sportsedge.data.espn import _probable, parse_goalie_stats
+
+    stats = {"splits": {"categories": [{"stats": [
+        {"name": "saves", "value": 9100.0}, {"name": "shotsAgainst", "value": 10000.0}]}]}}
+    assert parse_goalie_stats(stats) == (0.91, 10000.0)
+    assert parse_goalie_stats({}) is None
+    comp = {"probables": [{"name": "probableStartingGoalie", "playerId": 3069285,
+                           "athlete": {"id": "3069285", "displayName": "Linus Ullmark"}}]}
+    assert _probable(comp) == ("Linus Ullmark", None, 0, "3069285")

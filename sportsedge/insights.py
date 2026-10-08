@@ -126,10 +126,16 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
             if rest:
                 bullets.append(rest)
             if ctx.home_pitcher or ctx.away_pitcher:
-                def sp(name, era):
-                    return f"{name} ({era:.2f} ERA)" if era is not None else (name or "TBD")
+                def sp(name, era, sv):
+                    if era is not None:
+                        return f"{name} ({era:.2f} ERA)"
+                    if sv:
+                        return f"{name} ({sv[0]:.3f} career save %, {sv[1]:,.0f} shots)"
+                    return name or "TBD"
+                label = "Starting goalies" if scan.sport.key == "nhl" else "Starters"
                 bullets.append(
-                    f"Starters: {sp(ctx.away_pitcher, ctx.away_pitcher_era)} vs {sp(ctx.home_pitcher, ctx.home_pitcher_era)}."
+                    f"{label}: {sp(ctx.away_pitcher, ctx.away_pitcher_era, ctx.away_goalie_sv)} vs "
+                    f"{sp(ctx.home_pitcher, ctx.home_pitcher_era, ctx.home_goalie_sv)}."
                 )
 
         if ctx and pred:

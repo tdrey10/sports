@@ -137,6 +137,18 @@ class EspnClient:
             return None
         return parse_injuries(data) or None
 
+    def goalie_stats(self, athlete_id: str) -> tuple[float, float] | None:
+        """(career save %, career shots faced) of an NHL goalie, or None."""
+        if not athlete_id:
+            return None
+        url = f"https://sports.core.api.espn.com/v2/sports/hockey/leagues/nhl/athletes/{athlete_id}/statistics"
+        try:
+            data = self._get(url, {}, ttl=24 * 3600)
+        except requests.RequestException as exc:
+            log.info("ESPN goalie %s stats unavailable: %s", athlete_id, exc)
+            return None
+        return parse_goalie_stats(data)
+
     def player_games(self, cfg: SportConfig, results: list[GameResult], team: str) -> list[PlayerGame]:
         team_games = [g for g in results if g.completed and team in (g.home, g.away)]
         team_games = sorted(team_games, key=lambda g: g.date)[-cfg.prop_games:]
@@ -173,8 +185,8 @@ def _parse_event(ev: dict) -> GameResult | None:
             return None
 
     hs, as_ = score(home), score(away)
-    hp, hp_era, hp_dec = _probable(home)
-    ap, ap_era, ap_dec = _probable(away)
+    hp, hp_era, hp_dec, hp_id = _probable(home)
+    ap, ap_era, ap_dec, ap_id = _probable(away)
     final = completed and hs is not None and as_ is not None
     live = state == "in" and hs is not None and as_ is not None
     return GameResult(
@@ -197,11 +209,13 @@ def _parse_event(ev: dict) -> GameResult | None:
         away_pitcher=ap,
         away_pitcher_era=ap_era,
         away_pitcher_decisions=ap_dec,
+        home_starter_id=hp_id,
+        away_starter_id=ap_id,
     )
 
 
-def _probable(competitor: dict) -> tuple[str, float | None, int]:
-    """(name, ERA, decisions) of a team's probable starter, when ESPN lists one."""
+def _probable(competitor: dict) -> tuple[str, float | None, int, str]:
+    """(name, ERA, decisions, athlete id) of a team's probable starter (MLB pitcher or NHL goalie)."""
     for prob in competitor.get("probables", []) or []:
         athlete = prob.get("athlete") or {}
         name = athlete.get("displayName") or athlete.get("fullName") or ""
@@ -214,8 +228,26 @@ def _probable(competitor: dict) -> tuple[str, float | None, int]:
                 pass
         if name:
             decisions = int(stats.get("W", 0) + stats.get("L", 0))
-            return name, stats.get("ERA"), decisions
-    return "", None, 0
+            return name, stats.get("ERA"), decisions, str(athlete.get("id") or prob.get("playerId") or "")
+    return "", None, 0, ""
+
+
+def parse_goalie_stats(data: dict) -> tuple[float, float] | None:
+    """(save %, shots against) from ESPN's athlete statistics object."""
+    stats: dict[str, float] = {}
+    for cat in (data.get("splits") or {}).get("categories", []) or []:
+        for stat in cat.get("stats", []) or []:
+            try:
+                stats[stat.get("name", "")] = float(stat.get("value"))
+            except (TypeError, ValueError):
+                continue
+    saves, shots = stats.get("saves"), stats.get("shotsAgainst")
+    if saves is not None and shots:
+        return saves / shots, shots
+    pct = stats.get("savePct")
+    if pct and shots:
+        return (pct / 100 if pct > 1 else pct), shots
+    return None
 
 
 def parse_injuries(data: dict) -> dict[str, list[tuple[str, str, str]]]:

@@ -35,6 +35,9 @@ class LiveProvider:
     def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
         return self.espn.injuries(cfg)
 
+    def goalie_stats(self, athlete_id: str):
+        return self.espn.goalie_stats(athlete_id)
+
     def live_games(self, cfg: SportConfig) -> list[GameResult]:
         return self.espn.live_games(cfg)
 
@@ -71,6 +74,9 @@ class EspnProvider:
 
     def injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str]]]:
         return self.espn.injuries(cfg)
+
+    def goalie_stats(self, athlete_id: str):
+        return self.espn.goalie_stats(athlete_id)
 
     def live_games(self, cfg: SportConfig) -> list[GameResult]:
         return self.espn.live_games(cfg)
