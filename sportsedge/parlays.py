@@ -1,9 +1,8 @@
 """Parlays of the day: 2, 3, 4 and 8 legs, built from the day's best bets.
 
 Each parlay is posted once a day and never changes after that. Legs come from
-different games (no same-game parlays): today's best bets in rank order first,
-then the other unit plays by edge score. The 2-leg is the top two, the 3-leg
-the top three, and so on.
+different games (no same-game parlays): today's unit plays, most likely to win
+first. The 2-leg is the top two, the 3-leg the top three, and so on.
 
 When the board is short of unit plays, a size waits until mid-morning (or until
 its first leg is close to starting), then fills the missing legs with the day's
@@ -65,8 +64,9 @@ def leg_pool(entries, now: datetime, today: str, fill: bool = False) -> list:
     then (with ``fill``) the most likely winners among the no-unit picks."""
     cut = now + timedelta(hours=LEG_HOURS)
     open_today = [e for e in entries if e.day == today and e.status == "pending" and now < e.start <= cut]
+    # Most likely to win first; edge score breaks ties.
     strong = sorted((e for e in open_today if e.tier in LEG_TIERS and e.units > 0),
-                    key=lambda e: (e.best_rank is None, e.best_rank or 0, -(e.score or 0), -e.win_prob))
+                    key=lambda e: (-e.win_prob, -(e.score or 0)))
     rest = sorted((e for e in open_today if fill and e.tier in FILL_TIERS and e.units <= 0
                    and e.player is None and e.odds >= MAX_FAVORITE), key=lambda e: -e.win_prob)
     out, games = [], set()
