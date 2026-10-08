@@ -19,6 +19,17 @@
 
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.45 var(--body); }
+/* The Funky Buttlovin photo sits behind the whole engine, tinted navy so the picks stay readable.
+   A fixed layer (not background-attachment) so it also stays put on phones. */
+.photo-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 21, 46, .05) 0%, rgba(0, 21, 46, .35) 35%, rgba(0, 21, 46, .75) 70%, rgba(0, 21, 46, .85) 100%),
+    var(--mascot) 50% 0% / max(100%, 520px) auto no-repeat, var(--bg); }
+/* The page opens on the photo: the name sits at the bottom of a tall header, then the picks scroll up over it. */
+.mast { min-height: clamp(260px, 52vh, 560px); display: flex; flex-direction: column; justify-content: flex-end; }
+.mast h1 { font-size: 38px; text-shadow: 0 2px 12px rgba(0, 0, 0, .6); }
+.mast p { color: #e6eaee; text-shadow: 0 1px 6px rgba(0, 0, 0, .7); }
+.panel, .board { background: color-mix(in srgb, var(--surface) 80%, transparent); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.tabs { background: color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 120px; display: grid;
   grid-template-columns: minmax(0, 1fr); gap: 16px; }
 .wrap > *, .panel > *, .grid > * { min-width: 0; }
@@ -77,13 +88,6 @@ button, select { font: inherit; color: inherit; }
 .potd .price { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .potd .price b { font: 700 26px/1 var(--mono); }
 .potd p { margin: 0; font-size: 14px; color: var(--muted); }
-/* Dog of the day wears the Funky Buttlovin mascot photo, faded so the pick stays readable. */
-.potd.photo { position: relative; overflow: hidden; min-height: 230px; align-content: end; border-color: transparent;
-  background: linear-gradient(180deg, rgba(0, 21, 46, .1) 0%, rgba(0, 21, 46, .55) 45%, rgba(0, 21, 46, .94) 100%),
-    var(--mascot) center 20% / cover no-repeat, #2a2f36; color: #f4f2ee; }
-.potd.photo .kind { color: var(--accent); }
-.potd.photo p, .potd.photo .muted { color: #e2ded7; }
-.potd.photo .tag { background: rgba(255, 255, 255, .14); color: #fff; border-color: transparent; }
 
 /* tags */
 .tag { display: inline-block; font: 700 11px/1 var(--body); letter-spacing: .06em; text-transform: uppercase; border-radius: 6px;
@@ -158,7 +162,8 @@ td { font-variant-numeric: tabular-nums; }
 footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 12px; }
 </style>
 
-<main class="wrap" style="--mascot: url('__MASCOT__')">
+<div class="photo-bg" aria-hidden="true" style="--mascot: url('__MASCOT__')"></div>
+<main class="wrap">
   <header class="mast"><h1>Funky <span>Buttlovin</span></h1><p id="updated">Loading…</p></header>
   <div id="demo"></div>
   <section class="board" id="scoreboard" aria-label="Season record"></section>
@@ -177,7 +182,6 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 (function () {
   "use strict";
   let DATA = JSON.parse(document.getElementById("edge-data").textContent);
-  const MASCOT = !"__MASCOT__".startsWith("__");
   const slip = new Set();
   let slipOpen = false;
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
@@ -263,7 +267,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const potd = ["lock", "dog", "prop"].map((t) => {
       const e = items.find((x) => x.tier === t);
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t];
-      const photo = t === "dog" && MASCOT ? " photo" : "";
+      const photo = "";
       if (!e) return `<div class="potd${photo}"><span class="kind">${label}</span><p>Posts once a game clears the bar.</p></div>`;
       return `<div class="potd${photo}"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · $100 wins $${(100 * (dec(e.odds) - 1)).toFixed(0)}</span></div>
