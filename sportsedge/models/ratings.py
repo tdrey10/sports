@@ -125,12 +125,18 @@ def fit_ratings(
     unknown_percentile: float = 50.0,
     max_iter: int = 50,
     rest_effects: bool = False,
+    carryover: float = 1.0,
 ) -> TeamRatings:
     """Fit ratings. With ``rest_effects`` two extra coefficients learn how much
-    a back-to-back changes a team's own scoring and what it concedes."""
+    a back-to-back changes a team's own scoring and what it concedes.
+
+    ``carryover`` < 1 regresses last season to the mean: games before the most
+    recent off-season count that much less, so early in a season the ridge pulls
+    ratings toward average until this season's games take over."""
     games = [g for g in results if g.completed and g.date < as_of]
     if not games:
         raise ValueError("no completed games to fit ratings on")
+    season_start = _season_start(games) if carryover < 1 else None
     teams = sorted({g.home for g in games} | {g.away for g in games})
     idx = {t: i for i, t in enumerate(teams)}
     n = len(teams)
@@ -144,6 +150,8 @@ def fit_ratings(
     for g in games:
         age = (as_of - g.date).total_seconds() / 86400.0
         w = 0.5 ** (age / half_life_days)
+        if season_start is not None and g.date < season_start:
+            w *= carryover
         home_flag = 0.0 if g.neutral else 1.0
         for team, opp, score, flag in (
             (g.home, g.away, g.home_score, home_flag),
@@ -206,6 +214,18 @@ def fit_ratings(
         b2b_off=float(beta[2]) if rest_effects else 0.0,
         b2b_def=float(beta[3]) if rest_effects else 0.0,
     )
+
+
+OFFSEASON_DAYS = 45
+
+
+def _season_start(games: list[GameResult]) -> datetime | None:
+    """Start of the current season: the first game after the latest 45+ day gap."""
+    dates = sorted(g.date for g in games)
+    for prev, nxt in zip(reversed(dates[:-1]), reversed(dates[1:])):
+        if (nxt - prev).days >= OFFSEASON_DAYS:
+            return nxt
+    return None
 
 
 def _weighted_ridge(X: np.ndarray, y: np.ndarray, w: np.ndarray, penalty: np.ndarray) -> np.ndarray:

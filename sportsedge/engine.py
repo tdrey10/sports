@@ -211,7 +211,7 @@ class Engine:
             ridge=cfg.ridge,
             link=cfg.link,
             unknown_percentile=cfg.unknown_percentile,
-            rest_effects=cfg.rest_effects,
+            rest_effects=cfg.rest_effects, carryover=cfg.carryover,
         )
 
     def _injuries(self, cfg: SportConfig) -> dict[str, list[tuple[str, str, str]]] | None:

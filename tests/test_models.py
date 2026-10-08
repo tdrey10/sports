@@ -91,3 +91,21 @@ def test_combo_prop_requires_all_terms():
     spec = SPORTS["nba"].props["player_points_rebounds_assists"]
     games = [PlayerGame(f"g{i}", NOW, "P", "T", {"PTS": 20.0, "REB": 5.0}) for i in range(6)]
     assert project_prop(spec, "m", "P", games) is None
+
+
+def test_carryover_regresses_last_season_to_the_mean():
+    from datetime import datetime, timedelta, timezone
+
+    from sportsedge.models.ratings import GameResult, _season_start, fit_ratings
+
+    t0 = datetime(2025, 1, 1, tzinfo=timezone.utc)
+    last = [GameResult(f"l{i}", t0 + timedelta(days=i), "A", "B", 30, 10) for i in range(40)]  # A crushed B
+    new_start = t0 + timedelta(days=200)
+    now = [GameResult(f"n{i}", new_start + timedelta(days=i), "A", "B", 20, 20) for i in range(4)]
+    games = last + now
+    assert _season_start(games) == new_start
+    as_of = new_start + timedelta(days=5)
+    full = fit_ratings(games, as_of, half_life_days=365, ridge=1.0)
+    half = fit_ratings(games, as_of, half_life_days=365, ridge=1.0, carryover=0.35)
+    gap = lambda r: (r.off["A"] + r.deff["A"]) - (r.off["B"] + r.deff["B"])  # noqa: E731
+    assert 0 < gap(half) < gap(full)  # still rated better, but pulled toward average

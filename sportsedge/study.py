@@ -206,6 +206,8 @@ class SportStudy:
     early_blind: Result | None = None
     early_clv: float | None = None  # average value of the opening price against the closing no-vig line
     spots: list[dict] = field(default_factory=list)  # one tracked record per early-bet spot (see spots.py)
+    carryover: float = 1.0  # weight of last season's games, chosen on the tuning games
+    carryover_test: list[tuple] = field(default_factory=list)  # (carryover, tuned log loss, games, blind log loss, games)
     weight_log_loss: list[tuple[float, float]] = field(default_factory=list)  # (weight, log loss per side)
     platt: tuple[float, float] | None = None
     best: Result | None = None  # the chosen setting's record
@@ -231,6 +233,7 @@ class SportStudy:
             d["platt"] = tuple(d["platt"])
         d["calibration"] = [tuple(c) for c in d.get("calibration", [])]
         d["weight_log_loss"] = [tuple(c) for c in d.get("weight_log_loss", [])]
+        d["carryover_test"] = [tuple(c) for c in d.get("carryover_test", [])]
         return cls(**d)
 
 
@@ -475,7 +478,7 @@ def replay(
             continue
         ratings = fit_ratings(
             train, test[0].date, cfg.half_life_days, cfg.ridge, cfg.link, cfg.unknown_percentile,
-            rest_effects=cfg.rest_effects,
+            rest_effects=cfg.rest_effects, carryover=cfg.carryover,
         )
         for g in test:
             quotes = [q for q in closing(g) if q.market in ("h2h", "spreads", "totals")]
@@ -508,6 +511,31 @@ def replay(
     return sides, games, open_sides
 
 
+CARRYOVERS = (1.0, 0.6, 0.35)
+
+
+def choose_carryover(cfg: SportConfig, results: list[GameResult], start: datetime,
+                     end: datetime) -> tuple[float, list[tuple]]:
+    """How much last season should count: chosen by the model's own log loss on the
+    older (tuning) games, then checked on the newer (blind) games."""
+    from .backtest import backtest
+
+    mid = start + (end - start) * (1 - BLIND_SHARE)
+    rows = []
+    for c in CARRYOVERS:
+        trial = replace(cfg, carryover=c)
+        t, b = backtest(trial, results, start, mid), backtest(trial, results, mid, end)
+        rows.append((c, t.log_loss, t.games, b.log_loss, b.games))
+    usable = [r for r in rows if r[2] >= 100]
+    chosen = min(usable, key=lambda r: (r[1], -r[0]))[0] if usable else 1.0
+    return chosen, rows
+
+
+def apply_studies(sports: list[SportConfig], studies: dict[str, "SportStudy"]) -> list[SportConfig]:
+    """Each sport's config with what its study chose (the carryover)."""
+    return [replace(c, carryover=studies[c.key].carryover) if c.key in studies else c for c in sports]
+
+
 def run_studies(
     sports: list[SportConfig],
     results_for: Callable[[SportConfig, datetime, datetime], list[GameResult]],
@@ -523,6 +551,8 @@ def run_studies(
     for i, cfg in enumerate(sports):
         try:
             results = results_for(cfg, start - timedelta(days=cfg.lookback_days), now)
+            carry, carry_rows = choose_carryover(cfg, results, start, now)
+            cfg = replace(cfg, carryover=carry)
             # Share the download budget fairly so every sport gets studied each run.
             share = (history.budget - history.fetched) // (len(sports) - i)
             history.prefetch(cfg, [g for g in results if start <= g.date < now], limit=share)
@@ -544,6 +574,7 @@ def run_studies(
         else:
             window = f"{start:%b %-d} - {now:%b %-d, %Y}"
             st = study_sides(sides, cfg, games, window, open_sides)
+            st.carryover, st.carryover_test = carry, carry_rows
             close_for = lambda g, c=cfg: history.quotes(c, g)  # noqa: E731
             st.spots = study_spots(
                 spot_bets(cfg, results, close_for, lambda g, c=cfg: history.open_quotes(c, g), start, now)
