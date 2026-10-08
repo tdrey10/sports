@@ -156,7 +156,7 @@ class Ledger:
         today = self.day_of(now)
         # A lean Lock/Dog (no units) doesn't block a real one later in the day.
         return {e.tier if e.units > 0 else f"{e.tier}_lean"
-                for e in self.entries.values() if e.day == today and e.tier in DAY_TIERS}
+                for e in self.entries.values() if e.day == today and e.tier in DAY_TIERS and e.status != "void"}
 
     # ------------------------------------------------------------- publish
     def publish(self, cards: list[Card], now: datetime) -> list[Entry]:
@@ -181,6 +181,12 @@ class Ledger:
                 live_taken.add((p.event_id, card.tier))
             elif eid in self.entries:
                 existing = self.entries[eid]
+                # A pick withdrawn earlier comes back if it is today's Lock before its game starts.
+                if existing.status == "void" and card.tier == "lock" and existing.start > now:
+                    existing.status, existing.profit, existing.graded_at = "pending", None, None
+                    existing.tier, existing.units, existing.day = "lock", card.units, today
+                    existing.headline, existing.reasons = card.headline, card.reasons
+                    continue
                 # Promote an open unit play that is now one of today's best bets.
                 if card.best_rank and not existing.best_rank and existing.is_unit_play \
                         and existing.status == "pending" and existing.start > now and next_rank <= BEST_BETS:
@@ -250,7 +256,8 @@ class Ledger:
             if e.status != "pending" or e.start <= now or e.tier in LIVE_TIERS:
                 continue
             if e.units <= 0:
-                if not getattr(settings, "fill", False):  # no maybes: no-unit posts come off the board
+                daily_lock = e.tier == "lock" and getattr(settings, "daily_lock", True)
+                if not getattr(settings, "fill", False) and not daily_lock:  # no maybes: no-unit posts come off the board
                     e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
                     e.reasons = ["Withdrawn before the game: only bets backed by the data are posted."] + list(e.reasons)
                     pulled.append(e)

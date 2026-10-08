@@ -172,9 +172,11 @@ def build_cards(
     by_event: dict[str, SportScan] = {}
     game: list[Pick] = []
     props: list[Pick] = []
+    every: list[Pick] = []  # every game-line side, backed or not: only for the daily Lock fallback
     for scan in scans:
         for ev_id in scan.contexts:
             by_event[ev_id] = scan
+        every.extend(p for p in scan.picks if not p.is_prop)
         # Only bets backed by a blind test: no maybes on the board.
         game.extend(p for p in scan.picks if not p.is_prop and backed(p, settings))
         props.extend(p for p in scan.picks if p.is_prop and backed(p, settings))
@@ -218,11 +220,12 @@ def build_cards(
     # the betting record stays honest. A real one later in the day still posts.
     lean_ids: set[int] = set()
 
-    def lean_pool(extra=lambda p: True) -> list[Pick]:
+    def lean_pool(extra=lambda p: True, source: list[Pick] | None = None) -> list[Pick]:
         """Today's sides for a lean head pick: a positive edge if any game has one, otherwise
         the best of what is on the board (still a lean: no units), so there is one every day.
         Games with unknown injuries are a last resort."""
-        base = [p for p in game + [b for b in blocked if not b.is_prop]
+        pool = source if source is not None else game + [b for b in blocked if not b.is_prop]
+        base = [p for p in pool
                 if now < p.commence_time <= soon_cut and not p.warnings and p.american >= settings.max_favorite
                 and extra(p)]
         for tier_pool in (
@@ -237,14 +240,15 @@ def build_cards(
         locks = [p for p in soon if p.american >= LOCK_MIN_ODDS and solid(p)]
         if locks:
             chosen.append(("lock", max(locks, key=lambda p: (p.win_prob, p.ev))))
-        elif settings.fill and "lock_lean" not in taken:
+        elif (settings.fill or settings.daily_lock) and "lock_lean" not in taken:
             # A Lock every day: the most likely winner on today's board (-150 or better, injuries
             # known, our model and the market agreeing first). With no real edge it carries no
             # units, and every daily Lock keeps its own record.
             def agree(p: Pick) -> bool:
                 return (p.market_prob is not None and p.market_prob >= 0.5
                         and abs(p.model_prob - p.market_prob) <= LOCK_MAX_GAP)
-            near = lean_pool(lambda p: p.market in ("h2h", "spreads") and p.win_prob >= 0.5)
+            near = lean_pool(lambda p: p.market in ("h2h", "spreads") and p.win_prob >= 0.5,
+                             source=None if settings.fill else every)
             if near:
                 lock = max(near, key=lambda p: (agree(p), p.win_prob, p.ev))
                 chosen.append(("lock", lock))

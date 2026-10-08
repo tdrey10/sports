@@ -45,6 +45,9 @@ class Settings:
     track: dict[str, dict] = field(default_factory=dict)
     # No-unit posts (a daily Lock/Dog when nothing qualifies, leans). Off: only backed bets are posted.
     fill: bool = False
+    # A Lock every day: when nothing backed passes the Lock checks, the day's most likely winner
+    # is still posted as the Lock, with no units, clearly labeled and tracked in its own record.
+    daily_lock: bool = True
 
     def min_ev_for(self, pick: "Pick") -> float:
         if pick.is_prop:
