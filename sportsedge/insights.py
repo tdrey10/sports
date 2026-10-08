@@ -94,7 +94,9 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
             headline = f"Draw comes in {our:.0%} on our numbers vs {implied:.0%} priced."
         elif pick.market == "spreads" and team and pred:
             margin = pred.exp_margin if pick.side == "home" else -pred.exp_margin
-            headline = f"We project {team} {margin:+.1f}; getting {pick.point:+g} at {odds} covers {our:.0%} of the time."
+            outcome = f"to win by {margin:.1f}" if margin >= 0 else f"to lose by {-margin:.1f}"
+            line = f"laying {-pick.point:g}" if pick.point < 0 else f"getting {pick.point:g}"
+            headline = f"We project {team} {outcome}; {line} at {odds} covers {our:.0%} of the time."
         elif pick.market == "totals" and pred:
             headline = f"We project {pred.exp_total:.1f} total; {pick.selection} hits {our:.0%} of the time."
         else:
