@@ -1,56 +1,56 @@
-"""Temporary probe #2."""
+"""Temporary probe #3: what betting odds does ESPN expose for free?"""
 import json
 import requests
 
 S = requests.Session()
 S.headers["User-Agent"] = "Mozilla/5.0"
-B = "https://site.api.espn.com/apis/site/v2/sports"
+SITE = "https://site.api.espn.com/apis/site/v2/sports"
+CORE = "https://sports.core.api.espn.com/v2/sports"
 
 
-def get(path, **params):
-    r = S.get(f"{B}/{path}", params=params, timeout=30)
+def get(url, **params):
+    r = S.get(url, params=params, timeout=30)
     try:
         return r.status_code, r.json()
     except ValueError:
         return r.status_code, {}
 
 
-def count(label, path, **params):
-    code, data = get(path, **params)
-    evs = data.get("events", []) if isinstance(data, dict) else []
-    print(f"{code} events={len(evs):5d} {label} {params}")
+def dump(label, obj, n=1500):
+    print(f"--- {label}\n{json.dumps(obj)[:n]}\n")
 
 
-count("nba month", "basketball/nba/scoreboard", dates="202603")
-count("nba month limit=1000", "basketball/nba/scoreboard", dates="202603", limit=1000)
-count("nba month limit=300", "basketball/nba/scoreboard", dates="202603", limit=300)
-count("ncaab month g50 limit=1000", "basketball/mens-college-basketball/scoreboard", dates="202602", groups=50, limit=1000)
-count("ncaab month g50 limit=3000", "basketball/mens-college-basketball/scoreboard", dates="202602", groups=50, limit=3000)
-count("ncaaf month g80 limit=1000", "football/college-football/scoreboard", dates="202609", groups=80, limit=1000)
-count("mlb month limit=1000", "baseball/mlb/scoreboard", dates="202608", limit=1000)
-count("nfl month limit=1000", "football/nfl/scoreboard", dates="202609", limit=1000)
-count("epl month limit=1000", "soccer/eng.1/scoreboard", dates="202609", limit=1000)
-count("nba year limit=1000", "basketball/nba/scoreboard", dates="2026", limit=1000)
-# daily total for nba march as ground truth
-total = 0
-for d in range(1, 32):
-    _, data = get("basketball/nba/scoreboard", dates=f"202603{d:02d}")
-    total += len(data.get("events", []))
-print("nba march summed daily:", total)
-
-print("\n== MLB probable stats ==")
-_, data = get("baseball/mlb/scoreboard")
-for ev in data.get("events", [])[:1]:
-    for c in ev["competitions"][0]["competitors"]:
-        for p in c.get("probables", []):
-            print("probable keys:", list(p.keys()))
-            print("statistics:", json.dumps(p.get("statistics"))[:600])
-            print("record:", json.dumps(p.get("record"))[:200])
-
-print("\n== injury item ==")
-_, inj = get("basketball/nba/injuries")
-item = inj["injuries"][0]["injuries"][0]
-print("item keys:", list(item.keys()))
-print("status:", item.get("status"), "| type:", json.dumps(item.get("type"))[:200])
-print("athlete:", json.dumps(item.get("athlete"))[:300])
-print("details:", json.dumps(item.get("details"))[:300])
+for path, league in [("football/nfl", "nfl"), ("baseball/mlb", "mlb"), ("hockey/nhl", "nhl"),
+                     ("football/college-football", "college-football"), ("soccer/eng.1", "eng.1"),
+                     ("basketball/nba", "nba")]:
+    code, sb = get(f"{SITE}/{path}/scoreboard")
+    evs = sb.get("events", [])
+    print(f"===== {path}: scoreboard {code}, {len(evs)} events")
+    pre = [e for e in evs if e["status"]["type"]["state"] == "pre"]
+    live = [e for e in evs if e["status"]["type"]["state"] == "in"]
+    print("pre", len(pre), "live", len(live))
+    for label, group in (("PRE", pre[:1]), ("LIVE", live[:1])):
+        for e in group:
+            comp = e["competitions"][0]
+            dump(f"{label} scoreboard competitions[0].odds", comp.get("odds"))
+            eid = e["id"]
+            code, summ = get(f"{SITE}/{path}/summary", event=eid)
+            dump(f"{label} summary pickcenter", summ.get("pickcenter"), 1200)
+            dump(f"{label} summary odds", summ.get("odds"), 600)
+            sport, lg = path.split("/")
+            code, od = get(f"{CORE}/{sport}/leagues/{lg}/events/{eid}/competitions/{eid}/odds")
+            items = od.get("items", [])
+            print(f"{label} core odds {code}: {len(items)} providers")
+            for it in items[:6]:
+                ref = it.get("$ref")
+                if ref:
+                    c2, o = get(ref)
+                    prov = (o.get("provider") or {}).get("name")
+                    print("  provider:", prov, "| keys:", list(o.keys())[:20])
+                    dump(f"  {prov} odds object", {k: o.get(k) for k in ("details", "overUnder", "spread", "overOdds", "underOdds", "homeTeamOdds", "awayTeamOdds", "open", "current", "moneylineWinner")}, 900)
+                    pb = o.get("propBets") or {}
+                    if pb.get("$ref"):
+                        c3, props = get(pb["$ref"])
+                        print(f"  propBets {c3}: count={props.get('count')}")
+                        dump("  first prop", (props.get("items") or [None])[0], 700)
+            break
