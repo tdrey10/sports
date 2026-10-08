@@ -55,7 +55,7 @@ def backtest(
         as_of = test[0].date
         ratings = fit_ratings(
             train, as_of, cfg.half_life_days, cfg.ridge, cfg.link, cfg.unknown_percentile,
-            rest_effects=cfg.rest_effects,
+            rest_effects=cfg.rest_effects, carryover=cfg.carryover,
         )
         for g in test:
             pred = predict_game(

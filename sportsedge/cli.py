@@ -206,6 +206,9 @@ class Workspace:
         self.settings = _settings(args)
         self.studies = self._load_studies(data_dir)
         if self.studies:
+            from .study import apply_studies
+
+            self.sports = apply_studies(self.sports, self.studies)
             from dataclasses import replace
 
             from .study import learned_settings

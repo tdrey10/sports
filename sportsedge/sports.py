@@ -47,6 +47,7 @@ class SportConfig:
     margin_shape: dict[int, float] = field(default_factory=dict)  # learned key numbers, by |margin|
     total_shape: dict[int, float] = field(default_factory=dict)  # learned key numbers for totals
     has_injury_feed: bool = False  # ESPN publishes a league injury report
+    carryover: float = 1.0  # weight of last season's games (below 1 = regress to the mean); set by the studies
     props: dict[str, PropSpec] = field(default_factory=dict)
 
 

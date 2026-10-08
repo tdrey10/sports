@@ -152,7 +152,7 @@ class LiveScanner:
         results = self.provider.game_results(cfg, now - timedelta(days=cfg.lookback_days), now)
         ratings = fit_ratings(
             results, now, cfg.half_life_days, cfg.ridge, cfg.link, cfg.unknown_percentile,
-            rest_effects=cfg.rest_effects,
+            rest_effects=cfg.rest_effects, carryover=cfg.carryover,
         )
         teams = sorted(set(ratings.off) | {g.home for g in results} | {g.away for g in results})
         self._ratings[cfg.key] = (now, ratings, teams)
