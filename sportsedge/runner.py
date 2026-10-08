@@ -51,7 +51,10 @@ def run_cycle(
     """``props_sports`` limits player props to those sport keys (None = every sport)."""
     out = CycleResult()
     if learn:
-        settings = replace(settings, weight_overrides={**ledger.learn_weights(), **settings.weight_overrides})
+        # Weights the studies chose come in through settings; the engine's own graded
+        # picks take over once a sport has enough of them to be the better sample.
+        min_picks = 200 if settings.weight_overrides else 60
+        settings = replace(settings, weight_overrides={**settings.weight_overrides, **ledger.learn_weights(min_picks)})
     out.weights = settings.weight_overrides
     engine = Engine(provider, settings, now=now, calibrate=True)
     for cfg in sports:

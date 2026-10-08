@@ -25,7 +25,7 @@ from .models.props import PlayerGame, stat_value
 from .models.ratings import GameResult
 from .odds import american_to_decimal
 from .sports import SPORTS
-from .tiers import LIVE_TIERS, Card
+from .tiers import BEST_BETS, LIVE_TIERS, Card
 
 DAY_TIERS = ("lock", "dog", "prop")
 GRADE_AFTER = timedelta(hours=2)  # earliest a game can be final
@@ -60,6 +60,7 @@ class Entry:
     ev: float
     market_prob: float | None = None
     best_rank: int | None = None
+    score: float | None = None  # edge score 0-100 when published
     current_odds: float | None = None
     current_point: float | None = None
     current_book: str | None = None
@@ -173,8 +174,9 @@ class Ledger:
                 existing = self.entries[eid]
                 # Promote an open unit play that is now one of today's best bets.
                 if card.best_rank and not existing.best_rank and existing.is_unit_play \
-                        and existing.status == "pending" and existing.start > now and next_rank <= 5:
+                        and existing.status == "pending" and existing.start > now and next_rank <= BEST_BETS:
                     existing.best_rank, existing.day = next_rank, today
+                    existing.score = card.score
                     next_rank += 1
                 continue
             if p.player is None and card.units > 0 and not live:
@@ -207,6 +209,7 @@ class Ledger:
                 model_prob=p.model_prob,
                 market_prob=p.market_prob,
                 best_rank=None,
+                score=card.score,
                 win_prob=p.win_prob,
                 ev=p.ev,
                 current_odds=p.american,
@@ -216,7 +219,7 @@ class Ledger:
                 close_odds=p.american,
                 close_fair=p.market_prob,
             )
-            if card.best_rank and card.units > 0 and next_rank <= 5:
+            if card.best_rank and card.units > 0 and next_rank <= BEST_BETS:
                 e.best_rank = next_rank
                 next_rank += 1
             self.entries[eid] = e

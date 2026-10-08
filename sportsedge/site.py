@@ -23,6 +23,7 @@ def build_data(
     now: datetime,
     demo: bool = False,
     live_note: str = "",
+    studies: dict | None = None,
 ) -> dict:
     cutoff = now - timedelta(days=KEEP_DAYS)
     entries = []
@@ -44,6 +45,7 @@ def build_data(
         "stats": ledger.stats(now),
         "brains": [b.to_dict() for b in brains.values()],
         "weights": weights,
+        "studies": [s.to_dict() for s in (studies or {}).values()],
     }
 
 

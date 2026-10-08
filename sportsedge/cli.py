@@ -103,6 +103,37 @@ def cmd_backtest(args) -> int:
 DEMO_SPORTS = "nfl,nba,mlb,nhl,epl"
 
 
+def cmd_study(args) -> int:
+    """Replay past games against their closing odds and learn how to weigh picks."""
+    from pathlib import Path
+
+    from . import study
+
+    provider = _provider(args)
+    now = _now(provider)
+    data_dir = Path(args.data_dir)
+    history = study.ClosingHistory(
+        data_dir / ("demo-history" if args.demo else "history"), provider.closing_quotes, budget=args.budget
+    )
+    names = args.sports if args.sports != ["all"] or not args.demo else [DEMO_SPORTS]
+    studies = study.run_studies(resolve(names), provider.game_results, history, now, days=args.days)
+    history.save()
+    out = data_dir / ("demo-studies.json" if args.demo else "studies.json")
+    study.save(out, studies, now)
+    rows = []
+    for s in studies.values():
+        b = s.best
+        rows.append([
+            s.name, s.games, f"{s.weight:.0%}", f"{s.min_ev:.0%}",
+            f"{b.won:.0f}-{b.lost:.0f}" if b and b.bets else "-",
+            f"{b.roi:+.1%}" if b and b.roi is not None else "-",
+            "yes" if s.platt else "-", s.note,
+        ])
+    print(report.table(["Sport", "Games", "Market wt", "Min edge", "Record", "ROI", "Calibrated", "Note"], rows, "lrrrrrll"))
+    print(f"downloaded closing lines for {history.fetched} games; wrote {out}")
+    return 0
+
+
 def _settings(args) -> Settings:
     prop_weight = args.prop_market_weight
     if getattr(args, "odds_source", None) == "espn" and prop_weight == 0.8:
@@ -156,6 +187,23 @@ class Workspace:
         names = args.sports if args.sports != ["all"] or not self.demo else [DEMO_SPORTS]
         self.sports = resolve(names)
         self.settings = _settings(args)
+        self.studies = self._load_studies(data_dir)
+        if self.studies:
+            from dataclasses import replace
+
+            from .study import learned_settings
+
+            self.settings = replace(
+                self.settings,
+                weight_overrides={**learned_settings(self.studies), **self.settings.weight_overrides},
+                min_ev_overrides={k: s.min_ev for k, s in self.studies.items() if s.best and s.best.bets >= 30},
+                calibration={k: s.platt for k, s in self.studies.items() if s.platt},
+            )
+
+    def _load_studies(self, data_dir):
+        from .study import load
+
+        return load(data_dir / ("demo-studies.json" if self.demo else "studies.json"))
 
     def _load_brain(self):
         import json
@@ -235,7 +283,8 @@ class Workspace:
         self.ledger.save(self.ledger_path)
         self.brain_path.write_text(json.dumps(
             {"brains": {k: asdict(v) for k, v in self.brains.items()}, "weights": self.weights}, indent=1))
-        data = build_data(self.ledger, self.brains, self.weights, self.sports, now, demo=self.demo)
+        data = build_data(self.ledger, self.brains, self.weights, self.sports, now, demo=self.demo,
+                          studies=self.studies)
         path = write_site(self.site_dir, data)
         o = data["stats"]["overall"]
         print(f"dashboard: {path}  (record {o['won']}-{o['lost']}, {o['units']:+.1f}u, bankroll ${data['stats']['bankroll']:,.2f})")
@@ -353,7 +402,10 @@ def cmd_page(args) -> int:
         weights = raw.get("weights", {})
     except (OSError, ValueError, TypeError):
         brains, weights = {}, {}
-    data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc))
+    from .study import load as load_studies
+
+    data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc),
+                      studies=load_studies(data_dir / "studies.json"))
     Path(args.out).write_text(render_html(data, standalone=args.standalone))
     # Same picks and results -> same fingerprint, so a refresh job can skip republishing an unchanged page.
     fingerprint = hashlib.sha1(json.dumps(data["entries"], sort_keys=True, default=str).encode()).hexdigest()[:12]
@@ -413,6 +465,13 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--days", type=int, default=60, help="days of games to test on")
     b.add_argument("--refit-days", type=int, default=7)
     b.set_defaults(func=cmd_backtest)
+
+    st = sub.add_parser("study", help="test settings on past games at their closing odds and learn pick weights")
+    common(st)
+    st.add_argument("--days", type=int, default=180, help="days of finished games to study")
+    st.add_argument("--budget", type=int, default=1500, help="most new games to download closing odds for per run")
+    st.add_argument("--data-dir", default="data")
+    st.set_defaults(func=cmd_study)
 
     def board_opts(sp):
         common(sp)

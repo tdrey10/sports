@@ -14,6 +14,10 @@ on:
         description: "Also price NFL + NBA player props for games in the next 30 hours"
         type: boolean
         default: false
+      study:
+        description: "Run the studies first (replay past games at their closing odds)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -54,6 +58,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: funky live nfl,nba,mlb,nhl,soccer --once --notify
 
+      # Once a day (and on hand-started runs): replay the last 180 days of finished games
+      # against their real closing odds, learn the market weight, edge threshold and
+      # calibration per sport, and save each game's closing line so it is downloaded once.
+      - name: Studies
+        if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
+        run: funky study nfl,nba,mlb,nhl,soccer
+
       - name: Full engine cycle
         if: github.event.schedule != '41 0-6,11-23 * * *'
         env:
@@ -69,6 +80,7 @@ jobs:
           git config user.name "sportsedge-bot"
           git config user.email "sportsedge-bot@users.noreply.github.com"
           git add data/ledger.json data/brain.json
+          git add data/studies.json data/history 2>/dev/null || true
           git diff --cached --quiet || git commit -m "Update pick ledger"
           git pull --rebase --autostash && git push
 
