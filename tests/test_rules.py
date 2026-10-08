@@ -80,7 +80,7 @@ def test_unproven_bet_types_are_sized_at_half_a_unit():
     assert units_for(big, Settings(proven={"nfl:over/under", "nba:spreads"})) == 0.5
 
 
-def test_no_lean_lock_but_a_dog_every_morning():
+def test_a_lock_and_a_dog_every_morning():
     from sportsedge.ledger import Ledger
     from sportsedge.tiers import DOG_MAX_ODDS, DOG_MIN_ODDS
 
@@ -90,14 +90,18 @@ def test_no_lean_lock_but_a_dog_every_morning():
     scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
     cards = build_cards(scans, strict, provider.now)
     heads = {c.tier: c for c in cards if c.tier in ("lock", "dog")}
-    assert set(heads) == {"dog"}  # never a lean Lock: no Lock unless it passes every check
-    assert heads["dog"].units == 0 and heads["dog"].reasons[0].startswith("Lean ")
+    assert set(heads) == {"lock", "dog"}  # a Lock and a Dog every day
+    assert all(c.units == 0 for c in heads.values())  # no units without a real edge
+    assert heads["lock"].reasons[0].startswith("Today's most likely winner")
+    assert heads["dog"].reasons[0].startswith("Lean ")
     assert DOG_MIN_ODDS <= heads["dog"].pick.american <= DOG_MAX_ODDS
+    assert heads["lock"].pick.american >= -150
 
-    # A lean Dog taken this morning doesn't block a real Dog later in the day.
+    # A no-unit pick this morning doesn't block a real Lock or Dog later in the day.
     ledger = Ledger()
     ledger.publish(cards, provider.now)
-    assert "dog_lean" in ledger.taken_today(provider.now) and "dog" not in ledger.taken_today(provider.now)
+    assert ledger.taken_today(provider.now) >= {"lock_lean", "dog_lean"}
+    assert not {"lock", "dog"} & ledger.taken_today(provider.now)
     again = build_cards(scans, strict, provider.now, taken_today=ledger.taken_today(provider.now))
     assert not [c for c in again if c.tier in ("lock", "dog")]  # no second lean the same day
 
@@ -111,7 +115,7 @@ def test_lock_and_dog_even_when_no_side_shows_an_edge():
         for p in scan.picks:
             p.ev = -0.02  # the market is right about everything today
     heads = {c.tier: c for c in build_cards(scans, strict, provider.now) if c.tier in ("lock", "dog")}
-    assert set(heads) == {"dog"} and heads["dog"].units == 0
+    assert set(heads) == {"lock", "dog"} and all(c.units == 0 for c in heads.values())
 
 
 
@@ -122,7 +126,7 @@ def test_a_lock_must_pass_every_strict_check():
     engine = Engine(provider, Settings(), now=provider.now)
     scans = [engine.scan(c) for c in resolve("nba,nhl,mlb,nfl")]
     for c in build_cards(scans, engine.settings, provider.now):
-        if c.tier == "lock":
+        if c.tier == "lock" and c.units > 0:
             p = c.pick
-            assert c.units > 0 and p.model_prob >= LOCK_MIN_PROB and p.market_prob >= LOCK_MIN_MARKET
+            assert p.model_prob >= LOCK_MIN_PROB and p.market_prob >= LOCK_MIN_MARKET
             assert p.win_prob >= LOCK_MIN_CASH - 0.05 and p.american >= -150 and not p.warnings

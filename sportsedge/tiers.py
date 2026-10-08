@@ -171,7 +171,18 @@ def build_cards(
         locks = [p for p in soon if p.american >= LOCK_MIN_ODDS and solid(p)]
         if locks:
             chosen.append(("lock", max(locks, key=lambda p: (p.win_prob, p.ev))))
-        # No lean Lock: if nothing passes every check, there is no Lock today.
+        elif "lock_lean" not in taken:
+            # A Lock every day: the most likely winner on today's board (-150 or better, injuries
+            # known, our model and the market agreeing first). With no real edge it carries no
+            # units, and every daily Lock keeps its own record.
+            def agree(p: Pick) -> bool:
+                return (p.market_prob is not None and p.market_prob >= 0.5
+                        and abs(p.model_prob - p.market_prob) <= LOCK_MAX_GAP)
+            near = lean_pool(lambda p: p.market in ("h2h", "spreads") and p.win_prob >= 0.5)
+            if near:
+                lock = max(near, key=lambda p: (agree(p), p.win_prob, p.ev))
+                chosen.append(("lock", lock))
+                lean_ids.add(id(lock))
     if "dog" not in taken:
         used_now = {id(c) for _, c in chosen}
         dogs = [p for p in soon if DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS and id(p) not in used_now]
@@ -249,7 +260,13 @@ def build_cards(
         if ctx and ctx.injuries_unknown:
             bullets.insert(0, f"No bet: no injury report for {', '.join(ctx.injuries_unknown)}, "
                               "so injuries are unknown. Tracked as a lean only.")
-        if id(pick) in lean_ids:
+        if id(pick) in lean_ids and tier == "lock":
+            bullets.insert(0, f"Today's most likely winner ({pick.win_prob:.0%} on our numbers, the market "
+                              f"{pick.market_prob:.0%})" if pick.market_prob is not None else
+                              f"Today's most likely winner ({pick.win_prob:.0%} on our numbers)")
+            bullets.insert(1, "No units today: the price doesn't leave a big enough edge to bet. Every daily Lock "
+                              "is tracked in its own record.")
+        elif id(pick) in lean_ids:
             bullets.insert(0, f"Lean {TIER_LABELS[tier].split(' of ')[0]}: nothing cleared every check today, so this is "
                               "the closest one, posted with no units and tracked with the leans.")
         elif tier == "lock":

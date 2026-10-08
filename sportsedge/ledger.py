@@ -121,9 +121,6 @@ class Ledger:
         data = json.loads(path.read_text())
         names = {f.name for f in fields(Entry)}
         entries = [Entry(**{k: v for k, v in e.items() if k in names}) for e in data.get("entries", [])]
-        for e in entries:
-            if e.tier == "lock" and e.units <= 0:
-                e.tier = "lean"  # a Lock is only ever a real bet; an old no-unit "lean Lock" is just a lean
         kw.setdefault("start_bankroll", data.get("start_bankroll", 1000.0))
         return cls(entries, **kw)
 
@@ -375,6 +372,8 @@ class Ledger:
             "last7": summary([e for e in plays if e.start >= week_ago]),
             "by_tier": by_tier,
             "best": summary([e for e in plays if e.best_rank]),
+            # Every daily Lock, bet or not (no-unit Locks count as 1 unit), so the Lock has its own honest record.
+            "lock_all": summary([e for e in settled if e.tier == "lock"]),
             "by_market": {
                 m: summary([e for e in plays if _market_group(e) == m])
                 for m in ("spreads", "totals", "props", "moneyline")

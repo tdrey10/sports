@@ -139,7 +139,7 @@ def test_build_cards_tiers():
     cards = build_cards(scans, engine.settings, provider.now)
     tiers = [c.tier for c in cards]
     assert tiers.count("lock") <= 1 and tiers.count("dog") <= 1 and tiers.count("prop") <= 1
-    lean_heads = [c for c in cards if c.reasons and c.reasons[0].startswith("Lean ")]
+    lean_heads = [c for c in cards if c.reasons and c.reasons[0].startswith(("Lean ", "Today's most likely winner"))]
     assert all(c.units > 0 for c in cards if c.tier != "lean" and c not in lean_heads)
     assert all(c.units == 0 and c.tier in ("lock", "dog") and not c.best_rank for c in lean_heads)
     assert all(c.units == 0 for c in cards if c.tier == "lean")
@@ -325,7 +325,7 @@ def test_cards_show_the_numbers_and_locks_pass_every_check():
     team_picks = [c for c in games if c.pick.market in ("h2h", "spreads") and c.pick.side in ("home", "away")]
     assert team_picks and all(any(r.startswith("Upset") for r in c.reasons) for c in team_picks)
     for c in cards:
-        if c.tier == "lock":
+        if c.tier == "lock" and c.units > 0:  # a real (units) Lock; the daily no-unit Lock is checked elsewhere
             p = c.pick
             assert p.model_prob >= LOCK_MIN_PROB and not p.warnings
             assert abs(p.model_prob - p.market_prob) <= LOCK_MAX_GAP
@@ -333,11 +333,13 @@ def test_cards_show_the_numbers_and_locks_pass_every_check():
     assert props and all("of the last" in c.pick.projection for c in props)
 
 
-def test_a_no_unit_lock_loads_as_a_lean(tmp_path):
+def test_every_daily_lock_has_its_own_record():
     from sportsedge.ledger import Ledger
 
     ledger = Ledger()
     ledger.publish([card(make_pick(), tier="lock", units=0.0)], START)
-    path = tmp_path / "ledger.json"
-    ledger.save(path)
-    assert [e.tier for e in Ledger.load(path).entries.values()] == ["lean"]
+    for e in ledger.entries.values():
+        e.status, e.profit = "won", 0.91
+    stats = ledger.stats(START)
+    assert stats["lock_all"]["won"] == 1  # a no-unit daily Lock still counts in the Lock's own record
+    assert stats["by_tier"].get("lock", {"won": 0})["won"] == 0  # but not in the money record
