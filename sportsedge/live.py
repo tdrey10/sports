@@ -282,7 +282,7 @@ def live_cards(
             f"Best live price {p.american:+.0f} at {p.book}. Live lines move fast: confirm the score and price before betting.",
         ]
         cards.append(Card(
-            tier=tier, units=min(units_for(p), LIVE_MAX_UNITS), headline=headline, reasons=reasons, sport=p.sport,
+            tier=tier, units=min(units_for(p, scanner.settings), LIVE_MAX_UNITS), headline=headline, reasons=reasons, sport=p.sport,
             sport_name=sport_names.get(p.sport, p.sport), pick=p,
             home=game.home if game else "", away=game.away if game else "",
         ))

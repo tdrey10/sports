@@ -210,6 +210,10 @@ class Workspace:
                 min_ev_overrides={k: s.min_ev for k, s in self.studies.items() if s.best and s.best.bets >= 30},
                 calibration={k: s.platt for k, s in self.studies.items() if s.platt},
                 # Only spots proven blind add weight: how much more often they won than the close said.
+                proven={
+                    f"{k}:{r.label}" for k, s in self.studies.items() for r in s.by_market
+                    if r.bets >= 60 and r.score > 0
+                },
                 spot_weights={
                     f"{k}:{r['key']}": r["excess_win"]
                     for k, s in self.studies.items() for r in s.spots
