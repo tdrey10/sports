@@ -120,3 +120,14 @@ def test_steam_dog_detection_and_study(tmp_path):
     bets = steam_bets(SPORTS["nfl"], [game], lambda g: close, folder, start - timedelta(days=5), start + timedelta(days=1))
     got = {(at, b.american, b.win) for k, at, b in bets}
     assert got == {("open", 160.0, 1.0), ("close", 140.0, 1.0)}  # bet when the move showed up, and after it
+
+
+def test_rested_dog_vs_a_team_on_a_back_to_back():
+    tip = datetime(2026, 11, 10, 0, 30, tzinfo=timezone.utc)
+    results = [
+        GameResult("a", tip - timedelta(hours=24), "Boston Celtics", "Utah Jazz", 110, 100),  # Boston played last night
+        GameResult("b", tip - timedelta(days=3), "Denver Nuggets", "Phoenix Suns", 100, 101),  # Denver rested
+    ]
+    spots = team_spots("nba", "Boston Celtics", "Denver Nuggets", tip, results)
+    assert "rested_dog" in spots["away"] and "rested_dog" not in spots["home"]
+    assert "rested_dog" not in team_spots("nfl", "Boston Celtics", "Denver Nuggets", tip, results)["away"]

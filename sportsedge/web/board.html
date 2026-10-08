@@ -361,7 +361,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function renderHero() {
     const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
     if (!e) {
-      $("hero").innerHTML = `<div class="ticket-empty"><b>Today's #1 posts with the next scan</b><span class="muted">Picks refresh every hour from 6 AM Pacific. Only picks that clear every check make the top 10.</span></div>`;
+      $("hero").innerHTML = `<div class="ticket-empty"><b>Today's #1 posts with the next scan</b><span class="muted">Picks refresh every 30 minutes through the day. Only picks that clear every check make the top 10.</span></div>`;
       return;
     }
     const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";

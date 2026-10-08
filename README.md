@@ -85,7 +85,7 @@ Live lines move in seconds, so live betting runs as a session you start before g
 
 ### Run it on a schedule with GitHub Actions
 
-`.github/workflows/sportsedge.yml` runs a full cycle every hour from 4 AM to midnight Pacific (fresh odds, new picks, live bets, scores and grading; the 6:15 AM run posts the Lock and Dog), inside the free 2,000 Actions minutes a month for private repos,, and NFL + NBA player props once a day at 8:47 AM Pacific for games in the next 30 hours. It commits the ledger and saves the dashboard as a private download on each run (Actions tab → the run → **Artifacts**).
+`.github/workflows/sportsedge.yml` runs a full cycle every 30 minutes from 8 AM to 8 PM Pacific and hourly from 4 AM to 8 AM and 8 PM to midnight (fresh odds, new picks, live bets, scores and grading; the 6:15 AM run posts the Lock and Dog), inside the free 2,000 Actions minutes a month for private repos, and NFL + NBA player props once a day at 8:47 AM Pacific for games in the next 30 hours. It commits the ledger and saves the dashboard as a private download on each run (Actions tab → the run → **Artifacts**).
 
 1. Merge to the default branch. No secrets are needed.
 2. Run it once by hand from the **Actions** tab, using `props` if you want props.
