@@ -151,3 +151,33 @@ def apply_shape(pmf: Mapping[int, float], factors: Mapping[int, float], absolute
         return dict(pmf)
     shaped = {k: p * factors.get(abs(k) if absolute else k, 1.0) for k, p in pmf.items()}
     return normalise(shaped)
+
+
+def discrete_gamma_pmf(mean: float, sd: float, hi: int | None = None) -> Pmf:
+    """Right-skewed distribution for non-negative stats like yards or points.
+
+    Player yardage piles up near a typical game with a long tail of big games,
+    so its median sits below its mean. Sportsbooks set prop lines near the
+    median; a symmetric normal around the mean would lean toward overs.
+    """
+    mean = max(mean, 0.5)
+    sd = max(sd, 0.5)
+    shape = (mean / sd) ** 2
+    scale = sd**2 / mean
+    if shape > 400:  # effectively normal; avoid overflow
+        return discrete_normal_pmf(mean, sd, lo=0)
+    hi = hi or int(mean + 8 * sd + 10)
+    log_norm = math.lgamma(shape) + shape * math.log(scale)
+
+    def pdf(x: float) -> float:
+        if x <= 0:
+            return 0.0
+        return math.exp((shape - 1) * math.log(x) - x / scale - log_norm)
+
+    # Midpoint rule on [k - 0.5, k + 0.5] with 4 sub-steps; k = 0 covers [0, 0.5].
+    pmf: Pmf = {}
+    for k in range(0, hi + 1):
+        a, b = max(k - 0.5, 0.0), k + 0.5
+        step = (b - a) / 4
+        pmf[k] = sum(pdf(a + step * (i + 0.5)) for i in range(4)) * step
+    return normalise(pmf)

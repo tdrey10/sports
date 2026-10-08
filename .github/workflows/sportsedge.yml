@@ -1,15 +1,17 @@
 name: SportsEdge
 
-# Odds scans cost The Odds API credits; score updates and grading use ESPN only and are free.
+# Everything runs on free ESPN data (stats plus DraftKings lines). No API key or paid plan needed.
+# GitHub's free plan gives private repos 2,000 Actions minutes a month; this schedule uses about 700,
+# which leaves room for live sessions.
 on:
   schedule:
-    - cron: "17 17,23 * * *" # full cycle twice a day (10:17 AM and 4:17 PM Pacific): odds, picks, line tracking
+    - cron: "17 14,19,23 * * *" # full cycle 3x a day (7:17 AM, 12:17 PM, 4:17 PM Pacific): odds, picks, line tracking
     - cron: "47 15 * * *"    # daily NFL + NBA player props (8:47 AM Pacific)
-    - cron: "41 * * * *"     # live scores + grading only (hourly fits the free private-repo Actions minutes)
+    - cron: "41 */2 * * *"   # scores + grading only, every 2 hours
   workflow_dispatch:
     inputs:
       props:
-        description: "Also price NFL + NBA player props for games in the next 30 hours (uses more Odds API credits)"
+        description: "Also price NFL + NBA player props for games in the next 30 hours"
         type: boolean
         default: false
 
@@ -46,25 +48,18 @@ jobs:
       - run: pip install -e .
 
       - name: Live scores and grading
-        if: github.event.schedule == '41 * * * *'
-        run: sportsedge run all --scores-only
+        if: github.event.schedule == '41 */2 * * *'
+        run: sportsedge run nfl,nba,mlb,nhl,soccer --scores-only
 
       - name: Full engine cycle
-        if: github.event.schedule != '41 * * * *'
+        if: github.event.schedule != '41 */2 * * *'
         env:
-          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
-          # Props are billed per game and market, so: NFL + NBA only, the most popular markets,
-          # games in the next 30 hours, once a day (or when run by hand with props ticked).
+          # NFL + NBA props, most popular markets, games in the next 30 hours, once a day
+          # (or when run by hand with props ticked).
           PROPS_ARGS: >-
             ${{ (inputs.props || github.event.schedule == '47 15 * * *') && '--props --props-sports nfl,nba --props-hours 30
             --prop-markets player_pass_yds,player_rush_yds,player_reception_yds,player_receptions,player_points,player_rebounds,player_assists,player_threes,player_points_rebounds_assists' || '' }}
-        run: |
-          if [ -z "$ODDS_API_KEY" ]; then
-            echo "::warning::ODDS_API_KEY is not set yet, so no odds scan. Updating scores only."
-            sportsedge run all --scores-only
-          else
-            sportsedge run all $PROPS_ARGS
-          fi
+        run: sportsedge run nfl,nba,mlb,nhl,soccer $PROPS_ARGS
 
       - name: Save the ledger
         run: |

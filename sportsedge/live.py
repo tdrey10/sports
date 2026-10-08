@@ -169,9 +169,11 @@ class LiveScanner:
         matcher = NameMatcher(teams)
         by_teams = {(g.home, g.away): g for g in live}
         picks: list[Pick] = []
-        for event in self.provider.events(cfg):
-            if event.commence_time > now:
-                continue
+        if hasattr(self.provider, "live_events"):
+            events = self.provider.live_events(cfg, live)  # ESPN live odds for these games
+        else:
+            events = [e for e in self.provider.events(cfg) if e.commence_time <= now]
+        for event in events:
             home, away = matcher.match(event.home) or event.home, matcher.match(event.away) or event.away
             game = by_teams.get((home, away))
             if game is None:

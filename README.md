@@ -1,5 +1,7 @@
 # Funky Buttlovin
 
+**100% free to run:** stats and betting lines come from ESPN (DraftKings lines, plus bet365 for soccer, live in-game lines, and player prop lines), and it runs on GitHub's free plan. No API keys or paid plans.
+
 A stats-driven engine that prices every bet on the board and ranks the ones
 where the price is better than the true odds:
 
@@ -55,8 +57,7 @@ pip install -e .                    # Python 3.10+, depends on numpy + requests
 
 sportsedge scan nba --demo --props  # try it offline with synthetic data
 
-export ODDS_API_KEY=your_key        # free tier at https://the-odds-api.com
-sportsedge scan nba nfl             # live game lines
+sportsedge scan nba nfl             # real lines from ESPN, free
 sportsedge scan nba --props --bankroll 1000 --hours 12
 sportsedge scan soccer --books draftkings,fanduel,betmgm
 sportsedge scan all --json picks.json
@@ -86,8 +87,8 @@ Live lines move in seconds, so live betting runs as a session you start before g
 
 `.github/workflows/sportsedge.yml` runs a full cycle twice a day (10:17 AM and 4:17 PM Pacific), live scores every hour (inside the free 2,000 Actions minutes a month for private repos), and NFL + NBA player props once a day at 8:47 AM Pacific for games in the next 30 hours. It commits the ledger and saves the dashboard as a private download on each run (Actions tab → the run → **Artifacts**).
 
-1. Add your key under **Settings → Secrets and variables → Actions** as `ODDS_API_KEY`.
-2. Merge to the default branch. Run it once by hand from the **Actions** tab, using `props` if you want props.
+1. Merge to the default branch. No secrets are needed.
+2. Run it once by hand from the **Actions** tab, using `props` if you want props.
 
 **Publishing to GitHub Pages is off by default.** Project pages inherit the account's Pages custom domain. If this GitHub account also hosts another site, such as a business site on its own domain, the dashboard would appear under that domain. Only turn it on in a repo under an account with no other Pages site: add the repository variable `PUBLISH_PAGES` = `true` and set **Settings → Pages** to **GitHub Actions**.
 
@@ -186,7 +187,8 @@ is overconfident: raise `margin_sd` (or the ridge) for that sport.
   Responses are cached in `~/.cache/sportsedge`, or in `$SPORTSEDGE_CACHE`.
   Completed box scores are cached forever. The first college basketball run
   downloads a full season of scoreboards, so it is slower.
-- **The Odds API**: prices. A game-lines scan costs 3 credits per in-season sport (about 36 for everything in October), and props cost 1 credit per market per game. The free plan's 500 credits a month covers only a couple of full scans a day for about a week, so pick a paid plan for daily use. Every run prints the credits left, and scans are skipped instead of running the balance below `--credit-floor` (default 60).
+- **ESPN odds (default, free)**: DraftKings pregame and live prices for game lines, bet365 for soccer moneylines, and player prop lines. ESPN shows prop lines without their prices, so props are priced at an assumed -115 each way. Only take those at -115 or better.
+- **The Odds API (optional, `--odds-source oddsapi`)**: many books for line shopping. A game-lines scan costs 3 credits per in-season sport (about 36 for everything in October), and props cost 1 credit per market per game. The free plan's 500 credits a month covers only a couple of full scans a day for about a week, so pick a paid plan for daily use. Every run prints the credits left, and scans are skipped instead of running the balance below `--credit-floor` (default 60).
   Props are fetched per event (`--props`) and cost more, so narrow them with
   `--hours` and `--prop-markets`. Remaining credits are printed after each scan.
 - Soccer player props aren't supported yet: ESPN soccer box scores don't
