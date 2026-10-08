@@ -476,6 +476,10 @@ def cmd_page(args) -> int:
     data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc),
                       studies=load_studies(data_dir / "studies.json"), props=load_props(data_dir / "studies.json"))
     Path(args.out).write_text(render_html(data, standalone=args.standalone))
+    if args.app_dir:
+        from .site import write_app
+
+        write_app(args.app_dir, data)
     # Same picks and results -> same fingerprint, so a refresh job can skip republishing an unchanged page.
     fingerprint = hashlib.sha1(json.dumps(data["entries"], sort_keys=True, default=str).encode()).hexdigest()[:12]
     print(f"wrote {args.out} ({len(data['entries'])} picks, fingerprint {fingerprint})")
@@ -596,6 +600,7 @@ def build_parser() -> argparse.ArgumentParser:
     pg.add_argument("--data-dir", default="data")
     pg.add_argument("--tz", default="America/Los_Angeles")
     pg.add_argument("--out", default="great-hambino.html")
+    pg.add_argument("--app-dir", help="also write the page as its own website (Home Screen icon) into this folder")
     pg.add_argument("--standalone", action="store_true", help="full HTML document (default: Artifact body)")
     pg.set_defaults(func=cmd_page)
 

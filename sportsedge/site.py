@@ -53,7 +53,48 @@ def build_data(
     }
 
 
-def render_html(data: dict, standalone: bool = True) -> str:
+APP_HEAD = (
+    '<meta name="apple-mobile-web-app-capable" content="yes">\n'
+    '<meta name="mobile-web-app-capable" content="yes">\n'
+    '<meta name="apple-mobile-web-app-title" content="Hambino">\n'
+    '<meta name="apple-mobile-web-app-status-bar-style" content="black">\n'
+    '<meta name="theme-color" content="#0b0b0c">\n'
+    '<link rel="apple-touch-icon" href="apple-touch-icon.png">\n'
+    '<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">\n'
+    '<link rel="manifest" href="manifest.webmanifest">\n'
+)
+APP_MANIFEST = {
+    "name": "The Great Hambino",
+    "short_name": "Hambino",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#0b0b0c",
+    "theme_color": "#0b0b0c",
+    "icons": [
+        {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+        {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"},
+    ],
+}
+
+
+def write_app(out_dir: str | Path, data: dict) -> Path:
+    """The page as its own website, ready to save to a phone's Home Screen: the duck as the icon,
+    "Hambino" as the name, opening full screen like an app."""
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "index.html").write_text(render_html(data, standalone=True, app=True))
+    app = resources.files("sportsedge").joinpath("web", "app")
+    for name in ("apple-touch-icon.png", "icon-192.png", "icon-512.png"):
+        (out / name).write_bytes(app.joinpath(name).read_bytes())
+    (out / "favicon.ico").write_bytes(app.joinpath("icon-192.png").read_bytes())
+    (out / "manifest.webmanifest").write_text(json.dumps(APP_MANIFEST, indent=2))
+    # Always fetch the newest picks: the page changes every 30 minutes.
+    (out / "_headers").write_text("/\n  Cache-Control: no-cache\n/index.html\n  Cache-Control: no-cache\n")
+    return out / "index.html"
+
+
+def render_html(data: dict, standalone: bool = True, app: bool = False) -> str:
     web = resources.files("sportsedge").joinpath("web")
     template = web.joinpath("board.html").read_text()
     payload = json.dumps(data, default=str).replace("</", "<\\/")
@@ -72,7 +113,7 @@ def render_html(data: dict, standalone: bool = True) -> str:
     return (
         '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
-        + head + "</head>\n<body>\n<main" + rest + "\n</body>\n</html>\n"
+        + (APP_HEAD if app else "") + head + "</head>\n<body>\n<main" + rest + "\n</body>\n</html>\n"
     )
 
 

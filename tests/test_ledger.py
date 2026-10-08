@@ -343,3 +343,18 @@ def test_every_daily_lock_has_its_own_record():
     stats = ledger.stats(START)
     assert stats["lock_all"]["won"] == 1  # a no-unit daily Lock still counts in the Lock's own record
     assert stats["by_tier"].get("lock", {"won": 0})["won"] == 0  # but not in the money record
+
+
+def test_home_screen_site_has_its_icon_and_name(tmp_path):
+    import json as _json
+
+    from sportsedge.site import write_app
+
+    index = write_app(tmp_path, {"entries": [], "stats": {}})
+    html = index.read_text()
+    assert '<link rel="apple-touch-icon" href="apple-touch-icon.png">' in html
+    assert 'apple-mobile-web-app-title" content="Hambino"' in html
+    manifest = _json.loads((tmp_path / "manifest.webmanifest").read_text())
+    assert manifest["short_name"] == "Hambino" and manifest["display"] == "standalone"
+    for icon in ["apple-touch-icon.png"] + [i["src"] for i in manifest["icons"]]:
+        assert (tmp_path / icon).read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
