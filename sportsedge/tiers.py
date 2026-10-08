@@ -49,10 +49,19 @@ class Card:
         return d
 
 
+LONGSHOT_ODDS = 400
+LONGSHOT_MAX_UNITS = 0.5
+
+
 def units_for(pick: Pick) -> float:
-    """Kelly stake as units (1 unit = 1% of bankroll), rounded to half units."""
+    """Kelly stake as units (1 unit = 1% of bankroll), rounded to half units.
+
+    Long shots (+400 and up) are capped at half a unit: their win probability
+    is the hardest number to get right, and Kelly sizes them off it.
+    """
     units = round(pick.kelly * 100 * 2) / 2
-    return min(max(units, 0.5), MAX_UNITS)
+    cap = LONGSHOT_MAX_UNITS if pick.american >= LONGSHOT_ODDS else MAX_UNITS
+    return min(max(units, 0.5), cap)
 
 
 def build_cards(

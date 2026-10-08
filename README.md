@@ -116,7 +116,7 @@ Aliases: `soccer`, `football`, `basketball`, `college`, `cfb`, `cbb`, `hockey`, 
 | `--prop-market-weight` | 0.8 | Same, for player props. |
 | `--kelly` | 0.25 | Fraction of full Kelly used for stake sizing. |
 | `--max-stake` | 0.03 | Never stake more than 3% of bankroll on one bet. |
-| `--max-ev` | 0.30 | Hide "too good to be true" edges (usually stale lines or injury news). |
+| `--max-ev` | 0.20 | Hide "too good to be true" edges (usually stale lines or injury news). |
 | `--show-flagged` | off | Include picks where model and market differ by over 12 points. |
 | `--books` / `--regions` | `us` | Restrict which sportsbooks are compared. |
 | `--hours` | all | Only events starting within N hours. |
