@@ -299,7 +299,8 @@ def cmd_live(args) -> int:
     notifier = GitHubIssueNotifier() if args.notify else None
     stop_at = datetime.now(timezone.utc) + timedelta(hours=args.hours)
     last_save = datetime.now(timezone.utc)
-    print(f"live session: {', '.join(names.values())} for {args.hours:g}h, checking every {args.every:g} min")
+    print("live check: " + ", ".join(names.values()) if args.once else
+          f"live session: {', '.join(names.values())} for {args.hours:g}h, checking every {args.every:g} min")
     while datetime.now(timezone.utc) < stop_at:
         now = datetime.now(timezone.utc)
         for cfg in sports:
@@ -323,6 +324,8 @@ def cmd_live(args) -> int:
                     break
             except ValueError:
                 pass
+        if args.once:  # one check (scheduled runs), then grade and save
+            break
         if now - last_save >= timedelta(minutes=15):
             ws.scores()
             last_save = now
@@ -333,6 +336,7 @@ def cmd_live(args) -> int:
 
 def cmd_page(args) -> int:
     """Write the dashboard as an Artifact-ready page from the saved ledger (no network)."""
+    import hashlib
     import json
     from datetime import datetime, timezone
     from pathlib import Path
@@ -351,7 +355,9 @@ def cmd_page(args) -> int:
         brains, weights = {}, {}
     data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc))
     Path(args.out).write_text(render_html(data, standalone=args.standalone))
-    print(f"wrote {args.out} ({len(data['entries'])} picks)")
+    # Same picks and results -> same fingerprint, so a refresh job can skip republishing an unchanged page.
+    fingerprint = hashlib.sha1(json.dumps(data["entries"], sort_keys=True, default=str).encode()).hexdigest()[:12]
+    print(f"wrote {args.out} ({len(data['entries'])} picks, fingerprint {fingerprint})")
     return 0
 
 
@@ -453,6 +459,7 @@ def build_parser() -> argparse.ArgumentParser:
     lv.add_argument("--every", type=float, default=4, help="minutes between checks (default 4)")
     lv.add_argument("--min-credits", type=float, default=60, help="stop when Odds API credits fall below this")
     lv.add_argument("--notify", action="store_true", help="post each live bet to a GitHub issue (phone alerts)")
+    lv.add_argument("--once", action="store_true", help="check in-play games once and exit (for scheduled runs)")
     lv.set_defaults(func=cmd_live, hours=3)
 
     pg = sub.add_parser("page", help="write the dashboard page from the saved ledger")
