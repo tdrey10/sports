@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from ..distributions import (
     Pmf,
+    apply_shape,
     discrete_normal_pmf,
     line_probs,
     negate,
@@ -60,16 +61,21 @@ def predict_game(
     neutral: bool = False,
     home_b2b: bool = False,
     away_b2b: bool = False,
+    home_factor: float = 1.0,
+    away_factor: float = 1.0,
 ) -> GamePrediction:
+    """``home_factor``/``away_factor`` scale each side's expected score (e.g.
+    for the opposing starting pitcher)."""
     eh, ea = ratings.expected_scores(home, away, neutral, home_b2b, away_b2b)
+    eh, ea = eh * home_factor, ea * away_factor
     if cfg.scoring == "normal":
         return _predict_normal(cfg, home, away, eh, ea)
     return _predict_count(cfg, home, away, eh, ea)
 
 
 def _predict_normal(cfg: SportConfig, home: str, away: str, eh: float, ea: float) -> GamePrediction:
-    margin = discrete_normal_pmf(eh - ea, cfg.margin_sd)
-    total = discrete_normal_pmf(eh + ea, cfg.total_sd, lo=0)
+    margin = apply_shape(discrete_normal_pmf(eh - ea, cfg.margin_sd), cfg.margin_shape, absolute=True)
+    total = apply_shape(discrete_normal_pmf(eh + ea, cfg.total_sd, lo=0), cfg.total_shape)
     p_win = sum(p for k, p in margin.items() if k > 0)
     p_tie = margin.get(0, 0.0)
     # Regulation ties go to overtime, treated as a coin flip.
@@ -117,3 +123,17 @@ def baseline_team_score(ratings: TeamRatings, team: str) -> float:
     off = ratings.off.get(team, 0.0)
     eta = ratings.mu + off
     return math.exp(eta) if ratings.link == "log" else max(eta, 0.1)
+
+
+LEAGUE_ERA = 4.20
+STARTER_SHARE = 0.6  # starters cover roughly 5.5 of 9 innings
+ERA_SHRINK = 0.5  # a season ERA is noisy: move halfway back to league average
+
+
+def pitcher_factor(era: float | None, league_era: float = LEAGUE_ERA) -> float:
+    """Multiplier on the *opposing* team's expected runs for a starting pitcher."""
+    if era is None or era <= 0:
+        return 1.0
+    shrunk = league_era + ERA_SHRINK * (era - league_era)
+    factor = 1 + STARTER_SHARE * (shrunk / league_era - 1)
+    return min(max(factor, 0.85), 1.2)

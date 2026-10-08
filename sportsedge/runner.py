@@ -62,7 +62,9 @@ def run_cycle(
         out.warnings.extend(scan.warnings)
         if scan.brain:
             out.brains[cfg.key] = scan.brain
-    cards = build_cards(out.scans, settings, now, taken_today=ledger.taken_today(now))
+    cards = build_cards(
+        out.scans, settings, now, taken_today=ledger.taken_today(now), best_taken=ledger.best_taken(now)
+    )
     out.published = len(ledger.publish(cards, now))
     ledger.update_prices(out.scans, now)
     out.graded = refresh_scores(provider, ledger, now)

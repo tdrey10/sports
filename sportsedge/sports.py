@@ -44,6 +44,8 @@ class SportConfig:
     unknown_percentile: float = 50.0
     prop_games: int = 12
     rest_effects: bool = False  # learn a back-to-back penalty (NBA / NHL)
+    margin_shape: dict[int, float] = field(default_factory=dict)  # learned key numbers, by |margin|
+    total_shape: dict[int, float] = field(default_factory=dict)  # learned key numbers for totals
     has_injury_feed: bool = False  # ESPN publishes a league injury report
     props: dict[str, PropSpec] = field(default_factory=dict)
 

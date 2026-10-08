@@ -13,6 +13,7 @@ from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timedelta
 
 from .backtest import BacktestReport, backtest
+from .distributions import shape_factors
 from .models.ratings import GameResult
 from .sports import SportConfig
 
@@ -34,6 +35,7 @@ class BrainReport:
     margin_sd: float
     total_sd: float
     calibration: list[tuple[float, float, int]] = field(default_factory=list)
+    key_numbers: list[tuple[int, float]] = field(default_factory=list)  # strongest learned margin spikes
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -43,7 +45,11 @@ def train(
     cfg: SportConfig, results: list[GameResult], now: datetime, test_days: int = 60
 ) -> tuple[SportConfig, BrainReport]:
     start = now - timedelta(days=test_days)
+    if cfg.scoring == "normal":
+        cfg = with_shapes(cfg, results, before=start)  # learned only from games before the test window
     rep: BacktestReport = backtest(cfg, results, start, now)
+    if cfg.scoring == "normal":
+        cfg = with_shapes(cfg, results, before=now)  # then refreshed with everything for live use
     tuned = cfg
     if cfg.scoring == "normal" and rep.games >= 30:
         n = rep.games
@@ -64,5 +70,23 @@ def train(
         margin_sd=tuned.margin_sd,
         total_sd=tuned.total_sd,
         calibration=rep.calibration,
+        key_numbers=sorted(tuned.margin_shape.items(), key=lambda kv: -kv[1])[:4],
     )
     return tuned, report
+
+
+MIN_SHAPE_GAMES = 150
+
+
+def with_shapes(cfg: SportConfig, results: list[GameResult], before: datetime) -> SportConfig:
+    """Learn the sport's key numbers for margins and totals from final scores."""
+    done = [g for g in results if g.completed and g.date < before]
+    if len(done) < MIN_SHAPE_GAMES:
+        return cfg
+    margins = [round(g.home_score - g.away_score) for g in done]
+    totals = [round(g.home_score + g.away_score) for g in done]
+    return replace(
+        cfg,
+        margin_shape=shape_factors(margins, window=3, absolute=True),
+        total_shape=shape_factors(totals, window=4),
+    )

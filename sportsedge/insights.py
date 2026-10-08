@@ -120,6 +120,12 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
             rest = _rest_line(ctx)
             if rest:
                 bullets.append(rest)
+            if ctx.home_pitcher or ctx.away_pitcher:
+                def sp(name, era):
+                    return f"{name} ({era:.2f} ERA)" if era is not None else (name or "TBD")
+                bullets.append(
+                    f"Starters: {sp(ctx.away_pitcher, ctx.away_pitcher_era)} vs {sp(ctx.home_pitcher, ctx.home_pitcher_era)}."
+                )
 
     if pick.market_prob is not None:
         bullets.append(

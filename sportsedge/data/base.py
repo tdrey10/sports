@@ -48,7 +48,7 @@ class DataProvider(Protocol):
         """Player prop quotes for one event."""
 
     def player_games(self, cfg: SportConfig, results: list[GameResult], team: str) -> list[PlayerGame]:
-        """Box-score lines for ``team``'s players from its recent games."""
+        """Box-score lines (both teams) from ``team``'s recent games."""
 
     def box_score(self, cfg: SportConfig, game: GameResult) -> list[PlayerGame]:
         """Every player's line from one finished game (used to grade props)."""

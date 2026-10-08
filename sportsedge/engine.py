@@ -9,8 +9,8 @@ from datetime import datetime, timedelta, timezone
 from .brain import BrainReport, train
 from .data.base import DataProvider, Event, NameMatcher, Quote, is_out
 from .edge import Pick, Settings, evaluate, fmt_point
-from .models.game import GamePrediction, baseline_team_score, predict_game
-from .models.props import PlayerGame, PropProjection, project_prop
+from .models.game import GamePrediction, baseline_team_score, pitcher_factor, predict_game
+from .models.props import PlayerGame, PropProjection, matchup_factor, project_prop, usage_factor
 from .models.ratings import GameResult, TeamRatings, fit_ratings, is_b2b
 from .sports import SportConfig
 
@@ -26,6 +26,10 @@ class EventContext:
     home_rest: float | None
     away_rest: float | None
     injuries: dict[str, list[str]] = field(default_factory=dict)  # team -> players out
+    home_pitcher: str = ""
+    home_pitcher_era: float | None = None
+    away_pitcher: str = ""
+    away_pitcher_era: float | None = None
 
     @property
     def home_b2b(self) -> bool:
@@ -108,12 +112,16 @@ class Engine:
                         f"{cfg.name}: no rating for {odds_name!r}; using a "
                         f"{ratings.unknown_percentile:.0f}th-percentile team"
                     )
-            neutral = event.neutral or _is_neutral(scheduled, home, away, event.commence_time)
+            sched = _scheduled_game(scheduled, home, away, event.commence_time)
+            neutral = event.neutral or bool(sched and sched.neutral)
             ctx = EventContext(
                 event, home, away, neutral,
                 _rest_before(results, home, event.commence_time),
                 _rest_before(results, away, event.commence_time),
             )
+            if sched:
+                ctx.home_pitcher, ctx.home_pitcher_era = sched.home_pitcher, sched.home_pitcher_era
+                ctx.away_pitcher, ctx.away_pitcher_era = sched.away_pitcher, sched.away_pitcher_era
             if injury_matcher:
                 for team in (home, away):
                     key = injury_matcher.match(team)
@@ -124,6 +132,9 @@ class Engine:
             pred = predict_game(
                 cfg, ratings, home, away, neutral,
                 home_b2b=use_rest and ctx.home_b2b, away_b2b=use_rest and ctx.away_b2b,
+                # The away starter limits the home offence and vice versa.
+                home_factor=pitcher_factor(ctx.away_pitcher_era),
+                away_factor=pitcher_factor(ctx.home_pitcher_era),
             )
             scan.predictions[event.id] = pred
             scan.picks.extend(self._game_picks(cfg, event, pred))
@@ -206,20 +217,58 @@ class Engine:
         quotes = self.provider.prop_quotes(cfg, event, markets)
         if not quotes:
             return []
-        logs: dict[str, list[PlayerGame]] = {}
-        team_factor: dict[str, float] = {}
-        for team, exp in ((pred.home, pred.exp_home), (pred.away, pred.exp_away)):
+        lines: list[PlayerGame] = []
+        seen: set[tuple[str, str, str]] = set()
+        for team in (pred.home, pred.away):
             for pg in self.provider.player_games(cfg, results, team):
+                key = (pg.event_id, pg.team, pg.player)
+                if key not in seen:
+                    seen.add(key)
+                    lines.append(pg)
+        logs: dict[str, list[PlayerGame]] = {}
+        player_team: dict[str, str] = {}
+        for pg in lines:
+            if pg.team in (pred.home, pred.away):
                 logs.setdefault(pg.player, []).append(pg)
-                team_factor[pg.player] = exp / baseline_team_score(ratings, team)
+                player_team[pg.player] = pg.team
         if not logs:
             scan.warnings.append(f"{event.away} @ {event.home}: no player box scores for props")
             return []
+        game_script = {
+            pred.home: pred.exp_home / baseline_team_score(ratings, pred.home),
+            pred.away: pred.exp_away / baseline_team_score(ratings, pred.away),
+        }
+        opponent = {pred.home: pred.away, pred.away: pred.home}
         players = NameMatcher(logs, threshold=0.88)
         ruled_out = {p for names in ctx.injuries.values() for p in names}
         out_matcher = NameMatcher(ruled_out, threshold=0.9)
+        out_by_team: dict[str, set[str]] = {}
+        for p in logs:
+            if ruled_out and out_matcher.match(p):
+                out_by_team.setdefault(player_team[p], set()).add(p)
         cache: dict[tuple[str, str], PropProjection | None] = {}
+        factors: dict[tuple[str, str], tuple[float, list[str]]] = {}
         missing: set[str] = set()
+
+        def team_adjustment(market: str, team: str) -> tuple[float, list[str]]:
+            """Matchup (or game script for scoring stats) and teammates-out boost."""
+            key = (market, team)
+            if key not in factors:
+                spec = cfg.props[market]
+                notes = []
+                if spec.scales_with_team:
+                    f = min(max(game_script[team], 0.85), 1.15)
+                    if abs(f - 1) >= 0.02:
+                        notes.append(f"game script {f - 1:+.0%}")
+                else:
+                    f = matchup_factor(spec, lines, opponent[team])
+                    if abs(f - 1) >= 0.02:
+                        notes.append(f"vs {opponent[team]} {f - 1:+.0%}")
+                u, gone = usage_factor(spec, lines, team, out_by_team.get(team, set()))
+                if gone:
+                    notes.append(f"{', '.join(sorted(gone))} out {u - 1:+.0%}")
+                factors[key] = (f * u, notes)
+            return factors[key]
 
         def projection(q: Quote) -> PropProjection | None:
             if ruled_out and out_matcher.match(q.player or ""):
@@ -230,7 +279,8 @@ class Engine:
                 return None
             key = (name, q.market)
             if key not in cache:
-                cache[key] = project_prop(cfg.props[q.market], q.market, name, logs[name], team_factor.get(name, 1.0))
+                f, notes = team_adjustment(q.market, player_team[name])
+                cache[key] = project_prop(cfg.props[q.market], q.market, name, logs[name], f, notes=notes)
             return cache[key]
 
         def model(q: Quote):
@@ -243,7 +293,10 @@ class Engine:
             proj = projection(q)
             spec = cfg.props[q.market]
             sel = f"{q.player} {q.side.title()} {fmt_point(q.point, signed=False)} {spec.label}"
-            desc = f"projects {proj.mean:.1f} ± {proj.sd:.1f} (last {proj.games} games)" if proj else ""
+            desc = ""
+            if proj:
+                desc = f"projects {proj.mean:.1f} ± {proj.sd:.1f} (last {proj.games} games"
+                desc += "; " + ", ".join(proj.notes) + ")" if proj.notes else ")"
             return sel, desc
 
         picks = evaluate(event, quotes, model, describe, self.settings, lambda m: 2)
@@ -259,8 +312,8 @@ def _rest_before(results: list[GameResult], team: str, when: datetime) -> float 
     return (when - max(prev)).total_seconds() / 86400.0
 
 
-def _is_neutral(scheduled: list[GameResult], home: str, away: str, when: datetime) -> bool:
+def _scheduled_game(scheduled: list[GameResult], home: str, away: str, when: datetime) -> GameResult | None:
     for g in scheduled:
         if g.home == home and g.away == away and abs((g.date - when).total_seconds()) < 36 * 3600:
-            return g.neutral
-    return False
+            return g
+    return None

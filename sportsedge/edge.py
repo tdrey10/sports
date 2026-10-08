@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
@@ -198,6 +199,21 @@ def qualifying(picks: list[Pick], settings: Settings) -> list[Pick]:
         if settings.min_ev <= p.ev <= settings.max_ev and not (settings.hide_flagged and p.warnings)
     ]
     return sorted(out, key=lambda p: p.ev, reverse=True)
+
+
+def growth(p: Pick) -> float:
+    """Expected log-bankroll growth per bet at full Kelly.
+
+    Ranks bets by edge *and* certainty: a +4% EV bet at -110 beats a +6% EV
+    longshot at +450 because it grows a bankroll faster with less variance.
+    """
+    b = american_to_decimal(p.american) - 1
+    win = p.win_prob * (1 - p.push_prob)
+    loss = (1 - p.win_prob) * (1 - p.push_prob)
+    f = kelly_fraction(win, loss, b + 1)
+    if f <= 0:
+        return 0.0
+    return win * math.log(1 + b * f) + loss * math.log(1 - f)
 
 
 def best_per_event(picks: list[Pick], settings: Settings) -> list[Pick]:

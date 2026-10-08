@@ -1,4 +1,4 @@
-<title>SportsEdge</title>
+<title>Funky Buttlovin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -34,7 +34,7 @@ button { font: inherit; color: inherit; }
 
 /* header */
 .top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.brand h1 { font-size: 40px; font-weight: 800; line-height: .9; text-transform: uppercase; }
+.brand h1 { font-size: 40px; font-weight: 800; line-height: .9; text-transform: uppercase; display: flex; flex-wrap: wrap; column-gap: .25em; }
 .brand h1 span { color: var(--accent); }
 .brand p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
 .chips-top { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -106,6 +106,10 @@ details ul { margin: 0; padding: 0 16px 14px 32px; display: grid; gap: 4px; font
 .row-main .meta { grid-column: 1 / -1; }
 .row-side { justify-self: end; display: flex; gap: 6px; align-items: center; }
 .ev { font: 600 12px/1 var(--mono); color: var(--win); }
+.kind { font: 700 10px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 3px 5px; }
+.rank { font: 800 28px/1 var(--display); color: var(--accent); min-width: 1.4ch; }
+.row.best .row-main { grid-template-columns: auto 1fr auto; }
+.row.best .row-main .meta, .row.best .row-main .stamp { grid-column: 2 / -1; }
 .stamp { grid-column: 1 / -1; }
 
 /* slip */
@@ -149,13 +153,19 @@ footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-t
 <main class="wrap" id="app">
   <header class="top">
     <div class="brand">
-      <h1>Sports<span>Edge</span></h1>
+      <h1>Funky <span>Buttlovin</span></h1>
       <p id="updated">Loading the board…</p>
     </div>
     <div class="chips-top" id="topchips"></div>
   </header>
   <div id="demo"></div>
   <nav class="filters" id="filters" aria-label="Filter by sport"></nav>
+  <nav class="filters" id="markets" aria-label="Filter by bet type" style="margin-top:-20px"></nav>
+
+  <section id="best" aria-labelledby="h-best">
+    <div class="sec-head"><h2 id="h-best">Best bets</h2><span class="label">Top 5 · ranked by bankroll growth</span></div>
+    <div id="best-list" class="rows"></div>
+  </section>
 
   <section id="headliners" aria-labelledby="h-today">
     <div class="sec-head"><h2 id="h-today">Today's best</h2><span class="label" id="today-date"></span></div>
@@ -198,7 +208,7 @@ footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-t
   </section>
 
   <footer>
-    <p>Probabilities come from team ratings fitted to every final score (recent games weigh more, back-to-backs and home field learned from data), player box scores for props, and the no-vig consensus of the sportsbooks. The blend between our model and the market is re-learned from graded picks.</p>
+    <p>Funky Buttlovin prices every spread, over/under, moneyline and player prop. Probabilities come from team ratings fitted to every final score (recent games weigh more; back-to-backs, home field and key numbers like 3 and 7 learned from data; MLB starting pitchers), player box scores for props (opponent matchups, teammates out), and the no-vig consensus of the sportsbooks. The blend between our model and the market is re-learned from graded picks.</p>
     <p>Closing-line value (CLV) is the long-run tell: if our prices beat the closing line, the edge is real. No system wins every bet. Bet only what you can afford to lose, and only where it is legal for you.</p>
   </footer>
 </main>
@@ -209,8 +219,10 @@ footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-t
   "use strict";
   let DATA = JSON.parse(document.getElementById("edge-data").textContent);
   const slip = new Set();
-  let sport = "all";
-  try { sport = localStorage.getItem("edge-sport") || "all"; } catch (e) {}
+  let sport = "all", market = "all";
+  try { sport = localStorage.getItem("edge-sport") || "all"; market = localStorage.getItem("edge-market") || "all"; } catch (e) {}
+  const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "Over/Under"], ["props", "Props"], ["moneyline", "Moneyline"]];
+  const groupOf = (e) => (e.player ? "props" : e.market === "spreads" ? "spreads" : e.market === "totals" ? "totals" : "moneyline");
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -225,7 +237,7 @@ footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-t
   const fmtTime = (iso, opts) => new Date(iso).toLocaleString(undefined, Object.assign({ timeZone: tz }, opts));
   const TIER = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day", value: "Value play", early: "Early value", lean: "Lean" };
 
-  function visible(e) { return sport === "all" || e.sport === sport; }
+  function visible(e) { return (sport === "all" || e.sport === sport) && (market === "all" || groupOf(e) === market); }
   function isOpen(e) { return e.status === "pending" && new Date(e.commence_time) > new Date(); }
 
   function whenLine(e) {
@@ -292,13 +304,16 @@ footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-t
     </article>`;
   }
 
-  function row(e) {
-    return `<article class="row">
+  const KIND = { spreads: "Spread", totals: "O/U", props: "Prop", moneyline: "ML" };
+
+  function row(e, ranked) {
+    const rank = ranked && e.best_rank ? `<span class="rank num">${e.best_rank}</span>` : "";
+    return `<article class="row${rank ? " best" : ""}">
       <div class="row-main">
-        <h3>${esc(e.selection)}</h3>
-        <div class="row-side"><span class="ev">${e.ev >= 0 ? "+" : ""}${(e.ev * 100).toFixed(1)}% EV</span><span class="o num">${odds(e.odds)}</span></div>
+        ${rank}<h3>${esc(e.selection)}</h3>
+        <div class="row-side"><span class="kind">${KIND[groupOf(e)]}</span><span class="ev">${e.ev >= 0 ? "+" : ""}${(e.ev * 100).toFixed(1)}% EV</span><span class="o num">${odds(e.odds)}</span></div>
         <div class="meta">${esc(e.sport_name)} · ${esc(e.matchup)} · <span class="when">${whenLine(e)}</span> · ${unitsText(e)}</div>
-        <div class="meta" style="grid-column:1/-1">${esc(e.headline)}</div>
+        <div class="meta">${esc(e.headline)}</div>
         <div class="stamp">${movement(e)}${statusBits(e)}</div>
       </div>
       <div class="foot">${details(e)}${addBtn(e)}</div>
@@ -320,11 +335,12 @@ footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-t
     const head = items.filter((e) => ["lock", "dog", "prop"].includes(e.tier) && (e.day === today || !e.settled))
       .sort((a, b) => ["lock", "dog", "prop"].indexOf(a.tier) - ["lock", "dog", "prop"].indexOf(b.tier));
     const fill = (id, list, fn, empty) => { $(id).innerHTML = list.length ? list.map(fn).join("") : `<p class="empty">${empty}</p>`; };
+    fill("best-list", items.filter((e) => e.best_rank).sort((a, b) => a.best_rank - b.best_rank), (e) => row(e, true), "Best bets post once today's games clear the bar.");
     fill("headliner-list", head, ticket, "No headliners yet. They post once a game clears the bar.");
-    fill("value-list", items.filter((e) => e.tier === "value" && !e.player).sort((a, b) => b.ev - a.ev), row, "No game-line value plays right now.");
-    fill("prop-list", items.filter((e) => e.tier === "value" && e.player).sort((a, b) => b.ev - a.ev), row, "No prop edges right now.");
-    fill("early-list", items.filter((e) => e.tier === "early").sort((a, b) => b.ev - a.ev), row, "Nothing early yet.");
-    fill("lean-list", items.filter((e) => e.tier === "lean"), row, "No leans right now.");
+    fill("value-list", items.filter((e) => e.tier === "value" && !e.player).sort((a, b) => b.ev - a.ev), (e) => row(e), "No game-line value plays right now.");
+    fill("prop-list", items.filter((e) => e.tier === "value" && e.player).sort((a, b) => b.ev - a.ev), (e) => row(e), "No prop edges right now.");
+    fill("early-list", items.filter((e) => e.tier === "early").sort((a, b) => b.ev - a.ev), (e) => row(e), "Nothing early yet.");
+    fill("lean-list", items.filter((e) => e.tier === "lean"), (e) => row(e), "No leans right now.");
   }
 
   function renderSlip() {
@@ -383,6 +399,11 @@ footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-t
       return `<div class="tile"><span class="label">${TIER[t]}</span><b class="num">${rec(s)}</b>
         <small class="${cls(s.units)}">${signed(s.units, 1)}u · ${s.roi == null ? "–" : signed(s.roi * 100, 0) + "% ROI"}</small></div>`;
     }).join("") + `<div class="tile"><span class="label">Leans</span><b class="num">${st.leans.won}-${st.leans.lost}</b><small>${pct(st.leans.win_pct)} · no units</small></div>`;
+    const byMarket = MARKETS.slice(1).map(([k, n]) => {
+      const s = st.by_market[k];
+      return `<div class="tile"><span class="label">${n}</span><b class="num">${rec(s)}</b>
+        <small class="${cls(s.units)}">${signed(s.units, 1)}u · CLV ${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</small></div>`;
+    }).join("");
     const sports = Object.entries(st.by_sport).map(([k, s]) =>
       `<tr><td>${esc(s.name)}</td><td>${rec(s)}</td><td>${pct(s.win_pct)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.roi)}">${s.roi == null ? "–" : signed(s.roi * 100, 1) + "%"}</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`).join("");
     const recent = DATA.entries.filter((e) => e.settled && e.status !== "void" && visible(e))
@@ -393,16 +414,18 @@ footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-t
           <div class="meta">Started at ${money(st.start_bankroll)} · 1 unit = ${money(st.unit_value)}</div></div>
         ${spark(st.curve, st.start_bankroll)}
       </div>
-      <div class="grid4" style="margin-top:8px">
+      <div class="grid3" style="margin-top:8px">
         <div class="tile"><span class="label">Unit plays</span><b class="num">${rec(o)}</b><small>${pct(o.win_pct)} winners</small></div>
         <div class="tile"><span class="label">Profit</span><b class="num ${cls(o.units)}">${signed(o.units, 1)}u</b><small>${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
         <div class="tile"><span class="label">Beat the close</span><b class="num">${pct(o.beat_close)}</b><small>avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</small></div>
+        <div class="tile"><span class="label">Best bets</span><b class="num">${rec(st.best)}</b><small class="${cls(st.best.units)}">${signed(st.best.units, 1)}u · ${st.best.roi == null ? "–" : signed(st.best.roi * 100, 0) + "% ROI"}</small></div>
         <div class="tile"><span class="label">Last 7 days</span><b class="num ${cls(st.last7.units)}">${signed(st.last7.units, 1)}u</b><small>${rec(st.last7)}</small></div>
       </div>
       <div class="grid3" style="margin-top:8px">${tiers}</div>
+      <div class="grid4" style="margin-top:8px">${byMarket}</div>
       ${sports ? `<div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>Sport</th><th>W-L</th><th>Win</th><th>Units</th><th>ROI</th><th>CLV</th></tr></thead><tbody>${sports}</tbody></table></div>` : ""}
       <h3 style="font-size:20px;margin:18px 0 8px">Latest results</h3>
-      <div class="rows">${recent.length ? recent.map(row).join("") : `<p class="empty">No graded picks yet.</p>`}</div>`;
+      <div class="rows">${recent.length ? recent.map((e) => row(e)).join("") : `<p class="empty">No graded picks yet.</p>`}</div>`;
   }
 
   function renderBrain() {
@@ -429,6 +452,7 @@ footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-t
     $("demo").innerHTML = DATA.demo ? `<div class="demo">Demo data: made-up teams, players and odds so you can see how the board works. Nothing here is a real bet.</div>` : "";
     const sports = [["all", "All"], ...DATA.sports.map((s) => [s.key, s.name])];
     $("filters").innerHTML = sports.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${k === sport}">${esc(n)}</button>`).join("");
+    $("markets").innerHTML = MARKETS.map(([k, n]) => `<button data-market="${k}" aria-pressed="${k === market}">${esc(n)}</button>`).join("");
   }
 
   function render() { renderTop(); renderBoard(); renderSlip(); renderRecord(); renderBrain(); }
@@ -436,7 +460,8 @@ footer { color: var(--muted); font-size: 13px; display: grid; gap: 6px; border-t
   document.addEventListener("click", (ev) => {
     const t = ev.target.closest("button");
     if (!t) return;
-    if (t.dataset.sport) { sport = t.dataset.sport; try { localStorage.setItem("edge-sport", sport); } catch (e) {} render(); }
+    if (t.dataset.market) { market = t.dataset.market; try { localStorage.setItem("edge-market", market); } catch (e) {} render(); }
+    else if (t.dataset.sport) { sport = t.dataset.sport; try { localStorage.setItem("edge-sport", sport); } catch (e) {} render(); }
     else if (t.dataset.add) { slip.has(t.dataset.add) ? slip.delete(t.dataset.add) : slip.add(t.dataset.add); render(); }
     else if (t.id === "clear-slip") { slip.clear(); render(); }
   });

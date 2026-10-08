@@ -6,7 +6,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 
-from .edge import Pick, Settings, best_per_event, qualifying
+from .edge import Pick, Settings, best_per_event, growth, qualifying
 from .engine import SportScan
 from .insights import reasons
 
@@ -26,6 +26,7 @@ DOG_MAX_ODDS = 350  # past this the variance swamps the edge for a headline pick
 PROP_ODDS_RANGE = (-200, 200)
 EARLY_HOURS = 24  # games further out than this are "early value"
 MAX_UNITS = 3.0
+BEST_BETS = 5  # daily top picks across spreads, totals, moneylines and props
 
 
 @dataclass
@@ -39,6 +40,7 @@ class Card:
     pick: Pick
     home: str = ""
     away: str = ""
+    best_rank: int | None = None  # 1..BEST_BETS for the day's best bets
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -57,6 +59,7 @@ def build_cards(
     settings: Settings,
     now: datetime,
     taken_today: set[str] | None = None,
+    best_taken: int = 0,
     max_value: int = 12,
     max_early: int = 10,
     max_leans: int = 10,
@@ -112,6 +115,14 @@ def build_cards(
         best_lean.setdefault(p.event_id, p)
     chosen += [("lean", p) for p in list(best_lean.values())[:max_leans]]
 
+    # Best bets: today's unit plays with the fastest bankroll growth.
+    slots = max(BEST_BETS - best_taken, 0)
+    ranked = sorted(
+        (p for tier, p in chosen if tier in UNIT_TIERS and p.commence_time <= soon_cut),
+        key=growth, reverse=True,
+    )[:slots]
+    best_rank = {id(p): best_taken + i + 1 for i, p in enumerate(ranked)}
+
     cards = []
     for tier, pick in chosen:
         scan = by_event.get(pick.event_id)
@@ -128,6 +139,7 @@ def build_cards(
                 pick=pick,
                 home=ctx.home if ctx else "",
                 away=ctx.away if ctx else "",
+                best_rank=best_rank.get(id(pick)),
             )
         )
     return cards

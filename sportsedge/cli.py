@@ -255,7 +255,7 @@ def cmd_sports(_args) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="sportsedge", description="Find +EV bets from team and player stats.")
+    p = argparse.ArgumentParser(prog="funky", description="Funky Buttlovin: find +EV bets from team and player stats.")
     p.add_argument("-v", "--verbose", action="store_true")
     sub = p.add_subparsers(dest="command", required=True)
 

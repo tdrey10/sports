@@ -1,4 +1,4 @@
-# SportsEdge
+# Funky Buttlovin
 
 A stats-driven engine that prices every bet on the board and ranks the ones
 where the price is better than the true odds:
@@ -24,8 +24,10 @@ Thu 10:00  Mobile Storm @ Houston Titans    Under 236          fanduel     -101 
 
 ## The dashboard
 
-`sportsedge run` turns each scan into a phone-friendly dashboard (`site/index.html`):
+`funky run` (or `sportsedge run`, same thing) turns each scan into a phone-friendly dashboard (`site/index.html`):
 
+- **Best bets**: the day's top 5 across spreads, over/unders, moneylines and props. They're ranked by expected bankroll growth (Kelly), which weighs edge against risk, so a solid -110 edge outranks a +450 longshot with a slightly bigger EV.
+- **Filter by bet type**: Spreads, Over/Under, Props, Moneyline, plus a record and closing-line value for each type.
 - **Today's best**: Lock of the Day (highest win probability that still beats the price), Dog of the Day (best plus-money edge up to +350) and Prop of the Day.
 - **The board**: game-line value plays, player props, early value (games more than 24 hours out) and leans (small edges, no units, still tracked).
 - **Every pick explains itself**: projected score, team records, last result, back-to-backs and rest, injuries, model vs. market odds, and the best book.
@@ -63,7 +65,7 @@ sportsedge scan all --json picks.json
 Run the full engine and build the dashboard:
 
 ```bash
-sportsedge run --demo --props        # demo: 14 days of simulated history, then today's board
+funky run --demo --props             # demo: 14 days of simulated history, then today's board
 open site/index.html
 
 sportsedge run nba nfl ncaaf --props # live: picks go into data/ledger.json
@@ -145,9 +147,13 @@ The Odds API prices ──► no-vig consensus ───────────
 5. **Blend, then price.** The model's probability is blended with the market's
    (`--market-weight`). EV is computed at the **best available price** across
    books, with pushes handled exactly. Stakes use fractional Kelly with a cap.
-6. **Rest and injuries.** NBA/NHL back-to-back effects are fitted from the data. ESPN's injury report is shown on each pick, and props for players listed out are skipped.
-7. **Self-tuning.** Every run re-tests the model on recent games it never saw ("the brain"). It re-tunes each sport's score spread so a 60% call really wins 60%. Once a sport has 60 graded picks, it also re-learns how much to trust the model vs. the market.
-8. **Sanity filters.** Some edges are almost always data problems rather than
+6. **Key numbers.** Football margins land on 3, 7 and 10 far more often than a bell curve says, and totals have favorite numbers too. Each sport learns this lumpiness from its own final scores, so -3 vs -3.5 and the push chance on whole-number lines are priced correctly.
+7. **MLB starting pitchers.** ESPN's probable starters and their ERA adjust the opponent's expected runs (shrunk halfway to league average, applied to the ~60% of the game a starter pitches). This affects totals, run lines and moneylines.
+8. **Prop matchups.** Each stat is adjusted for how much of it this opponent has allowed lately vs. the average team (rebounds allowed, strikeouts by opposing pitchers, receiving yards allowed…), measured from box scores. Scoring stats follow the game model's expected score instead.
+9. **Teammates out.** When a recent regular is ruled out, half of their production is redistributed to healthy teammates in proportion to their share.
+10. **Rest and injuries.** NBA/NHL back-to-back effects are fitted from the data. ESPN's injury report is shown on each pick, and props for players listed out are skipped.
+11. **Self-tuning.** Every run re-tests the model on recent games it never saw ("the brain"). It re-tunes each sport's score spread so a 60% call really wins 60%. Once a sport has 60 graded picks, it also re-learns how much to trust the model vs. the market.
+12. **Sanity filters.** Some edges are almost always data problems rather than
    real value: huge EVs, or big model-vs-market disagreements (injuries,
    suspensions, a starter resting, a goalie or pitcher change). These are
    hidden by default and counted in the output.

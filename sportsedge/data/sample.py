@@ -297,10 +297,7 @@ class SampleProvider:
         games = sorted(games, key=lambda g: g.date)[-cfg.prop_games:]
         out = []
         for g in games:
-            for pname, stats in world["players"].get(team, []):
-                line = self._player_line(g.event_id, pname, stats)
-                if line is not None:
-                    out.append(PlayerGame(g.event_id, g.date, pname, team, line))
+            out.extend(self.box_score(cfg, g))
         return out
 
 

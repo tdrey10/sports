@@ -34,6 +34,10 @@ class GameResult:
     detail: str = ""  # e.g. "1:28 - 3rd" for games in progress
     live_home: float | None = None
     live_away: float | None = None
+    home_pitcher: str = ""  # MLB probable starters (scheduled games)
+    home_pitcher_era: float | None = None
+    away_pitcher: str = ""
+    away_pitcher_era: float | None = None
 
     @property
     def completed(self) -> bool:

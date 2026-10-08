@@ -59,6 +59,7 @@ class Entry:
     win_prob: float
     ev: float
     market_prob: float | None = None
+    best_rank: int | None = None
     current_odds: float | None = None
     current_point: float | None = None
     current_book: str | None = None
@@ -135,6 +136,10 @@ class Ledger:
     def day_of(self, when: datetime) -> str:
         return when.astimezone(self.tz).date().isoformat()
 
+    def best_taken(self, now: datetime) -> int:
+        today = self.day_of(now)
+        return sum(1 for e in self.entries.values() if e.day == today and e.best_rank)
+
     def taken_today(self, now: datetime) -> set[str]:
         today = self.day_of(now)
         return {e.tier for e in self.entries.values() if e.day == today and e.tier in DAY_TIERS}
@@ -145,10 +150,19 @@ class Ledger:
         and each game gets at most one game-line unit play."""
         added = []
         unit_events = {e.event_id for e in self.entries.values() if e.is_unit_play and e.player is None}
-        for card in cards:
+        today = self.day_of(now)
+        ranked_today = [e for e in self.entries.values() if e.day == today and e.best_rank]
+        next_rank = max((e.best_rank for e in ranked_today), default=0) + 1
+        for card in sorted(cards, key=lambda c: c.best_rank or 99):
             p = card.pick
             eid = entry_id(p)
             if eid in self.entries:
+                existing = self.entries[eid]
+                # Promote an open unit play that is now one of today's best bets.
+                if card.best_rank and not existing.best_rank and existing.is_unit_play \
+                        and existing.status == "pending" and existing.start > now and next_rank <= 5:
+                    existing.best_rank, existing.day = next_rank, today
+                    next_rank += 1
                 continue
             if p.player is None and card.units > 0:
                 if p.event_id in unit_events:
@@ -179,6 +193,7 @@ class Ledger:
                 odds=p.american,
                 model_prob=p.model_prob,
                 market_prob=p.market_prob,
+                best_rank=None,
                 win_prob=p.win_prob,
                 ev=p.ev,
                 current_odds=p.american,
@@ -188,6 +203,9 @@ class Ledger:
                 close_odds=p.american,
                 close_fair=p.market_prob,
             )
+            if card.best_rank and card.units > 0 and next_rank <= 5:
+                e.best_rank = next_rank
+                next_rank += 1
             self.entries[eid] = e
             added.append(e)
         return added
@@ -332,11 +350,22 @@ class Ledger:
             "overall": summary(plays),
             "last7": summary([e for e in plays if e.start >= week_ago]),
             "by_tier": by_tier,
+            "best": summary([e for e in plays if e.best_rank]),
+            "by_market": {
+                m: summary([e for e in plays if _market_group(e) == m])
+                for m in ("spreads", "totals", "props", "moneyline")
+            },
             "by_sport": by_sport,
             "leans": {"won": lean_won, "lost": lean_lost,
                       "win_pct": lean_won / (lean_won + lean_lost) if lean_won + lean_lost else None},
             "curve": curve,
         }
+
+
+def _market_group(e: "Entry") -> str:
+    if e.player:
+        return "props"
+    return {"spreads": "spreads", "totals": "totals"}.get(e.market, "moneyline")
 
 
 def find_game(results: list[GameResult], e: Entry) -> GameResult | None:

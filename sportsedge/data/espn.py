@@ -109,7 +109,7 @@ class EspnClient:
             except requests.RequestException as exc:
                 log.warning("ESPN summary %s failed: %s", g.event_id, exc)
                 continue
-            out.extend(pg for pg in parse_box_score(summary, g.event_id, g.date) if pg.team == team)
+            out.extend(parse_box_score(summary, g.event_id, g.date))  # both sides: opponents feed matchup factors
         return out
 
 
@@ -131,6 +131,8 @@ def _parse_event(ev: dict) -> GameResult | None:
             return None
 
     hs, as_ = score(home), score(away)
+    hp, hp_era = _probable(home)
+    ap, ap_era = _probable(away)
     final = completed and hs is not None and as_ is not None
     live = state == "in" and hs is not None and as_ is not None
     return GameResult(
@@ -145,7 +147,28 @@ def _parse_event(ev: dict) -> GameResult | None:
         detail=status.get("shortDetail") or status.get("detail") or "",
         live_home=hs if live else None,
         live_away=as_ if live else None,
+        home_pitcher=hp,
+        home_pitcher_era=hp_era,
+        away_pitcher=ap,
+        away_pitcher_era=ap_era,
     )
+
+
+def _probable(competitor: dict) -> tuple[str, float | None]:
+    """(name, ERA) of a team's probable starting pitcher, when ESPN lists one."""
+    for prob in competitor.get("probables", []) or []:
+        athlete = prob.get("athlete") or {}
+        name = athlete.get("displayName") or athlete.get("fullName") or ""
+        era = None
+        for stat in prob.get("statistics", []) or []:
+            if (stat.get("abbreviation") or stat.get("name") or "").upper() == "ERA":
+                try:
+                    era = float(stat.get("displayValue"))
+                except (TypeError, ValueError):
+                    era = None
+        if name:
+            return name, era
+    return "", None
 
 
 def parse_injuries(data: dict) -> dict[str, list[tuple[str, str]]]:

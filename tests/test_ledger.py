@@ -179,7 +179,7 @@ def test_simulated_history_and_dashboard(tmp_path):
     assert stats["overall"]["won"] + stats["overall"]["lost"] > 0
     data = build_data(L, {**brains, **res.brains}, res.weights, sports, provider.now, demo=True)
     html = render_html(data)
-    assert html.startswith("<!doctype html>") and "<title>SportsEdge</title>" in html.split("<body>")[0]
+    assert html.startswith("<!doctype html>") and "<title>Funky Buttlovin</title>" in html.split("<body>")[0]
     assert "__DATA__" not in html
     json.dumps(data)  # serialisable
 
@@ -192,3 +192,72 @@ def test_cli_run_demo(tmp_path, capsys):
     assert (tmp_path / "data" / "demo-ledger.json").exists()
     assert main(args + ["--scores-only"]) == 0
     assert "dashboard:" in capsys.readouterr().out
+
+
+def test_best_bets_ranked_by_growth():
+    from sportsedge.edge import growth
+    safe = make_pick(american=-110, win_prob=0.56, ev=0.07)
+    longshot = make_pick(american=450, win_prob=0.20, ev=0.10)
+    assert growth(safe) > growth(longshot)
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(c, props=True) for c in resolve("nba,nhl")]
+    cards = build_cards(scans, engine.settings, provider.now)
+    ranks = sorted(c.best_rank for c in cards if c.best_rank)
+    assert ranks == list(range(1, len(ranks) + 1)) and len(ranks) <= 5
+    assert len([c for c in build_cards(scans, engine.settings, provider.now, best_taken=5) if c.best_rank]) == 0
+
+
+def test_key_numbers_learned_by_brain():
+    import random
+    from dataclasses import replace
+    from sportsedge.brain import with_shapes
+    rng = random.Random(3)
+    def pts():
+        return sum(rng.choice([0, 0, 3, 7]) for _ in range(4))
+    games = [GameResult(f"g{i}", NOW - timedelta(days=200 - i / 5), "A", "B", pts(), pts()) for i in range(800)]
+    cfg = with_shapes(SPORTS["nfl"], games, NOW)
+    assert cfg.margin_shape[3] > 1.3 and cfg.margin_shape[7] > 1.3
+    assert SPORTS["nfl"].margin_shape == {}  # the global config is untouched
+
+
+def test_pitcher_factor_and_parse():
+    from sportsedge.data.espn import _parse_event
+    from sportsedge.models.game import pitcher_factor
+    assert pitcher_factor(2.5) < 1 < pitcher_factor(6.0)
+    ev = {"id": "1", "date": "2026-10-08T23:05Z", "status": {"type": {"completed": False, "state": "pre"}},
+          "competitions": [{"competitors": [
+              {"homeAway": "home", "team": {"displayName": "Yankees"},
+               "probables": [{"athlete": {"displayName": "Gerrit Cole"}, "statistics": [{"abbreviation": "ERA", "displayValue": "2.95"}]}]},
+              {"homeAway": "away", "team": {"displayName": "Red Sox"}}]}]}
+    g = _parse_event(ev)
+    assert g.home_pitcher == "Gerrit Cole" and g.home_pitcher_era == 2.95 and g.away_pitcher == ""
+
+
+def test_prop_matchup_and_usage_factors():
+    from sportsedge.models.props import matchup_factor, usage_factor
+    spec = SPORTS["nba"].props["player_rebounds"]
+    lines = []
+    for i in range(10):
+        for team, opp in (("Soft", f"X{i}"), ("Hard", f"Y{i}")):
+            ev = f"{team}{i}"
+            lines.append(PlayerGame(ev, NOW, f"{team} big", team, {"REB": 10.0}))
+            lines.append(PlayerGame(ev, NOW, f"{opp} big", opp, {"REB": 14.0 if team == "Soft" else 8.0}))
+    assert matchup_factor(spec, lines, "Soft") > 1.02
+    assert matchup_factor(spec, lines, "Hard") < 0.98
+    team_lines = [PlayerGame(f"t{i}", NOW + timedelta(days=i), p, "T", {"REB": v})
+                  for i in range(5) for p, v in (("Star", 12.0), ("Role", 6.0))]
+    f, gone = usage_factor(spec, team_lines, "T", {"Star"})
+    assert gone == ["Star"] and f == pytest.approx(1.25)
+    assert usage_factor(spec, team_lines, "T", set()) == (1.0, [])
+
+
+def test_best_rank_promotes_existing_and_numbers_without_gaps():
+    L = Ledger()
+    early = make_pick(event_id="a")
+    L.publish([card(early, tier="early")], NOW)
+    c1 = card(early, tier="value"); c1.best_rank = 1
+    c2 = card(make_pick(event_id="b")); c2.best_rank = 2
+    L.publish([c2, c1], NOW)
+    ranks = sorted((e.event_id, e.best_rank) for e in L.entries.values())
+    assert ranks == [("a", 1), ("b", 2)]

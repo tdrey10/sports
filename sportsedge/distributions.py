@@ -111,3 +111,43 @@ def line_probs(pmf: Mapping[int, float], line: float) -> tuple[float, float, flo
 
 def negate(pmf: Mapping[int, float]) -> Pmf:
     return {-k: p for k, p in pmf.items()}
+
+
+def shape_factors(
+    values: list[int], window: int = 3, pseudo: float = 10.0, absolute: bool = False
+) -> dict[int, float]:
+    """How much more (or less) often each exact value occurs than its neighbours.
+
+    Compares the histogram of observed values with a smoothed copy of itself.
+    In the NFL a margin of 3 shows up far more often than 2 or 4 ("key
+    numbers"); in the NBA a margin of 0 never happens. ``pseudo`` shrinks
+    thinly observed values toward 1. With ``absolute`` the factors are keyed
+    by |value| (margins are symmetric).
+    """
+    if not values:
+        return {}
+    vals = [abs(v) for v in values] if absolute else list(values)
+    hist: dict[int, int] = {}
+    for v in vals:
+        hist[v] = hist.get(v, 0) + 1
+    lo, hi = (0 if absolute else min(hist)), max(hist)
+    factors: dict[int, float] = {}
+    for m in range(lo, hi + 1):
+        neighbours = []
+        for d in range(-window, window + 1):
+            k = m + d
+            if absolute and k < 0:
+                k = -k  # reflect at zero
+            neighbours.append(hist.get(k, 0))
+        smooth = sum(neighbours) / len(neighbours)
+        ratio = (hist.get(m, 0) + pseudo) / (smooth + pseudo)
+        if abs(ratio - 1) > 0.03:
+            factors[m] = round(ratio, 4)
+    return factors
+
+
+def apply_shape(pmf: Mapping[int, float], factors: Mapping[int, float], absolute: bool = False) -> Pmf:
+    if not factors:
+        return dict(pmf)
+    shaped = {k: p * factors.get(abs(k) if absolute else k, 1.0) for k, p in pmf.items()}
+    return normalise(shaped)
