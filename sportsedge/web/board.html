@@ -1,211 +1,177 @@
 <title>Funky Buttlovin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-/* Layout: one phone-width column of glowing pick cards. Live first, then the day's headliners,
-   the board, early plays, leans, the slip, the record and the model. One committed dark look. */
+/* Layout: a scoreboard strip, sticky tabs (Today · Live · Props · Early · Results · Model), picks grouped
+   by game like a sportsbook board, and a parlay slip docked to the bottom of the screen. Calm, muted palette. */
 :root {
-  --bg: #040609; --panel: #0b0f17; --panel-2: #101723; --line: #1b2433;
-  --fg: #f2f5fb; --muted: #9aa6bb; --dim: #6b7790;
-  --live: #ff3b3b; --lock: #22e39a; --dog: #ff7a00; --board: #ffc233; --prop: #b36bff; --early: #ff5a1f;
-  --best: #22d3ee; --lean: #ffc233; --win: #22e39a; --loss: #ff3b3b;
-  /* second colour of each card's gradient edge */
-  --live-2: #ff2a8a; --lock-2: #0fb87a; --dog-2: #ff2a2a; --board-2: #ff8a00; --prop-2: #2f8bff; --early-2: #ffc233;
-  --best-2: #2f8bff; --lean-2: #e8c77a;
-  --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
-  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  color-scheme: dark;
+  --bg: #f1f3f5; --surface: #ffffff; --surface-2: #f6f7f9; --line: #dde1e6; --line-2: #c9cfd6;
+  --fg: #1b1f24; --muted: #5d6671; --accent: #9a6b12; --accent-soft: #f3e8d2;
+  --win: #2f7a50; --win-soft: #e1efe6; --loss: #b0463b; --loss-soft: #f5e1de;
+  --live: #b4532f; --live-soft: #f6e4dc; --info: #3e6a8a; --info-soft: #e1ebf2;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
 }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15181d; --surface: #1d2127; --surface-2: #23282f; --line: #2f353e; --line-2: #3b424d;
+  --fg: #e7e5e0; --muted: #9ba2ab; --accent: #d6a24a; --accent-soft: #3a3020;
+  --win: #74bd90; --win-soft: #1f3328; --loss: #d6786c; --loss-soft: #3a2422;
+  --live: #e08a68; --live-soft: #3b2820; --info: #86afcb; --info-soft: #1f2d38; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #15181d; --surface: #1d2127; --surface-2: #23282f; --line: #2f353e; --line-2: #3b424d;
+  --fg: #e7e5e0; --muted: #9ba2ab; --accent: #d6a24a; --accent-soft: #3a3020;
+  --win: #74bd90; --win-soft: #1f3328; --loss: #d6786c; --loss-soft: #3a2422;
+  --live: #e08a68; --live-soft: #3b2820; --info: #86afcb; --info-soft: #1f2d38; color-scheme: dark; }
+
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.45 var(--body);
-  background-image: radial-gradient(1200px 500px at 50% -200px, #1a0d1a 0%, transparent 70%); }
-.wrap { max-width: 620px; margin: 0 auto; padding-inline: 16px; padding-block: 18px 56px; display: grid;
-  grid-template-columns: minmax(0, 1fr); gap: 22px; }
-.wrap > *, section > *, .stack > * { min-width: 0; }
-h1, h2, h3 { margin: 0; font-family: var(--display); text-wrap: balance; }
-button { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--best); outline-offset: 2px; }
-.num { font-variant-numeric: tabular-nums; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.45 var(--body); }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 120px; display: grid;
+  grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.wrap > *, .panel > *, .grid > * { min-width: 0; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+button, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; font-family: var(--mono); }
+.muted { color: var(--muted); }
+.small { font-size: 14px; }
 
-/* header */
-.hero { display: grid; gap: 6px; }
-.hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-.hero h1 { font: italic 800 46px/0.9 var(--display); text-transform: uppercase; letter-spacing: .01em; }
-.hero h1 .a { color: var(--fg); } .hero h1 .b { color: var(--live); text-shadow: 0 0 18px color-mix(in srgb, var(--live) 60%, transparent); }
-.hero .sub { font: 700 13px/1 var(--body); letter-spacing: .35em; text-transform: uppercase; color: var(--board); }
-.hero .tag { font: italic 800 24px/1 var(--display); letter-spacing: .06em; text-transform: uppercase; padding-bottom: 6px;
-  border-bottom: 3px solid var(--live); width: fit-content; }
-.live-pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--lock); color: var(--lock);
-  border-radius: 999px; padding: 4px 10px; font: 700 12px/1 var(--body); letter-spacing: .08em; white-space: nowrap; }
-.live-pill.on { border-color: var(--live); color: var(--live); }
-.live-pill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-.live-pill.on::before { animation: pulse 1.2s infinite; }
-@keyframes pulse { 50% { opacity: .2; } }
-@media (prefers-reduced-motion: reduce) { .live-pill.on::before, .pill-live::before { animation: none; } }
-.updated { color: var(--muted); font-size: 13px; }
-.demo { border: 1px solid var(--board); color: var(--board); border-radius: 12px; padding: 10px 12px; font-size: 13px; font-weight: 600; }
+/* masthead */
+.mast h1 { font-size: 30px; font-weight: 800; letter-spacing: -.01em; }
+.mast h1 span { color: var(--accent); }
+.mast p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.demo { background: var(--accent-soft); color: var(--fg); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
 
-/* chips */
-.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
-.chips button { flex: none; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px;
-  font: 600 13px/1 var(--body); cursor: pointer; color: var(--muted); }
-.chips button[aria-pressed="true"] { color: var(--bg); background: var(--fg); border-color: var(--fg); }
+/* scoreboard strip */
+.board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 14px; overflow: hidden; }
+.board div { padding: 12px 14px; border-left: 1px solid var(--line); display: grid; gap: 2px; }
+.board div:first-child { border-left: 0; }
+.board span { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.board b { font: 700 22px/1.1 var(--mono); }
+.board small { color: var(--muted); font-size: 13px; }
+@media (max-width: 560px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .board div:nth-child(3) { border-left: 0; } .board div:nth-child(n+3) { border-top: 1px solid var(--line); } }
 
-/* section heads */
-.sec { display: grid; gap: 12px; }
-.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.sec-head h2 { font: 800 18px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
-.sec-head h2::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--dot, var(--board)); box-shadow: 0 0 10px var(--dot, var(--board)); }
-.sec-head .aside { color: var(--board); font-size: 13px; font-weight: 600; text-align: right; }
-.empty { color: var(--muted); font-size: 14px; background: var(--panel); border: 1px dashed var(--line); border-radius: 14px; padding: 14px; }
-.stack { display: grid; gap: 14px; }
+/* tabs + filters */
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 6px;
+  display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
+.tabs button { flex: none; background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; cursor: pointer;
+  font-weight: 700; color: var(--muted); }
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.tabs .count { font: 600 12px var(--mono); margin-left: 4px; color: var(--muted); }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; overflow-x: auto; max-width: 100%; }
+.seg button { flex: none; background: none; border: 0; border-radius: 7px; padding: 6px 10px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
 
-/* glowing card */
-.card { --c: var(--board); --c2: var(--board-2); border: 1.5px solid transparent; border-radius: 18px; overflow: hidden; position: relative;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--c) 8%, var(--panel)), var(--panel) 140px) padding-box,
-    linear-gradient(135deg, var(--c), var(--c2)) border-box;
-  box-shadow: 0 0 28px -8px color-mix(in srgb, var(--c) 70%, transparent), 0 0 46px -18px color-mix(in srgb, var(--c2) 60%, transparent); }
-.card.live, .card.live_win, .card.live_plus { --c: var(--live); --c2: var(--live-2); } .card.lock { --c: var(--lock); --c2: var(--lock-2); }
-.card.dog { --c: var(--dog); --c2: var(--dog-2); } .card.prop { --c: var(--prop); --c2: var(--prop-2); }
-.card.early { --c: var(--early); --c2: var(--early-2); } .card.value { --c: var(--board); --c2: var(--board-2); }
-.card.lean { --c: var(--lean); --c2: var(--lean-2); } .card.best { --c: var(--best); --c2: var(--best-2); }
-.card-in { padding: 16px; display: grid; gap: 8px; }
-.card-head { display: flex; align-items: center; gap: 10px; }
-.icon { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; font-size: 20px; flex: none;
-  background: linear-gradient(135deg, var(--c), var(--c2)); box-shadow: 0 0 14px -2px var(--c); }
-.card-head h3 { font: 800 20px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--c); flex: 1; min-width: 0; }
-.badge { font: 800 11px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; border-radius: 999px; padding: 5px 9px;
-  background: linear-gradient(135deg, var(--c), var(--c2)); color: #fff; white-space: nowrap; text-shadow: 0 1px 1px rgba(0,0,0,.35); }
-.odds-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
-.big { font: 800 58px/0.95 var(--display); letter-spacing: -.01em; }
-.wins { color: var(--muted); font-size: 15px; text-align: right; }
-.wins b { color: var(--win); font: 800 24px/1 var(--display); }
-.units { display: flex; justify-content: flex-end; align-items: center; gap: 6px; font: 800 18px/1 var(--display); letter-spacing: .06em; }
-.blurb { margin: 0; text-align: right; font-weight: 600; }
-.divider { border-top: 1px solid var(--line); margin: 4px 0; }
-.sportline { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 600; }
-.pick { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.pick h4 { margin: 0; font: 700 22px/1.15 var(--body); min-width: 0; overflow-wrap: anywhere; }
-.pick h4 small { font-size: 13px; color: var(--muted); font-weight: 700; margin-left: 4px; }
-.pick .o { font: 700 18px/1 var(--mono); }
-.opp { color: var(--muted); font-size: 14px; margin-top: -4px; }
-.why { margin: 0; }
-.when { color: var(--board); font-weight: 700; font-size: 14px; }
-.move { font-weight: 700; font-size: 14px; }
-.move.beat { color: var(--win); } .move.flat { color: var(--board); } .move.worse { color: var(--muted); }
-.pill-live { display: inline-flex; align-items: center; gap: 6px; color: var(--live); font: 800 12px/1 var(--body); letter-spacing: .1em; }
-.pill-live::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--live); animation: pulse 1.2s infinite; }
-.score { font: 600 14px/1.3 var(--mono); }
-.score .clock { color: var(--live); }
-.stamp { position: absolute; top: 70px; right: 22px; transform: rotate(-9deg); border: 4px solid currentColor; border-radius: 10px;
-  padding: 2px 14px; font: 800 38px/1.1 var(--display); letter-spacing: .1em; text-transform: uppercase; pointer-events: none; opacity: .92; }
-.stamp.won { color: var(--win); } .stamp.lost { color: var(--loss); } .stamp.push, .stamp.void { color: var(--muted); }
-.result { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
-.tag-pill { font: 800 11px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; border-radius: 999px; padding: 4px 9px; }
-.tag-pill.won { background: var(--win); color: #06140d; } .tag-pill.lost { background: var(--loss); color: #fff; }
-.foot { display: flex; align-items: stretch; border-top: 1px solid var(--line); }
-details { flex: 1; min-width: 0; }
-summary { list-style: none; cursor: pointer; padding: 12px 16px; font-weight: 700; color: var(--board); display: flex; gap: 8px; align-items: center; }
-summary::before { content: "🔍"; }
-summary::after { content: "▾"; margin-left: auto; color: var(--muted); }
-details[open] summary::after { content: "▴"; }
-details ul { margin: 0; padding: 0 16px 14px 34px; display: grid; gap: 5px; font-size: 14px; color: #d7dae6; }
-.add { margin: 8px 12px 8px 0; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 0 12px;
-  font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
-.add[aria-pressed="true"] { background: var(--best); color: #04131a; border-color: var(--best); }
+/* panels */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 12px; }
+.panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.panel-head h2 { font-size: 18px; font-weight: 800; }
+.panel-head .muted { font-size: 14px; }
+.empty { color: var(--muted); font-size: 15px; margin: 0; }
+.grid { display: grid; gap: 12px; }
+.grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.two { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+@media (max-width: 640px) { .grid.three { grid-template-columns: minmax(0, 1fr); } }
 
-/* compact plays inside a section card */
-.plays { display: grid; }
-.play { padding: 14px 16px; border-top: 1px solid var(--line); display: grid; gap: 6px; }
-.play:first-child { border-top: 0; }
-.play .pick h4 { font-size: 20px; }
-.rank { font: 800 30px/1 var(--display); color: var(--best); margin-right: 6px; }
-.banner { margin: 0 16px 4px; border-radius: 12px; padding: 10px; text-align: center; font: 800 14px/1.2 var(--body); letter-spacing: .08em;
-  text-transform: uppercase; background: linear-gradient(90deg, var(--c), var(--c2)); color: #fff; box-shadow: 0 0 16px -4px var(--c); }
+/* pick of the day tiles */
+.potd { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 6px; background: var(--surface-2); align-content: start; }
+.potd .kind { font: 700 12px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.potd h3 { font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
+.potd .price { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.potd .price b { font: 700 26px/1 var(--mono); }
+.potd p { margin: 0; font-size: 14px; color: var(--muted); }
 
-/* slip */
-.slip-legs { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
-.kv-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.kv { background: var(--panel-2); border-radius: 12px; padding: 10px; display: grid; gap: 4px; }
-.kv span { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.kv b { font: 800 24px/1 var(--display); }
-.stake { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.stake input { width: 100px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; color: var(--fg); font: 600 15px var(--mono); }
-.note { color: var(--muted); font-size: 13px; margin: 0; }
-.warn { color: var(--loss); }
+/* tags */
+.tag { display: inline-block; font: 700 11px/1 var(--body); letter-spacing: .06em; text-transform: uppercase; border-radius: 6px;
+  padding: 4px 6px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); white-space: nowrap; }
+.tag.lock { background: var(--win-soft); color: var(--win); border-color: transparent; }
+.tag.dog, .tag.early { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.tag.prop { background: var(--info-soft); color: var(--info); border-color: transparent; }
+.tag.live, .tag.live_win, .tag.live_plus { background: var(--live-soft); color: var(--live); border-color: transparent; }
+.tag.won { background: var(--win-soft); color: var(--win); border-color: transparent; }
+.tag.lost { background: var(--loss-soft); color: var(--loss); border-color: transparent; }
 
-/* record */
-.big-tile { background: var(--panel); border: 1px solid color-mix(in srgb, var(--c, var(--lock)) 45%, var(--line)); border-radius: 18px;
-  padding: 16px; text-align: center; display: grid; gap: 4px; box-shadow: 0 0 22px -10px var(--c, var(--lock)); }
-.big-tile .label { font: 800 13px/1 var(--body); letter-spacing: .14em; text-transform: uppercase; }
-.big-tile b { font: 800 64px/1 var(--display); }
-.big-tile .sub { font-weight: 700; color: var(--c, var(--lock)); }
-.big-tile small { color: var(--muted); }
-.bank { text-align: left; }
-.bank b { color: var(--win); font-size: 52px; }
-.bank b.neg { color: var(--loss); }
-.ledger-rows { display: grid; gap: 0; margin-top: 8px; }
-.ledger-rows div { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line); font-weight: 600; }
-.ledger-rows div span:last-child { font-family: var(--mono); }
+/* game groups and pick rows */
+.game { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
+.game:first-child { border-top: 0; padding-top: 0; }
+.game-head { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--muted); font-weight: 600; flex-wrap: wrap; }
+.game-head b { color: var(--fg); }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 8px 0; }
+.row + .row { border-top: 1px dashed var(--line); }
+.row .sel { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
+.row .sel strong { font-size: 17px; overflow-wrap: anywhere; }
+.row .odds { text-align: right; }
+.row .odds b { font: 700 18px/1.2 var(--mono); display: block; }
+.row .odds small { color: var(--muted); font-size: 13px; }
+.row .why { grid-column: 1 / -1; font-size: 14px; color: var(--muted); margin: 0; }
+.row .meta { grid-column: 1 / -1; display: flex; gap: 6px 14px; flex-wrap: wrap; align-items: center; font-size: 14px; }
+.move-good { color: var(--win); font-weight: 600; } .move-bad { color: var(--muted); }
+.live-dot { color: var(--live); font-weight: 700; }
+.live-dot::before { content: "● "; }
+.rank { font: 700 15px var(--mono); color: var(--accent); min-width: 1.6ch; }
+details.more { grid-column: 1 / -1; }
+details.more summary { cursor: pointer; color: var(--info); font-size: 14px; font-weight: 600; list-style: none; }
+details.more summary::-webkit-details-marker { display: none; }
+details.more summary::after { content: " ›"; }
+details.more[open] summary::after { content: " ‹"; }
+details.more ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; display: grid; gap: 3px; }
+.add { background: none; border: 1px solid var(--line-2); border-radius: 8px; padding: 2px 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.add[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+/* live slots */
+.slot { border: 1px solid var(--line); border-left: 4px solid var(--live); border-radius: 12px; padding: 12px; background: var(--surface-2); display: grid; gap: 4px; }
+.slot.plus { border-left-color: var(--accent); }
+.slot .kind { font: 700 12px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.steps { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+
+/* results */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 560px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; }
+.stat span { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.stat b { font: 700 20px/1.15 var(--mono); }
+.stat small { font-size: 13px; color: var(--muted); }
 .pos { color: var(--win) !important; } .neg { color: var(--loss) !important; }
-.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.tile { --c: var(--board); background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--c); border-radius: 14px; padding: 12px; display: grid; gap: 4px; }
-.tile .label { font: 800 12px/1.1 var(--body); letter-spacing: .1em; text-transform: uppercase; }
-.tile b { font: 800 22px/1 var(--display); }
-.tile small { font-weight: 700; }
-.sports { display: grid; gap: 10px; }
-.sport-row { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.sport-row b { font: 700 17px/1.2 var(--body); } .sport-row small { display: block; color: var(--muted); font-family: var(--mono); }
-.sport-row .pct { font: 800 24px/1 var(--display); }
-.spark { width: 100%; height: 70px; display: block; margin-top: 6px; }
-
-/* brain */
-.brain ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.chart { width: 100%; height: 110px; display: block; }
 .table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { padding: 8px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { padding: 8px 8px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
 th:first-child, td:first-child { text-align: left; }
-th { color: var(--muted); font: 700 11px/1 var(--body); letter-spacing: .1em; text-transform: uppercase; }
+th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 td { font-variant-numeric: tabular-nums; }
-footer { text-align: center; color: var(--muted); font-size: 13px; display: grid; gap: 6px; padding-top: 10px; }
-footer b { color: var(--fg); letter-spacing: .08em; }
-@media (max-width: 420px) { .big { font-size: 50px; } .hero h1 { font-size: 40px; } .stamp { font-size: 30px; top: 64px; } }
+.model ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+
+/* docked parlay slip */
+.slip { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--surface); border-top: 1px solid var(--line-2); box-shadow: 0 -6px 20px rgba(0, 0, 0, .08); }
+.slip-in { max-width: 760px; margin: 0 auto; padding: 10px 16px; display: grid; gap: 8px; }
+.slip-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.slip-bar button { background: none; border: 0; cursor: pointer; font-weight: 700; padding: 4px 0; }
+.slip-body { display: grid; gap: 8px; max-height: 45vh; overflow-y: auto; }
+.slip-body ol { margin: 0; padding-left: 20px; font-size: 15px; }
+.slip-body .stake { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.slip-body input { width: 90px; border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 8px; background: var(--surface-2); color: var(--fg); font: 600 15px var(--mono); }
+footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 12px; }
 </style>
 
-<main class="wrap" id="app">
-  <header class="hero">
-    <div class="hero-top">
-      <div><h1><span class="a">Funky</span> <span class="b">Buttlovin</span></h1></div>
-      <span class="live-pill" id="livepill">LIVE</span>
-    </div>
-    <div class="sub">Sports Engine</div>
-    <div class="tag">Trust the numbers</div>
-    <div class="updated" id="updated"></div>
-  </header>
+<main class="wrap">
+  <header class="mast"><h1>Funky <span>Buttlovin</span></h1><p id="updated">Loading…</p></header>
   <div id="demo"></div>
-  <nav class="chips" id="sports" aria-label="Filter by sport"></nav>
-  <nav class="chips" id="markets" aria-label="Filter by bet type" style="margin-top:-12px"></nav>
-
-  <section class="sec" style="--dot: var(--live)"><div class="sec-head"><h2>Live</h2><span class="aside" id="live-aside"></span></div><div id="live" class="stack"></div></section>
-  <section class="sec" style="--dot: var(--best)"><div class="sec-head"><h2>Best bets</h2><span class="aside">Top 5 · ranked by bankroll growth</span></div><div id="best" class="stack"></div></section>
-  <section class="sec" style="--dot: var(--board)"><div class="sec-head"><h2>Today's board</h2><span class="aside" id="today"></span></div><div id="headliners" class="stack"></div></section>
-  <section class="sec" style="--dot: var(--board)"><div class="sec-head"><h2>Value plays</h2><span class="aside">Sized by Kelly</span></div><div id="value" class="stack"></div></section>
-  <section class="sec" style="--dot: var(--prop)"><div class="sec-head"><h2>Player props</h2><span class="aside">Box-score projections</span></div><div id="props" class="stack"></div></section>
-  <section class="sec" style="--dot: var(--early)"><div class="sec-head"><h2>Early value plays</h2><span class="aside">More than 24 hours out</span></div><div id="early" class="stack"></div></section>
-  <section class="sec" style="--dot: var(--lean)"><div class="sec-head"><h2>Leans</h2><span class="aside">No units · tracked anyway</span></div><div id="leans" class="stack"></div></section>
-  <section class="sec" style="--dot: var(--best)"><div class="sec-head"><h2>Build a parlay</h2><span class="aside">Tap "Add" on open picks</span></div><div id="slip" class="card best"></div></section>
-  <section class="sec" style="--dot: var(--lock)"><div class="sec-head"><h2>The results</h2><span class="aside">Every play, graded</span></div><div id="record" class="stack"></div></section>
-  <section class="sec brain" style="--dot: var(--board)"><div class="sec-head"><h2>The brain</h2><span class="aside" id="brain-time"></span></div><div id="brain" class="card value"></div></section>
-
+  <section class="board" id="scoreboard" aria-label="Season record"></section>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Sections"></nav>
+  <div class="filters"><div class="seg" id="sports" aria-label="Sport"></div><div class="seg" id="markets" aria-label="Bet type"></div></div>
+  <div id="view" class="grid"></div>
   <footer>
-    <b>FUNKY BUTTLOVIN SPORTS ENGINE</b>
-    <span>Ratings · form · rest · injuries · key numbers · line moves · retrained every run</span>
-    <span>Free data: ESPN stats and DraftKings lines. Picks only, no bets placed. Bet only what you can afford to lose.</span>
+    <span>Free data: ESPN stats and DraftKings lines. Picks only; no bets are placed.</span>
+    <span>No model wins every bet. Judge it by the record and the closing-line value over many picks. Bet only what you can afford to lose.</span>
   </footer>
 </main>
+<aside class="slip" id="slip" aria-label="Parlay slip" hidden></aside>
 
 <script id="edge-data" type="application/json">__DATA__</script>
 <script>
@@ -213,18 +179,16 @@ footer b { color: var(--fg); letter-spacing: .08em; }
   "use strict";
   let DATA = JSON.parse(document.getElementById("edge-data").textContent);
   const slip = new Set();
+  let slipOpen = false;
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
-  const SPORTS = [["all", "All"], ["nfl", "🏈 NFL"], ["nba", "🏀 NBA"], ["mlb", "⚾ MLB"], ["nhl", "🏒 NHL"], ["soccer", "⚽ Soccer"]];
-  const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "Over/Under"], ["props", "Props"], ["moneyline", "Moneyline"]];
-  const EMOJI = { nfl: "🏈", ncaaf: "🏈", nba: "🏀", ncaab: "🏀", mlb: "⚾", nhl: "🏒" };
-  const TIER = {
-    live: ["🔴", "Live bet", "Bet it now"], live_win: ["🔴", "Live · most likely to win", "Bet it now"],
-    live_plus: ["💰", "Live plus money", "Bet it now"], lock: ["🔒", "Lock of the day", "Lock"], dog: ["🐺", "Dog of the day", "Value play"],
-    prop: ["🎯", "Prop of the day", "Prop"], value: ["🔥", "Value play", "Value"], early: ["⏰", "We got in early", "Early"],
-    lean: ["🟡", "Lean", "No units"],
-  };
-  let sport = "all", market = "all";
-  try { sport = localStorage.getItem("fb-sport") || "all"; market = localStorage.getItem("fb-market") || "all"; } catch (e) {}
+  const SPORTS = [["all", "All"], ["nfl", "NFL"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
+  const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
+  const TABS = [["today", "Today"], ["live", "Live"], ["props", "Props"], ["early", "Early"], ["results", "Results"], ["model", "Model"]];
+  const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
+    live: "Live", live_win: "Live · likely winner", live_plus: "Live · plus money" };
+  const state = { tab: "today", sport: "all", market: "all" };
+  try { Object.assign(state, JSON.parse(localStorage.getItem("fb-state") || "{}")); } catch (e) {}
+  const save = () => { try { localStorage.setItem("fb-state", JSON.stringify(state)); } catch (e) {} };
 
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -240,221 +204,194 @@ footer b { color: var(--fg); letter-spacing: .08em; }
   const dayOf = (iso) => new Date(iso).toLocaleDateString("en-CA", { timeZone: tz });
   const groupOf = (e) => (e.player ? "props" : e.market === "spreads" ? "spreads" : e.market === "totals" ? "totals" : "moneyline");
   const sportGroup = (k) => (SOCCER.has(k) ? "soccer" : k);
-  const emoji = (k) => (SOCCER.has(k) ? "⚽" : EMOJI[k] || "🏟️");
-  const visible = (e) => (sport === "all" || sportGroup(e.sport) === sport) && (market === "all" || groupOf(e) === market);
+  const isLive = (e) => (e.tier || "").startsWith("live");
   const isOpen = (e) => e.status === "pending" && new Date(e.commence_time) > new Date();
+  const visible = (e) => (state.sport === "all" || sportGroup(e.sport) === state.sport) && (state.market === "all" || groupOf(e) === state.market);
   const today = () => dayOf(DATA.generated_at);
+  const onBoard = (e) => visible(e) && (!e.settled || e.day === today());
+  const cls = (x) => (x == null ? "" : x >= 0 ? "pos" : "neg");
+  const rec = (s) => `${s.won}-${s.lost}${s.push ? "-" + s.push : ""}`;
+  const units = (e) => (e.units > 0 ? `${e.units === 0.5 ? "½" : e.units}u` : "lean");
+  const timeOf = (e) => fmt(e.commence_time, { weekday: "short", hour: "numeric", minute: "2-digit" });
+  const SETTLED = { won: "Won", lost: "Lost", push: "Push", void: "Void", half_won: "Half won", half_lost: "Half lost" };
 
-  function units(e) {
-    if (!(e.units > 0)) return "No units — just a lean";
-    const u = e.units === 0.5 ? "½" : e.units % 1 ? e.units.toFixed(1) : String(e.units);
-    return `💰 ${u} UNIT${e.units > 1 ? "S" : ""}`;
-  }
-  function blurb(e) {
-    if (e.tier === "live_win") return "Our safest live bet right now. Confirm the score and price first.";
-    if (e.tier === "live_plus") return "Plus money live. Small bet, big payout. Confirm the price first.";
-    if (e.tier.startsWith("live")) return "Live line. Confirm the score and price before you bet.";
-    if (!(e.units > 0)) return "Our read, no money on it.";
-    if (e.units >= 2) return "Strong edge at this price — full send.";
-    if (e.units >= 1) return "The value's real — a solid bet.";
-    return e.odds > 0 ? "Small bet, big payout — the value's still worth it." : "Thin edge — keep it small.";
-  }
-  function when(e) {
-    const d = new Date(e.commence_time);
-    const day = dayOf(e.commence_time) === dayOf(new Date().toISOString()) ? "Today" : fmt(d, { weekday: "long", month: "numeric", day: "numeric" });
-    return `${day} · game starts at ${fmt(d, { hour: "numeric", minute: "2-digit", timeZoneName: "short" })}`;
-  }
-  function movement(e) {
-    if (e.current_odds == null || e.settled || e.tier.startsWith("live")) return "";
+  function moveText(e) {
+    if (e.current_odds == null || e.settled || isLive(e)) return "";
     const moved = e.current_point != null && e.point != null && e.current_point !== e.point;
-    if (e.current_odds === e.odds && !moved) return `<div class="move flat">📈 Got it at ${odds(e.odds)} → still ${odds(e.odds)} · hasn't moved</div>`;
+    if (e.current_odds === e.odds && !moved) return `<span class="muted">Line steady at ${odds(e.odds)}</span>`;
     const now = moved ? `${e.current_point > 0 ? "+" : ""}${e.current_point} ${odds(e.current_odds)}` : odds(e.current_odds);
     const beat = implied(e.current_odds) > implied(e.odds) || (moved && e.market === "spreads" && e.current_point < e.point);
-    return beat ? `<div class="move beat">📈 Got it at ${odds(e.odds)} → now ${now} · 🔥 we beat the line</div>`
-                : `<div class="move worse">📈 Got it at ${odds(e.odds)} → now ${now} · 💰 better price now</div>`;
+    return beat ? `<span class="move-good">Got ${odds(e.odds)}, now ${now}: beat the line</span>` : `<span class="move-bad">Got ${odds(e.odds)}, now ${now}</span>`;
   }
-  function liveLine(e) {
-    if (e.status !== "live" || !e.live) return "";
-    return `<div class="score"><span class="pill-live">LIVE</span> ${esc(e.away)} ${e.live.away ?? ""} @ ${esc(e.home)} ${e.live.home ?? ""} · <span class="clock">${esc(e.live.detail || "")}</span></div>`;
+  function statusText(e) {
+    if (SETTLED[e.status]) {
+      const c = e.status.replace("half_", "");
+      const p = e.units > 0 && e.profit != null ? ` ${signed(e.profit, 2)}u` : "";
+      return `<span class="tag ${c}">${SETTLED[e.status]}</span> <span class="muted">${esc(e.final || "")}${e.result_value != null ? " · finished " + e.result_value : ""}${p}</span>`;
+    }
+    if (e.status === "live" && e.live) return `<span class="live-dot">${esc(e.away)} ${e.live.away ?? ""}, ${esc(e.home)} ${e.live.home ?? ""} · ${esc(e.live.detail || "")}</span>`;
+    return "";
   }
-  const SETTLED = { won: "Won", lost: "Lost", push: "Push", void: "Void", half_won: "Half won", half_lost: "Half lost" };
-  function stamp(e) {
-    if (!SETTLED[e.status]) return "";
-    const cls = e.status.replace("half_", "");
-    return `<div class="stamp ${cls}">${SETTLED[e.status]}</div>`;
+  function addBtn(e) {
+    if (!isOpen(e)) return "";
+    return `<button class="add" data-add="${e.id}" aria-pressed="${slip.has(e.id)}">${slip.has(e.id) ? "In slip" : "+ Slip"}</button>`;
   }
-  function result(e) {
-    if (!SETTLED[e.status]) return "";
-    const cls = e.status.replace("half_", "");
-    const val = e.result_value != null ? ` · finished with ${e.result_value}` : "";
-    const p = e.units > 0 && e.profit != null ? ` · ${signed(e.profit, 2)}u` : "";
-    return `<div class="result"><span class="tag-pill ${cls}">${SETTLED[e.status]}</span>Final: ${esc(e.final || "")}${val}${p}</div>`;
-  }
-  function foot(e) {
-    const d = e.reasons && e.reasons.length
-      ? `<details><summary>${e.settled ? "Pregame breakdown" : "Full breakdown"}</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>`
-      : `<span style="flex:1"></span>`;
-    const add = isOpen(e) ? `<button class="add" data-add="${e.id}" aria-pressed="${slip.has(e.id)}">${slip.has(e.id) ? "On slip ✓" : "Add"}</button>` : "";
-    return `<div class="foot">${d}${add}</div>`;
-  }
-  function pickBlock(e, opts = {}) {
-    const name = esc(e.selection.replace(" (live)", ""));
-    const mk = e.player ? "" : `<small>${e.market === "h2h" ? "ML" : ""}</small>`;
-    return `
-      <div class="sportline"><span>${emoji(e.sport)} ${esc(e.sport_name)}</span>${e.status === "live" ? '<span class="pill-live">LIVE</span>' : ""}</div>
-      <div class="pick"><h4>${opts.rank ? `<span class="rank">${e.best_rank}</span>` : ""}${name} ${mk}</h4><span class="o num">${odds(e.odds)}</span></div>
-      <div class="opp">${esc(e.matchup)}</div>
-      <p class="why">🧠 ${esc(e.headline)}</p>
-      ${e.tier.startsWith("live") ? "" : `<div class="when">${when(e)}</div>`}
-      ${movement(e)}${liveLine(e)}${result(e)}`;
-  }
-
-  // Big headliner card (lock / dog / prop / live)
-  function bigCard(e) {
-    const [ic, label, badge] = TIER[e.tier] || TIER.value;
-    return `<article class="card ${e.tier}">${stamp(e)}<div class="card-in">
-      <div class="card-head"><span class="icon">${ic}</span><h3>${label}</h3><span class="badge">${badge}</span></div>
-      <div class="odds-row"><span class="big num">${odds(e.odds)}</span><span class="wins">$100 wins <b class="num">$${(100 * (dec(e.odds) - 1)).toFixed(0)}</b></span></div>
-      <div class="units">${units(e)}</div><p class="blurb">${blurb(e)}</p>
-      <div class="divider"></div>${pickBlock(e)}</div>${foot(e)}</article>`;
-  }
-  // Section card holding several compact plays
-  function groupCard(tier, list, banner, opts = {}) {
-    const [ic, label, badge] = opts.head || TIER[tier];
-    return `<article class="card ${opts.cls || tier}"><div class="card-in" style="padding-bottom:6px">
-      <div class="card-head"><span class="icon">${ic}</span><h3>${label}</h3><span class="badge">${badge}</span></div></div>
-      ${banner ? `<div class="banner">${banner}</div>` : ""}
-      <div class="plays">${list.map((e) => `<div class="play" style="position:relative">${pickBlock(e, opts)}
-        <div class="units" style="justify-content:flex-start;font-size:16px">${units(e)} <span style="color:var(--muted);font:600 13px var(--body);margin-left:6px">${signed(e.ev * 100, 1)}% EV</span></div>
-        ${foot(e).replace('class="foot"', 'class="foot" style="margin:4px -16px -14px"')}</div>`).join("")}</div></article>`;
+  function row(e, opts = {}) {
+    const more = e.reasons && e.reasons.length ? `<details class="more"><summary>Why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "";
+    return `<div class="row">
+      <div class="sel">${opts.rank ? `<span class="rank">${e.best_rank}</span>` : ""}<span class="tag ${e.tier}">${TIER[e.tier] || e.tier}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
+      <div class="odds"><b>${odds(e.odds)}</b><small>${units(e)} · ${signed(e.ev * 100, 1)}% EV</small></div>
+      <p class="why">${esc(e.headline)}</p>
+      <div class="meta">${opts.matchup ? `<span class="muted">${esc(e.matchup)} · ${timeOf(e)}</span>` : ""}${moveText(e)}${statusText(e)}${addBtn(e)}</div>
+      ${more}</div>`;
   }
   const empty = (msg) => `<p class="empty">${msg}</p>`;
+  const panel = (title, aside, body) => `<section class="panel"><div class="panel-head"><h2>${title}</h2><span class="muted">${aside || ""}</span></div>${body}</section>`;
 
-  function boardEntries() {
-    const t = today();
-    return DATA.entries.filter((e) => visible(e) && (!e.settled || e.day === t));
+  function byGame(list) {
+    const games = new Map();
+    list.forEach((e) => { if (!games.has(e.event_id)) games.set(e.event_id, []); games.get(e.event_id).push(e); });
+    return [...games.values()].sort((a, b) => new Date(a[0].commence_time) - new Date(b[0].commence_time)).map((g) => {
+      const e = g[0];
+      return `<div class="game"><div class="game-head"><span><b>${esc(e.matchup)}</b> · ${esc(e.sport_name)}</span><span>${timeOf(e)}</span></div>
+        ${g.sort((a, b) => b.ev - a.ev).map((x) => row(x)).join("")}</div>`;
+    }).join("");
   }
 
-  function renderPicks() {
-    const items = boardEntries().sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time));
-    const live = items.filter((e) => e.tier.startsWith("live"))
-      .sort((a, b) => (a.tier === "live_win" ? 0 : 1) - (b.tier === "live_win" ? 0 : 1));
-    $("live").innerHTML = live.length ? live.map(bigCard).join("") :
-      empty("No live bets right now. To get live picks during games, open the GitHub app → Actions → <b>Live session</b> → Run workflow. New live edges show up here and as a phone notification.");
-    $("live-aside").textContent = live.length ? `${live.length} live` : "Starts when you run a live session";
+  function viewToday() {
+    const items = DATA.entries.filter(onBoard);
+    const potd = ["lock", "dog", "prop"].map((t) => {
+      const e = items.find((x) => x.tier === t);
+      const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t];
+      if (!e) return `<div class="potd"><span class="kind">${label}</span><p>Posts once a game clears the bar.</p></div>`;
+      return `<div class="potd"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
+        <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · $100 wins $${(100 * (dec(e.odds) - 1)).toFixed(0)}</span></div>
+        <p>${esc(e.matchup)} · ${timeOf(e)}</p><p>${esc(e.headline)}</p><div>${statusText(e)} ${moveText(e)}</div></div>`;
+    }).join("");
     const best = items.filter((e) => e.best_rank).sort((a, b) => a.best_rank - b.best_rank);
-    $("best").innerHTML = best.length ? groupCard("value", best, "", { head: ["🎯", "Best bets", "Top 5"], cls: "best", rank: true }) : empty("Best bets post with the next scan.");
-    const order = ["lock", "dog", "prop"];
-    const head = items.filter((e) => order.includes(e.tier)).sort((a, b) => order.indexOf(a.tier) - order.indexOf(b.tier));
-    $("headliners").innerHTML = head.length ? head.map(bigCard).join("") : empty("Lock, Dog and Prop of the Day post once a game clears the bar.");
-    const value = items.filter((e) => e.tier === "value" && !e.player).sort((a, b) => b.ev - a.ev);
-    $("value").innerHTML = value.length ? groupCard("value", value, "", { head: ["🔥", "Value plays", "Bet it now"] }) : empty("No game-line value plays right now.");
-    const props = items.filter((e) => e.tier === "value" && e.player).sort((a, b) => b.ev - a.ev);
-    $("props").innerHTML = props.length ? groupCard("prop", props, "", { head: ["🎯", "Player props", "Props"] }) : empty("No prop edges right now. NFL and NBA props are priced every morning.");
-    const early = items.filter((e) => e.tier === "early").sort((a, b) => b.ev - a.ev);
-    $("early").innerHTML = early.length ? groupCard("early", early, "🔥 Get it before the line moves 🔥", { head: ["⏰", "Early value plays", "Early"] }) : empty("Nothing early yet.");
+    const rest = items.filter((e) => !isLive(e) && !["early", "lean"].includes(e.tier) && !e.player);
     const leans = items.filter((e) => e.tier === "lean");
-    $("leans").innerHTML = leans.length ? groupCard("lean", leans, "", { head: ["🟡", "Strong leans", "No units"] }) : empty("No leans right now.");
+    return panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
+      + panel("Best bets", "Top 5 by bankroll growth", best.length ? best.map((e) => row(e, { rank: true, matchup: true })).join("") : empty("Best bets post with the next scan."))
+      + panel("The board", "Today's game-line plays, by game", rest.length ? byGame(rest) : empty("No game-line plays on today's board."))
+      + panel("Leans", "No units, tracked anyway", leans.length ? byGame(leans) : empty("No leans right now."));
+  }
+
+  function viewLive() {
+    const items = DATA.entries.filter((e) => isLive(e) && onBoard(e)).sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
+    const latest = (t) => items.find((e) => e.tier === t);
+    const slot = (t, title, extra) => { const e = latest(t);
+      return `<div class="slot ${extra}"><span class="kind">${title}</span>${e ? row(e, { matchup: true }) : `<p class="empty">None yet in this session.</p>`}</div>`; };
+    const shown = new Set([latest("live_win"), latest("live_plus")].filter(Boolean).map((e) => e.id));
+    const earlier = items.filter((e) => !shown.has(e.id));
+    const howto = `<ol class="steps"><li>Open the GitHub app on your phone.</li><li>Go to <b>tdrey10/sports → Actions → Live session</b>.</li><li>Tap <b>Run workflow</b>, pick sports and hours.</li></ol>
+      <p class="empty">Each new live bet shows up here and as a notification on the “Funky Buttlovin live bets” issue.</p>`;
+    return panel("Live right now", items.length ? `${items.length} live bets today` : "",
+        `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money", "plus")}</div>`)
+      + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "")
+      + panel("Start a live session", "Free · up to 5 hours", howto);
+  }
+
+  function viewList(filter, title, aside, msg) {
+    const items = DATA.entries.filter((e) => onBoard(e) && filter(e)).sort((a, b) => b.ev - a.ev);
+    return panel(title, aside, items.length ? items.map((e) => row(e, { matchup: true })).join("") : empty(msg));
+  }
+
+  function chart(curve, start) {
+    if (!curve.length) return "";
+    const pts = [start, ...curve.map((c) => c[1])];
+    const lo = Math.min(...pts), hi = Math.max(...pts), W = 700, H = 110, pad = 8, span = hi - lo || 1;
+    const x = (i) => pad + (i / (pts.length - 1)) * (W - 2 * pad), y = (v) => H - pad - ((v - lo) / span) * (H - 2 * pad);
+    const d = pts.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
+    const col = pts[pts.length - 1] >= start ? "var(--win)" : "var(--loss)";
+    return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Bankroll over time">
+      <line x1="0" x2="${W}" y1="${y(start)}" y2="${y(start)}" stroke="var(--line-2)" stroke-dasharray="4 4"/>
+      <path d="${d}L${x(pts.length - 1)},${H}L${x(0)},${H}Z" fill="${col}" opacity=".12"/>
+      <path d="${d}" fill="none" stroke="${col}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+  }
+  function viewResults() {
+    const st = DATA.stats;
+    const tierRows = [["lock", "Lock of the day"], ["dog", "Dog of the day"], ["prop", "Prop of the day"], ["value", "Value plays"], ["early", "Early value"], ["live_win", "Live · likely winner"], ["live_plus", "Live · plus money"]]
+      .map(([k, n]) => { const s = st.by_tier[k] || { won: 0, lost: 0, units: 0 }; return `<tr><td>${n}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("");
+    const typeRows = [["spreads", "Spreads"], ["totals", "Over/Under"], ["props", "Props"], ["moneyline", "Moneyline"]]
+      .map(([k, n]) => { const s = st.by_market[k]; return `<tr><td>${n}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`; }).join("");
+    const sportRows = Object.entries(st.by_sport).map(([k, s]) => `<tr><td>${esc(s.name)}</td><td>${rec(s)}</td><td>${pct(s.win_pct)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td></tr>`).join("");
+    const recent = DATA.entries.filter((e) => e.settled && e.status !== "void" && visible(e)).sort((a, b) => (b.graded_at || "").localeCompare(a.graded_at || "")).slice(0, 15);
+    return panel("Bankroll", `Started at ${money(st.start_bankroll)} · 1 unit = ${money(st.unit_value)}`,
+        `<div class="stats"><div class="stat"><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b></div>
+         <div class="stat"><span>Last 7 days</span><b class="${cls(st.last7.units)}">${signed(st.last7.units, 1)}u</b><small>${rec(st.last7)}</small></div>
+         <div class="stat"><span>Leans</span><b>${st.leans.won}-${st.leans.lost}</b><small>no units</small></div></div>${chart(st.curve, st.start_bankroll)}`)
+      + panel("By pick type", "", `<div class="table-wrap"><table><thead><tr><th>Pick</th><th>W-L</th><th>Units</th><th>ROI</th></tr></thead><tbody>${tierRows}</tbody></table></div>`)
+      + panel("By bet type", "CLV: our price vs the closing line", `<div class="table-wrap"><table><thead><tr><th>Bet</th><th>W-L</th><th>Units</th><th>CLV</th></tr></thead><tbody>${typeRows}</tbody></table></div>`)
+      + (sportRows ? panel("By sport", "", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>W-L</th><th>Win</th><th>Units</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
+      + panel("Latest graded", "", recent.length ? recent.map((e) => row(e, { matchup: true })).join("") : empty("Results appear after games finish."));
+  }
+
+  function viewModel() {
+    const b = (DATA.brains || []).filter((x) => x.games);
+    const all = b.reduce((a, x) => ({ g: a.g + x.games, w: a.w + x.accuracy * x.games }), { g: 0, w: 0 });
+    const keys = (b.find((x) => x.sport === "nfl") || {}).key_numbers || [];
+    const rows = b.map((x) => `<tr><td>${esc(x.name)}</td><td>${x.games}</td><td>${pct(x.accuracy, 1)}</td><td class="${x.log_loss <= x.baseline_log_loss ? "pos" : "neg"}">${signed((1 - x.log_loss / x.baseline_log_loss) * 100, 1)}%</td></tr>`).join("");
+    const weights = Object.entries(DATA.weights || {}).map(([k, w]) => `${esc(k.replace(":", " "))} ${(100 - w * 100).toFixed(0)}% model`).join(" · ");
+    return panel("How the model is doing", b[0] ? "Retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
+      `<div class="model"><ul>
+        ${all.g ? `<li>Picks the straight-up winner <b>${pct(all.w / all.g, 0)}</b> of the time on ${all.g.toLocaleString()} recent games it never saw.</li>` : ""}
+        ${keys.length ? `<li>Learned NFL key numbers from real scores: ${keys.map((k) => k[0]).join(", ")}.</li>` : ""}
+        <li>Prices blend our numbers with the market's no-vig odds. ${weights ? "Learned trust: " + weights + "." : "Trust is re-learned once a sport has 60 graded picks."}</li>
+        <li>Live picks need the model to agree with the market's direction; a "likely winner" needs 60%+ on our numbers.</li></ul></div>
+       ${rows ? `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Games</th><th>Winner</th><th>vs coin flip</th></tr></thead><tbody>${rows}</tbody></table></div>` : ""}`);
   }
 
   function renderSlip() {
     const legs = DATA.entries.filter((e) => slip.has(e.id));
-    if (!legs.length) { $("slip").innerHTML = `<div class="card-in"><div class="card-head"><span class="icon">🧩</span><h3>Your parlay</h3></div><p class="note">Tap <b>Add</b> on open picks from different games to price a parlay with our numbers.</p></div>`; return; }
-    const events = new Set(), dup = new Set();
-    legs.forEach((e) => { if (events.has(e.event_id)) dup.add(e.event_id); events.add(e.event_id); });
-    const d = legs.reduce((x, e) => x * dec(e.current_odds ?? e.odds), 1);
-    const p = legs.reduce((x, e) => x * e.win_prob, 1);
+    $("slip").hidden = !legs.length;
+    if (!legs.length) return;
+    const d = legs.reduce((x, e) => x * dec(e.current_odds ?? e.odds), 1), p = legs.reduce((x, e) => x * e.win_prob, 1);
+    const games = new Set(legs.map((e) => e.event_id));
     let stake = 10;
     try { stake = parseFloat($("stake")?.value) || 10; } catch (e) {}
-    $("slip").innerHTML = `<div class="card-in"><div class="card-head"><span class="icon">🧩</span><h3>Your parlay</h3><span class="badge">${legs.length} legs</span></div>
-      <ol class="slip-legs">${legs.map((e) => `<li>${esc(e.selection)} <b class="num">${odds(e.current_odds ?? e.odds)}</b> <span class="note">· ${pct(e.win_prob)}</span></li>`).join("")}</ol>
-      <div class="kv-row"><div class="kv"><span>Price</span><b class="num">${odds(toAmerican(d))}</b></div><div class="kv"><span>Hits</span><b class="num">${pct(p, 1)}</b></div>
-      <div class="kv"><span>EV</span><b class="num ${p * d - 1 >= 0 ? "pos" : "neg"}">${signed((p * d - 1) * 100, 1)}%</b></div></div>
-      <div class="stake"><label for="stake">Stake $</label><input id="stake" type="number" min="1" step="1" value="${stake}" inputmode="decimal"><span>pays <b class="num" id="pays">${money(stake * d)}</b></span></div>
-      ${dup.size ? `<p class="note warn">Two legs from the same game move together, so books usually won't allow it.</p>` : ""}
-      <p class="note">Parlays stack the book's cut too. Keep parlay stakes small.</p>
-      <button class="add" id="clear-slip" style="justify-self:start;padding:8px 12px;margin:0">Clear</button></div>`;
-  }
-
-  function spark(curve, start) {
-    if (!curve.length) return "";
-    const pts = [start, ...curve.map((c) => c[1])];
-    const lo = Math.min(...pts), hi = Math.max(...pts), W = 600, H = 70, pad = 6, span = hi - lo || 1;
-    const x = (i) => pad + (i / (pts.length - 1)) * (W - 2 * pad), y = (v) => H - pad - ((v - lo) / span) * (H - 2 * pad);
-    const line = pts.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
-    const col = pts[pts.length - 1] >= start ? "var(--win)" : "var(--loss)";
-    return `<svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Bankroll over time">
-      <line x1="0" x2="${W}" y1="${y(start)}" y2="${y(start)}" stroke="var(--line)" stroke-dasharray="4 4"/>
-      <path d="${line}L${x(pts.length - 1)},${H}L${x(0)},${H}Z" fill="${col}" opacity=".14"/>
-      <path d="${line}" fill="none" stroke="${col}" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
-      <circle cx="${x(pts.length - 1)}" cy="${y(pts[pts.length - 1])}" r="4" fill="${col}"/></svg>`;
-  }
-  const rec = (s) => `${s.won}-${s.lost}${s.push ? "-" + s.push : ""}`;
-  const cls = (x) => (x == null ? "" : x >= 0 ? "pos" : "neg");
-  const roi = (s) => (s.roi == null ? "–" : signed(s.roi * 100, 0) + "% ROI");
-
-  function renderRecord() {
-    const st = DATA.stats, o = st.overall;
-    const tierTile = (k, label, c) => { const s = st.by_tier[k] || { won: 0, lost: 0, units: 0 };
-      const wp = s.won + s.lost ? s.won / (s.won + s.lost) : null;
-      return `<div class="tile" style="--c:var(${c})"><span class="label">${label}</span><b class="num">${s.won} won · ${s.lost} lost</b><small class="${cls(s.units)}">${pct(wp)} · ${signed(s.units, 1)}u</small></div>`; };
-    const marketTile = ([k, n]) => { const s = st.by_market[k]; const wp = s.won + s.lost ? s.won / (s.won + s.lost) : null;
-      return `<div class="tile" style="--c:var(--best)"><span class="label">${n}</span><b class="num">${s.won} won · ${s.lost} lost</b><small class="${cls(s.units)}">${pct(wp)} · CLV ${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</small></div>`; };
-    const sports = Object.entries(st.by_sport).map(([k, s]) =>
-      `<div class="sport-row"><div><b>${emoji(k)} ${esc(s.name)}</b><small>${rec(s)} · ${signed(s.units, 1)}u</small></div><span class="pct ${s.win_pct == null ? "" : s.win_pct >= 0.524 ? "pos" : "neg"}">${pct(s.win_pct)}</span></div>`).join("");
-    const recent = DATA.entries.filter((e) => e.settled && e.status !== "void" && visible(e)).sort((a, b) => (b.graded_at || "").localeCompare(a.graded_at || "")).slice(0, 8);
-    $("record").innerHTML = `
-      <div class="big-tile" style="--c:var(--lock)"><span class="label">💰 Unit plays record</span><b class="num">${rec(o)}</b><span class="sub ${cls(o.units)}">${signed(o.units, 1)} UNITS · ${roi(o)}</span><small>The bets we put money on</small></div>
-      <div class="big-tile" style="--c:var(--best)"><span class="label">📈 Beat the closing line</span><b class="num">${pct(o.beat_close)}</b><span class="sub">avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</span><small>The truest sign of a real edge, long before the record shows it</small></div>
-      <div class="big-tile" style="--c:var(--lean)"><span class="label">🟡 Leans record</span><b class="num">${st.leans.won}-${st.leans.lost}</b><span class="sub">${pct(st.leans.win_pct)} · no units</span></div>
-      <div class="big-tile bank" style="--c:var(--lock)"><span class="label">💰 Bankroll</span><b class="num ${st.bankroll < st.start_bankroll ? "neg" : ""}">${money(st.bankroll)}</b>
-        <small>Started at ${money(st.start_bankroll)} · 1 unit = 1% = ${money(st.unit_value)}</small>${spark(st.curve, st.start_bankroll)}
-        <div class="ledger-rows"><div><span>Overall</span><span class="${cls(o.units)}">${money(o.dollars)} · ${roi(o)}</span></div>
-        <div><span>Last 7 days</span><span class="${cls(st.last7.units)}">${money(st.last7.dollars)} · ${roi(st.last7)}</span></div>
-        <div><span>🎯 Best bets</span><span class="${cls(st.best.units)}">${money(st.best.dollars)} · ${roi(st.best)}</span></div>
-        <div><span>🔒 Locks</span><span class="${cls(st.by_tier.lock.units)}">${money(st.by_tier.lock.dollars)} · ${roi(st.by_tier.lock)}</span></div>
-        <div><span>⏰ Early value</span><span class="${cls(st.by_tier.early.units)}">${money(st.by_tier.early.dollars)} · ${roi(st.by_tier.early)}</span></div>
-        <div><span>🔴 Live bets</span><span class="${cls((st.by_tier.live || {}).units)}">${money((st.by_tier.live || { dollars: 0 }).dollars)} · ${roi(st.by_tier.live || {})}</span></div></div></div>
-      <div class="tiles">${tierTile("lock", "🔒 Lock of the day", "--lock")}${tierTile("dog", "🐺 Dog of the day", "--dog")}${tierTile("prop", "🎯 Prop of the day", "--prop")}${tierTile("value", "🔥 Value plays", "--board")}${tierTile("early", "⏰ Early value", "--early")}${tierTile("live_win", "🔴 Live: likely winners", "--live")}${tierTile("live_plus", "💰 Live plus money", "--live")}</div>
-      <div class="sec-head"><h2 style="font-size:14px">By bet type</h2></div><div class="tiles">${MARKETS.slice(1).map(marketTile).join("")}</div>
-      ${sports ? `<div class="sec-head"><h2 style="font-size:14px">By sport (unit plays)</h2></div><div class="sports">${sports}</div>` : ""}
-      <div class="sec-head"><h2 style="font-size:14px">Latest graded</h2></div>
-      ${recent.length ? groupCard("value", recent, "", { head: ["🧾", "Every pick, graded", "Results"] }) : empty("No graded picks yet. Results appear after games finish.")}`;
-  }
-
-  function renderBrain() {
-    const b = (DATA.brains || []).filter((x) => x.games);
-    if (b[0]) $("brain-time").textContent = "retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-    const all = b.reduce((a, x) => ({ g: a.g + x.games, w: a.w + x.accuracy * x.games }), { g: 0, w: 0 });
-    const o = DATA.stats.overall;
-    const rows = b.map((x) => `<tr><td>${emoji(x.sport)} ${esc(x.name)}</td><td>${x.games}</td><td>${pct(x.accuracy, 1)}</td><td class="${x.log_loss <= x.baseline_log_loss ? "pos" : "neg"}">${signed((1 - x.log_loss / x.baseline_log_loss) * 100, 1)}%</td></tr>`).join("");
-    const keys = (b.find((x) => x.sport === "nfl") || {}).key_numbers || [];
-    $("brain").innerHTML = `<div class="card-in"><div class="card-head"><span class="icon">🧠</span><h3>Today in a nutshell</h3></div><ul>
-      <li>⏳ ${o.won + o.lost ? `${rec(o)} on unit plays so far (${signed(o.units, 1)}u).` : "First picks are in. Results start rolling in as games finish."}</li>
-      ${all.g ? `<li>🎯 The engine calls the straight-up winner <b>${pct(all.w / all.g, 0)}</b> of the time on ${all.g.toLocaleString()} recent games it never saw.</li>` : ""}
-      ${keys.length ? `<li>🏈 Learned NFL key numbers from real scores: ${keys.map((k) => k[0]).join(", ")}. Spreads are priced around them.</li>` : ""}
-      <li>🧪 It retrains on every final score and re-checks itself every run. A 60% call should win 60%.</li></ul>
-      ${rows ? `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Games</th><th>Winner</th><th>vs coin flip</th></tr></thead><tbody>${rows}</tbody></table></div>` : ""}</div>`;
+    $("slip").innerHTML = `<div class="slip-in"><div class="slip-bar"><button id="slip-toggle" aria-expanded="${slipOpen}">Parlay · ${legs.length} leg${legs.length > 1 ? "s" : ""} · <span class="num">${odds(toAmerican(d))}</span> ${slipOpen ? "▾" : "▴"}</button>
+      <span class="small"><span class="${cls(p * d - 1)}">${signed((p * d - 1) * 100, 1)}% EV</span> · hits ${pct(p, 1)}</span></div>
+      ${slipOpen ? `<div class="slip-body"><ol>${legs.map((e) => `<li>${esc(e.selection)} <span class="num">${odds(e.current_odds ?? e.odds)}</span></li>`).join("")}</ol>
+        ${games.size < legs.length ? `<p class="small neg" style="margin:0">Two legs from one game move together; most books won't take that parlay.</p>` : ""}
+        <div class="stake"><label for="stake">Stake $</label><input id="stake" type="number" min="1" value="${stake}" inputmode="decimal"><span>pays <b class="num" id="pays">${money(stake * d)}</b></span>
+        <button class="add" id="clear-slip">Clear</button></div></div>` : ""}</div>`;
   }
 
   function renderTop() {
-    const live = DATA.entries.some((e) => e.status === "live" || (e.tier.startsWith("live") && !e.settled));
-    $("livepill").className = "live-pill" + (live ? " on" : "");
-    $("updated").textContent = "Updated " + fmt(DATA.generated_at, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-    $("today").textContent = fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" });
+    const st = DATA.stats, o = st.overall;
+    $("updated").textContent = "Sports picks engine · updated " + fmt(DATA.generated_at, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
     $("demo").innerHTML = DATA.demo ? `<div class="demo">Demo data: made-up teams and odds so you can see how it works. Nothing here is a real bet.</div>` : "";
-    $("sports").innerHTML = SPORTS.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${k === sport}">${n}</button>`).join("");
-    $("markets").innerHTML = MARKETS.map(([k, n]) => `<button data-market="${k}" aria-pressed="${k === market}">${n}</button>`).join("");
+    $("scoreboard").innerHTML = `<div><span>Record</span><b>${rec(o)}</b><small>${pct(o.win_pct)} unit plays</small></div>
+      <div><span>Profit</span><b class="${cls(o.units)}">${signed(o.units, 1)}u</b><small>${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
+      <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b><small>from ${money(st.start_bankroll)}</small></div>
+      <div><span>Beat the close</span><b>${pct(o.beat_close)}</b><small>avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</small></div>`;
+    const counts = { live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
+      early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length };
+    $("tabs").innerHTML = TABS.map(([k, n]) => `<button role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${n}${counts[k] ? `<span class="count">${counts[k]}</span>` : ""}</button>`).join("");
+    $("sports").innerHTML = SPORTS.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${state.sport === k}">${n}</button>`).join("");
+    $("markets").innerHTML = MARKETS.map(([k, n]) => `<button data-market="${k}" aria-pressed="${state.market === k}">${n}</button>`).join("");
   }
 
-  function render() { renderTop(); renderPicks(); renderSlip(); renderRecord(); renderBrain(); }
+  function render() {
+    renderTop();
+    const views = {
+      today: viewToday, live: viewLive, results: viewResults, model: viewModel,
+      props: () => viewList((e) => e.player, "Player props", "Priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
+      early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves", "Nothing early yet."),
+    };
+    $("view").innerHTML = (views[state.tab] || viewToday)();
+    renderSlip();
+  }
 
   document.addEventListener("click", (ev) => {
     const t = ev.target.closest("button");
     if (!t) return;
-    if (t.dataset.sport) { sport = t.dataset.sport; try { localStorage.setItem("fb-sport", sport); } catch (e) {} render(); }
-    else if (t.dataset.market) { market = t.dataset.market; try { localStorage.setItem("fb-market", market); } catch (e) {} render(); }
-    else if (t.dataset.add) { slip.has(t.dataset.add) ? slip.delete(t.dataset.add) : slip.add(t.dataset.add); render(); }
+    if (t.dataset.tab) { state.tab = t.dataset.tab; save(); render(); }
+    else if (t.dataset.sport) { state.sport = t.dataset.sport; save(); render(); }
+    else if (t.dataset.market) { state.market = t.dataset.market; save(); render(); }
+    else if (t.dataset.add) { slip.has(t.dataset.add) ? slip.delete(t.dataset.add) : slip.add(t.dataset.add); if (slip.size === 1) slipOpen = true; render(); }
+    else if (t.id === "slip-toggle") { slipOpen = !slipOpen; renderSlip(); }
     else if (t.id === "clear-slip") { slip.clear(); render(); }
   });
   document.addEventListener("input", (ev) => {
@@ -462,7 +399,6 @@ footer b { color: var(--fg); letter-spacing: .08em; }
     const d = DATA.entries.filter((e) => slip.has(e.id)).reduce((x, e) => x * dec(e.current_odds ?? e.odds), 1);
     $("pays").textContent = money((parseFloat(ev.target.value) || 0) * d);
   });
-
   render();
   if (location.protocol.startsWith("http")) {
     setInterval(async () => { try { const r = await fetch("data.json", { cache: "no-store" }); if (r.ok) { DATA = await r.json(); render(); } } catch (e) {} }, 60000);
