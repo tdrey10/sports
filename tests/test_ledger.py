@@ -299,3 +299,8 @@ def test_cli_page_from_saved_ledger(tmp_path):
     assert main(["page", "--data-dir", str(tmp_path / "data"), "--out", str(out)]) == 0
     html = out.read_text()
     assert html.startswith("<title>Funky Buttlovin</title>") and "__DATA__" not in html
+
+
+def test_longshots_capped_at_half_unit():
+    assert units_for(make_pick(american=600, kelly=0.03)) == 0.5
+    assert units_for(make_pick(american=250, kelly=0.03)) == 3.0

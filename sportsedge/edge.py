@@ -34,7 +34,7 @@ class Settings:
     disagreement_warning: float = 0.12
     hide_flagged: bool = True  # leave out picks where model and market disagree by > disagreement_warning
     max_odds: float = 600  # skip extreme longshots (e.g. +1500 props)
-    max_ev: float = 0.30  # EV above this is almost always stale data / news the model can't see
+    max_ev: float = 0.20  # EV above this is almost always stale data / news the model can't see
 
     def weight_for(self, sport: str, is_prop: bool) -> float:
         key = f"{sport}:{'prop' if is_prop else 'game'}"

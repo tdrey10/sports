@@ -376,7 +376,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--props", action="store_true", help="also evaluate player props (uses more API credits)")
     s.add_argument("--prop-markets", help="comma separated prop market keys (default: all for the sport)")
     s.add_argument("--min-ev", type=float, default=0.02, help="minimum EV per unit staked (default 0.02)")
-    s.add_argument("--max-ev", type=float, default=0.30, help="hide picks above this EV as suspect (default 0.30)")
+    s.add_argument("--max-ev", type=float, default=0.20, help="hide picks above this EV as suspect (default 0.20)")
     s.add_argument("--market-weight", type=float, default=0.75,
                    help="0..1 weight on the no-vig market probability vs the model for game lines (default 0.75)")
     s.add_argument("--prop-market-weight", type=float, default=0.8, help="same for player props (default 0.8)")
@@ -414,7 +414,7 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--props-hours", type=float, help="only price props for games starting within this many hours")
         sp.add_argument("--prop-markets", help="comma separated prop market keys (default: all for each sport)")
         sp.add_argument("--min-ev", type=float, default=0.02)
-        sp.add_argument("--max-ev", type=float, default=0.30)
+        sp.add_argument("--max-ev", type=float, default=0.20)
         sp.add_argument("--market-weight", type=float, default=0.75)
         sp.add_argument("--prop-market-weight", type=float, default=0.8)
         sp.add_argument("--kelly", type=float, default=0.25)
