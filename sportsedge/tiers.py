@@ -64,14 +64,30 @@ LONGSHOT_ODDS = 400
 LONGSHOT_MAX_UNITS = 0.5
 
 
-def units_for(pick: Pick) -> float:
-    """Kelly stake as units (1 unit = 1% of bankroll), rounded to half units.
+UNPROVEN_MAX_UNITS = 0.5
+STUDY_MARKET = {"h2h": "moneyline", "spreads": "spreads", "totals": "over/under"}
+
+
+def market_key(pick: Pick) -> str:
+    return f"{pick.sport}:{'props' if pick.is_prop else STUDY_MARKET.get(pick.market, pick.market)}"
+
+
+def is_proven(pick: Pick, settings: Settings | None) -> bool:
+    """True when this sport and bet type beat the close in the blind study (or no studies are loaded)."""
+    return settings is None or settings.proven is None or market_key(pick) in settings.proven
+
+
+def units_for(pick: Pick, settings: Settings | None = None) -> float:
+    """Quarter-Kelly stake as units (1 unit = 1% of bankroll), rounded to half units.
 
     Long shots (+400 and up) are capped at half a unit: their win probability
-    is the hardest number to get right, and Kelly sizes them off it.
+    is the hardest number to get right, and Kelly sizes them off it. So is any
+    sport and bet type that hasn't been proven in a blind test.
     """
     units = round(pick.kelly * 100 * 2) / 2
     cap = LONGSHOT_MAX_UNITS if pick.american >= LONGSHOT_ODDS else MAX_UNITS
+    if not is_proven(pick, settings):
+        cap = min(cap, UNPROVEN_MAX_UNITS)
     return min(max(units, 0.5), cap)
 
 
@@ -189,6 +205,8 @@ def build_cards(
                 bullets.append(f"Spot: {SPOTS[key].label}"
                                + (" (proven blind: weighted into the read)." if proven
                                   else " (tracked; not proven blind yet, so it adds nothing to the read)."))
+        if tier in UNIT_TIERS and not is_proven(pick, settings):
+            bullets.append("Sized at ½ unit: this sport and bet type hasn't beaten the closing line in a blind test yet.")
         if ctx and ctx.injuries_unknown:
             bullets.insert(0, f"No bet: no injury report for {', '.join(ctx.injuries_unknown)}, "
                               "so injuries are unknown. Tracked as a lean only.")
@@ -200,7 +218,7 @@ def build_cards(
         cards.append(
             Card(
                 tier=tier,
-                units=units_for(pick) if tier in UNIT_TIERS else 0.0,
+                units=units_for(pick, settings) if tier in UNIT_TIERS else 0.0,
                 headline=headline,
                 reasons=bullets,
                 sport=pick.sport,

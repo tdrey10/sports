@@ -68,3 +68,13 @@ def test_failed_injury_feed_is_unknown_not_healthy():
     scan = engine.scan(SPORTS["nba"])
     assert scan.contexts and all(ctx.injuries_unknown for ctx in scan.contexts.values())
     assert not [c for c in build_cards([scan], engine.settings, provider.now) if c.units > 0]
+
+
+def test_unproven_bet_types_are_sized_at_half_a_unit():
+    from sportsedge.tiers import units_for
+
+    big = make_pick(kelly=0.03, sport="nfl", market="spreads")
+    assert units_for(big) == 3.0  # no studies loaded: normal quarter-Kelly sizing
+    assert units_for(big, Settings(proven=set())) == 0.5
+    assert units_for(big, Settings(proven={"nfl:spreads"})) == 3.0
+    assert units_for(big, Settings(proven={"nfl:over/under", "nba:spreads"})) == 0.5

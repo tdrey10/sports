@@ -39,6 +39,7 @@ class Settings:
     max_ev: float = 0.20  # EV above this is almost always stale data / news the model can't see
     max_favorite: float = -150  # never bet a price worse than this: big favorites kill ROI
     spot_weights: dict[str, float] = field(default_factory=dict)  # "sport:spot" -> win-chance bump, proven spots only
+    proven: set[str] | None = None  # "sport:market" proven blind; None = no studies loaded (no sizing cap)
 
     def min_ev_for(self, pick: "Pick") -> float:
         if pick.is_prop:
