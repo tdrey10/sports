@@ -148,7 +148,9 @@ class Ledger:
 
     def taken_today(self, now: datetime) -> set[str]:
         today = self.day_of(now)
-        return {e.tier for e in self.entries.values() if e.day == today and e.tier in DAY_TIERS}
+        # A lean Lock/Dog (no units) doesn't block a real one later in the day.
+        return {e.tier if e.units > 0 else f"{e.tier}_lean"
+                for e in self.entries.values() if e.day == today and e.tier in DAY_TIERS}
 
     # ------------------------------------------------------------- publish
     def publish(self, cards: list[Card], now: datetime) -> list[Entry]:

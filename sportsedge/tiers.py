@@ -30,8 +30,8 @@ LOCK_MIN_ODDS = -150  # never bet worse than -150, the Lock included
 LOCK_MIN_PROB = 0.58  # model alone gives it at least this
 LOCK_MAX_GAP = 0.06  # model and the no-vig market agree to within 6 points
 LOCK_MIN_GAMES = 6  # both teams have enough games this season to trust their ratings
-DOG_MIN_ODDS = 120
-DOG_MAX_ODDS = 350  # past this the variance swamps the edge for a headline pick
+DOG_MIN_ODDS = 100  # the blueprint: dogs +100 to +220 only
+DOG_MAX_ODDS = 220
 PROP_ODDS_RANGE = (-200, 200)
 EARLY_HOURS = 24  # games further out than this are "early value"
 MAX_UNITS = 3.0
@@ -141,15 +141,36 @@ def build_cards(
         played = scan.ratings.games_played
         return played.get(ctx.home, 0) >= LOCK_MIN_GAMES and played.get(ctx.away, 0) >= LOCK_MIN_GAMES
 
+    # A Lock and a Dog every morning. A real one (units) must clear every check; when none
+    # does, the closest one is still posted as a lean: no units, tracked with the leans so
+    # the betting record stays honest. A real one later in the day still posts.
+    lean_ids: set[int] = set()
+    open_game = [
+        p for p in game
+        if now < p.commence_time <= soon_cut and not p.warnings and p.ev > 0 and p.american >= settings.max_favorite
+    ]
     if "lock" not in taken:
         locks = [p for p in soon if p.american >= LOCK_MIN_ODDS and solid(p)]
         if locks:
-            lock = max(locks, key=lambda p: (p.win_prob, p.ev))
-            chosen.append(("lock", lock))
+            chosen.append(("lock", max(locks, key=lambda p: (p.win_prob, p.ev))))
+        elif "lock_lean" not in taken:
+            near = [p for p in open_game if p.win_prob >= 0.5 and p.market in ("h2h", "spreads")]
+            if near:
+                lock = max(near, key=lambda p: (p.win_prob, p.ev))
+                chosen.append(("lock", lock))
+                lean_ids.add(id(lock))
     if "dog" not in taken:
-        dogs = [p for p in soon if DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS and p not in [c for _, c in chosen]]
+        used_now = {id(c) for _, c in chosen}
+        dogs = [p for p in soon if DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS and id(p) not in used_now]
         if dogs:
             chosen.append(("dog", max(dogs, key=lambda p: p.ev)))
+        elif "dog_lean" not in taken:
+            near = [p for p in open_game if p.market == "h2h" and DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS
+                    and id(p) not in used_now]
+            if near:
+                dog = max(near, key=lambda p: p.ev)
+                chosen.append(("dog", dog))
+                lean_ids.add(id(dog))
     used = {id(p) for _, p in chosen}
     chosen += [("value", p) for p in soon if id(p) not in used][:max_value]
     chosen += [("early", p) for p in later][:max_early]
@@ -182,7 +203,7 @@ def build_cards(
     slots = max(BEST_BETS - best_taken, 0)
     contenders = [
         p for tier, p in chosen
-        if tier in UNIT_TIERS and p.commence_time <= soon_cut and not p.warnings
+        if tier in UNIT_TIERS and id(p) not in lean_ids and p.commence_time <= soon_cut and not p.warnings
         and scores[id(p)][0] >= BEST_MIN_SCORE and scores[id(p)][2] > 0
     ]
     ranked = sorted(contenders, key=lambda p: scores[id(p)][0], reverse=True)[:slots]
@@ -215,7 +236,10 @@ def build_cards(
         if ctx and ctx.injuries_unknown:
             bullets.insert(0, f"No bet: no injury report for {', '.join(ctx.injuries_unknown)}, "
                               "so injuries are unknown. Tracked as a lean only.")
-        if tier == "lock":
+        if id(pick) in lean_ids:
+            bullets.insert(0, f"Lean {TIER_LABELS[tier].split(' of ')[0]}: nothing cleared every check today, so this is "
+                              "the closest one, posted with no units and tracked with the leans.")
+        elif tier == "lock":
             bullets.insert(0, f"Passed every Lock check: our model ({pick.model_prob:.0%}) and the market "
                               f"({pick.market_prob:.0%}) agree, no data warnings, and both teams have "
                               f"{LOCK_MIN_GAMES}+ games this season.")
@@ -223,7 +247,7 @@ def build_cards(
         cards.append(
             Card(
                 tier=tier,
-                units=units_for(pick, settings) if tier in UNIT_TIERS else 0.0,
+                units=units_for(pick, settings) if tier in UNIT_TIERS and id(pick) not in lean_ids else 0.0,
                 headline=headline,
                 reasons=bullets,
                 sport=pick.sport,

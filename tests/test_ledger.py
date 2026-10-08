@@ -139,7 +139,9 @@ def test_build_cards_tiers():
     cards = build_cards(scans, engine.settings, provider.now)
     tiers = [c.tier for c in cards]
     assert tiers.count("lock") <= 1 and tiers.count("dog") <= 1 and tiers.count("prop") <= 1
-    assert all(c.units > 0 for c in cards if c.tier != "lean")
+    lean_heads = [c for c in cards if c.reasons and c.reasons[0].startswith("Lean ")]
+    assert all(c.units > 0 for c in cards if c.tier != "lean" and c not in lean_heads)
+    assert all(c.units == 0 and c.tier in ("lock", "dog") and not c.best_rank for c in lean_heads)
     assert all(c.units == 0 for c in cards if c.tier == "lean")
     assert all(c.headline and c.reasons for c in cards)
     again = build_cards(scans, engine.settings, provider.now, taken_today={"lock", "dog", "prop"})

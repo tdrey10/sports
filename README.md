@@ -30,7 +30,7 @@ Thu 10:00  Mobile Storm @ Houston Titans    Under 236          fanduel     -101 
 
 - **Best bets**: the day's top 5 across spreads, over/unders, moneylines and props. They're ranked by expected bankroll growth (Kelly), which weighs edge against risk, so a solid -110 edge outranks a +450 longshot with a slightly bigger EV.
 - **Filter by bet type**: Spreads, Over/Under, Props, Moneyline, plus a record and closing-line value for each type.
-- **Today's best**: Lock of the Day (highest win probability that still beats the price), Dog of the Day (best plus-money edge up to +350) and Prop of the Day.
+- **Today's best**: Lock of the Day (highest win probability that passes every check), Dog of the Day (best edge on a +100 to +220 dog) and Prop of the Day. A Lock and a Dog are on the page by 8 AM Pacific every day: when nothing clears every check, the closest one is posted as a lean (no units, tracked with the leans), and a real one later in the day still posts.
 - **The board**: game-line value plays, player props, early value (games more than 24 hours out) and leans (small edges, no units, still tracked).
 - **Every pick explains itself**: projected score, team records, last result, back-to-backs and rest, injuries, model vs. market odds, and the best book.
 - **Line tracking**: "Got it at +215 → now +150 · we beat the line" for every open pick.
