@@ -626,6 +626,28 @@ def load_props(path) -> dict:
         return {}
 
 
+def _flipped(opened: list[Quote], close: list[Quote]) -> bool:
+    """True when the opening line says the other team was a clear favorite.
+
+    A real move that big (a 14-point swing on the spread) is rare; ESPN's opening
+    data occasionally has the two teams the wrong way round. Those games are left
+    out of the early-line study rather than counted as huge line moves.
+    """
+    from .odds import implied_prob
+
+    def home_spread(qs):
+        return next((q.point for q in qs if q.market == "spreads" and q.side == "home" and q.point is not None), None)
+
+    def home_ml(qs):
+        return next((implied_prob(q.american) for q in qs if q.market == "h2h" and q.side == "home"), None)
+
+    o, c = home_spread(opened), home_spread(close)
+    if o is not None and c is not None and o * c < 0 and min(abs(o), abs(c)) >= 2.5 and abs(o - c) >= 6:
+        return True
+    o, c = home_ml(opened), home_ml(close)
+    return o is not None and c is not None and (o - 0.5) * (c - 0.5) < 0 and abs(o - c) >= 0.25
+
+
 class ClosingHistory:
     """Closing lines saved in the repo (data/history/<sport>.json), so each finished
     game is downloaded once and the studies grow every day for free.
@@ -645,16 +667,25 @@ class ClosingHistory:
         self.deadline = time.monotonic() + minutes * 60 if minutes else None  # stop downloading, keep what we have
         self.fetched = 0
         self._data: dict[str, dict[str, list]] = {}
-        self._dirty: set[str] = set()
+        self._months: dict[str, dict[str, str]] = {}  # sport -> event id -> month file, for games saved this run
+        self._dirty: set[tuple[str, str]] = set()
 
     def _sport(self, key: str) -> dict[str, list]:
+        """Every saved game for a sport: the old single file (read-only now) plus one
+        file per month (data/history/<sport>/<YYYY-MM>.json), so finished months never
+        change and the repository doesn't grow by a whole file every day."""
         import json
 
         if key not in self._data:
-            try:
-                self._data[key] = json.loads((self.folder / f"{key}.json").read_text())
-            except (OSError, ValueError):
-                self._data[key] = {}
+            store: dict[str, list] = {}
+            legacy = self.folder / f"{key}.json"
+            for path in ([legacy] if legacy.exists() else []) + sorted((self.folder / key).glob("*.json")):
+                try:
+                    store.update(json.loads(path.read_text()))
+                except (OSError, ValueError):
+                    continue
+            self._data[key] = store
+            self._months[key] = {}
         return self._data[key]
 
     def prefetch(self, cfg: SportConfig, games: list[GameResult], limit: int | None = None) -> None:
@@ -687,7 +718,9 @@ class ClosingHistory:
                 rows += [r for r in old if r[3] == STUDY_BOOK]  # never lose a close we already had
             rows.append(["meta", CHECK_VERSION, None, OPEN_BOOK, 0])  # don't ask again
             store[g.event_id] = rows
-            self._dirty.add(cfg.key)
+            month = f"{g.date:%Y-%m}"
+            self._months[cfg.key][g.event_id] = month
+            self._dirty.add((cfg.key, month))
 
     def _late(self) -> bool:
         import time
@@ -709,12 +742,21 @@ class ClosingHistory:
                   if book == OPEN_BOOK and m != "meta"]
         if cfg.draws and not any(q.market == "h2h" and q.side == "draw" for q in quotes):
             quotes = [q for q in quotes if q.market != "h2h"]
+        if quotes and _flipped(quotes, self.quotes(cfg, game)):
+            return []  # the open names the other team as a big favorite: almost always swapped data
         return quotes
 
     def save(self) -> None:
         import json
 
-        self.folder.mkdir(parents=True, exist_ok=True)
-        for key in self._dirty:
-            (self.folder / f"{key}.json").write_text(json.dumps(self._data[key], separators=(",", ":")))
+        for key, month in self._dirty:
+            path = self.folder / key / f"{month}.json"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                current = json.loads(path.read_text())
+            except (OSError, ValueError):
+                current = {}
+            store = self._data[key]
+            current.update({eid: store[eid] for eid, m in self._months[key].items() if m == month})
+            path.write_text(json.dumps(current, separators=(",", ":")))
         self._dirty.clear()

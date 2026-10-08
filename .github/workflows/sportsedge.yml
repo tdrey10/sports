@@ -63,8 +63,8 @@ jobs:
       # calibration per sport, and save each game's closing line so it is downloaded once.
       - name: Studies
         if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
-        run: hambino study nfl,ncaaf,nba,ncaab,mlb,nhl,soccer --budget 5000 --minutes 30
-        timeout-minutes: 45
+        run: hambino study nfl,ncaaf,nba,ncaab,mlb,nhl,soccer --budget 12000 --minutes 35
+        timeout-minutes: 50
 
       - name: Full engine cycle
         if: github.event.schedule != '41 0-6,11-23 * * *'
