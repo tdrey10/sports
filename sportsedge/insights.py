@@ -79,13 +79,16 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
 
     if pick.is_prop:
         headline = (
-            f"We make this {our:.0%} to cash; {odds} only needs {implied:.0%}."
+            f"We make this {our:.0%} to cash; {odds} only needs {implied:.0%}." if pick.ev > 0
+            else f"No edge: we make this {our:.0%} to cash and {odds} needs {implied:.0%}."
         )
         if pick.projection:
             bullets.append(f"Projection: {pick.projection}.")
     else:
         team = pick_team(pick, ctx) if ctx else None
-        if pick.market == "h2h" and team:
+        if pick.market == "h2h" and team and pick.ev <= 0:
+            headline = f"No edge at {odds}: {team} wins {our:.0%} of the time on our numbers, and the price needs {implied:.0%}."
+        elif pick.market == "h2h" and team:
             if pick.american > 0:
                 headline = f"{odds} undersells {team}: our numbers say they win {our:.0%} of the time, the price pays like {implied:.0%}."
             else:

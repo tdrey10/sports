@@ -27,9 +27,12 @@ UNIT_TIERS = ("lock", "dog", "prop", "value", "early") + LIVE_TIERS
 
 LOCK_MIN_ODDS = -150  # never bet worse than -150, the Lock included
 # The Lock of the Day is the safest pick, not the biggest edge, so it must clear every check:
-LOCK_MIN_PROB = 0.58  # model alone gives it at least this
+LOCK_MIN_PROB = 0.62  # our model alone gives it at least this
+LOCK_MIN_MARKET = 0.55  # and the market (no vig) also has it as a clear favorite
+LOCK_MIN_CASH = 0.60  # calibrated chance to cash, after the studies' correction
+LOCK_MIN_SCORE = 50  # edge score: a real edge on a likely winner
 LOCK_MAX_GAP = 0.06  # model and the no-vig market agree to within 6 points
-LOCK_MIN_GAMES = 6  # both teams have enough games this season to trust their ratings
+LOCK_MIN_GAMES = 8  # both teams have enough games this season to trust their ratings
 DOG_MIN_ODDS = 100  # the blueprint: dogs +100 to +220 only
 DOG_MAX_ODDS = 220
 PROP_ODDS_RANGE = (-200, 200)
@@ -134,7 +137,10 @@ def build_cards(
         ctx = scan.contexts.get(p.event_id) if scan else None
         if p.warnings or p.market_prob is None or p.model_prob < LOCK_MIN_PROB:
             return False
-        if abs(p.model_prob - p.market_prob) > LOCK_MAX_GAP or p.market_prob < 0.5:
+        if abs(p.model_prob - p.market_prob) > LOCK_MAX_GAP or p.market_prob < LOCK_MIN_MARKET:
+            return False
+        score, cash, cal_ev = edge_score(p, settings)
+        if cash < LOCK_MIN_CASH or score < LOCK_MIN_SCORE or cal_ev <= 0:
             return False
         if scan is None or ctx is None or scan.ratings is None:
             return False
@@ -165,12 +171,7 @@ def build_cards(
         locks = [p for p in soon if p.american >= LOCK_MIN_ODDS and solid(p)]
         if locks:
             chosen.append(("lock", max(locks, key=lambda p: (p.win_prob, p.ev))))
-        elif "lock_lean" not in taken:
-            near = lean_pool(lambda p: p.win_prob >= 0.5 and p.market in ("h2h", "spreads"))
-            if near:
-                lock = max(near, key=lambda p: (p.win_prob, p.ev))
-                chosen.append(("lock", lock))
-                lean_ids.add(id(lock))
+        # No lean Lock: if nothing passes every check, there is no Lock today.
     if "dog" not in taken:
         used_now = {id(c) for _, c in chosen}
         dogs = [p for p in soon if DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS and id(p) not in used_now]
@@ -252,9 +253,11 @@ def build_cards(
             bullets.insert(0, f"Lean {TIER_LABELS[tier].split(' of ')[0]}: nothing cleared every check today, so this is "
                               "the closest one, posted with no units and tracked with the leans.")
         elif tier == "lock":
-            bullets.insert(0, f"Passed every Lock check: our model ({pick.model_prob:.0%}) and the market "
-                              f"({pick.market_prob:.0%}) agree, no data warnings, and both teams have "
-                              f"{LOCK_MIN_GAMES}+ games this season.")
+            sc, cash, _ = scores[id(pick)]
+            bullets.insert(0, f"Passed every Lock check: our model {pick.model_prob:.0%} and the market "
+                              f"{pick.market_prob:.0%} both make it a clear favorite and agree, it cashes "
+                              f"{cash:.0%} after calibration with a real edge (score {sc:.0f}), injuries are "
+                              f"known, -150 or better, and both teams have {LOCK_MIN_GAMES}+ games this season.")
         ctx = scan.contexts.get(pick.event_id) if scan else None
         cards.append(
             Card(
