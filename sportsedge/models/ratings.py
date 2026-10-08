@@ -40,6 +40,8 @@ class GameResult:
     away_pitcher_era: float | None = None
     home_pitcher_decisions: int = 0  # wins + losses, a proxy for how much the ERA can be trusted
     away_pitcher_decisions: int = 0
+    home_starter_id: str = ""  # ESPN athlete id of the probable starter (pitcher, or NHL goalie)
+    away_starter_id: str = ""
     period: int = 0  # live: quarter / period / half / inning
     clock: str = ""  # live: game clock as ESPN shows it ("7:42", "67'")
 

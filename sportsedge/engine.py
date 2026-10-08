@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from .brain import BrainReport, train
 from .data.base import DataProvider, Event, NameMatcher, Quote, is_out
 from .edge import Pick, Settings, evaluate, fmt_point
-from .models.game import GamePrediction, baseline_team_score, pitcher_factor, predict_game
+from .models.game import GamePrediction, baseline_team_score, goalie_factor, pitcher_factor, predict_game
 from .models.props import PlayerGame, PropProjection, matchup_factor, project_prop, usage_factor
 from .models.ratings import GameResult, TeamRatings, fit_ratings, is_b2b
 from .spots import SPOTS, capped_bump, is_dog_price, steamed, team_spots
@@ -37,6 +37,8 @@ class EventContext:
     away_pitcher: str = ""
     away_pitcher_era: float | None = None
     home_pitcher_decisions: int = 0
+    home_goalie_sv: tuple[float, float] | None = None  # NHL: (career save %, shots) of the probable goalie
+    away_goalie_sv: tuple[float, float] | None = None
     away_pitcher_decisions: int = 0
 
     @property
@@ -160,6 +162,10 @@ class Engine:
                 ctx.home_pitcher, ctx.home_pitcher_era = sched.home_pitcher, sched.home_pitcher_era
                 ctx.away_pitcher, ctx.away_pitcher_era = sched.away_pitcher, sched.away_pitcher_era
                 ctx.home_pitcher_decisions = sched.home_pitcher_decisions
+                goalie = getattr(self.provider, "goalie_stats", None)
+                if cfg.key == "nhl" and goalie is not None:
+                    ctx.home_goalie_sv = goalie(sched.home_starter_id)
+                    ctx.away_goalie_sv = goalie(sched.away_starter_id)
                 ctx.away_pitcher_decisions = sched.away_pitcher_decisions
             # A team with no injury report is unknown, not healthy: its games get no bet.
             win_hit = {home: 0.0, away: 0.0}
@@ -195,8 +201,10 @@ class Engine:
                 home_b2b=use_rest and ctx.home_b2b, away_b2b=use_rest and ctx.away_b2b,
                 # The away starter limits the home offence and vice versa; key players out lower a team's score.
                 home_factor=pitcher_factor(ctx.away_pitcher_era, ctx.away_pitcher_decisions)
+                * goalie_factor(*(ctx.away_goalie_sv or (None, None)))
                 * injury_factor(cfg, win_hit[home], eh),
                 away_factor=pitcher_factor(ctx.home_pitcher_era, ctx.home_pitcher_decisions)
+                * goalie_factor(*(ctx.home_goalie_sv or (None, None)))
                 * injury_factor(cfg, win_hit[away], ea),
             )
             scan.predictions[event.id] = pred

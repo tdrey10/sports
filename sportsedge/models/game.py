@@ -131,6 +131,23 @@ ERA_TRUST_MAX = 0.5  # even a full season's ERA only moves halfway from league a
 ERA_PRIOR_DECISIONS = 6  # decisions (W+L) at which the ERA gets half of that trust
 
 
+LEAGUE_SAVE_PCT = 0.904
+GOALIE_PRIOR_SHOTS = 1500.0  # shots of league-average goaltending behind every save %
+
+
+def goalie_factor(save_pct: float | None, shots: float | None) -> float:
+    """Multiplier on the *opposing* team's expected goals for a starting goalie.
+
+    Goals allowed scale with (1 - save %). The goalie's career save % is shrunk toward the
+    league average by how many shots he has faced, so a backup with a small sample counts
+    for less than a proven starter, and a weak backup in net raises the other team's total.
+    """
+    if save_pct is None or not shots or not (0.8 < save_pct < 0.96):
+        return 1.0
+    shrunk = (save_pct * shots + LEAGUE_SAVE_PCT * GOALIE_PRIOR_SHOTS) / (shots + GOALIE_PRIOR_SHOTS)
+    return min(max((1 - shrunk) / (1 - LEAGUE_SAVE_PCT), 0.85), 1.15)
+
+
 def pitcher_factor(era: float | None, decisions: int | None = None, league_era: float = LEAGUE_ERA) -> float:
     """Multiplier on the *opposing* team's expected runs for a starting pitcher.
 
