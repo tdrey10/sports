@@ -214,6 +214,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; display:
 table { width: 100%; border-collapse: collapse; font-size: 15px; }
 th, td { padding: 8px 8px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
 th:first-child, td:first-child { text-align: left; }
+th.text, td.text { text-align: left; white-space: normal; min-width: 11em; }
 th { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 td { font-variant-numeric: tabular-nums; }
 .model ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
@@ -353,13 +354,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     .sort((a, b) => score(b) - score(a) || a.best_rank - b.best_rank).map((e, i) => Object.assign({}, e, { rank: i + 1 }));
 
   function renderHero() {
-    const pool = DATA.entries.filter((e) => e.day === today() && !isLive(e));
-    const e = bestToday()[0] || pool.find((x) => x.tier === "lock");
+    const e = bestToday()[0] || DATA.entries.find((x) => x.tier === "lock" && onBoard(x) && !x.settled);
     if (!e) {
       $("hero").innerHTML = `<div class="ticket-empty"><b>Today's #1 posts with the next scan</b><span class="muted">Picks run at 7:17 AM, 12:17 PM and 4:17 PM Pacific. Only picks that clear every check make the top 10.</span></div>`;
       return;
     }
-    const kind = e.best_rank ? "Today's #1 best bet" : "Lock of the day";
+    const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : "Lock of the day";
     $("hero").innerHTML = `<div class="ticket">
       <div class="t-head"><span class="t-kind">${kind}</span><span class="t-sport">${esc(e.sport_name)} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)} · ${timeOf(e)}</span></div>
       <h2>${esc(e.selection)}</h2>
@@ -476,10 +476,10 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
          ${big && big.calibration && big.calibration.length >= 3 ? `<div class="grid two"><div>${calibChart(big.calibration)}</div><p class="empty">${esc(big.name)}: each dot is a group of past lines. Dots on the dashed line mean that when the engine said 60%, those bets won 60% of the time. The edge score uses this to correct its win odds before ranking.</p></div>` : ""}`)
       : panel("Studies", "", empty("The first study runs on the next daily cycle (8:47 AM Pacific) and fills this in."));
     const spotStudy = [];
-    studies.forEach((s) => (s.spots || []).forEach((r) => spotStudy.push(`<tr><td>${esc(s.name)}</td><td>${esc(r.label)}</td><td>${wl(r.open_blind)}</td>${roiCell(r.open_blind)}<td>${wl(r.close_blind)}</td>${roiCell(r.close_blind)}<td class="${cls(r.open_clv)}">${r.open_clv == null ? "–" : signed(r.open_clv * 100, 1) + "%"}</td><td>${r.proven ? `<span class="pill ok">Proven blind</span>` : `<span class="pill wait">Not yet</span>`}</td></tr>`)));
+    studies.forEach((s) => (s.spots || []).forEach((r) => spotStudy.push(`<tr><td>${esc(s.name)}</td><td class="text">${esc(r.label)}</td><td>${wl(r.open_blind)}</td>${roiCell(r.open_blind)}<td>${wl(r.close_blind)}</td>${roiCell(r.close_blind)}<td class="${cls(r.open_clv)}">${r.open_clv == null ? "–" : signed(r.open_clv * 100, 1) + "%"}</td><td>${r.proven ? `<span class="pill ok">Proven blind</span>` : `<span class="pill wait">Not yet</span>`}</td></tr>`)));
     const spotPanel = spotStudy.length ? panel("Early-bet spots", "Dogs +100 to +220 (wind: the under) · blind games only",
         `<p class="empty">Each spot is judged on its own: bet every dog in that spot, at the opening line and at the close, on games the settings never saw. A spot adds weight to a pick only after it holds up blind, and all spots together are capped at 6 points of win chance on a dog.</p>
-         <div class="table-wrap"><table><thead><tr><th>Sport</th><th>Spot</th><th>Open W-L</th><th>Open ROI</th><th>Close W-L</th><th>Close ROI</th><th>Open CLV</th><th>Status</th></tr></thead><tbody>${spotStudy.join("")}</tbody></table></div>`) : "";
+         <div class="table-wrap"><table><thead><tr><th>Sport</th><th class="text">Spot</th><th>Open W-L</th><th>Open ROI</th><th>Close W-L</th><th>Close ROI</th><th>Open CLV</th><th>Status</th></tr></thead><tbody>${spotStudy.join("")}</tbody></table></div>`) : "";
     const propRows = [];
     Object.entries(DATA.props || {}).forEach(([sport, markets]) => Object.entries(markets).forEach(([m, t]) => {
       const graded = t.over + t.under;
