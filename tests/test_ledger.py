@@ -277,3 +277,14 @@ def test_spread_headline_wording():
         headline, _ = reasons(p, scans[0])
         assert ("laying" in headline) == (p.point < 0)
         assert "to win by" in headline or "to lose by" in headline
+
+
+def test_props_limited_by_sport_and_window():
+    provider = SampleProvider(seed=4)
+    L = Ledger()
+    res = run_cycle(provider, resolve("nba,nhl"), L, Settings(), provider.now,
+                    props=True, props_sports={"nba"}, props_hours=6)
+    by_sport = {s.sport.key: s for s in res.scans}
+    assert not any(p.is_prop for p in by_sport["nhl"].picks)
+    nba_props = [p for p in by_sport["nba"].picks if p.is_prop]
+    assert nba_props and all(p.commence_time <= provider.now + timedelta(hours=6) for p in nba_props)
