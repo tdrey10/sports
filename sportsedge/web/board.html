@@ -6,11 +6,12 @@
 /* Layout: a scoreboard strip, sticky tabs (Today · Live · Props · Early · Results · Model), picks grouped
    by game like a sportsbook board, and a parlay slip docked to the bottom of the screen. */
 :root {
-  /* Seahawks-inspired dark palette: College Navy, Action Green, Wolf Gray. One committed dark look. */
-  --bg: #00152e; --surface: #002244; --surface-2: #0a2d52; --line: #1b3d63; --line-2: #2c5179;
-  --fg: #f1f4f7; --muted: #a5acaf; --accent: #69be28; --accent-soft: #163f2c;
-  --win: #7fd13b; --win-soft: #15402b; --loss: #f07a6a; --loss-soft: #3e2233;
-  --live: #69be28; --live-soft: #163f2c; --info: #9cc7e8; --info-soft: #12355a;
+  /* Trail Blazers-inspired dark palette: black, Blazers red, silver. One committed dark look. */
+  --bg: #0b0b0c; --surface: #17171a; --surface-2: #202024; --line: #2c2c31; --line-2: #3a3a40;
+  --fg: #f4f4f5; --muted: #a2aaad; --accent: #e03a3e; --accent-soft: #3a1618;
+  --win: #e8eaeb; --win-soft: #2a2b2e; --loss: #ff6b6e; --loss-soft: #3a1a1c;
+  --live: #e03a3e; --live-soft: #3a1618; --info: #c4cacd; --info-soft: #26272b;
+  --tint: 11, 11, 12;
   --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
@@ -20,13 +21,22 @@
 * { box-sizing: border-box; }
 html { background: var(--bg); }
 body { margin: 0; background: transparent; color: var(--fg); font: 16px/1.45 var(--body); }
-/* The Funky Buttlovin photo sits behind the whole engine, tinted navy so the picks stay readable,
-   and fades into the navy page below it (the photo is 3:4, hence the 4 / 3 height).
+/* The Funky Buttlovin photo sits behind the whole engine, tinted black so the picks stay readable,
+   and fades into the black page below it (the photo is 3:4, hence the 4 / 3 height).
    A fixed layer (not background-attachment) so it also stays put on phones. */
 .photo-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(0, 21, 46, .5) 0%, rgba(0, 21, 46, .4) 30%, rgba(0, 21, 46, .6) 55%, rgba(0, 21, 46, .88) 80%, rgba(0, 21, 46, .95) 100%),
+  background: linear-gradient(180deg, rgba(var(--tint), .5) 0%, rgba(var(--tint), .4) 30%, rgba(var(--tint), .6) 55%, rgba(var(--tint), .88) 80%, rgba(var(--tint), .95) 100%),
     linear-gradient(180deg, transparent 70%, var(--bg)) 50% 0% / max(100vw, 520px) calc(max(100vw, 520px) * 4 / 3) no-repeat,
     var(--mascot) 50% 0% / max(100vw, 520px) auto no-repeat, var(--bg); }
+/* Wide screens (and the gallery thumbnail): a full-width photo would show only the wall, so frame the
+   portrait by height, centered on the face, and fade its sides and bottom into the page. */
+@media (min-width: 761px) {
+  .photo-bg { --ph: max(110vh, 720px); --pw: calc(var(--ph) * 3 / 4); --py: calc(var(--ph) * -0.12);
+    background: linear-gradient(180deg, rgba(var(--tint), .45) 0%, rgba(var(--tint), .35) 35%, rgba(var(--tint), .7) 60%, rgba(var(--tint), .92) 85%),
+      linear-gradient(90deg, var(--bg), transparent 28%, transparent 72%, var(--bg)) 50% var(--py) / var(--pw) var(--ph) no-repeat,
+      linear-gradient(180deg, transparent 60%, var(--bg)) 50% var(--py) / var(--pw) var(--ph) no-repeat,
+      var(--mascot) 50% var(--py) / var(--pw) var(--ph) no-repeat, var(--bg); }
+}
 /* The page opens on the photo: the name sits at the bottom of a tall header, then the picks scroll up over it. */
 .mast { min-height: clamp(260px, 52vh, 560px); display: flex; flex-direction: column; justify-content: flex-end; }
 .mast h1 { font-size: 38px; text-shadow: 0 2px 12px rgba(0, 0, 0, .6); }
@@ -66,7 +76,7 @@ button, select { font: inherit; color: inherit; }
 .tabs button { flex: none; background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; cursor: pointer;
   font-weight: 700; color: var(--muted); }
 .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
-.seg button[aria-pressed="true"] { background: var(--accent) !important; color: #00152e !important; }
+.seg button[aria-pressed="true"] { background: var(--accent) !important; color: #fff !important; }
 .tabs .count { font: 600 12px var(--mono); margin-left: 4px; color: var(--muted); }
 .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; overflow-x: auto; max-width: 100%; }
