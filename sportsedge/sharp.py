@@ -7,8 +7,8 @@ relying on our own model. It's the standard method of value-betting software.
 
 Odds come from The Odds API (free plan: 500 requests a month, key in
 ODDS_API_KEY). One check of one sport's moneylines and spreads across Pinnacle and
-up to nine US books costs 2 requests, so checks run twice a day for the sports in
-season and stop well before the monthly limit. Each pick is matched to its ESPN
+up to nine US books costs 1 request (moneylines), so checks run twice a day for the
+big five in season (about 10 requests a day) and stop well before the monthly limit. Each pick is matched to its ESPN
 game so it is graded and its closing line value tracked like every other pick; the
 adaptive layer pauses sharp value in a sport whose picks keep losing to the close.
 """
@@ -36,14 +36,15 @@ US_BOOKS = ("draftkings", "fanduel", "betmgm", "williamhill_us", "espnbet", "bet
 BOOK_NAMES = {"draftkings": "DraftKings", "fanduel": "FanDuel", "betmgm": "BetMGM", "williamhill_us": "Caesars",
               "espnbet": "ESPN BET", "betrivers": "BetRivers", "fanatics": "Fanatics", "ballybet": "Bally Bet",
               "hardrockbet": "Hard Rock"}
-MARKETS = ("h2h", "spreads")
+MARKETS = ("h2h",)  # moneylines only: one request per sport keeps the free plan's 500 a month
+SPORTS = ("nfl", "nba", "nhl", "mlb", "ncaaf")  # the biggest markets, where Pinnacle's line is sharpest
 MIN_EV = 0.02
 MAX_EV = 0.15  # bigger than this is almost always a stale or wrong price
 MAX_FAVORITE = -150
 MAX_UNITS = 1.0  # new method: small until its CLV record is in
 CHECK_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific
 CREDIT_FLOOR = 40
-CREDITS_PER_SPORT = 2  # two markets, one region's worth of books
+CREDITS_PER_SPORT = 1  # one market, up to ten books
 
 
 def due(now: datetime) -> bool:
@@ -187,7 +188,7 @@ def run(sports: list[SportConfig], provider, now: datetime, clv_trust: dict | No
         return []
     out = []
     for cfg in sports:
-        if cfg.odds_key not in active:
+        if cfg.key not in SPORTS or cfg.odds_key not in active:
             continue
         if client.remaining is not None and client.remaining - CREDITS_PER_SPORT < CREDIT_FLOOR:
             print(f"sharp value: stopping, {client.remaining:.0f} Odds API requests left this month")

@@ -321,7 +321,8 @@ class Workspace:
 
             if sharp.due(now) or getattr(self.args, "sharp_now", False):
                 trust = {k: v["factor"] for k, v in self.ledger.clv_trust(now).items()}
-                added = self.ledger.publish(sharp.run(sports, self.provider, now, clv_trust=trust), now)
+                added = self.ledger.publish(sharp.run(resolve([",".join(sharp.SPORTS)]), self.provider, now,
+                                                      clv_trust=trust), now)
                 print(f"sharp value: posted {len(added)}")
         from . import archive
 
