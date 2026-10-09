@@ -174,3 +174,34 @@ def test_swapped_opening_lines_are_left_out(tmp_path):
     day = datetime(2026, 9, 1, tzinfo=timezone.utc)
     assert history.open_quotes(SPORTS["ncaaf"], GameResult("swapped", day, "A", "B", 1, 0)) == []
     assert len(history.open_quotes(SPORTS["ncaaf"], GameResult("moved", day, "A", "B", 1, 0))) == 2  # a real move
+
+
+def test_learned_model_is_judged_blind_against_the_market():
+    import random
+
+    from sportsedge.learn import FEATURES, evaluate
+    from sportsedge.study import Side
+
+    rng = random.Random(3)
+
+    def rows(n, start):
+        out = []
+        for i in range(n):
+            m = rng.uniform(0.3, 0.7)
+            edge = rng.choice([0.0, 0.0, 0.12])  # a hidden feature the market misses
+            p = min(m + edge, 0.95)
+            won = rng.random() < p
+            feats = [0.0] * len(FEATURES)
+            feats[0] = math.log(m / (1 - m))
+            feats[7] = edge * 10  # "rest_diff" carries the signal
+            am = round(100 / m - 100) if m < 0.5 else round(-100 * m / (1 - m))
+            out.append(Side("nba", f"g{start + i}", "h2h", "home", am, m, m, 0.0, float(won), 0.0, float(not won),
+                            date=f"2025-{1 + (start + i) // 2000:02d}-01", features=feats))
+        return out
+
+    import math
+    res = evaluate(rows(4000, 0), rows(2000, 4000))
+    assert res["beats_market"] and res["log_loss_learned"] < res["log_loss_market"]
+    assert res["bets"] >= 60 and res["roi"] > 0
+    # Pure noise: nothing to learn, so it must not beat the market.
+    assert evaluate(rows(700, 0)[:0], rows(10, 0)).get("note")

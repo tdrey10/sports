@@ -71,6 +71,7 @@ class Side:
     loss: float
     date: str = ""  # game start (ISO), for splitting tuning games from blind ones
     point: float | None = None
+    features: list[float] | None = None  # pre-game context for the learned model (learn.py)
 
     def blended(self, w: float) -> float:
         if self.market_prob is None:
@@ -217,6 +218,7 @@ class SportStudy:
     by_market: list[Result] = field(default_factory=list)
     by_band: list[Result] = field(default_factory=list)
     calibration: list[tuple[float, float, int]] = field(default_factory=list)  # (said, won, n)
+    learned: dict = field(default_factory=dict)  # gradient-boosting model vs the market, blind (learn.py)
     note: str = ""
 
     def to_dict(self) -> dict:
@@ -265,6 +267,13 @@ def study_sides(sides: list[Side], cfg: SportConfig, games: int, window: str,
         return st
     tune, blind = split_blind(sides)
     st.tune_window, st.blind_window = _window(tune), _window(blind)
+    try:
+        from .learn import evaluate
+
+        st.learned = evaluate(tune, blind)
+    except Exception as exc:  # the learned model is extra: never let it break a study
+        log.warning("%s learned model failed: %s", cfg.key, exc)
+        st.learned = {"note": f"failed: {exc}"}
 
     # 1. Market weight, on the tuning games only: the blend whose probabilities best
     # predicted what happened (log loss, a proper score; far steadier than ROI).
@@ -499,10 +508,13 @@ def replay(
     """Price and grade every side of every closing (and opening) line between ``start`` and ``end``.
 
     Returns (closing sides, games, opening sides)."""
+    from .learn import Form, game_context, side_features
     from .ledger import _settle
 
     completed = sorted((g for g in results if g.completed), key=lambda g: g.date)
     rest = rest_days(results) if cfg.rest_effects else {}
+    form = Form(results)
+    rest_all = rest or rest_days(results)  # rest and travel are features even where the ratings ignore them
     cfg = with_shapes(cfg, results, before=start) if cfg.scoring == "normal" else cfg
     engine = Engine(provider=None, settings=Settings(market_weight=0.0, prop_market_weight=0.0, max_odds=10_000))
     sides: list[Side] = []
@@ -531,6 +543,7 @@ def replay(
                 away_b2b=cfg.rest_effects and is_b2b(rest.get((g.event_id, g.away))),
             )
             hs, as_ = g.home_score, g.away_score
+            ctx = game_context(cfg, g, form, rest_all)
             for line_quotes, bucket in ((quotes, sides), (opening(g) if opening else [], open_sides)):
                 if not line_quotes:
                     continue
@@ -547,6 +560,7 @@ def replay(
                     bucket.append(Side(
                         cfg.key, g.event_id, p.market, p.side, p.american, p.model_prob, p.market_prob,
                         p.push_prob, *out, date=g.date.isoformat(), point=p.point,
+                        features=side_features(ctx, p.market, p.side, p.point, p.model_prob, p.market_prob),
                     ))
     return sides, games, open_sides
 
