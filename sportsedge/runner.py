@@ -75,6 +75,7 @@ def run_cycle(
         out.warnings.extend(scan.warnings)
         if scan.brain:
             out.brains[cfg.key] = scan.brain
+    _funnel(out.scans, settings)
     held = settings.board_hour is not None and now.astimezone(ledger.tz).hour < settings.board_hour
     cards = [] if held else build_cards(
         out.scans, settings, now, taken_today=ledger.taken_today(now), best_taken=ledger.best_taken(now)
@@ -110,3 +111,31 @@ def simulate_history(
         t += step
     provider.clock = end
     return brains
+
+
+def _funnel(scans, settings) -> None:
+    """Log how many sides survive each rule, so an empty board can be explained."""
+    from collections import Counter
+
+    from .edge import best_per_event, qualifying
+    from .tiers import LEGIT_MIN_WIN, backed, not_legit
+
+    game = [p for s in scans for p in s.picks if not p.is_prop]
+    ev_ok = qualifying(game, settings)
+    best = best_per_event(game, settings)
+    reasons = Counter()
+    for p in best:
+        if not backed(p, settings):
+            reasons["paused by CLV"] += 1
+        elif (r := not_legit(p, settings)):
+            reasons[r.split(" (")[0][:60]] += 1
+        elif p.win_prob < LEGIT_MIN_WIN:
+            reasons["under 45% to win"] += 1
+        else:
+            reasons["passes"] += 1
+    top = sorted(game, key=lambda p: p.ev, reverse=True)[:5]
+    print(f"funnel: {len(game)} sides, {len(ev_ok)} with {settings.min_ev:.0%}+ edge, {len(best)} best per game: "
+          + ", ".join(f"{k} {v}" for k, v in reasons.most_common()))
+    for p in top:
+        print(f"  top edge: {p.sport} {p.selection} {p.american:+.0f} ev {p.ev:+.1%} win {p.win_prob:.0%} "
+              f"market {p.market_prob if p.market_prob is None else round(p.market_prob, 3)} warn {bool(p.warnings)}")
