@@ -128,8 +128,9 @@ def test_only_bets_backed_by_a_blind_test_are_posted():
     engine = Engine(provider, Settings(), now=provider.now)
     scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
     assert build_cards(scans, Settings(), provider.now)  # no studies loaded: open
-    assert build_cards(scans, Settings(proven=set()), provider.now) == []  # studies loaded, nothing proven
-    only = [c for c in build_cards(scans, Settings(proven={"nba:spreads"}), provider.now) if c.units > 0]
+    strict = dict(require_proven=True)
+    assert build_cards(scans, Settings(proven=set(), **strict), provider.now) == []  # nothing proven
+    only = [c for c in build_cards(scans, Settings(proven={"nba:spreads"}, **strict), provider.now) if c.units > 0]
     assert only and all(c.pick.sport == "nba" and c.pick.market == "spreads" for c in only)
 
 
@@ -231,6 +232,7 @@ def test_clv_is_the_reward_that_adapts_trust():
     assert bad["factor"] == 0.0 and good["factor"] == 1.25 and few["factor"] == 1.0  # few picks: no change
     pick = make_pick(sport="nba", market="spreads", kelly=0.02)
     assert not backed(pick, Settings(clv_trust={"nba:spreads": 0.0}))
+    assert backed(pick, Settings(proven=set()))  # unproven but with a real edge: posts (half a unit)
     assert units_for(pick, Settings(clv_trust={"nba:spreads": 0.5})) == 1.0
     assert units_for(pick) == 2.0
 
