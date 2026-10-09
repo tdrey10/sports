@@ -21,6 +21,7 @@ TIER_LABELS = {
     "live": "Live Bet",
     "live_win": "Live: Most Likely to Win",
     "live_plus": "Live Plus Money",
+    "sharp": "Sharp Value",
 }
 LIVE_TIERS = ("live", "live_win", "live_plus")
 UNIT_TIERS = ("lock", "dog", "prop", "value", "early") + LIVE_TIERS

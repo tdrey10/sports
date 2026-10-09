@@ -254,8 +254,8 @@ class Ledger:
         pulled = []
         seen: dict[tuple, Entry] = {}
         for e in sorted(self.entries.values(), key=lambda e: (not e.event_id.isdigit(), e.created_at)):
-            if e.status != "pending" or e.start <= now or e.tier in LIVE_TIERS:
-                continue
+            if e.status != "pending" or e.start <= now or e.tier in LIVE_TIERS or e.tier == "sharp":
+                continue  # live and sharp-value bets have their own checks (and their own CLV record)
             if e.units <= 0:
                 daily_lock = e.tier == "lock" and getattr(settings, "daily_lock", True)
                 if not getattr(settings, "fill", False) and not daily_lock:  # no maybes: no-unit posts come off the board
@@ -388,8 +388,8 @@ class Ledger:
         for e in self.entries.values():
             if e.tier in LIVE_TIERS or e.status == "void" or e.start > now or e.clv is None:
                 continue
-            key = f"{e.sport}:{'props' if e.player else STUDY_MARKET.get(e.market, e.market)}"
-            groups[key].append(e.clv)
+            kind = "sharp" if e.tier == "sharp" else "props" if e.player else STUDY_MARKET.get(e.market, e.market)
+            groups[f"{e.sport}:{kind}"].append(e.clv)
         out = {}
         for key, vals in groups.items():
             n = len(vals)

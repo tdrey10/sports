@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -315,6 +316,13 @@ class Workspace:
         for w in dict.fromkeys(res.warnings):
             print("warning:", w)
         print(f"published {res.published} new picks, graded {res.graded}")
+        if not self.demo and os.environ.get("ODDS_API_KEY"):
+            from . import sharp
+
+            if sharp.due(now) or getattr(self.args, "sharp_now", False):
+                trust = {k: v["factor"] for k, v in self.ledger.clv_trust(now).items()}
+                added = self.ledger.publish(sharp.run(sports, self.provider, now, clv_trust=trust), now)
+                print(f"sharp value: posted {len(added)}")
         from . import archive
 
         prefix = "demo-" if self.demo else ""
@@ -606,6 +614,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     rn = sub.add_parser("run", help="one cycle: scan, publish picks, track lines, grade, build the dashboard")
     board_opts(rn)
+    rn.add_argument("--sharp-now", action="store_true",
+                    help="check sharp value (Pinnacle vs US books) now, not just at its two daily times")
     rn.add_argument("--scores-only", action="store_true",
                     help="only update live scores and grade (ESPN only, no odds credits)")
     rn.set_defaults(func=cmd_run)
