@@ -189,6 +189,14 @@ button, select { font: inherit; color: inherit; }
 .game:first-child { border-top: 0; padding-top: 0; }
 .game-head { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; color: var(--muted); font-weight: 600; flex-wrap: wrap; }
 .game-head b { color: var(--fg); }
+.row, .bet, .parlay { position: relative; }
+.stamp { position: absolute; top: 50%; left: 50%; z-index: 2; transform: translate(-50%, -50%) rotate(-11deg);
+  font: 900 clamp(26px, 7vw, 46px)/1 var(--display); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
+  color: #3ddc84; border: 4px solid #3ddc84; border-radius: 10px; padding: 6px 16px; pointer-events: none;
+  background: color-mix(in srgb, var(--bg) 55%, transparent); box-shadow: 0 0 16px color-mix(in srgb, #3ddc84 35%, transparent); }
+.stamp.big { color: #ffcc33; border-color: #ffcc33; box-shadow: 0 0 18px color-mix(in srgb, #ffcc33 45%, transparent); }
+@media (prefers-reduced-motion: no-preference) { .stamp { animation: slam .35s cubic-bezier(.2, .8, .2, 1.4) both; } }
+@keyframes slam { from { transform: translate(-50%, -50%) rotate(-11deg) scale(2.2); opacity: 0; } }
 .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 8px 0; }
 .row + .row { border-top: 1px dashed var(--line); }
 .row .sel { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
@@ -328,8 +336,14 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
   const addBtn = () => "";  // straight bets only: no parlay slip
   const more = (e) => (e.reasons && e.reasons.length ? `<details class="more"><summary>Stats &amp; why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "");
+  // A won bet gets a stamp across it: "Cashed", or "Won big" for a plus-money winner or 2+ units.
+  function stamp(e) {
+    if (!["won", "half_won"].includes(e.status)) return "";
+    const big = e.status === "won" && (e.odds >= 150 || (e.profit || 0) >= 2);
+    return `<span class="stamp${big ? " big" : ""}">${big ? "Won big" : "Cashed"}</span>`;
+  }
   function row(e, opts = {}) {
-    return `<div class="row">
+    return `<div class="row">${stamp(e)}
       <div class="sel"><span class="tag ${e.tier}">${TIER[e.tier] || e.tier}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
       <div class="odds"><b>${odds(e.odds)}</b><small>${units(e)} · ${signed(e.ev * 100, 1)}% EV</small></div>
       <p class="why">${esc(e.headline)}</p>
@@ -338,7 +352,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
   function bet(e) {
     const kind = e.player ? "Prop" : LABEL[e.market] || e.market_label;
-    return `<article class="bet">
+    return `<article class="bet">${stamp(e)}
       <div class="rk" aria-label="Rank ${e.rank}">${e.rank}</div>
       <div class="sel"><strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${TIER[e.tier]}</span>` : ""}</div>
       <div class="price"><b>${odds(e.odds)}</b><small>${units(e)} · ${signed(e.ev * 100, 1)}% EV</small></div>
@@ -372,7 +386,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       return;
     }
     const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
-    $("hero").innerHTML = `<div class="ticket">
+    $("hero").innerHTML = `<div class="ticket">${stamp(e)}
       <div class="t-head"><span class="t-kind">${kind}</span><span class="t-sport">${esc(e.sport_name)} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)} · ${timeOf(e)}</span></div>
       <h2>${esc(e.selection)}</h2>
       <div class="t-row"><span class="t-odds">${odds(e.odds)}</span><span class="t-pay">${units(e)} · ${wins(e)}<br><b>cashes ${pct(e.win_prob)}</b> on our numbers</span></div>
@@ -389,7 +403,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
       if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">Bet on it, the heat is coming</p></div>`;
-      return `<div class="potd"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
+      return `<div class="potd">${stamp(e)}<span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · ${wins(e)}</span></div>
         <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${more(e)}</div>`;
     }).join("");
@@ -417,7 +431,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     }).join("");
     const st = PSTATUS[p.status] || p.status;
     const res = p.profit != null ? ` ${signed(p.profit, 2)}u` : "";
-    return `<div class="parlay"><span class="kind">${p.size}-team parlay</span>
+    return `<div class="parlay">${p.status === "won" ? `<span class="stamp big">Won big</span>` : ""}<span class="kind">${p.size}-team parlay</span>
       <div class="price"><b>${odds(p.american)}</b><span class="muted">${p.units > 0 ? p.units + "u" : "no units, tracked"} · $10 pays $${(10 * p.decimal).toFixed(2)}</span></div>
       <p class="small"><b>Hits ${pct(p.hit_prob, p.hit_prob < 0.1 ? 1 : 0)}</b> of the time on our numbers <span class="muted">(about 1 in ${Math.max(1, Math.round(1 / p.hit_prob))})</span></p>
       <ol>${legs}</ol>
