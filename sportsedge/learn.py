@@ -36,6 +36,7 @@ FEATURES = (
     "adv1", "adv2", "adv3", "adv4", "adv5", "adv_total", "adv_known",  # advanced box-score stats (advanced.py)
 )
 MIN_ROWS = 600
+HALF_LIFE_DAYS = 365  # older games count less: a game a season ago counts half as much
 MIN_EV, MAX_EV, MAX_FAVORITE = 0.02, 0.20, -150
 PROVEN_BETS = 60
 
@@ -157,7 +158,11 @@ def evaluate(tune: list["Side"], blind: list["Side"], close_fair: dict | None = 
         max_depth=3, learning_rate=0.04, max_iter=300, min_samples_leaf=80, l2_regularization=1.0,
         early_stopping=True, validation_fraction=0.2, random_state=7,
     )
-    clf.fit(tX, ty)
+    # Recent games weigh more, so the model follows leagues and markets as they change.
+    newest = max(datetime.fromisoformat(s.date) for s in t_keep if s.date)
+    weights = [0.5 ** ((newest - datetime.fromisoformat(s.date)).days / HALF_LIFE_DAYS) if s.date else 1.0
+               for s in t_keep]
+    clf.fit(tX, ty, sample_weight=weights)
     learned = _paired(b_keep, clf.predict_proba(bX)[:, 1])
     market = [s.market_prob for s in b_keep]
     ll_market, ll_learned = _log_loss(market, by), _log_loss(learned, by)

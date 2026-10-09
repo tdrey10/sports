@@ -481,7 +481,13 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const labels = DATA.spot_labels || {};
     const spotRows = Object.entries(st.by_spot || {}).map(([k, s]) => `<tr><td>${esc(labels[k] || k)}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`).join("");
     const recent = DATA.entries.filter((e) => e.settled && e.status !== "void" && visible(e)).sort((a, b) => (b.graded_at || "").localeCompare(a.graded_at || "")).slice(0, 15);
-    return panel("Bankroll", `Started at ${money(st.start_bankroll)} · 1 unit = ${money(st.unit_value)}`,
+    const au = st.audit || {};
+    const auRow = (k, n) => { const s = au[k]; if (!s) return ""; return `<tr><td>${n}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 1) + "%"}</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td><td>${pct(s.beat_close)}</td></tr>`; };
+    const calRows = (st.calibration || []).filter((c) => c.n >= 5).map((c) => `<tr><td>${pct(c.said)}</td><td class="${Math.abs(c.won - c.said) <= 0.05 ? "pos" : "neg"}">${pct(c.won)}</td><td>${c.n}</td></tr>`).join("");
+    const auditPanel = panel("Audit", "Recent vs all-time, to catch drift early",
+      `<div class="table-wrap"><table><thead><tr><th>Window</th><th>Record</th><th>Profit</th><th>ROI</th><th>Avg CLV</th><th>Beat close</th></tr></thead><tbody>${auRow("30", "Last 30 days")}${auRow("90", "Last 90 days")}${auRow("all", "All time")}</tbody></table></div>
+       ${calRows ? `<p class="empty">Did our win chances come true? Every graded pick, by the chance we gave it.</p><div class="table-wrap"><table><thead><tr><th>We said</th><th>Actually won</th><th>Picks</th></tr></thead><tbody>${calRows}</tbody></table></div>` : ""}`);
+    return auditPanel + panel("Bankroll", `Started at ${money(st.start_bankroll)} · 1 unit = ${money(st.unit_value)}`,
         `<div class="stats"><div class="stat"><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b></div>
          <div class="stat"><span>Top bets</span><b class="${cls(b.units)}">${rec(b)}</b><small>${signed(b.units || 0, 1)}u</small></div>
          <div class="stat"><span>Last 7 days</span><b class="${cls(st.last7.units)}">${signed(st.last7.units, 1)}u</b><small>${rec(st.last7)}</small></div></div>${chart(st.curve, st.start_bankroll)}`)
