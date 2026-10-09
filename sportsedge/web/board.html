@@ -460,12 +460,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       return `<div class="slot ${extra}"><span class="kind">${title}</span>${e ? row(e, { matchup: true }) : `<p class="empty">Bet on it, the heat is coming</p>`}</div>`; };
     const shown = new Set([latest("live_win"), latest("live_plus")].filter(Boolean).map((e) => e.id));
     const earlier = items.filter((e) => !shown.has(e.id));
-    const howto = `<ol class="steps"><li>Open the GitHub app on your phone.</li><li>Go to <b>tdrey10/sports → Actions → Live session</b>.</li><li>Tap <b>Run workflow</b>, pick sports and hours.</li></ol>
-      <p class="empty">A session checks every few minutes instead of every hour. Each new live bet shows up here and as a notification on the “The Great Hambino live bets” issue.</p>`;
     return panel("Live right now", items.length ? `${items.length} live bets today` : "",
         `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money", "plus")}</div>`)
-      + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "")
-      + panel("Watch closer", "Free · up to 5 hours", howto);
+      + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "");
   }
 
   function viewList(filter, title, aside, msg) {
