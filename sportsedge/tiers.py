@@ -78,6 +78,8 @@ def market_key(pick: Pick) -> str:
 def backed(pick: Pick, settings: Settings | None) -> bool:
     """Posted at all only when its sport and bet type beat the closing line in the blind study.
     (No studies loaded at all, as in the demo and tests, leaves everything open.)"""
+    if settings is not None and settings.clv_trust.get(market_key(pick)) == 0.0:
+        return False  # our own picks of this kind keep losing to the closing line: paused
     return settings is None or settings.proven is None or market_key(pick) in settings.proven
 
 
@@ -152,6 +154,9 @@ def units_for(pick: Pick, settings: Settings | None = None) -> float:
     cap = LONGSHOT_MAX_UNITS if pick.american >= LONGSHOT_ODDS else MAX_UNITS
     if not is_proven(pick, settings):
         cap = min(cap, UNPROVEN_MAX_UNITS)
+    if settings is not None:
+        units *= settings.clv_trust.get(market_key(pick), 1.0)  # adaptive: our CLV record
+        units = round(units * 2) / 2
     return min(max(units, 0.5), cap)
 
 

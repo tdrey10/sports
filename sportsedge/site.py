@@ -52,6 +52,7 @@ def build_data(
         "spot_labels": {k: s.label for k, s in SPOTS.items()},
         "props": props or {},
         "ufc": ufc or {},
+        "clv_trust": ledger.clv_trust(now),
         "parlays": [v for v in ledger.parlay_views() if v["created_at"] >= cutoff.isoformat()],
     }
 

@@ -58,6 +58,7 @@ def run_cycle(
         min_picks = 200 if settings.weight_overrides else 60
         settings = replace(settings, weight_overrides={**settings.weight_overrides, **ledger.learn_weights(min_picks)})
     out.weights = settings.weight_overrides
+    settings = replace(settings, clv_trust={k: v["factor"] for k, v in ledger.clv_trust(now).items()})
     engine = Engine(provider, settings, now=now, calibrate=True, weather=weather, first_seen=first_seen)
     for cfg in sports:
         try:
