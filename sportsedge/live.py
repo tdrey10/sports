@@ -232,6 +232,8 @@ from .tiers import Card, units_for  # noqa: E402
 
 LIVE_WIN_MIN_ODDS = -150  # never bet worse than -150, live included
 LIVE_WIN_MIN_PROB = 0.60  # and it has to be a bet we expect to cash at least 60% of the time
+LIVE_PLUS_MAX_ODDS = 200  # plus money, but a real chance to win: +100 to +200 only
+LIVE_PLUS_MIN_PROB = 0.42  # and at least 42% on our numbers (break-even at +200 is 33%)
 
 
 def _trusted(p: Pick) -> bool:
@@ -247,7 +249,8 @@ def live_cards(
 
     - ``live_win``: the bet most likely to cash that still has an edge (EV >= 0, at least 60% to
       cash on our numbers, odds -300 or longer);
-    - ``live_plus``: the best plus-money bet (+100 or longer, EV >= the live minimum).
+    - ``live_plus``: the plus-money bet most likely to win (+100 to +200, 42%+ on our numbers,
+      with a real edge: EV >= the live minimum).
 
     ``taken`` holds (event_id, tier) pairs already posted, so each game gets at most one of each.
     """
@@ -259,13 +262,13 @@ def live_cards(
         if p.ev > 0 and p.win_prob >= LIVE_WIN_MIN_PROB and p.american >= LIVE_WIN_MIN_ODDS
         and (p.event_id, "live_win") not in taken
     ]
-    plus = [p for p in ok if p.american >= 100 and p.ev >= scanner.settings.min_ev
-            and (p.event_id, "live_plus") not in taken]
+    plus = [p for p in ok if 100 <= p.american <= LIVE_PLUS_MAX_ODDS and p.win_prob >= LIVE_PLUS_MIN_PROB
+            and p.ev >= scanner.settings.min_ev and (p.event_id, "live_plus") not in taken]
     chosen: list[tuple[str, Pick]] = []
     if win:
         chosen.append(("live_win", max(win, key=lambda p: (p.win_prob, p.ev))))
     if plus:
-        best_plus = max(plus, key=lambda p: p.ev)
+        best_plus = max(plus, key=lambda p: (p.win_prob, p.ev))  # most likely winner first
         if not chosen or best_plus is not chosen[0][1]:
             chosen.append(("live_plus", best_plus))
 

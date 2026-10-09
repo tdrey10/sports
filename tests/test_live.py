@@ -184,7 +184,11 @@ def test_live_picks_one_likely_winner_and_one_plus_money():
     coin.model_prob = 0.55  # a coin flip is never the "most likely to win" pick
     cards = live_cards([fav, dog, small, coin], S(), {"nfl": "NFL"})
     # The -200 favourite breaks the never-worse-than--150 rule, so the -150 side is the likely winner.
-    assert [(c.tier, c.pick.event_id) for c in cards] == [("live_win", "c"), ("live_plus", "b")]
+    # Plus money goes to the likeliest winner with an edge: the +105 at 52%, not the +180 at 40%.
+    assert [(c.tier, c.pick.event_id) for c in cards] == [("live_win", "c"), ("live_plus", "d")]
+    longshot = make_pick(event_id="e", american=+400, win_prob=0.27, market_prob=0.20, ev=0.35)
+    longshot.model_prob = 0.30
+    assert not live_cards([longshot], S(), {"nfl": "NFL"})  # +400 long shots never post
     # Already posted the likely winner for game "c": no other side qualifies, so none is forced.
     cards = live_cards([fav, dog, small, coin], S(), {"nfl": "NFL"}, {("c", "live_win")})
     assert [c.tier for c in cards] == ["live_plus"]
