@@ -181,7 +181,7 @@ def test_simulated_history_and_dashboard(tmp_path):
     assert stats["overall"]["won"] + stats["overall"]["lost"] > 0
     data = build_data(L, {**brains, **res.brains}, res.weights, sports, provider.now, demo=True)
     html = render_html(data)
-    assert html.startswith("<!doctype html>") and "<title>The Great Hambino</title>" in html.split("<body>")[0]
+    assert html.startswith("<!doctype html>") and "<title>Follow Me, Instead Of Your Dreams</title>" in html.split("<body>")[0]
     assert "__DATA__" not in html
     json.dumps(data)  # serialisable
 
@@ -304,7 +304,7 @@ def test_cli_page_from_saved_ledger(tmp_path):
     out = tmp_path / "page.html"
     assert main(["page", "--data-dir", str(tmp_path / "data"), "--out", str(out)]) == 0
     html = out.read_text()
-    assert html.startswith("<title>The Great Hambino</title>") and "__DATA__" not in html
+    assert html.startswith("<title>Follow Me, Instead Of Your Dreams</title>") and "__DATA__" not in html
 
 
 def test_longshots_capped_at_half_unit():
@@ -353,8 +353,8 @@ def test_home_screen_site_has_its_icon_and_name(tmp_path):
     index = write_app(tmp_path, {"entries": [], "stats": {}})
     html = index.read_text()
     assert '<link rel="apple-touch-icon" href="apple-touch-icon.png">' in html
-    assert 'apple-mobile-web-app-title" content="Hambino"' in html
+    assert 'apple-mobile-web-app-title" content="Follow Me"' in html
     manifest = _json.loads((tmp_path / "manifest.webmanifest").read_text())
-    assert manifest["short_name"] == "Hambino" and manifest["display"] == "standalone"
+    assert manifest["short_name"] == "Follow Me" and manifest["display"] == "standalone"
     for icon in ["apple-touch-icon.png"] + [i["src"] for i in manifest["icons"]]:
         assert (tmp_path / icon).read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"

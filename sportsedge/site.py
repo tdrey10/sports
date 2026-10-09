@@ -60,7 +60,7 @@ def build_data(
 APP_HEAD = (
     '<meta name="apple-mobile-web-app-capable" content="yes">\n'
     '<meta name="mobile-web-app-capable" content="yes">\n'
-    '<meta name="apple-mobile-web-app-title" content="Hambino">\n'
+    '<meta name="apple-mobile-web-app-title" content="Follow Me">\n'
     '<meta name="apple-mobile-web-app-status-bar-style" content="black">\n'
     '<meta name="theme-color" content="#0b0b0c">\n'
     '<link rel="apple-touch-icon" href="apple-touch-icon.png">\n'
@@ -68,8 +68,8 @@ APP_HEAD = (
     '<link rel="manifest" href="manifest.webmanifest">\n'
 )
 APP_MANIFEST = {
-    "name": "The Great Hambino",
-    "short_name": "Hambino",
+    "name": "Follow Me, Instead Of Your Dreams",
+    "short_name": "Follow Me",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
