@@ -294,7 +294,9 @@ def build_cards(
     ] + [
         p for p in blocked
         if not p.is_prop and p.ev > 0 and not p.warnings and p.american >= settings.max_favorite
+        and p.win_prob >= LEGIT_MIN_WIN
     ]
+    leans = [p for p in leans if p.commence_time <= soon_cut]  # today's slate only, not next week's
     best_lean: dict[str, Pick] = {}
     for p in sorted(leans, key=lambda p: p.ev, reverse=True):
         best_lean.setdefault(p.event_id, p)
