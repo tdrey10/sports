@@ -272,11 +272,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
-  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["props", "Props"], ["early", "Early"], ["results", "Results"], ["model", "Model"]];
+  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
   const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
     live: "Live", live_win: "Live · likely winner", live_plus: "Live · plus money", sharp: "Sharp value" };
   const state = { tab: "today", sport: "all", market: "all" };
   try { Object.assign(state, JSON.parse(localStorage.getItem("fb-state") || "{}")); } catch (e) {}
+  if (!TABS.some(([k]) => k === state.tab)) state.tab = "today";  // e.g. a saved tab that no longer exists
   const save = () => { try { localStorage.setItem("fb-state", JSON.stringify(state)); } catch (e) {} };
 
   const $ = (id) => document.getElementById(id);
@@ -602,7 +603,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     renderTop();
     renderHero();
     const views = {
-      today: viewToday, parlays: viewParlays, live: viewLive, results: viewResults, model: viewModel,
+      today: viewToday, parlays: viewParlays, live: viewLive, results: viewResults,
       props: () => viewList((e) => e.player, "Player props", "Best edge first · priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
       early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves", "Nothing early yet."),
     };
