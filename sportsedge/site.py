@@ -26,6 +26,7 @@ def build_data(
     live_note: str = "",
     studies: dict | None = None,
     props: dict | None = None,
+    ufc: dict | None = None,
 ) -> dict:
     cutoff = now - timedelta(days=KEEP_DAYS)
     entries = []
@@ -50,6 +51,7 @@ def build_data(
         "studies": [s.to_dict() for s in (studies or {}).values()],
         "spot_labels": {k: s.label for k, s in SPOTS.items()},
         "props": props or {},
+        "ufc": ufc or {},
         "parlays": [v for v in ledger.parlay_views() if v["created_at"] >= cutoff.isoformat()],
     }
 
