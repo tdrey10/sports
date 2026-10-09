@@ -368,7 +368,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function renderHero() {
     const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
     if (!e) {
-      $("hero").innerHTML = `<div class="ticket-empty"><b>No pick today: nothing is backed by the data yet</b><span class="muted">A bet posts only when its kind of bet has beaten the closing line in a blind test (60+ bets it was never tuned on). No maybes, no filler. Lines are checked every 30 minutes.</span></div>`;
+      $("hero").innerHTML = "";
       return;
     }
     const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
@@ -388,7 +388,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const e = items.filter((x) => x.tier === t).sort((a, b) => b.units - a.units)[0];
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
-      if (!e) return `<div class="potd"><span class="kind">${label}</span><p>${t === "lock" ? "Posts only when a backed pick passes every Lock check." : "Posts only when a backed pick clears the bar."}</p></div>`;
+      if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">–</p></div>`;
       return `<div class="potd"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · ${wins(e)}</span></div>
         <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${more(e)}</div>`;
@@ -397,7 +397,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const rest = items.filter((e) => !isLive(e) && !["early", "lean"].includes(e.tier) && !e.player && !e.best_rank);
     const leans = items.filter((e) => e.tier === "lean");
     const topNote = best.length ? `${best.length} of 10 cleared the bar · ranked by edge score` : "Ranked by edge score";
-    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("No pick is backed by the data today. Bets post only when their kind of bet has passed a blind test; see the Model tab for what is being tested."))
+    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("No top bets yet today."))
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
       + panel("The board", "Every other game-line play today, by game", rest.length ? byGame(rest) : empty("No other game-line plays on today's board."))
       + (leans.length ? panel("Leans", "No units, tracked anyway", byGame(leans)) : "");
@@ -425,8 +425,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const ps = DATA.parlays || [], ids = byId();
     const todays = ps.filter((p) => p.day === today()).sort((a, b) => a.size - b.size);
     const earlier = ps.filter((p) => p.day !== today()).sort((a, b) => b.day.localeCompare(a.day) || a.size - b.size);
-    const missing = [2, 3, 4, 8].filter((n) => !todays.some((p) => p.size === n));
-    const note = missing.length ? `<p class="empty">${missing.map((n) => n + "-team").join(", ")} ${missing.length > 1 ? "post" : "posts"} only when there are enough legitimate edges from different games on today's board. No filler legs.</p>` : "";
+    const note = "";
     const st = (DATA.stats && DATA.stats.parlays) || {};
     const rows = [2, 3, 4, 8].map((n) => { const s = st[n] || { won: 0, lost: 0, units: 0 };
       return `<tr><td>${n}-team</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 2)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("");
@@ -545,8 +544,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const edgeA = (0.25 * f.model_a + 0.75 * f.market_a) - f.market_a;
       return `<tr><td class="text">${esc(f.a)} <small class="muted">${esc(f.a_record)}</small><br>${esc(f.b)} <small class="muted">${esc(f.b_record)}</small></td><td>${esc(f.weight)}</td><td>${odds(f.a_ml)}<br>${odds(f.b_ml)}</td><td>${pct(f.market_a)}<br>${pct(1 - f.market_a)}</td><td>${f.a_fights || f.b_fights ? pct(f.model_a) + "<br>" + pct(1 - f.model_a) : "–"}</td><td class="${cls(edgeA)}">${signed(edgeA * 100, 1)}</td></tr>`;
     }).join("");
-    const ufcPanel = u.fights ? panel("UFC research", "Not a pick until proven",
-      `<p class="empty">Fighter ratings replayed over ${u.fights.toLocaleString()} UFC fights since 2019, each predicted before it happened: picked the winner <b>${pct(u.accuracy, 1)}</b> of the ${(u.called || 0).toLocaleString()} fights where it had a favorite (log loss ${u.log_loss == null ? "–" : u.log_loss.toFixed(3)}; a coin flip is 0.693). ESPN drops UFC odds after each fight, so lines are saved from now on: <b>${um.bets || 0} of 60</b> graded test bets so far${um.roi != null ? ", ROI " + signed(um.roi * 100, 1) + "%" : ""}. UFC bets post only after that test is passed.</p>
+    const ufcPanel = u.fights ? panel("UFC research", "Fighter ratings and DraftKings lines",
+      `<p class="empty">Fighter ratings replayed over ${u.fights.toLocaleString()} UFC fights since 2019, each predicted before it happened: picked the winner <b>${pct(u.accuracy, 1)}</b> of the ${(u.called || 0).toLocaleString()} fights where it had a favorite (log loss ${u.log_loss == null ? "–" : u.log_loss.toFixed(3)}; a coin flip is 0.693). ESPN drops UFC odds after each fight, so lines are saved from now on: <b>${um.bets || 0} of 60</b> graded test bets so far${um.roi != null ? ", ROI " + signed(um.roi * 100, 1) + "%" : ""}.</p>
        ${fightRows ? `<div class="table-wrap"><table><thead><tr><th class="text">Fight</th><th>Class</th><th>DraftKings</th><th>Market</th><th>Ratings</th><th>Blend vs market (pts)</th></tr></thead><tbody>${fightRows}</tbody></table></div>` : empty("No upcoming fights with DraftKings lines yet.")}`) : "";
     return studyPanel + spotPanel + propPanel + ufcPanel + panel("How the model is doing", b[0] ? "Retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
       `<div class="model"><ul>
