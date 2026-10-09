@@ -267,7 +267,8 @@ class Ledger:
                 continue  # live and sharp-value bets have their own checks (and their own CLV record)
             if e.units <= 0:
                 daily_lock = e.tier == "lock" and getattr(settings, "daily_lock", True)
-                if not getattr(settings, "fill", False) and not daily_lock:  # no maybes: no-unit posts come off the board
+                lean = e.tier == "lean" and getattr(settings, "show_leans", True)
+                if not getattr(settings, "fill", False) and not daily_lock and not lean:  # no maybes: no-unit posts come off the board
                     e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
                     e.reasons = ["Withdrawn before the game: only bets backed by the data are posted."] + list(e.reasons)
                     pulled.append(e)
