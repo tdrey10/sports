@@ -73,6 +73,7 @@ jobs:
 
       - name: Full engine cycle
         env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}  # optional: sharp value (Pinnacle vs US books)
           # NFL + NBA props, most popular markets, games in the next 30 hours, once a day
           # (or when run by hand with props ticked).
           PROPS_ARGS: >-
