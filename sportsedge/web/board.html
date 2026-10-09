@@ -368,7 +368,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function renderHero() {
     const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
     if (!e) {
-      $("hero").innerHTML = `<div class="ticket-empty"><b>Pick coming soon</b></div>`;
+      $("hero").innerHTML = `<div class="ticket-empty"><b>Bet on it, the heat is coming</b></div>`;
       return;
     }
     const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
@@ -388,7 +388,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const e = items.filter((x) => x.tier === t).sort((a, b) => b.units - a.units)[0];
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
-      if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">Pick coming soon</p></div>`;
+      if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">Bet on it, the heat is coming</p></div>`;
       return `<div class="potd"><span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · ${wins(e)}</span></div>
         <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${more(e)}</div>`;
@@ -398,7 +398,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const rest = items.filter((e) => !isLive(e) && !["early", "lean", "sharp"].includes(e.tier) && !e.player && !e.best_rank);
     const leans = items.filter((e) => e.tier === "lean");
     const topNote = best.length ? `${best.length} of 10 cleared the bar · ranked by edge score` : "Ranked by edge score";
-    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("Pick coming soon."))
+    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("Bet on it, the heat is coming."))
       + (sharpBets.length ? panel("Sharp value", "A sportsbook paying more than Pinnacle's fair price", byGame(sharpBets)) : "")
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
       + panel("The board", "Every other game-line play today, by game", rest.length ? byGame(rest) : empty("No other game-line plays on today's board."))
@@ -443,7 +443,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const items = DATA.entries.filter((e) => isLive(e) && onBoard(e)).sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     const latest = (t) => items.find((e) => e.tier === t);
     const slot = (t, title, extra) => { const e = latest(t);
-      return `<div class="slot ${extra}"><span class="kind">${title}</span>${e ? row(e, { matchup: true }) : `<p class="empty">Pick coming soon</p>`}</div>`; };
+      return `<div class="slot ${extra}"><span class="kind">${title}</span>${e ? row(e, { matchup: true }) : `<p class="empty">Bet on it, the heat is coming</p>`}</div>`; };
     const shown = new Set([latest("live_win"), latest("live_plus")].filter(Boolean).map((e) => e.id));
     const earlier = items.filter((e) => !shown.has(e.id));
     const howto = `<ol class="steps"><li>Open the GitHub app on your phone.</li><li>Go to <b>tdrey10/sports → Actions → Live session</b>.</li><li>Tap <b>Run workflow</b>, pick sports and hours.</li></ol>
