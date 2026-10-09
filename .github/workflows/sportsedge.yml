@@ -8,8 +8,9 @@ on:
     # Each refresh: live-bet check, fresh odds and injuries, new picks, line tracking, scores, grading.
     # Every 30 minutes from 8 AM to 8 PM Pacific, when lines move and games start.
     - cron: "15,45 0-2,15-23 * * *"
-    # Hourly early morning and late evening. The 13:15 UTC run posts the Lock and Dog by 8 AM Pacific.
-    - cron: "15 3-6,11-14 * * *"
+    # Hourly the rest of the day and all night: the engine watches lines and injury news overnight;
+    # the day's picks are held until the board drops at 8 AM Pacific.
+    - cron: "15 3-14 * * *"
     - cron: "47 15 * * *"      # daily studies + NFL and NBA player props (8:47 AM Pacific)
   workflow_dispatch:
     inputs:

@@ -358,3 +358,19 @@ def test_home_screen_site_has_its_icon_and_name(tmp_path):
     assert manifest["short_name"] == "Follow Me" and manifest["display"] == "standalone"
     for icon in ["apple-touch-icon.png"] + [i["src"] for i in manifest["icons"]]:
         assert (tmp_path / icon).read_bytes()[:8] == b"\x89PNG\r\n\x1a\n"
+
+
+def test_board_drops_at_8am_local():
+    from dataclasses import replace
+
+    from sportsedge.data.sample import SampleProvider
+    from sportsedge.ledger import Ledger
+    from sportsedge.runner import run_cycle
+    from sportsedge.sports import resolve
+
+    provider = SampleProvider(seed=5)
+    hour = provider.now.astimezone(Ledger().tz).hour
+    held = run_cycle(provider, resolve("nba,nhl"), Ledger(), Settings(board_hour=hour + 1), provider.now)
+    assert held.published == 0  # before the board drops: lines watched, nothing posted
+    open_ = run_cycle(provider, resolve("nba,nhl"), Ledger(), Settings(board_hour=hour), provider.now)
+    assert open_.published > 0

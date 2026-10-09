@@ -75,12 +75,14 @@ def run_cycle(
         out.warnings.extend(scan.warnings)
         if scan.brain:
             out.brains[cfg.key] = scan.brain
-    cards = build_cards(
+    held = settings.board_hour is not None and now.astimezone(ledger.tz).hour < settings.board_hour
+    cards = [] if held else build_cards(
         out.scans, settings, now, taken_today=ledger.taken_today(now), best_taken=ledger.best_taken(now)
     )
     out.published = len(ledger.publish(cards, now))
     ledger.withdraw(settings, now)
-    ledger.post_parlays(now)
+    if not held:
+        ledger.post_parlays(now)
     ledger.update_prices(out.scans, now)
     out.graded = refresh_scores(provider, ledger, now)
     return out

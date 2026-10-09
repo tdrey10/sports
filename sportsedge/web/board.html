@@ -88,6 +88,10 @@ button, select { font: inherit; color: inherit; }
 .ticket .t-stub .meter { --track: #d9d6d0; }
 .ticket .muted, .ticket .move-bad { color: var(--ticket-muted); }
 .ticket .move-good { color: #1d6b3a; }
+.drops { border: 2px dashed #d4a64a; border-radius: 18px; padding: 22px 20px; text-align: center;
+  background: color-mix(in srgb, var(--surface) 92%, transparent); color: var(--fg);
+  font: 800 clamp(17px, 4.6vw, 22px)/1.4 var(--body); text-wrap: balance; }
+.drops b { color: #f4b740; }
 .ticket-empty { background: color-mix(in srgb, var(--surface) 88%, transparent); border: 1px dashed var(--line-2); border-radius: 14px; padding: 18px 20px; display: grid; gap: 6px; }
 .ticket-empty b { font: 800 22px/1 var(--display); text-transform: uppercase; letter-spacing: .02em; }
 @media (prefers-reduced-motion: no-preference) {
@@ -382,7 +386,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function renderHero() {
     const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
     if (!e) {
-      $("hero").innerHTML = `<div class="ticket-empty"><b>Bet on it, the heat is coming</b></div>`;
+      $("hero").innerHTML = `<div class="drops"><span aria-hidden="true">🕗</span> <b>8 AM PT</b> on game day — that's when the board drops. All night the engine's watching the lines move — so every big move and late scratch is baked in. That's how the pros do it.</div>`;
       return;
     }
     const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
