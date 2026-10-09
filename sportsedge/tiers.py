@@ -81,7 +81,9 @@ def backed(pick: Pick, settings: Settings | None) -> bool:
     (No studies loaded at all, as in the demo and tests, leaves everything open.)"""
     if settings is not None and settings.clv_trust.get(market_key(pick)) == 0.0:
         return False  # our own picks of this kind keep losing to the closing line: paused
-    return settings is None or settings.proven is None or market_key(pick) in settings.proven
+    if settings is None or not settings.require_proven:
+        return True  # real-edge picks post; unproven ones are sized at half a unit (units_for)
+    return settings.proven is None or market_key(pick) in settings.proven
 
 
 def is_proven(pick: Pick, settings: Settings | None) -> bool:
