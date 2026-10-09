@@ -511,6 +511,7 @@ def replay(
     refit_days: int = 7,
     min_train_games: int = 50,
     opening: Callable[[GameResult], list[Quote]] | None = None,
+    box: dict | None = None,
 ) -> tuple[list[Side], int, list[Side]]:
     """Price and grade every side of every closing (and opening) line between ``start`` and ``end``.
 
@@ -521,6 +522,9 @@ def replay(
     completed = sorted((g for g in results if g.completed), key=lambda g: g.date)
     rest = rest_days(results) if cfg.rest_effects else {}
     form = Form(results)
+    from .advanced import Advanced
+
+    adv = Advanced(cfg, results, box) if box else None
     rest_all = rest or rest_days(results)  # rest and travel are features even where the ratings ignore them
     cfg = with_shapes(cfg, results, before=start) if cfg.scoring == "normal" else cfg
     engine = Engine(provider=None, settings=Settings(market_weight=0.0, prop_market_weight=0.0, max_odds=10_000))
@@ -550,7 +554,7 @@ def replay(
                 away_b2b=cfg.rest_effects and is_b2b(rest.get((g.event_id, g.away))),
             )
             hs, as_ = g.home_score, g.away_score
-            ctx = game_context(cfg, g, form, rest_all)
+            ctx = game_context(cfg, g, form, rest_all, adv)
             for line_quotes, bucket in ((quotes, sides), (opening(g) if opening else [], open_sides)):
                 if not line_quotes:
                     continue
@@ -606,7 +610,10 @@ def run_studies(
     games_folder=None,
     weather=None,
     odds_folder=None,
+    boxes=None,
 ) -> dict[str, SportStudy]:
+    """``boxes``: an advanced.BoxStore; box scores are downloaded within its time budget and
+    their advanced stats join the learned model's features."""
     """``games_folder``: also write every final score with its lines to monthly CSV files."""
     out: dict[str, SportStudy] = {}
     start = now - timedelta(days=days)
@@ -619,9 +626,21 @@ def run_studies(
             share = (history.budget - history.fetched) // (len(sports) - i)
             history.prefetch(cfg, [g for g in results if start <= g.date < now], limit=share)
             history.save()  # after each sport, so a long run never loses its downloads
+            box = None
+            if boxes is not None and cfg.espn_path.split("/")[0] in ("basketball", "hockey", "football", "soccer"):
+                try:
+                    left = sum(1 for c in sports[i:] if c.espn_path.split("/")[0] in
+                               ("basketball", "hockey", "football", "soccer"))
+                    share = boxes.remaining() / max(left, 1)  # every sport gets its turn each day
+                    boxes.prefetch(cfg, [g for g in results if start - timedelta(days=60) <= g.date < now],
+                                   seconds=None if share == float("inf") else share)
+                    boxes.save()
+                except Exception as exc:  # box scores are extra: never let them stop a study
+                    log.warning("%s box scores failed: %s", cfg.key, exc)
+                box = boxes.sport(cfg.key)
             sides, games, open_sides = replay(
                 cfg, results, lambda g, c=cfg: history.quotes(c, g), start, now,
-                opening=lambda g, c=cfg: history.open_quotes(c, g),
+                opening=lambda g, c=cfg: history.open_quotes(c, g), box=box,
             )
             if games_folder is not None:
                 from .archive import write_games

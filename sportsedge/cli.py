@@ -124,9 +124,14 @@ def cmd_study(args) -> int:
         from .weather import WeatherClient
 
         weather = WeatherClient()
+    boxes = None
+    if not args.demo and args.box_minutes:
+        from .advanced import BoxStore
+
+        boxes = BoxStore(data_dir / "boxscores", minutes=args.box_minutes)
     studies = study.run_studies(resolve(names), provider.game_results, history, now, days=args.days,
                                 games_folder=games_dir, weather=weather,
-                                odds_folder=data_dir / ("demo-odds" if args.demo else "odds"))
+                                odds_folder=data_dir / ("demo-odds" if args.demo else "odds"), boxes=boxes)
     history.save()
     from . import archive
 
@@ -568,6 +573,8 @@ def build_parser() -> argparse.ArgumentParser:
     st.add_argument("--days", type=int, default=730, help="days of finished games to study (about two seasons)")
     st.add_argument("--budget", type=int, default=5000, help="most new games to download closing odds for per run")
     st.add_argument("--minutes", type=float, default=None, help="stop downloading after this many minutes")
+    st.add_argument("--box-minutes", type=float, default=0,
+                    help="minutes to spend downloading box scores for the advanced stats (0 = off)")
     st.add_argument("--data-dir", default="data")
     st.set_defaults(func=cmd_study)
 
