@@ -208,3 +208,29 @@ def test_a_withdrawn_pick_can_come_back_as_the_daily_lock():
     led.publish([card(p, tier="lock", units=0.0)], NOW)
     assert e.status == "pending" and e.tier == "lock" and e.units == 0.0
     assert "lock_lean" in led.taken_today(NOW)
+
+
+def test_clv_is_the_reward_that_adapts_trust():
+    from datetime import timedelta
+
+    from sportsedge.ledger import Ledger
+    from sportsedge.tiers import backed, units_for
+    from tests.test_ledger import NOW, card
+
+    def ledger_with(clv_fair, n):
+        led = Ledger()
+        for i in range(n):
+            led.publish([card(make_pick(event_id=f"e{i}", sport="nba", american=-110))], NOW)
+        for e in led.entries.values():
+            e.close_fair = clv_fair  # -110 pays 1.909: fair 0.50 -> CLV -4.5%, 0.55 -> +5%
+        return led
+
+    later = NOW + timedelta(days=1)
+    bad = ledger_with(0.50, 60).clv_trust(later)["nba:spreads"]
+    good = ledger_with(0.55, 60).clv_trust(later)["nba:spreads"]
+    few = ledger_with(0.50, 5).clv_trust(later)["nba:spreads"]
+    assert bad["factor"] == 0.0 and good["factor"] == 1.25 and few["factor"] == 1.0  # few picks: no change
+    pick = make_pick(sport="nba", market="spreads", kelly=0.02)
+    assert not backed(pick, Settings(clv_trust={"nba:spreads": 0.0}))
+    assert units_for(pick, Settings(clv_trust={"nba:spreads": 0.5})) == 1.0
+    assert units_for(pick) == 2.0

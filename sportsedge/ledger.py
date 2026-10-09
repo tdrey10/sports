@@ -29,6 +29,7 @@ from .parlays import SIZES as PARLAY_SIZES, Parlay, build as build_parlays, sett
 from .tiers import BEST_BETS, LIVE_TIERS, Card
 
 DAY_TIERS = ("lock", "dog", "prop")
+CLV_PRIOR = 30  # picks of "no edge" the CLV average is shrunk toward
 GRADE_AFTER = timedelta(hours=2)  # earliest a game can be final
 
 
@@ -372,6 +373,39 @@ class Ledger:
         return graded
 
     # ------------------------------------------------------------- learning
+    def clv_trust(self, now: datetime) -> dict[str, dict]:
+        """How our posted picks did against the closing line, per sport and bet type.
+
+        Closing line value is known as soon as a line closes, long before luck evens out
+        in wins and losses, so it is the reward signal: picks that keep beating the close
+        earn more trust, picks that keep losing to it lose trust, then stakes, then their
+        spot on the board. The average is shrunk toward zero (30 picks of 'no edge'), so
+        one good or bad night barely moves it.
+        """
+        from .tiers import STUDY_MARKET
+
+        groups: dict[str, list[float]] = defaultdict(list)
+        for e in self.entries.values():
+            if e.tier in LIVE_TIERS or e.status == "void" or e.start > now or e.clv is None:
+                continue
+            key = f"{e.sport}:{'props' if e.player else STUDY_MARKET.get(e.market, e.market)}"
+            groups[key].append(e.clv)
+        out = {}
+        for key, vals in groups.items():
+            n = len(vals)
+            shrunk = sum(vals) / (n + CLV_PRIOR)
+            if n >= 40 and shrunk <= -0.025:
+                factor = 0.0
+            elif n >= 20 and shrunk <= -0.01:
+                factor = 0.5
+            elif n >= 20 and shrunk >= 0.01:
+                factor = 1.25
+            else:
+                factor = 1.0
+            out[key] = {"picks": n, "avg_clv": sum(vals) / n, "shrunk": shrunk, "factor": factor,
+                        "beat": sum(1 for v in vals if v > 0) / n}
+        return out
+
     def learn_weights(self, min_picks: int = 60) -> dict[str, float]:
         """Learn how much to trust the market vs. the model from graded picks.
 
