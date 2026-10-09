@@ -256,7 +256,7 @@ def live_cards(
     ok = [p for p in picks if _trusted(p) and p.ev <= scanner.settings.max_ev and not p.warnings]
     win = [
         p for p in ok
-        if p.ev >= 0 and p.win_prob >= LIVE_WIN_MIN_PROB and p.american >= LIVE_WIN_MIN_ODDS
+        if p.ev > 0 and p.win_prob >= LIVE_WIN_MIN_PROB and p.american >= LIVE_WIN_MIN_ODDS
         and (p.event_id, "live_win") not in taken
     ]
     plus = [p for p in ok if p.american >= 100 and p.ev >= scanner.settings.min_ev

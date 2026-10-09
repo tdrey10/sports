@@ -47,7 +47,7 @@ class Settings:
     fill: bool = False
     # A Lock every day: when nothing backed passes the Lock checks, the day's most likely winner
     # is still posted as the Lock, with no units, clearly labeled and tracked in its own record.
-    daily_lock: bool = True
+    daily_lock: bool = False  # off: a Lock posts only when a pick has a real edge
     # Adaptive trust from our own picks' closing line value: "sport:market" -> stake factor.
     # 0 = paused (keeps losing to the close), 0.5 = cut, 1.25 = picks keep beating the close.
     clv_trust: dict[str, float] = field(default_factory=dict)
