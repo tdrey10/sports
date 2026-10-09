@@ -342,8 +342,6 @@ def build_cards(
             bullets.insert(0, f"Today's most likely winner ({pick.win_prob:.0%} on our numbers, the market "
                               f"{pick.market_prob:.0%})" if pick.market_prob is not None else
                               f"Today's most likely winner ({pick.win_prob:.0%} on our numbers)")
-            bullets.insert(1, "No units today: the price doesn't leave a big enough edge to bet. Every daily Lock "
-                              "is tracked in its own record.")
         elif id(pick) in lean_ids:
             bullets.insert(0, f"Lean {TIER_LABELS[tier].split(' of ')[0]}: nothing cleared every check today, so this is "
                               "the closest one, posted with no units and tracked with the leans.")
