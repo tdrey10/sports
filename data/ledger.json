@@ -1028,8 +1028,8 @@
    "status": "live",
    "live": {
     "home": 1.0,
-    "away": 0.0,
-    "detail": "9:15 - 1st"
+    "away": 1.0,
+    "detail": "End of 1st"
    },
    "final": null,
    "result_value": null,
@@ -3195,6 +3195,67 @@
    "result_value": null,
    "profit": 0.0,
    "graded_at": "2026-10-08T22:59:32.781350+00:00"
+  },
+  {
+   "id": "bae324a05dfd23d1",
+   "created_at": "2026-10-09T23:54:32.485005+00:00",
+   "day": "2026-10-09",
+   "tier": "lean",
+   "units": 0.0,
+   "sport": "nhl",
+   "sport_name": "NHL",
+   "event_id": "401892479",
+   "commence_time": "2026-10-10T23:30:00+00:00",
+   "home": "New York Islanders",
+   "away": "Tampa Bay Lightning",
+   "matchup": "Tampa Bay Lightning @ New York Islanders",
+   "market": "totals",
+   "market_label": "Total",
+   "side": "under",
+   "point": 5.5,
+   "player": null,
+   "selection": "Under 5.5",
+   "headline": "We project 5.2 total; Under 5.5 hits 51% of the time.",
+   "reasons": [
+    "Projected score: Tampa Bay Lightning 2.7 - New York Islanders 2.5.",
+    "Tampa Bay Lightning (3-1) @ New York Islanders (2-2).",
+    "Tampa Bay Lightning fresh off a 3-2 win over Minnesota Wild (Thu 10/8).",
+    "Starting goalies: Andrei Vasilevskiy (0.917 career save %, 17,650 shots) vs Ilya Sorokin (0.915 career save %, 9,176 shots).",
+    "Season goals per game: Tampa Bay Lightning 2.8 scored / 2.2 allowed; New York Islanders 3.2 scored / 2.0 allowed.",
+    "Last 5: Tampa Bay Lightning 3-1 (avg margin +0.5); New York Islanders 2-2 (avg margin +1.2).",
+    "Power rank: Tampa Bay Lightning #6 vs New York Islanders #16 (of 32).",
+    "Model 59% \u00b7 market (no-vig) 48% \u00b7 blended 51% \u2192 fair -103.",
+    "Best price -102 at DraftKings (1 books compared).",
+    "New York Islanders missing: Alexander Romanov, Mathew Barzal.",
+    "Tampa Bay Lightning missing: Emil Lilleberg, Yanni Gourde."
+   ],
+   "book": "draftkings",
+   "odds": -102.0,
+   "model_prob": 0.5857464720438494,
+   "win_prob": 0.5075049977206816,
+   "ev": 0.005058917054683143,
+   "market_prob": 0.48142450627962563,
+   "best_rank": null,
+   "score": 15.1,
+   "spots": [],
+   "current_odds": -102.0,
+   "current_point": 5.5,
+   "current_book": "draftkings",
+   "history": [
+    [
+     "2026-10-09T23:54:32.485005+00:00",
+     -102.0,
+     5.5
+    ]
+   ],
+   "close_odds": -102.0,
+   "close_fair": 0.48142450627962563,
+   "status": "pending",
+   "live": null,
+   "final": null,
+   "result_value": null,
+   "profit": null,
+   "graded_at": null
   },
   {
    "id": "3676ad7a85afd888",
