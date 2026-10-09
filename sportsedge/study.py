@@ -219,6 +219,7 @@ class SportStudy:
     by_band: list[Result] = field(default_factory=list)
     calibration: list[tuple[float, float, int]] = field(default_factory=list)  # (said, won, n)
     learned: dict = field(default_factory=dict)  # gradient-boosting model vs the market, blind (learn.py)
+    learned_open: dict = field(default_factory=dict)  # the same model betting the opening line, with its CLV
     note: str = ""
 
     def to_dict(self) -> dict:
@@ -354,6 +355,12 @@ def study_sides(sides: list[Side], cfg: SportConfig, games: int, window: str,
             if (k := (s.event_id, s.market, s.side, s.point)) in close_fair and close_fair[k] is not None
         ]
         st.early_clv = sum(clv) / len(clv) if clv else None
+        try:
+            from .learn import evaluate
+
+            st.learned_open = evaluate(o_tune, o_blind, close_fair)
+        except Exception as exc:
+            log.warning("%s learned opening-line model failed: %s", cfg.key, exc)
     return st
 
 

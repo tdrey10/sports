@@ -136,8 +136,11 @@ def _log_loss(ps: list[float], ys: list[int]) -> float:
                 for p, y in zip(ps, ys)) / max(len(ys), 1)
 
 
-def evaluate(tune: list["Side"], blind: list["Side"]) -> dict:
-    """Train on the tuning games, judge on the blind ones."""
+def evaluate(tune: list["Side"], blind: list["Side"], close_fair: dict | None = None) -> dict:
+    """Train on the tuning games, judge on the blind ones.
+
+    ``close_fair`` (event, market, side, point) -> closing no-vig chance: when given (the
+    opening-line test), each bet's closing line value is measured too."""
     try:
         from sklearn.ensemble import HistGradientBoostingClassifier
     except ImportError:  # pragma: no cover
@@ -171,7 +174,14 @@ def evaluate(tune: list["Side"], blind: list["Side"]) -> dict:
     won = sum(s.win for _, s in best.values())
     lost = sum(s.loss for _, s in best.values())
     proven = n >= PROVEN_BETS and roi is not None and roi - (se or 0) > 0 and ll_learned < ll_market
+    clv = None
+    if close_fair is not None:
+        vals = [close_fair[k] * american_to_decimal(s.american) - 1 for _, s in best.values()
+                if (k := (s.event_id, s.market, s.side, s.point)) in close_fair and close_fair[k] is not None]
+        clv = {"bets": len(vals), "avg": sum(vals) / len(vals) if vals else None,
+               "beat": sum(1 for v in vals if v > 0) / len(vals) if vals else None}
     return {
+        "clv": clv,
         "tune_rows": len(tX), "blind_rows": len(bX),
         "log_loss_market": round(ll_market, 5), "log_loss_learned": round(ll_learned, 5),
         "beats_market": ll_learned < ll_market,
