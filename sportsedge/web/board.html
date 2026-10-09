@@ -539,7 +539,16 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       propRows.length
         ? `<p class="empty">Every prop line seen is saved and graded against the real stat. Props can't be judged until this history is big enough; until then prop picks stay at half a unit.</p><div class="table-wrap"><table><thead><tr><th>Sport</th><th>Stat</th><th>Lines</th><th>Over hit</th><th>Line moved</th></tr></thead><tbody>${propRows.join("")}</tbody></table></div>`
         : empty("Prop lines are being logged every day; the first graded ones show up here after those games end."));
-    return studyPanel + spotPanel + propPanel + panel("How the model is doing", b[0] ? "Retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
+    const u = DATA.ufc || {};
+    const um = u.market || {};
+    const fightRows = (u.upcoming || []).filter((f) => f.market_a != null).map((f) => {
+      const edgeA = (0.25 * f.model_a + 0.75 * f.market_a) - f.market_a;
+      return `<tr><td class="text">${esc(f.a)} <small class="muted">${esc(f.a_record)}</small><br>${esc(f.b)} <small class="muted">${esc(f.b_record)}</small></td><td>${esc(f.weight)}</td><td>${odds(f.a_ml)}<br>${odds(f.b_ml)}</td><td>${pct(f.market_a)}<br>${pct(1 - f.market_a)}</td><td>${f.a_fights || f.b_fights ? pct(f.model_a) + "<br>" + pct(1 - f.model_a) : "–"}</td><td class="${cls(edgeA)}">${signed(edgeA * 100, 1)}</td></tr>`;
+    }).join("");
+    const ufcPanel = u.fights ? panel("UFC research", "Not a pick until proven",
+      `<p class="empty">Fighter ratings replayed over ${u.fights.toLocaleString()} UFC fights since 2019, each predicted before it happened: picked the winner <b>${pct(u.accuracy, 1)}</b> of the ${(u.called || 0).toLocaleString()} fights where it had a favorite (log loss ${u.log_loss == null ? "–" : u.log_loss.toFixed(3)}; a coin flip is 0.693). ESPN drops UFC odds after each fight, so lines are saved from now on: <b>${um.bets || 0} of 60</b> graded test bets so far${um.roi != null ? ", ROI " + signed(um.roi * 100, 1) + "%" : ""}. UFC bets post only after that test is passed.</p>
+       ${fightRows ? `<div class="table-wrap"><table><thead><tr><th class="text">Fight</th><th>Class</th><th>DraftKings</th><th>Market</th><th>Ratings</th><th>Blend vs market (pts)</th></tr></thead><tbody>${fightRows}</tbody></table></div>` : empty("No upcoming fights with DraftKings lines yet.")}`) : "";
+    return studyPanel + spotPanel + propPanel + ufcPanel + panel("How the model is doing", b[0] ? "Retrained " + fmt(b[0].trained_at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "",
       `<div class="model"><ul>
         ${all.g ? `<li>Picks the straight-up winner <b>${pct(all.w / all.g, 0)}</b> of the time on ${all.g.toLocaleString()} recent games it never saw.</li>` : ""}
         ${keys.length ? `<li>Learned NFL key numbers from real scores: ${keys.map((k) => k[0]).join(", ")}.</li>` : ""}

@@ -6,6 +6,7 @@ import argparse
 import logging
 import sys
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from . import report
 from .backtest import backtest
@@ -356,7 +357,7 @@ class Workspace:
         from .study import load_props
 
         data = build_data(self.ledger, self.brains, self.weights, self.sports, now, demo=self.demo,
-                          studies=self.studies,
+                          studies=self.studies, ufc=_ufc(self.data_dir, self.demo),
                           props=load_props(self.data_dir / ("demo-studies.json" if self.demo else "studies.json")))
         path = write_site(self.site_dir, data)
         o = data["stats"]["overall"]
@@ -477,7 +478,7 @@ def cmd_page(args) -> int:
         brains, weights = {}, {}
     from .study import load as load_studies, load_props
 
-    data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc),
+    data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc), ufc=_ufc(data_dir),
                       studies=load_studies(data_dir / "studies.json"), props=load_props(data_dir / "studies.json"))
     Path(args.out).write_text(render_html(data, standalone=args.standalone))
     if args.app_dir:
@@ -487,6 +488,25 @@ def cmd_page(args) -> int:
     # Same picks and results -> same fingerprint, so a refresh job can skip republishing an unchanged page.
     fingerprint = hashlib.sha1(json.dumps(data["entries"], sort_keys=True, default=str).encode()).hexdigest()[:12]
     print(f"wrote {args.out} ({len(data['entries'])} picks, fingerprint {fingerprint})")
+    return 0
+
+
+def _ufc(data_dir, demo: bool = False) -> dict:
+    from .ufc import load
+
+    return {} if demo else load(Path(data_dir))
+
+
+def cmd_ufc(args) -> int:
+    """Refresh UFC fights and DraftKings lines, replay the fighter ratings, save data/ufc.json."""
+    from .ufc import run
+
+    out = run(Path(args.data_dir))
+    m = out["market"]
+    print(f"UFC: {out['fights']} fights replayed, winner picked {(out['accuracy'] or 0):.1%} "
+          f"(log loss {(out['log_loss'] or 0):.3f}); {out['lines_saved']} fight lines saved; "
+          f"blind test {m['bets']} bets" + (f", ROI {m['roi']:+.1%}" if m['roi'] is not None else ""))
+    print(f"{len(out['upcoming'])} upcoming fights")
     return 0
 
 
@@ -607,6 +627,10 @@ def build_parser() -> argparse.ArgumentParser:
     pg.add_argument("--app-dir", help="also write the page as its own website (Home Screen icon) into this folder")
     pg.add_argument("--standalone", action="store_true", help="full HTML document (default: Artifact body)")
     pg.set_defaults(func=cmd_page)
+
+    uf = sub.add_parser("ufc", help="UFC: refresh fights and lines, replay fighter ratings (research until proven)")
+    uf.add_argument("--data-dir", default="data")
+    uf.set_defaults(func=cmd_ufc)
 
     sub.add_parser("sports", help="list supported sports").set_defaults(func=cmd_sports)
     return p

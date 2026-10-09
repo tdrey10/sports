@@ -80,13 +80,19 @@ jobs:
             --prop-markets player_pass_yds,player_rush_yds,player_reception_yds,player_receptions,player_points,player_rebounds,player_assists,player_threes,player_points_rebounds_assists' || '' }}
         run: sportsedge run nfl,nba,mlb,nhl,soccer $PROPS_ARGS
 
+      # UFC research: fights, DraftKings lines (ESPN drops them after each fight, so they are saved
+      # here), fighter ratings. No UFC bets are posted until the blind test is passed.
+      - name: UFC lines and ratings
+        continue-on-error: true
+        run: hambino ufc
+
       - name: Save the ledger
         run: |
           git config user.name "sportsedge-bot"
           git config user.email "sportsedge-bot@users.noreply.github.com"
           git add data/ledger.json data/brain.json
           # One path at a time: git add fails as a whole if any path is missing.
-          for p in data/studies.json data/history data/games data/odds data/props data/props_graded; do
+          for p in data/studies.json data/ufc.json data/history data/games data/odds data/props data/props_graded; do
             if [ -e "$p" ]; then git add "$p"; fi
           done
           git diff --cached --quiet || git commit -m "Update pick ledger"
