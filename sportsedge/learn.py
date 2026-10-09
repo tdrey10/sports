@@ -33,6 +33,7 @@ FEATURES = (
     "market", "model_gap", "is_h2h", "is_spread", "is_total", "point", "is_home",
     "rest_diff", "own_b2b", "opp_b2b", "form_margin", "form_for", "form_against", "pace",
     "travel", "sample", "era_diff", "era_known",
+    "adv1", "adv2", "adv3", "adv4", "adv5", "adv_total", "adv_known",  # advanced box-score stats (advanced.py)
 )
 MIN_ROWS = 600
 MIN_EV, MAX_EV, MAX_FAVORITE = 0.02, 0.20, -150
@@ -68,7 +69,7 @@ class Form:
         return pf - pa, pf, pa, i
 
 
-def game_context(cfg, g: GameResult, form: Form, rest: dict) -> dict:
+def game_context(cfg, g: GameResult, form: Form, rest: dict, adv=None) -> dict:
     """Home-perspective context for one game."""
     from .spots import ZONE_HOURS, zone
 
@@ -87,6 +88,7 @@ def game_context(cfg, g: GameResult, form: Form, rest: dict) -> dict:
         "sample": float(min(hn, an)),
         "era_diff": (g.away_pitcher_era - g.home_pitcher_era) if era_known else 0.0,  # + = home starter better
         "era_known": float(era_known),
+        **(adv.context(g) if adv is not None else {"adv": [0.0] * 5, "adv_total": 0.0, "adv_known": 0.0}),
     }
 
 
@@ -106,6 +108,7 @@ def side_features(ctx: dict, market: str, side: str, point: float | None,
         sign * ctx["form_margin"], sign * ctx["form_for"], sign * ctx["form_against"],
         pace_sign * ctx["pace"], sign * ctx["travel"], ctx["sample"],
         sign * ctx["era_diff"], ctx["era_known"],
+        *[sign * x for x in ctx["adv"]], pace_sign * ctx["adv_total"], ctx["adv_known"],
     ]
 
 
@@ -158,6 +161,19 @@ def evaluate(tune: list["Side"], blind: list["Side"], close_fair: dict | None = 
     learned = _paired(b_keep, clf.predict_proba(bX)[:, 1])
     market = [s.market_prob for s in b_keep]
     ll_market, ll_learned = _log_loss(market, by), _log_loss(learned, by)
+    # A neural network on the same rows, as a comparison (gradient boosting usually wins on tables).
+    ll_nn = None
+    try:
+        from sklearn.neural_network import MLPClassifier
+        from sklearn.pipeline import make_pipeline
+        from sklearn.preprocessing import StandardScaler
+
+        nn = make_pipeline(StandardScaler(), MLPClassifier(hidden_layer_sizes=(16, 8), alpha=1e-2, max_iter=400,
+                                                           early_stopping=True, random_state=7))
+        nn.fit(tX, ty)
+        ll_nn = round(_log_loss(_paired(b_keep, nn.predict_proba(bX)[:, 1]), by), 5)
+    except Exception as exc:  # comparison only
+        log.info("neural net comparison failed: %s", exc)
 
     # The bets it would have made: best 2%+ edge per game, -150 or better, at the closing price.
     best: dict[str, tuple[float, "Side"]] = {}
@@ -183,7 +199,7 @@ def evaluate(tune: list["Side"], blind: list["Side"], close_fair: dict | None = 
     return {
         "clv": clv,
         "tune_rows": len(tX), "blind_rows": len(bX),
-        "log_loss_market": round(ll_market, 5), "log_loss_learned": round(ll_learned, 5),
+        "log_loss_market": round(ll_market, 5), "log_loss_learned": round(ll_learned, 5), "log_loss_nn": ll_nn,
         "beats_market": ll_learned < ll_market,
         "bets": n, "won": won, "lost": lost, "units": round(sum(profits), 2),
         "roi": roi, "se": se, "proven": proven,
