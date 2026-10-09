@@ -48,6 +48,9 @@ class Settings:
     # A Lock every day: when nothing backed passes the Lock checks, the day's most likely winner
     # is still posted as the Lock, with no units, clearly labeled and tracked in its own record.
     daily_lock: bool = False  # off: a Lock posts only when a pick has a real edge
+    # The board drops at this local hour (8 = 8 AM Pacific): earlier runs watch the lines and
+    # injury news but hold the day's picks, so overnight moves and scratches are baked in.
+    board_hour: int | None = None
     # Adaptive trust from our own picks' closing line value: "sport:market" -> stake factor.
     # 0 = paused (keeps losing to the close), 0.5 = cut, 1.25 = picks keep beating the close.
     clv_trust: dict[str, float] = field(default_factory=dict)
