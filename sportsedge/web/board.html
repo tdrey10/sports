@@ -304,6 +304,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const units = (e) => (e.units > 0 ? `${e.units === 0.5 ? "½" : e.units}u` : "lean");
   const timeOf = (e) => fmt(e.commence_time, { weekday: "short", hour: "numeric", minute: "2-digit" });
   const wins = (e) => `$100 wins $${(100 * (dec(e.odds) - 1)).toFixed(0)}`;
+  // Our win chance next to what the price needs to break even: a good bet always wins more than it needs.
+  const needs = (e) => `wins ${pct(e.win_prob)} · needs ${pct(implied(e.odds))}`;
   const SETTLED = { won: "Won", lost: "Lost", push: "Push", void: "Void", half_won: "Half won", half_lost: "Half lost" };
   const LABEL = { h2h: "Moneyline", spreads: "Spread", totals: "Total" };
 
@@ -343,7 +345,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function row(e, opts = {}) {
     return `<div class="row">${stamp(e)}
       <div class="sel"><span class="tag ${e.tier}">${TIER[e.tier] || e.tier}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
-      <div class="odds"><b>${odds(e.odds)}</b><small>${units(e)} · ${signed(e.ev * 100, 1)}% EV</small></div>
+      <div class="odds"><b>${odds(e.odds)}</b><small>${units(e)} · ${needs(e)}</small></div>
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${opts.matchup ? `<span class="muted">${esc(e.matchup)} · ${timeOf(e)}</span>` : ""}${moveText(e)}${statusText(e)}${addBtn(e)}</div>
       ${more(e)}</div>`;
@@ -355,7 +357,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div class="sel"><strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${TIER[e.tier]}</span>` : ""}</div>
       <div class="price"><b>${odds(e.odds)}</b><small>${units(e)} · ${signed(e.ev * 100, 1)}% EV</small></div>
       <div class="sub">${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}</div>
-      <div class="gauge">${meter(e)}<span class="small muted">cashes ${pct(e.win_prob)}</span></div>
+      <div class="gauge">${meter(e)}<span class="small muted">${needs(e)}</span></div>
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${moveText(e)}${statusText(e)}${addBtn(e)}</div>
       ${more(e)}</article>`;
@@ -387,7 +389,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     $("hero").innerHTML = `<div class="ticket">${stamp(e)}
       <div class="t-head"><span class="t-kind">${kind}</span><span class="t-sport">${esc(e.sport_name)} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)} · ${timeOf(e)}</span></div>
       <h2>${esc(e.selection)}</h2>
-      <div class="t-row"><span class="t-odds">${odds(e.odds)}</span><span class="t-pay">${units(e)} · ${wins(e)}<br><b>cashes ${pct(e.win_prob)}</b> on our numbers</span></div>
+      <div class="t-row"><span class="t-odds">${odds(e.odds)}</span><span class="t-pay">${units(e)} · ${wins(e)}<br><b>wins ${pct(e.win_prob)}</b> on our numbers · needs ${pct(implied(e.odds))}</span></div>
       <p>${esc(e.headline)}</p>
       <div class="t-stub">${meter(e)}<span class="small muted">${esc(e.matchup)}</span><span>${statusText(e)} ${moveText(e)}</span>${addBtn(e)}</div>
     </div>`;
@@ -402,7 +404,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
       if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">Bet on it, the heat is coming</p></div>`;
       return `<div class="potd">${stamp(e)}<span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
-        <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · ${wins(e)}</span></div>
+        <div class="price"><b>${odds(e.odds)}</b><span class="muted">${units(e)} · ${wins(e)}</span></div><p class="small">${needs(e)}</p>
         <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${more(e)}</div>`;
     }).join("");
     const best = bestToday();

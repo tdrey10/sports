@@ -29,6 +29,11 @@ from .parlays import SIZES as PARLAY_SIZES, Parlay, build as build_parlays, sett
 from .tiers import BEST_BETS, LIVE_TIERS, Card
 
 DAY_TIERS = ("lock", "dog", "prop")
+
+
+def break_even(american: float) -> float:
+    """The win chance a price needs just to break even (-142 needs 58.7%, +150 needs 40%)."""
+    return 1 / american_to_decimal(american)
 CLV_PRIOR = 30  # picks of "no edge" the CLV average is shrunk toward
 GRADE_AFTER = timedelta(hours=2)  # earliest a game can be final
 
@@ -173,6 +178,10 @@ class Ledger:
         next_rank = max((e.best_rank for e in ranked_today), default=0) + 1
         for card in sorted(cards, key=lambda c: c.best_rank or 99):
             p = card.pick
+            # Hard rule: never post a bet that wins less often than its price needs to break even
+            # (at -142 that's 59%). No-unit picks (only when filler is switched on) are exempt.
+            if card.units > 0 and p.win_prob * (1 - p.push_prob) <= break_even(p.american) * (1 - p.push_prob):
+                continue
             live = card.tier in LIVE_TIERS
             eid = entry_id(p, live=live)
             if live:

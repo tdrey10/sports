@@ -118,9 +118,9 @@ def test_lock_and_dog_even_when_no_side_shows_an_edge():
     assert set(heads) == {"lock", "dog"} and all(c.units == 0 for c in heads.values())
     # By default nothing unbacked is posted: no maybes on the board.
     plain = Settings(min_ev=0.5)
-    no_units = [c for c in build_cards(scans, plain, provider.now) if c.units == 0]
-    assert [c.tier for c in no_units] == ["lock"]  # except the daily Lock, which is always posted
-    assert not [c for c in build_cards(scans, Settings(min_ev=0.5, daily_lock=False), provider.now) if c.units == 0]
+    assert not [c for c in build_cards(scans, plain, provider.now) if c.units == 0]  # no Lock without an edge
+    no_units = [c for c in build_cards(scans, Settings(min_ev=0.5, daily_lock=True), provider.now) if c.units == 0]
+    assert [c.tier for c in no_units] == ["lock"]  # the old daily Lock is still there if switched on
 
 
 def test_only_bets_backed_by_a_blind_test_are_posted():
@@ -128,8 +128,7 @@ def test_only_bets_backed_by_a_blind_test_are_posted():
     engine = Engine(provider, Settings(), now=provider.now)
     scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
     assert build_cards(scans, Settings(), provider.now)  # no studies loaded: open
-    nothing = build_cards(scans, Settings(proven=set()), provider.now)  # studies loaded, nothing proven
-    assert [(c.tier, c.units) for c in nothing] == [("lock", 0.0)]  # only the daily Lock, no units
+    assert build_cards(scans, Settings(proven=set()), provider.now) == []  # studies loaded, nothing proven
     only = [c for c in build_cards(scans, Settings(proven={"nba:spreads"}), provider.now) if c.units > 0]
     assert only and all(c.pick.sport == "nba" and c.pick.market == "spreads" for c in only)
 
@@ -234,3 +233,15 @@ def test_clv_is_the_reward_that_adapts_trust():
     assert not backed(pick, Settings(clv_trust={"nba:spreads": 0.0}))
     assert units_for(pick, Settings(clv_trust={"nba:spreads": 0.5})) == 1.0
     assert units_for(pick) == 2.0
+
+
+def test_no_bet_posts_below_its_break_even():
+    from sportsedge.ledger import Ledger, break_even
+    from tests.test_ledger import NOW, card
+
+    assert round(break_even(-142), 3) == 0.587 and break_even(150) == 0.4
+    led = Ledger()
+    short = make_pick(event_id="a", market="h2h", side="home", point=None, american=-142, win_prob=0.56)
+    good = make_pick(event_id="b", market="h2h", side="home", point=None, american=-142, win_prob=0.62)
+    added = led.publish([card(short, tier="lock"), card(good, tier="lock")], NOW)
+    assert [e.event_id for e in added] == ["b"]  # 56% at -142 (needs 59%) never posts
