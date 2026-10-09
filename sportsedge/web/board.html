@@ -421,7 +421,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + (sharpBets.length ? panel("Sharp value", "A sportsbook paying more than Pinnacle's fair price", byGame(sharpBets)) : "")
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
       + panel("The board", "Every other game-line play today, by game", rest.length ? byGame(rest) : empty("No other game-line plays on today's board."))
-      + (leans.length ? panel("Leans", "No units, tracked anyway", byGame(leans)) : "");
+      + (leans.length ? panel("Leans", "No units — just a lean. A small edge, not enough to bet.", byGame(leans)) : "");
   }
 
   // Parlays of the day: posted once, from the best bets, one leg per game.

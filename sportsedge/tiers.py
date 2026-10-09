@@ -290,7 +290,7 @@ def build_cards(
     leans = [
         p for p in game
         if p.event_id not in covered and 0 < p.ev < settings.min_ev and not p.warnings
-        and p.american >= settings.max_favorite
+        and p.american >= settings.max_favorite and p.win_prob >= LEGIT_MIN_WIN
     ] + [
         p for p in blocked
         if not p.is_prop and p.ev > 0 and not p.warnings and p.american >= settings.max_favorite
@@ -298,7 +298,7 @@ def build_cards(
     best_lean: dict[str, Pick] = {}
     for p in sorted(leans, key=lambda p: p.ev, reverse=True):
         best_lean.setdefault(p.event_id, p)
-    if settings.fill:
+    if settings.fill or settings.show_leans:
         chosen += [("lean", p) for p in list(best_lean.values())[:max_leans]]
 
     # Best bets: today's unit plays ranked by edge score, only those that clear the bar.
