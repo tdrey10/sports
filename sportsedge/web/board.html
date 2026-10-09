@@ -262,6 +262,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   <nav class="tabs" id="tabs" role="tablist" aria-label="Sections"></nav>
   <div class="filters"><div class="seg" id="sports" aria-label="Sport"></div><div class="seg" id="markets" aria-label="Bet type"></div></div>
   <div id="view" class="grid"></div>
+  <div class="drops"><span aria-hidden="true">🕗</span> <b>8 AM PT</b> on game day — that's when the board drops. All night the engine's watching the lines move — so every big move and late scratch is baked in. That's how the pros do it.</div>
   <footer>
     <span>Picks only; no bets are placed. Parlays: every leg has to win.</span>
     <span>No model wins every bet. Judge it by the record and the closing-line value over many picks. Bet only what you can afford to lose.</span>
@@ -386,7 +387,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function renderHero() {
     const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
     if (!e) {
-      $("hero").innerHTML = `<div class="drops"><span aria-hidden="true">🕗</span> <b>8 AM PT</b> on game day — that's when the board drops. All night the engine's watching the lines move — so every big move and late scratch is baked in. That's how the pros do it.</div>`;
+      $("hero").innerHTML = `<div class="ticket-empty"><b>Bet on it, the heat is coming</b></div>`;
       return;
     }
     const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
