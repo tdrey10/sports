@@ -500,9 +500,26 @@ class Ledger:
             "leans": {"won": lean_won, "lost": lean_lost,
                       "win_pct": lean_won / (lean_won + lean_lost) if lean_won + lean_lost else None},
             "curve": curve,
+            # The audit: the same numbers over the last 30 and 90 days, to catch drift early.
+            "audit": {
+                "30": summary([e for e in plays if e.start >= now - timedelta(days=30)]),
+                "90": summary([e for e in plays if e.start >= now - timedelta(days=90)]),
+                "all": summary(plays),
+            },
+            # Did our posted win chances come true? Every graded pick, bet or not, by chance band.
+            "calibration": self._calibration(settled),
             # Parlays keep their own record, apart from the straight-bet money above.
             "parlays": self._parlay_stats(),
         }
+
+    @staticmethod
+    def _calibration(settled: list[Entry]) -> list[dict]:
+        bands = defaultdict(list)
+        for e in settled:
+            if e.status in ("won", "lost") and e.tier not in LIVE_TIERS:
+                bands[min(int(e.win_prob * 10), 9)].append((e.win_prob, 1.0 if e.status == "won" else 0.0))
+        return [{"said": sum(p for p, _ in v) / len(v), "won": sum(y for _, y in v) / len(v), "n": len(v)}
+                for _, v in sorted(bands.items())]
 
     def _parlay_stats(self) -> dict:
         views = [v for v in self.parlay_views() if v["status"] in ("won", "lost", "push")]
