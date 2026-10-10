@@ -278,15 +278,15 @@ class Workspace:
 
     @staticmethod
     def _with_history_spots(settings, data_dir):
-        """Spots proven on eight seasons of NBA/NHL/MLB/college hoops lines (espn_history.json)
-        set their weight unless the live study already has one."""
+        """Spots STRONG on 2018+ closing lines in six sports (line_studies.json: blind, tuning and
+        beyond the luck control) set their weight unless one is already set."""
         import json
         from dataclasses import replace
 
-        from .espnhist import spot_weights
+        from .linestudies import spot_weights
 
         try:
-            res = json.loads((data_dir / "espn_history.json").read_text())
+            res = json.loads((data_dir / "line_studies.json").read_text())
         except (OSError, ValueError):
             return settings
         new = {k: w for k, w in spot_weights(res).items() if k not in settings.spot_weights}
@@ -606,14 +606,19 @@ def cmd_espn_history(args) -> int:
             print(f"could not fetch {espnhist.REPO}: {exc}")
     out = {}
     for sport in args.sports:
-        folder = data_dir / "lines" / sport
+        folder = data_dir / "lines" / "espn" / sport
         if src is not None and (src / sport).exists():
             print(f"{espnhist.build(src / sport, folder, sport)} {sport.upper()} games saved")
-        if not any(folder.glob("*.csv.gz")):
-            continue
+        if sport not in espnhist.GRID or not any(folder.glob("*.csv.gz")):
+            continue  # NFL and college football have longer model tests of their own; here they feed the studies
         out[sport] = espnhist.run(folder, sport)
         print(espnhist.report(out[sport], sport) + "\n")
     (data_dir / "espn_history.json").write_text(json.dumps(out, indent=1, default=str))
+    from . import linestudies
+
+    studies = linestudies.run(data_dir / "lines" / "espn")
+    print(linestudies.report(studies))
+    (data_dir / "line_studies.json").write_text(json.dumps(studies, indent=1, default=str))
     return 0
 
 
@@ -757,8 +762,8 @@ def build_parser() -> argparse.ArgumentParser:
     nc.add_argument("--data-dir", default="data")
     nc.set_defaults(func=cmd_ncaaf_history)
 
-    eh = sub.add_parser("espn-history", help="NBA/NHL/MLB/college hoops blind test on 2018+ closing lines")
-    eh.add_argument("sports", nargs="*", default=["nba", "nhl", "mlb", "ncaab"])
+    eh = sub.add_parser("espn-history", help="NBA/NHL/MLB/college hoops blind test + 15 line studies on 2018+ closing lines")
+    eh.add_argument("sports", nargs="*", default=["nfl", "ncaaf", "nba", "nhl", "mlb", "ncaab"])
     eh.add_argument("--fetch", action="store_true", help="refresh the seasons from the public source archive first")
     eh.add_argument("--src", help="a local copy of the source's data/sports/games folder")
     eh.add_argument("--data-dir", default="data")

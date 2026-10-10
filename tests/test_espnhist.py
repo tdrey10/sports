@@ -4,7 +4,7 @@ from sportsedge import espnhist, nflhist
 
 FIELDS = ["id", "status", "start", "home", "away", "home_score", "away_score", "neutral", "indoor", "ml_home",
           "ml_away", "ml_home_open", "ml_away_open", "spread_home", "spread_home_odds", "spread_away_odds", "total",
-          "over_odds", "under_odds"]
+          "over_odds", "under_odds", "stype", "ls_home", "ls_away", "sp_home", "elev"]
 
 
 def _src(tmp_path, rows):
@@ -63,18 +63,13 @@ def test_rested_dog_spot_needs_the_other_team_on_a_back_to_back():
     assert not any("rested" in s for s, _ in espnhist.daily_spots(pred(1, 1)))
 
 
-def _rec(bets, roi, se, proven):
-    return {"bets": bets, "flat_roi": roi, "se": se, "proven": proven}
-
-
-def test_only_spots_proven_in_both_periods_get_a_weight():
-    spot = "dog rested vs a team on a back-to-back"
-    res = {
-        "nba": {"spots": {spot: {"in_sample": _rec(300, 0.03, 0.07, False), "blind": _rec(300, 0.085, 0.072, True)}}},
-        "nhl": {"spots": {spot: {"in_sample": _rec(300, -0.02, 0.07, False), "blind": _rec(300, 0.1, 0.05, True)}}},
-        "mlb": {"spots": {"home dog": {"in_sample": _rec(300, 0.05, 0.01, True), "blind": _rec(300, 0.05, 0.01, True)}}},
-    }
-    w = espnhist.spot_weights(res)
-    assert set(w) == {"nba:rested_dog"}  # NHL lost in tuning; "home dog" has no live spot
-    assert abs(w["nba:rested_dog"] - (0.085 - 0.072) / espnhist.DOG_DECIMAL) < 1e-9
-    assert espnhist.spot_weights(None) == {}
+def test_preseason_games_are_left_out_and_first_halves_are_summed(tmp_path):
+    src = _src(tmp_path, [
+        _game(1, "2024-01-01T00:00Z", "A", "B", 100, 90, stype="1"),
+        _game(2, "2024-01-02T00:00Z", "A", "B", 100, 90, stype="2", ls_home="20,30,25,25", ls_away="30,20,20,20"),
+    ])
+    out = tmp_path / "lines"
+    assert espnhist.build(src, out, "nba") == 1
+    assert espnhist.first_half("mlb", "0,1,0,2,0,3,0,0,0") == 3
+    assert espnhist.first_half("ncaab", "41,33") == 41
+    assert espnhist.first_half("nba", "20") is None and espnhist.first_half("nhl", "1,2,0") is None
