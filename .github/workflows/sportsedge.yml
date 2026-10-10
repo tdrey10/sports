@@ -47,7 +47,11 @@ jobs:
     env:
       HAS_CLOUDFLARE: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
     steps:
+      # Always start from the newest main (a queued run would otherwise use the ledger from
+      # when it was queued, and clash with the run that finished before it).
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - uses: actions/setup-python@v5
         with:
@@ -114,7 +118,8 @@ jobs:
             if [ -e "$p" ]; then git add "$p"; fi
           done
           git diff --cached --quiet || git commit -m "Update pick ledger"
-          git pull --rebase --autostash && git push
+          # If another run saved in the meantime, this run's data wins any clash (it is newer).
+          git pull --rebase --autostash -X theirs && git push
 
       # The Home Screen site on Cloudflare Pages (free): the duck as the app icon, "Hambino" as
       # its name. Runs once the repository secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are set.
