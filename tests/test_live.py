@@ -167,7 +167,7 @@ def test_live_cards_reject_stale_line_edges_and_cap_stakes():
     assert cards[0].units == 1.0
 
 
-def test_live_picks_one_likely_winner_and_one_plus_money():
+def test_live_picks_one_likely_winner_and_the_best_plus_money_bet():
     from tests.test_ledger import make_pick
 
     class S:
@@ -183,12 +183,18 @@ def test_live_picks_one_likely_winner_and_one_plus_money():
     coin = make_pick(event_id="d", american=+105, win_prob=0.52, market_prob=0.49, ev=0.07)
     coin.model_prob = 0.55  # a coin flip is never the "most likely to win" pick
     cards = live_cards([fav, dog, small, coin], S(), {"nfl": "NFL"})
-    # The -200 favourite breaks the never-worse-than--150 rule, so the -150 side is the likely winner.
-    # Plus money goes to the likeliest winner with an edge: the +105 at 52%, not the +180 at 40%.
-    assert [(c.tier, c.pick.event_id) for c in cards] == [("live_win", "c"), ("live_plus", "d")]
-    longshot = make_pick(event_id="e", american=+400, win_prob=0.27, market_prob=0.20, ev=0.35)
-    longshot.model_prob = 0.30
-    assert not live_cards([longshot], S(), {"nfl": "NFL"})  # +400 long shots never post
+    # The -200 favourite breaks the never-worse-than--170 rule, so the -150 side is the likely winner.
+    # Plus money goes to the best bet: the biggest edge, the +180 (EV 12%) over the +105 (EV 7%).
+    assert [(c.tier, c.pick.event_id) for c in cards] == [("live_win", "c"), ("live_plus", "b")]
+    stale = make_pick(event_id="e", american=+400, win_prob=0.27, market_prob=0.20, ev=0.35)
+    stale.model_prob = 0.30
+    assert not live_cards([stale], S(), {"nfl": "NFL"})  # an edge that big is a stale price: never posts
+    long = make_pick(event_id="f", american=+1200, win_prob=0.085, market_prob=0.07, ev=0.10)
+    long.model_prob = 0.09
+    assert [c.tier for c in live_cards([long], S(), {"nfl": "NFL"})] == ["live_plus"]  # up to +2000 is fine
+    too_long = make_pick(event_id="g", american=+2500, win_prob=0.042, market_prob=0.035, ev=0.09)
+    too_long.model_prob = 0.045
+    assert not live_cards([too_long], S(), {"nfl": "NFL"})  # past +2000: never
     # Already posted the likely winner for game "c": no other side qualifies, so none is forced.
     cards = live_cards([fav, dog, small, coin], S(), {"nfl": "NFL"}, {("c", "live_win")})
     assert [c.tier for c in cards] == ["live_plus"]
