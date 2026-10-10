@@ -7,7 +7,7 @@ closing moneyline, spread and total from 2018 on and the opening moneyline from 
 archives hold: the same games, prices within 3 points of win chance on 97%+ of them,
 and the favorites won as often as the prices said (closing lines, not post-game ones).
 
-Built once into data/lines/<sport>/<season>.csv.gz in the NFL file's columns, then run
+Built once into data/lines/espn/<sport>/<season>.csv.gz in the NFL file's columns, then run
 through the same engine as the NFL and college football tests (nflhist):
 
 1. Ratings from results + market blend at the closing price, moneyline and spread
@@ -32,7 +32,8 @@ from .cfbhist import bet_with_clv, open_rows
 from .nflhist import Record, learn_trust
 
 REPO = "https://github.com/D503therapper/autonomous-crypto-engine"
-SPORTS = ("nba", "nhl", "mlb", "ncaab")
+SPORTS = ("nba", "nhl", "mlb", "ncaab")  # the model test; the studies also use nfl and ncaaf
+ALL_SPORTS = ("nfl", "ncaaf", "nba", "ncaab", "mlb", "nhl")
 SEASON_START = {"nba": 8, "nhl": 8, "ncaab": 8, "mlb": 1, "ncaaf": 8, "nfl": 8}  # month a season's file starts
 TUNE_LAST = 2021  # lines start 2018: tune on 2018-2021, blind on 2022 onward
 GRID = {  # home edge in each sport's own scoring units (points, goals, runs)
@@ -41,10 +42,11 @@ GRID = {  # home edge in each sport's own scoring units (points, goals, runs)
     "nhl": {"k": (0.02, 0.04, 0.06), "hfa": (0.1, 0.2, 0.3), "rest": (0.0, 0.1, 0.2), "qb": (0.0,), "carry": (0.5, 0.7, 0.9)},
     "mlb": {"k": (0.01, 0.02, 0.04), "hfa": (0.1, 0.2, 0.3), "rest": (0.0, 0.1), "qb": (0.0,), "carry": (0.5, 0.7, 0.9)},
 }
-EXTRA = ["open_home_ml", "open_away_ml"]
+RAW = ["start", "stype", "elev", "tzo", "wx_temp", "wx_wind", "wx_rain", "sp_home", "sp_away",
+       "h1_ml_home", "h1_ml_away", "h1_spread_home", "h1_spread_home_odds", "h1_spread_away_odds"]
+EXTRA = ["open_home_ml", "open_away_ml", *RAW, "h1_home", "h1_away"]
+H1_PERIODS = {"nfl": 2, "ncaaf": 2, "nba": 2, "ncaab": 1, "mlb": 5}  # first half; MLB: first five innings
 SPOT_DOG = (100, 220)
-SPOT_KEYS = {"dog rested vs a team on a back-to-back": "rested_dog"}  # test spot -> live spot key (spots.py)
-DOG_DECIMAL = 2.5  # about +150, the middle of the +100..+220 dog range: turns ROI into win-chance points
 
 
 def _f(v) -> float | None:
@@ -69,9 +71,20 @@ def read_source(folder: Path) -> list[dict]:
     games: dict[str, dict] = {}
     for f in sorted(Path(folder).glob("*.csv")):
         for r in csv.DictReader(open(f, newline="")):
+            if r.get("stype") == "1":  # preseason (spring training): lines and lineups aren't real
+                continue
             if r.get("status") == "final" and _f(r.get("home_score")) is not None and _f(r.get("away_score")) is not None:
                 games[r["id"]] = r
     return sorted(games.values(), key=lambda r: (r["start"], r["id"]))
+
+
+def first_half(sport: str, linescore: str | None) -> float | None:
+    """Points in the first half (MLB: first five innings) from a "7,14,0,3" linescore."""
+    n = H1_PERIODS.get(sport)
+    parts = [_f(x) for x in (linescore or "").split(",") if x.strip()]
+    if not n or len(parts) < n or None in parts[:n]:
+        return None
+    return sum(parts[:n])
 
 
 def build(src: Path, out: Path, sport: str) -> int:
@@ -108,6 +121,10 @@ def build(src: Path, out: Path, sport: str) -> int:
             row.update({"spread_line": -spread, "home_spread_odds": sh, "away_spread_odds": sa})
         if _f(r.get("total")) and _ml(r.get("over_odds")) and _ml(r.get("under_odds")):
             row.update({"total_line": r["total"], "over_odds": r["over_odds"], "under_odds": r["under_odds"]})
+        row.update({k: r.get(k) or "" for k in RAW})
+        h1 = {side: first_half(sport, r.get(f"ls_{side}")) for side in ("home", "away")}
+        if None not in h1.values():
+            row.update({"h1_home": h1["home"], "h1_away": h1["away"]})
         oh, oa = _ml(r.get("ml_home_open")), _ml(r.get("ml_away_open"))
         if oh and oa:
             row.update({"open_home_ml": oh, "open_away_ml": oa})
@@ -129,7 +146,7 @@ def extras(folder: Path) -> dict[str, dict[str, float | None]]:
     for f in sorted(Path(folder).glob("*.csv.gz")):
         with gzip.open(f, "rt", newline="") as fh:
             for r in csv.DictReader(fh):
-                out[r["game_id"]] = {k: _f(r.get(k)) for k in EXTRA}
+                out[r["game_id"]] = {k: _f(r.get(k)) for k in ("open_home_ml", "open_away_ml")}
     return out
 
 
@@ -198,23 +215,6 @@ def proven(res: dict | None) -> list[str]:
     for spot, d in ((res or {}).get("spots") or {}).items():
         if nflhist.held_up(d).strip() == "PROVEN":
             out.append(spot)
-    return out
-
-
-def spot_weights(results: dict[str, dict] | None) -> dict[str, float]:
-    """{"sport:spot": win-chance bump} for every spot proven on these seasons (blind AND tuning).
-
-    One standard error is shaved off the blind ROI first, so the bump is only the part luck
-    can't explain, then it is turned into win-chance points at a typical dog price."""
-    out = {}
-    for sport, res in (results or {}).items():
-        for name, d in ((res or {}).get("spots") or {}).items():
-            key = SPOT_KEYS.get(name)
-            blind = d.get("blind") or {}
-            if key and nflhist.held_up(d).strip() == "PROVEN":
-                w = (blind["flat_roi"] - (blind.get("se") or 0)) / DOG_DECIMAL
-                if w > 0:
-                    out[f"{sport}:{key}"] = w
     return out
 
 
