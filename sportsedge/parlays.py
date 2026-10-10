@@ -1,14 +1,13 @@
-"""Parlays of the day: 2, 3, 4 and 8 legs, built from the day's best bets.
+"""Parlays of the day, in two kinds, built from the day's best bets.
+
+- The Heat (2, 3, 4 and 8 legs): every leg is a unit play. Rare.
+- Wanna Dabble? (2, 3, 4, 5 and 8 legs, half a unit each): posted every day when
+  possible from FILL_HOUR on. Unit plays first, then the most likely leans that still
+  show an edge and win 50%+ fill the open legs.
 
 Each parlay is posted once a day and never changes after that. Legs come from
-different games (no same-game parlays): today's unit plays, most likely to win
-first. The 2-leg is the top two, the 3-leg the top three, and so on.
-
-Unit plays (legitimate edges) come first. The 2- and 3-team parlays are posted
-every day when possible: if there aren't enough unit plays by FILL_HOUR, the next
-most likely winners that still show an edge (leans and sharp picks, 50%+ to win)
-fill the open legs, and that parlay carries no units (tracked, for fun). The 4- and
-8-team parlays never use filler.
+different games (no same-game parlays), most likely to win first: the 2-leg is the
+top two, the 3-leg the top three, and so on.
 
 A parlay multiplies the book's edge on every leg, so even strong legs make a
 long shot: the page shows each parlay's real chance to hit (our win chances
@@ -24,11 +23,12 @@ from datetime import datetime, timedelta
 
 from .odds import american_to_decimal
 
-SIZES = (2, 3, 4, 8)
+SIZES = (2, 3, 4, 8)  # The Heat
 STAKE = {2: 0.5, 3: 0.25, 4: 0.25, 8: 0.1}  # units: small on purpose, every leg has to win
+DABBLE_SIZES = (2, 3, 4, 5, 8)  # Wanna Dabble?
+DABBLE_STAKE = 0.5
 LEG_TIERS = ("lock", "dog", "value", "prop", "sharp")  # unit plays
-FILL_TIERS = ("lean",)  # small edges with no units: filler for the daily 2- and 3-team parlays
-FILL_SIZES = (2, 3)
+FILL_TIERS = ("lean",)  # small edges with no units: fill the Wanna Dabble? parlays
 FILL_HOUR = 10  # local time: give the day's real picks a chance to post before filling with leans
 FILL_MIN_WIN = 0.5
 LEG_HOURS = 24  # legs start within a day of posting (today's slate, not next week's)
@@ -47,6 +47,7 @@ class Parlay:
     units: float
     decimal: float = 0.0
     hit_prob: float = 0.0  # our win chances multiplied together
+    kind: str = "heat"  # "heat" (all unit plays) or "dabble" (leans fill in)
     extra: dict = field(default_factory=dict)
 
     @property
@@ -89,31 +90,35 @@ def fill_pool(entries, now: datetime, today: str, taken: set[str]) -> list:
     return out
 
 
+def _parlay(kind: str, size: int, legs: list, today: str, now: datetime, units: float) -> Parlay:
+    prices = [e.current_odds if e.current_odds is not None else e.odds for e in legs]
+    dec, hit = 1.0, 1.0
+    for e, a in zip(legs, prices):
+        dec *= american_to_decimal(a)
+        hit *= e.win_prob
+    tag = f"parlay|{today}|{size}" if kind == "heat" else f"parlay|{today}|dabble|{size}"
+    return Parlay(hashlib.sha1(tag.encode()).hexdigest()[:16], today, now.isoformat(), size, [e.id for e in legs],
+                  prices, units, decimal=round(dec, 4), hit_prob=round(hit, 4), kind=kind)
+
+
 def build(entries, existing: list[Parlay], now: datetime, today: str, local_hour: int = 0) -> list[Parlay]:
-    """New parlays for sizes not yet posted today (once posted, a parlay never changes)."""
+    """New parlays for kinds and sizes not yet posted today (once posted, a parlay never changes)."""
     entries = list(entries)
-    posted = {p.size for p in existing if p.day == today}
+    posted = {(p.kind, p.size) for p in existing if p.day == today}
     strong = leg_pool(entries, now, today)
-    fill = fill_pool(entries, now, today, {e.event_id for e in strong}) if local_hour >= FILL_HOUR else []
     out = []
-    for size in SIZES:
-        if size in posted:
-            continue
-        if len(strong) >= size:
-            legs = strong[:size]
-        elif size in FILL_SIZES and len(strong) + len(fill) >= size:
-            legs = strong + fill[:size - len(strong)]  # the daily 2- and 3-team: next best legs fill in
-        else:
-            continue
-        prices = [e.current_odds if e.current_odds is not None else e.odds for e in legs]
-        dec, hit = 1.0, 1.0
-        for e, a in zip(legs, prices):
-            dec *= american_to_decimal(a)
-            hit *= e.win_prob
-        pid = hashlib.sha1(f"parlay|{today}|{size}".encode()).hexdigest()[:16]
-        units = STAKE[size] if all(e.units > 0 for e in legs) else 0.0
-        out.append(Parlay(pid, today, now.isoformat(), size, [e.id for e in legs], prices, units,
-                          decimal=round(dec, 4), hit_prob=round(hit, 4)))
+    for size in SIZES:  # The Heat: unit plays only, never filler
+        if ("heat", size) not in posted and len(strong) >= size:
+            out.append(_parlay("heat", size, strong[:size], today, now, STAKE[size]))
+    if local_hour >= FILL_HOUR:  # Wanna Dabble?: unit plays first, the most likely leans fill in
+        pool = strong + fill_pool(entries, now, today, {e.event_id for e in strong})
+        for size in DABBLE_SIZES:
+            if ("dabble", size) in posted or len(pool) < size:
+                continue
+            legs = pool[:size]
+            if size in SIZES and all(e in strong for e in legs):
+                continue  # all unit plays: that's The Heat of this size, not a second copy
+            out.append(_parlay("dabble", size, legs, today, now, DABBLE_STAKE))
     return out
 
 
