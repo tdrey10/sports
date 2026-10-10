@@ -248,7 +248,8 @@ def build_cards(
     if "lock" not in taken:
         locks = [p for p in soon if p.american >= LOCK_MIN_ODDS and solid(p)]
         if locks:
-            chosen.append(("lock", max(locks, key=lambda p: (p.win_prob, p.ev))))
+            # Best edge AND likely to win (the edge score), not just the biggest favorite.
+            chosen.append(("lock", max(locks, key=lambda p: (edge_score(p, settings)[0], p.win_prob))))
         elif (heads or settings.daily_lock) and "lock_lean" not in taken:
             # A Lock every day: the most likely winner on today's board (-170 or better, injuries
             # known, our model and the market agreeing first). With no real edge it carries no
@@ -259,7 +260,9 @@ def build_cards(
             near = lean_pool(lambda p: p.market in ("h2h", "spreads") and p.win_prob >= 0.5,
                              source=None if heads else every)
             if near:
-                lock = max(near, key=lambda p: (agree(p), p.win_prob, p.ev))
+                # Weigh everything (the edge score blends the edge with the chance to win),
+                # not just who is favored.
+                lock = max(near, key=lambda p: (agree(p), edge_score(p, settings)[0], p.win_prob))
                 chosen.append(("lock", lock))
                 lean_ids.add(id(lock))
     if "dog" not in taken:

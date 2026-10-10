@@ -281,3 +281,20 @@ def test_no_bet_posts_below_its_break_even():
     good = make_pick(event_id="b", market="h2h", side="home", point=None, american=-142, win_prob=0.62)
     added = led.publish([card(short, tier="lock"), card(good, tier="lock")], NOW)
     assert [e.event_id for e in added] == ["b"]  # 56% at -142 (needs 59%) never posts
+
+
+def test_daily_lock_weighs_the_edge_not_just_the_favorite():
+    provider = SampleProvider(seed=5)
+    settings = Settings(min_ev=0.5)
+    engine = Engine(provider, settings, now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    sides = [p for scan in scans for p in scan.picks if not p.is_prop and p.market in ("h2h", "spreads")]
+    for p in sides:
+        p.ev, p.warnings = -0.05, []
+    fav, edge = sorted(sides, key=lambda p: p.american)[:2]
+    fav.american, fav.win_prob, fav.ev = -165, 0.63, 0.002  # the favorite: barely beats -165
+    edge.american, edge.win_prob, edge.ev = 105, 0.53, 0.087  # a coin flip with a real edge
+    for p in (fav, edge):
+        p.market_prob, p.model_prob = p.win_prob - 0.01, p.win_prob
+    lock = next(c for c in build_cards(scans, settings, provider.now) if c.tier == "lock")
+    assert lock.pick is edge
