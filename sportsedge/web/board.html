@@ -447,7 +447,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     }).join("");
     const st = PSTATUS[p.status] || p.status;
     const res = p.profit != null ? ` ${signed(p.profit, 2)}u` : "";
-    return `<div class="parlay">${p.status === "won" ? `<span class="stamp">Cashed</span>` : ""}<span class="kind">${p.size}-team parlay</span>
+    return `<div class="parlay">${p.status === "won" ? `<span class="stamp">Cashed</span>` : ""}<span class="kind">${p.units > 0 ? "🔥 The Heat" : "Wanna Dabble?"} · ${p.size}-team</span>
       <div class="price"><b>${odds(p.american)}</b><span class="muted">${p.units > 0 ? p.units + "u" : "no units, tracked"} · $10 pays $${(10 * p.decimal).toFixed(2)}</span></div>
       <p class="small"><b>Hits ${pct(p.hit_prob, p.hit_prob < 0.1 ? 1 : 0)}</b> of the time on our numbers <span class="muted">(about 1 in ${Math.max(1, Math.round(1 / p.hit_prob))})</span></p>
       <ol>${legs}</ol>
@@ -463,7 +463,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       return `<tr><td>${n}-team</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 2)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("");
     return panel("Parlays of the day", "A 2- and 3-team every day when possible · most likely winners first, one leg per game",
         (todays.length ? `<div class="grid two">${todays.map((p) => parlayCard(p, ids)).join("")}</div>` : "") + note
-        + `<p class="small muted">Every leg has to win, and the book's edge stacks on every leg, so parlays lose more often than straight bets. Stakes stay small: ½u on a 2-team, ¼u on a 3- or 4-team, 0.1u on an 8-team.</p>`)
+        + `<p class="small muted"><b>🔥 The Heat</b>: every leg is a real unit play, so it's rare. Stakes stay small: ½u on a 2-team, ¼u on a 3- or 4-team, 0.1u on an 8-team. <b>Wanna Dabble?</b>: the daily 2- or 3-team filled in with leans, no units, just for fun. Every leg has to win, so parlays lose more often than straight bets.</p>`)
       + panel("Parlay record", "Kept apart from the straight-bet record",
         `<div class="table-wrap"><table><thead><tr><th>Parlay</th><th>Record</th><th>Profit</th><th>ROI</th></tr></thead><tbody>${rows}</tbody></table></div>`)
       + (earlier.length ? panel("Earlier parlays", "Last 7 days", `<div class="grid two">${earlier.map((p) => parlayCard(p, ids)).join("")}</div>`) : "");
