@@ -90,3 +90,17 @@ def test_regular_quarterback_tie_goes_to_the_most_recent_starter():
     # A set's order changes from run to run; a tie must not, or results drift between runs.
     assert nflhist._regular_qb(["a", "b", "a", "b"]) == "b"
     assert nflhist._regular_qb(["b", "a", "b", "a"]) == "a"
+
+
+def test_long_shots_are_never_bet_even_with_an_edge():
+    pred = nflhist.Pred(_game(0, 2020, 1, "A", "B", 10, 24), 0, False, False)
+    row = nflhist.Row(pred, "ml", {"home": 0.75, "away": 0.25}, {"home": 0.88, "away": 0.12},
+                      {"home": -800, "away": 650}, {"home": 0.0, "away": 1.0})
+    assert nflhist.bet([row], trust=1.0).bets == 0  # +650 dog with a 13-point edge: still no bet
+
+
+def test_proven_needs_both_periods():
+    good = {"bets": 100, "won": 60, "lost": 40, "push": 0, "units": 10, "roi": 0.1, "flat_roi": 0.1, "se": 0.05,
+            "proven": True}
+    assert nflhist.held_up({"in_sample": good, "blind": good}) == "  PROVEN"
+    assert "blind only" in nflhist.held_up({"in_sample": {**good, "flat_roi": -0.05}, "blind": good})
