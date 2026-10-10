@@ -295,12 +295,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   "use strict";
   let DATA = JSON.parse(document.getElementById("edge-data").textContent);
   const SCORES = {};  // ESPN event id (and "away|home") -> {home, away, detail, final}: pulled by the page itself
-  const BOARD = {};  // sport key -> every game on today's ESPN scoreboard (for the Live tab's scoreboard)
+  const BOARD = {};  // sport key -> every game on today's ESPN scoreboard (for the Scores tab)
   const gameKey = (away, home) => `${(away || "").toLowerCase()}|${(home || "").toLowerCase()}`;
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
-  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
+  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["scores", "Scores"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
   const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
     live: "Live", live_win: "Live · likely winner", live_plus: "Live · plus money", sharp: "Sharp value" };
   const state = { tab: "today", sport: "all", market: "all" };
@@ -502,10 +502,13 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
 
   // Every game on today's scoreboards: live first, then upcoming, then final. Pulled from ESPN.
-  function scoreboard() {
+  const pickedSport = (key) => state.sport === "all" || state.sport === key || (state.sport === "soccer" && SOCCER.has(key));
+  const liveGames = () => (DATA.sports || []).filter((sp) => pickedSport(sp.key))
+    .reduce((n, sp) => n + (BOARD[sp.key] || []).filter((g) => g.state === "in").length, 0);
+  function viewScores() {
     const order = { in: 0, pre: 1, post: 2 };
-    const sports = (DATA.sports || []).filter((sp) => (BOARD[sp.key] || []).length);
-    if (!sports.length) return "";
+    const sports = (DATA.sports || []).filter((sp) => pickedSport(sp.key) && (BOARD[sp.key] || []).length);
+    if (!sports.length) return panel("Scores", "Today's games", empty("Loading today's scores from ESPN…"));
     const line = (g) => {
       const tail = g.state === "pre" ? fmt(g.when, { hour: "numeric", minute: "2-digit" }) : esc(g.detail);
       const sc = g.state === "pre" ? "" : ` <b>${esc(g.as ?? "")}-${esc(g.hs ?? "")}</b>`;
@@ -515,7 +518,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const games = [...BOARD[sp.key]].sort((a, b) => (order[a.state] ?? 1) - (order[b.state] ?? 1) || new Date(a.when) - new Date(b.when));
       return `<div><span class="kind">${esc(sp.name)}</span><ul class="scores">${games.map(line).join("")}</ul></div>`;
     }).join("");
-    const live = sports.reduce((n, sp) => n + BOARD[sp.key].filter((g) => g.state === "in").length, 0);
+    const live = liveGames();
     return panel("Scores", live ? `${live} live now · updates every 30 seconds` : "Today's games", `<div class="grid two">${body}</div>`);
   }
 
@@ -530,7 +533,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const open = items.filter((e) => !SETTLED[e.status]);
     const top = open.length ? open.reduce((a, b) => (score(b) > score(a) ? b : a)) : null;
     const best = top ? panel("Best live bet", "The one we'd take right now · highest edge score", row(top, { matchup: true })) : "";
-    return best + scoreboard() + panel("Live right now", items.length ? `${items.length} live bets today` : "",
+    return best + panel("Live right now", items.length ? `${items.length} live bets today` : "",
         `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money · +100 to +2000 · best edge & likely to win", "plus")}</div>`)
       + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "");
   }
@@ -665,7 +668,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b><small>from ${money(st.start_bankroll)}</small></div>
       <div><span>Beat the close</span><b>${pct(o.beat_close)}</b><small>avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</small></div>`;
     const counts = { today: bestToday().length, parlays: (DATA.parlays || []).filter((p) => p.day === today()).length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
-      early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length };
+      early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length, scores: liveGames() };
     $("tabs").innerHTML = TABS.map(([k, n]) => `<button role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${n}${counts[k] ? `<span class="count">${counts[k]}</span>` : ""}</button>`).join("");
     $("sports").innerHTML = SPORTS.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${state.sport === k}">${n}</button>`).join("");
     $("markets").innerHTML = MARKETS.map(([k, n]) => `<button data-market="${k}" aria-pressed="${state.market === k}">${n}</button>`).join("");
@@ -675,7 +678,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     renderTop();
     renderHero();
     const views = {
-      today: viewToday, parlays: viewParlays, live: viewLive, results: viewResults,
+      today: viewToday, parlays: viewParlays, live: viewLive, scores: viewScores, results: viewResults,
       props: () => viewList((e) => e.player, "Player props", "Best edge first · priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
       early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves", "Nothing early yet."),
     };
@@ -685,7 +688,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   document.addEventListener("click", (ev) => {
     const t = ev.target.closest("button");
     if (!t) return;
-    if (t.dataset.tab) { state.tab = t.dataset.tab; save(); render(); if (state.tab === "live") pollScores(); }
+    if (t.dataset.tab) { state.tab = t.dataset.tab; save(); render(); if (state.tab === "scores") pollScores(); }
     else if (t.dataset.sport) { state.sport = t.dataset.sport; save(); render(); }
     else if (t.dataset.market) { state.market = t.dataset.market; save(); render(); }
   });
@@ -710,7 +713,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const day = espnDay(e.commence_time);
       boards[`${s.path}|${day}`] = { s, day, sport: e.sport };
     }
-    if (state.tab === "live") {  // the whole scoreboard, for every sport on the page
+    if (state.tab === "scores") {  // the whole scoreboard, for every sport on the page
       const day = espnDay(new Date().toISOString());
       for (const sp of DATA.sports || []) {
         const s = (DATA.espn || {})[sp.key];
