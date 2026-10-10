@@ -257,6 +257,27 @@ class Workspace:
                     if r.get("proven") and r.get("excess_win")
                 },
             )
+        if not self.demo:
+            self.settings = self._with_nfl_wind(self.settings, data_dir)
+
+    @staticmethod
+    def _with_nfl_wind(settings, data_dir):
+        """The NFL windy under is proven on 20 seasons of closing lines (nfl_history.json), far more
+        than one live season, so that proof sets its weight unless the live study already has one."""
+        import json
+        from dataclasses import replace
+
+        from .nflhist import wind_under_weight
+
+        key = "nfl:wind_under"
+        try:
+            res = json.loads((data_dir / "nfl_history.json").read_text())
+        except (OSError, ValueError):
+            return settings
+        weight = wind_under_weight(res)
+        if weight <= 0 or key in settings.spot_weights:
+            return settings
+        return replace(settings, spot_weights={**settings.spot_weights, key: weight})
 
     def _first_seen(self, sports):
         """The first moneyline we logged for every upcoming game, to spot early money on a dog."""

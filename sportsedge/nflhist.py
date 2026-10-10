@@ -447,6 +447,22 @@ def wind_unders(games: list[Game], blind_from: int) -> dict[str, Record]:
     return out
 
 
+WIND_DECIMAL = 1.9  # about -110: turns an ROI gap into win-chance points
+
+
+def wind_under_weight(res: dict | None) -> float:
+    """Win-chance bump the daily board may add to a windy under, from the 20-season blind test.
+
+    Zero unless the blind seasons are proven (60+ bets, ROI minus its standard error above 0)
+    AND the tuning seasons also profited. Otherwise one standard error is shaved off the blind
+    ROI and the rest is turned into win-chance points, so the bump is the part luck can't explain."""
+    w = (res or {}).get("wind_unders") or {}
+    blind, tuned = w.get("blind") or {}, w.get("in_sample") or {}
+    if not (blind.get("proven") and (tuned.get("roi") or 0) > 0 and blind.get("bets", 0) >= PROVEN_BETS):
+        return 0.0
+    return max(0.0, (blind["flat_roi"] - (blind.get("se") or 0)) / WIND_DECIMAL)
+
+
 # ------------------------------------------------------------------- the test
 
 def calibration(pairs: list[tuple[float, int]], bins: int = 10) -> list[dict]:

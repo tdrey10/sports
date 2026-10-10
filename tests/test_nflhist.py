@@ -104,3 +104,32 @@ def test_proven_needs_both_periods():
             "proven": True}
     assert nflhist.held_up({"in_sample": good, "blind": good}) == "  PROVEN"
     assert "blind only" in nflhist.held_up({"in_sample": {**good, "flat_roi": -0.05}, "blind": good})
+
+
+def _wind(blind, tuned):
+    return {"wind_unders": {"blind": blind, "in_sample": tuned}}
+
+
+def test_wind_under_weight_needs_both_proofs():
+    good = {"bets": 161, "flat_roi": 0.10, "roi": 0.10, "se": 0.075, "proven": True}
+    tuned = {"bets": 273, "roi": 0.08, "flat_roi": 0.08, "se": 0.06, "proven": True}
+    w = nflhist.wind_under_weight(_wind(good, tuned))
+    assert abs(w - 0.025 / nflhist.WIND_DECIMAL) < 1e-9
+    assert nflhist.wind_under_weight(_wind(good, {**tuned, "roi": -0.01})) == 0.0  # lost in the tuning seasons
+    assert nflhist.wind_under_weight(_wind({**good, "proven": False}, tuned)) == 0.0
+    assert nflhist.wind_under_weight(_wind({**good, "bets": 59}, tuned)) == 0.0
+    assert nflhist.wind_under_weight({}) == 0.0 and nflhist.wind_under_weight(None) == 0.0
+
+
+def test_workspace_weights_the_nfl_wind_under_only_from_proof(tmp_path):
+    import json
+    from sportsedge.cli import Workspace
+    from sportsedge.edge import Settings
+
+    rec = {"bets": 161, "flat_roi": 0.10, "roi": 0.10, "se": 0.075, "proven": True}
+    (tmp_path / "nfl_history.json").write_text(json.dumps(_wind(rec, {**rec, "bets": 273})))
+    out = Workspace._with_nfl_wind(Settings(), tmp_path)
+    assert 0 < out.spot_weights["nfl:wind_under"] < 0.02
+    keep = Settings(spot_weights={"nfl:wind_under": 0.03})
+    assert Workspace._with_nfl_wind(keep, tmp_path).spot_weights["nfl:wind_under"] == 0.03
+    assert Workspace._with_nfl_wind(Settings(), tmp_path / "missing").spot_weights == {}
