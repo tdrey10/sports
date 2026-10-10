@@ -1901,16 +1901,12 @@
    ],
    "close_odds": -110.0,
    "close_fair": 0.5,
-   "status": "live",
-   "live": {
-    "home": 17.0,
-    "away": 17.0,
-    "detail": "3:55 - 4th"
-   },
-   "final": null,
+   "status": "won",
+   "live": null,
+   "final": "Tulane Green Wave 17 @ Army Black Knights 20",
    "result_value": null,
-   "profit": null,
-   "graded_at": null
+   "profit": 0.8696,
+   "graded_at": "2026-10-10T19:27:06.784261+00:00"
   },
   {
    "id": "453c615d4f9f2ebd",
@@ -1974,9 +1970,9 @@
    "close_fair": 0.5185754937203745,
    "status": "live",
    "live": {
-    "home": 44.0,
+    "home": 45.0,
     "away": 14.0,
-    "detail": "4:34 - 3rd"
+    "detail": "7:38 - 4th"
    },
    "final": null,
    "result_value": null,
@@ -2108,9 +2104,9 @@
    "close_fair": 0.5046406578888563,
    "status": "live",
    "live": {
-    "home": 10.0,
-    "away": 17.0,
-    "detail": "Delayed"
+    "home": 13.0,
+    "away": 24.0,
+    "detail": "5:47 - 3rd"
    },
    "final": null,
    "result_value": null,
@@ -2288,8 +2284,8 @@
    "status": "live",
    "live": {
     "home": 3.0,
-    "away": 0.0,
-    "detail": "11:41 - 3rd"
+    "away": 2.0,
+    "detail": "14:04 - 4th"
    },
    "final": null,
    "result_value": null,
@@ -2359,9 +2355,9 @@
    "close_fair": 0.5767508206681559,
    "status": "live",
    "live": {
-    "home": 2.0,
-    "away": 0.0,
-    "detail": "19:06 - 3rd"
+    "home": 5.0,
+    "away": 1.0,
+    "detail": "2:39 - 3rd"
    },
    "final": null,
    "result_value": null,
@@ -2436,7 +2432,7 @@
    "live": {
     "home": 10.0,
     "away": 14.0,
-    "detail": "12:54 - 2nd"
+    "detail": "1:02 - 2nd"
    },
    "final": null,
    "result_value": null,
@@ -2865,6 +2861,63 @@
    ],
    "close_odds": 100.0,
    "close_fair": 0.4767709538487313,
+   "status": "live",
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "24'"
+   },
+   "final": null,
+   "result_value": null,
+   "profit": null,
+   "graded_at": null
+  },
+  {
+   "id": "3149284470e74985",
+   "created_at": "2026-10-10T19:27:07.069827+00:00",
+   "day": "2026-10-10",
+   "tier": "sharp",
+   "units": 0.5,
+   "sport": "ncaaf",
+   "sport_name": "College Football",
+   "event_id": "401858259",
+   "commence_time": "2026-10-10T19:30:00+00:00",
+   "home": "California Golden Bears",
+   "away": "Virginia Tech Hokies",
+   "matchup": "Virginia Tech Hokies @ California Golden Bears",
+   "market": "h2h",
+   "market_label": "Moneyline",
+   "side": "home",
+   "point": null,
+   "player": null,
+   "selection": "California Golden Bears ML",
+   "headline": "Bally Bet pays +360; Pinnacle's fair price is +346 (22%). That's a 3.1% edge.",
+   "reasons": [
+    "Pinnacle (the sharpest book) has California Golden Bears ML at +304; without its margin that's 22.4% to win.",
+    "Bally Bet pays +360: +3.1% expected value per bet.",
+    "Bet it at this book and price or better; the edge is gone if the price moves."
+   ],
+   "book": "Bally Bet",
+   "odds": 360.0,
+   "model_prob": 0.22414486037190884,
+   "win_prob": 0.22414486037190884,
+   "ev": 0.03106635771078059,
+   "market_prob": 0.22414486037190884,
+   "best_rank": null,
+   "score": null,
+   "spots": [],
+   "current_odds": 360.0,
+   "current_point": null,
+   "current_book": "Bally Bet",
+   "history": [
+    [
+     "2026-10-10T19:27:07.069827+00:00",
+     360.0,
+     null
+    ]
+   ],
+   "close_odds": 360.0,
+   "close_fair": 0.22414486037190884,
    "status": "pending",
    "live": null,
    "final": null,
@@ -2995,7 +3048,7 @@
    "best_rank": null,
    "score": 21.5,
    "spots": [],
-   "current_odds": -112.0,
+   "current_odds": -118.0,
    "current_point": 54.5,
    "current_book": "draftkings",
    "history": [
@@ -3003,10 +3056,15 @@
      "2026-10-10T18:56:23.393429+00:00",
      -112.0,
      54.5
+    ],
+    [
+     "2026-10-10T19:27:07.069827+00:00",
+     -118.0,
+     54.5
     ]
    ],
-   "close_odds": -112.0,
-   "close_fair": 0.5046406578888563,
+   "close_odds": -118.0,
+   "close_fair": 0.5185754937203745,
    "status": "pending",
    "live": null,
    "final": null,
@@ -3058,8 +3116,8 @@
    "best_rank": null,
    "score": 15.4,
    "spots": [],
-   "current_odds": -110.0,
-   "current_point": -10.5,
+   "current_odds": -112.0,
+   "current_point": -10.0,
    "current_book": "draftkings",
    "history": [
     [
@@ -3071,10 +3129,76 @@
      "2026-10-10T18:31:03.476664+00:00",
      -110.0,
      -10.5
+    ],
+    [
+     "2026-10-10T19:27:07.069827+00:00",
+     -112.0,
+     -10.0
     ]
    ],
    "close_odds": -110.0,
    "close_fair": 0.5,
+   "status": "pending",
+   "live": null,
+   "final": null,
+   "result_value": null,
+   "profit": null,
+   "graded_at": null
+  },
+  {
+   "id": "6ed6f54028fe46e8",
+   "created_at": "2026-10-10T19:27:07.069827+00:00",
+   "day": "2026-10-10",
+   "tier": "lean",
+   "units": 0.0,
+   "sport": "ncaaf",
+   "sport_name": "College Football",
+   "event_id": "401858259",
+   "commence_time": "2026-10-10T19:30:00+00:00",
+   "home": "California Golden Bears",
+   "away": "Virginia Tech Hokies",
+   "matchup": "Virginia Tech Hokies @ California Golden Bears",
+   "market": "totals",
+   "market_label": "Total",
+   "side": "over",
+   "point": 52.5,
+   "player": null,
+   "selection": "Over 52.5",
+   "headline": "We project 57.0 total; Over 52.5 hits 52% of the time.",
+   "reasons": [
+    "Projected score: Virginia Tech Hokies 27.1 - California Golden Bears 29.9.",
+    "Virginia Tech Hokies (4-1) @ California Golden Bears (2-3).",
+    "Virginia Tech Hokies coming off a 33-35 loss to Pittsburgh Panthers (Fri 10/2).",
+    "Season goals per game: Virginia Tech Hokies 41.2 scored / 19.8 allowed; California Golden Bears 27.0 scored / 26.6 allowed.",
+    "Last 5: Virginia Tech Hokies 4-1 (avg margin +21.4); California Golden Bears 2-3 (avg margin +0.4).",
+    "Splits: California Golden Bears 1-2 at home; Virginia Tech Hokies 2-0 on the road.",
+    "Power rank: Virginia Tech Hokies #45 vs California Golden Bears #101 (of 138).",
+    "Model 60% \u00b7 market (no-vig) 50% \u00b7 blended 52% \u2192 fair -109.",
+    "Best price -108 at DraftKings (1 books compared).",
+    "California Golden Bears missing: A. Mohammed, C. Vargas.",
+    "Virginia Tech Hokies missing: B. Meadows, B. Davis."
+   ],
+   "book": "draftkings",
+   "odds": -108.0,
+   "model_prob": 0.6040566825831306,
+   "win_prob": 0.5225336772291405,
+   "ev": 0.006361156145011315,
+   "market_prob": 0.4953593421111437,
+   "best_rank": null,
+   "score": 19.6,
+   "spots": [],
+   "current_odds": -108.0,
+   "current_point": 52.5,
+   "current_book": "draftkings",
+   "history": [
+    [
+     "2026-10-10T19:27:07.069827+00:00",
+     -108.0,
+     52.5
+    ]
+   ],
+   "close_odds": -108.0,
+   "close_fair": 0.4953593421111437,
    "status": "pending",
    "live": null,
    "final": null,
