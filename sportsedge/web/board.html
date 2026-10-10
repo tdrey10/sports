@@ -520,7 +520,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const top = open.length ? open.reduce((a, b) => (score(b) > score(a) ? b : a)) : null;
     const best = top ? panel("Best live bet", "The one we'd take right now · highest edge score", row(top, { matchup: true })) : "";
     return best + scoreboard() + panel("Live right now", items.length ? `${items.length} live bets today` : "",
-        `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money · +100 to +2000 · biggest edge", "plus")}</div>`)
+        `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money · +100 to +2000 · best edge & likely to win", "plus")}</div>`)
       + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "");
   }
 

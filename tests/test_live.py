@@ -184,8 +184,12 @@ def test_live_picks_one_likely_winner_and_the_best_plus_money_bet():
     coin.model_prob = 0.55  # a coin flip is never the "most likely to win" pick
     cards = live_cards([fav, dog, small, coin], S(), {"nfl": "NFL"})
     # The -200 favourite breaks the never-worse-than--170 rule, so the -150 side is the likely winner.
-    # Plus money goes to the best bet: the biggest edge, the +180 (EV 12%) over the +105 (EV 7%).
-    assert [(c.tier, c.pick.event_id) for c in cards] == [("live_win", "c"), ("live_plus", "b")]
+    # Plus money goes to the best edge score (edge and chance to win together): the +105 at 52%
+    # (EV 7%) beats the +180 at 40% (EV 12%), whose edge counts less because it usually loses.
+    assert [(c.tier, c.pick.event_id) for c in cards] == [("live_win", "c"), ("live_plus", "d")]
+    strong = make_pick(event_id="h", american=+150, win_prob=0.47, market_prob=0.42, ev=0.14)
+    strong.model_prob = 0.5  # bigger edge AND a fair chance: beats the +105 coin flip
+    assert [c.pick.event_id for c in live_cards([coin, strong], S(), {"nfl": "NFL"})] == ["h"]
     stale = make_pick(event_id="e", american=+400, win_prob=0.27, market_prob=0.20, ev=0.35)
     stale.model_prob = 0.30
     assert not live_cards([stale], S(), {"nfl": "NFL"})  # an edge that big is a stale price: never posts
