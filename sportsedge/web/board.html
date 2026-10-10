@@ -27,7 +27,7 @@ body { margin: 0; background: transparent; color: var(--fg); font: 16px/1.45 var
    It is landscape, so it is sized by height (--mh) and centered: on a phone the two of them stay
    in frame between the guns. A fixed layer (not background-attachment) so it stays put on phones. */
 .photo-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; --mh: max(62vh, 460px);
-  --my: calc(var(--mh) * -0.36);  /* lifted so the two of them sit above the title, not behind it */
+  --my: 0px;  /* on phones the title sits at the top, so the two of them show below it */
   background: linear-gradient(180deg, rgba(var(--tint), .25) 0%, rgba(var(--tint), .15) 20%, rgba(var(--tint), .62) 40%, rgba(var(--tint), .9) 70%, rgba(var(--tint), .96) 100%),
     linear-gradient(180deg, transparent 65%, var(--bg)) 50% var(--my) / 100% var(--mh) no-repeat,
     var(--mascot) 50% var(--my) / auto var(--mh) no-repeat, var(--bg); }
@@ -56,6 +56,10 @@ button, select { font: inherit; color: inherit; }
 
 /* ---------- cover ---------- */
 .mast { min-height: clamp(230px, 40vh, 430px); display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; }
+/* Phones: the title goes to the top of the screen; the photo's two characters show below it. */
+@media (max-width: 760px) {
+  .mast { justify-content: flex-start; min-height: clamp(400px, 60vh, 560px); }
+}
 .eyebrow { margin: 0; font: 700 13px/1.4 var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--silver);
   text-shadow: 0 1px 8px rgba(0, 0, 0, .8); }
 .eyebrow .dot { display: inline-block; width: 8px; height: 8px; margin-right: 8px; vertical-align: 1px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px rgba(224, 58, 62, .25); }
