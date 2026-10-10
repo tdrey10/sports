@@ -120,7 +120,41 @@ def test_lock_and_dog_even_when_no_side_shows_an_edge():
     plain = Settings(min_ev=0.5)
     assert not [c for c in build_cards(scans, plain, provider.now) if c.units == 0]  # no Lock without an edge
     no_units = [c for c in build_cards(scans, Settings(min_ev=0.5, daily_lock=True), provider.now) if c.units == 0]
-    assert [c.tier for c in no_units] == ["lock"]  # the old daily Lock is still there if switched on
+    assert not no_units  # even the old daily Lock never posts a side that loses to its price
+
+
+def test_daily_lock_and_dog_leans_must_beat_break_even():
+    from sportsedge.ledger import break_even
+
+    provider = SampleProvider(seed=5)
+    settings = Settings(min_ev=0.5)  # nothing clears the bar for units today
+    engine = Engine(provider, settings, now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    for scan in scans:
+        for i, p in enumerate(scan.picks):
+            p.ev = 0.01 if i % 3 == 0 else -0.02  # a few sides beat their price, most don't
+    heads = {c.tier: c for c in build_cards(scans, settings, provider.now) if c.tier in ("lock", "dog")}
+    assert set(heads) == {"lock", "dog"}  # one of each, every day
+    assert all(c.units == 0 for c in heads.values())  # no units: a lean, clearly labeled
+    assert all(c.pick.ev > 0 for c in heads.values())  # never a side that loses to its price
+    off = Settings(min_ev=0.5, daily_heads=False)
+    assert not [c for c in build_cards(scans, off, provider.now) if c.tier in ("lock", "dog")]
+
+
+def test_withdraw_keeps_a_daily_lock_lean_only_while_it_beats_break_even():
+    from datetime import timedelta
+
+    from sportsedge.ledger import Ledger
+    from tests.test_ledger import START, card, make_pick
+
+    now = START - timedelta(hours=5)
+    led = Ledger()
+    good = make_pick(event_id="a", american=-120, win_prob=0.58)  # needs 54.5%
+    bad = make_pick(event_id="b", american=-142, win_prob=0.56)  # needs 58.7%: the brother's catch
+    led.publish([card(good, tier="lock", units=0.0), card(bad, tier="dog", units=0.0)], now)
+    led.withdraw(Settings(), now)
+    status = {e.event_id: e.status for e in led.entries.values()}
+    assert status == {"a": "pending", "b": "void"}
 
 
 def test_only_bets_backed_by_a_blind_test_are_posted():

@@ -267,6 +267,9 @@ class Ledger:
                 continue  # live and sharp-value bets have their own checks (and their own CLV record)
             if e.units <= 0:
                 daily_lock = e.tier == "lock" and getattr(settings, "daily_lock", True)
+                # The daily Lock/Dog lean stays only while it still beats its price's break-even.
+                daily_lock = daily_lock or (e.tier in ("lock", "dog") and getattr(settings, "daily_heads", False)
+                                            and e.win_prob > break_even(e.odds))
                 lean = e.tier == "lean" and getattr(settings, "show_leans", True) and e.win_prob >= LEGIT_MIN_WIN
                 if not getattr(settings, "fill", False) and not daily_lock and not lean:  # no maybes: no-unit posts come off the board
                     e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()

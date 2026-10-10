@@ -48,6 +48,9 @@ class Settings:
     # A Lock every day: when nothing backed passes the Lock checks, the day's most likely winner
     # is still posted as the Lock, with no units, clearly labeled and tracked in its own record.
     daily_lock: bool = False  # off: a Lock posts only when a pick has a real edge
+    # A Lock and a Dog of the Day every day: when none qualifies for units, the best side that
+    # still beats its price's break-even (EV > 0) posts as a no-unit lean, clearly labeled.
+    daily_heads: bool = True
     # Optional hold: before this local hour, runs watch the lines but post no picks. Off (None)
     # by default: a pick posts the moment an edge is found, day or night.
     board_hour: int | None = None
