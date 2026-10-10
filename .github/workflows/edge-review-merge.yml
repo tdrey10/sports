@@ -40,5 +40,10 @@ jobs:
           git pull --ff-only origin main
           git merge --no-ff "origin/${GITHUB_REF_NAME}" -m "Merge ${GITHUB_REF_NAME} (daily edge review)"
           python -m pytest -q
-          git push origin main
+          # The engine saves picks to main often: if main moved, take its new data and push again.
+          for i in 1 2 3 4 5; do
+            git push origin main && break
+            git pull --no-rebase --no-edit -X ours origin main
+            sleep $((i * 5))
+          done
           git push origin --delete "${GITHUB_REF_NAME}"
