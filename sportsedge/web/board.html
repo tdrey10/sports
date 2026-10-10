@@ -294,7 +294,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const BOARD = {};  // sport key -> every game on today's ESPN scoreboard (for the Live tab's scoreboard)
   const gameKey = (away, home) => `${(away || "").toLowerCase()}|${(home || "").toLowerCase()}`;
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
-  const SPORTS = [["all", "All"], ["nfl", "NFL"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
+  const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
   const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
   const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
