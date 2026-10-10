@@ -57,6 +57,9 @@ class Settings:
     # True: only bet types proven in the blind study post at all. False: any bet with a real edge
     # (every legitimacy check) posts, at half a unit until its bet type is proven.
     require_proven: bool = False
+    # Money only on proven bet types: a sport and bet type (or spot) that beat the closing line
+    # in the blind tests. Everything else still posts, as a no-unit lean, tracked until it proves out.
+    units_proven_only: bool = True
     # Leans: a positive edge too small to bet (under min_ev), shown with no units and tracked.
     show_leans: bool = True
     # Adaptive trust from our own picks' closing line value: "sport:market" -> stake factor.

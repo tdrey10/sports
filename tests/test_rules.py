@@ -298,3 +298,23 @@ def test_daily_lock_weighs_the_edge_not_just_the_favorite():
         p.market_prob, p.model_prob = p.win_prob - 0.01, p.win_prob
     lock = next(c for c in build_cards(scans, settings, provider.now) if c.tier == "lock")
     assert lock.pick is edge
+
+
+def test_money_only_on_proven_bet_types():
+    from sportsedge.tiers import market_key
+
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    open_cards = [c for c in build_cards(scans, Settings(), provider.now) if c.units > 0]
+    assert open_cards  # no studies loaded: everything is open
+    first = open_cards[0].pick
+    proven_one = Settings(proven={market_key(first)})
+    cards = build_cards(scans, proven_one, provider.now)
+    money = [c for c in cards if c.units > 0]
+    assert money and all(market_key(c.pick) == market_key(first) for c in money)  # only the proven kind
+    unproven = [c for c in cards if market_key(c.pick) != market_key(first) and not c.pick.is_prop]
+    assert unproven and all(c.units == 0 for c in unproven)  # still posted, as no-unit leans
+    assert all(c.tier in ("lean", "lock", "dog") for c in unproven)
+    old_way = build_cards(scans, Settings(proven={market_key(first)}, units_proven_only=False), provider.now)
+    assert any(c.units == 0.5 and market_key(c.pick) != market_key(first) for c in old_way)  # ½ unit before
