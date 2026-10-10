@@ -351,7 +351,21 @@ def build_cards(
             if (kind := losing_kind(pick, settings)) and not best_rank.get(id(pick)):
                 bullets.append(f"Left out of Top bets: {kind} bets in this sport lost in the blind study "
                                "by more than luck.")
-        if settings.units_proven_only and tier in UNIT_TIERS and id(pick) not in lean_ids \
+        # The owner's rule: the Lock is never a lean. Unproven, it carries a small stake, but only
+        # if it passes every bet rule; otherwise it stays a no-unit lean as before.
+        small_lock = (tier == "lock" and settings.lock_units > 0 and not earns_units(pick, in_spots)
+                      and pick.ev > 0 and pick.american >= LOCK_MIN_ODDS and not pick.warnings
+                      and not (ctx and ctx.injuries_unknown))
+        if small_lock:
+            fallback = id(pick) in lean_ids
+            lean_ids.discard(id(pick))
+            best_rank.pop(id(pick), None)  # unproven: not a Top bet
+            bullets.insert(0, f"Small stake ({settings.lock_units:g}u): today's Lock always gets one. This bet type "
+                              "hasn't beaten the closing line in a blind test yet, so it stays small.")
+            if fallback:
+                bullets.insert(0, f"Today's best Lock: the strongest side on the board ({pick.win_prob:.0%} on our "
+                                  f"numbers, {pick.ev:+.1%} edge), -170 or better, injuries known.")
+        elif settings.units_proven_only and tier in UNIT_TIERS and id(pick) not in lean_ids \
                 and not earns_units(pick, in_spots):
             # Money only on proven bet types: this one posts with no units until it proves out.
             bullets.insert(0, "No units: this sport and bet type hasn't beaten the closing line in a blind "
@@ -373,7 +387,7 @@ def build_cards(
         elif id(pick) in lean_ids:
             bullets.insert(0, f"Lean {TIER_LABELS[tier].split(' of ')[0]}: nothing cleared every check today, so this is "
                               "the closest one, posted with no units and tracked with the leans.")
-        elif tier == "lock":
+        elif tier == "lock" and not small_lock:
             sc, cash, _ = scores[id(pick)]
             bullets.insert(0, f"Passed every Lock check: our model {pick.model_prob:.0%} and the market "
                               f"{pick.market_prob:.0%} both make it a clear favorite and agree, it cashes "
@@ -383,7 +397,8 @@ def build_cards(
         cards.append(
             Card(
                 tier=tier,
-                units=units_for(pick, settings) if tier in UNIT_TIERS and id(pick) not in lean_ids else 0.0,
+                units=(settings.lock_units if small_lock
+                       else units_for(pick, settings) if tier in UNIT_TIERS and id(pick) not in lean_ids else 0.0),
                 headline=headline,
                 reasons=bullets,
                 sport=pick.sport,

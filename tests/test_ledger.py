@@ -407,3 +407,13 @@ def test_daily_lock_promotes_a_side_already_posted_as_a_lean():
     (e,) = led.entries.values()
     assert e.tier == "lock" and added == [e]  # the lean became today's Lock, not a skipped duplicate
     assert "lock_lean" in led.taken_today(now)
+
+
+def test_a_small_stake_lock_stays_while_it_beats_break_even():
+    s = Settings(proven=set())
+    L = Ledger()
+    p = make_pick(market="h2h", side="home", point=None, american=-130, win_prob=0.60, ev=0.04)
+    (e,) = L.publish([card(p, tier="lock", units=0.5)], NOW)
+    assert not L.withdraw(s, NOW)  # unproven, but the Lock's small stake is the owner's rule
+    e.win_prob = 0.55  # -130 needs 56.5%
+    assert L.withdraw(s, NOW) == [e] and e.status == "void"
