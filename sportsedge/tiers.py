@@ -230,25 +230,26 @@ def build_cards(
 
     def lean_pool(extra=lambda p: True, source: list[Pick] | None = None) -> list[Pick]:
         """Today's sides for a lean head pick: a positive edge if any game has one, otherwise
-        the best of what is on the board (still a lean: no units), so there is one every day.
-        Games with unknown injuries are a last resort."""
+        (fill mode only) the best of what is on the board. The daily Lock and Dog never take a
+        side that loses to its price: it must beat break-even (EV > 0). Games with unknown
+        injuries are a last resort."""
         pool = source if source is not None else game + [b for b in blocked if not b.is_prop]
         base = [p for p in pool
                 if now < p.commence_time <= soon_cut and not p.warnings and p.american >= settings.max_favorite
                 and extra(p)]
-        for tier_pool in (
-            [p for p in base if p.ev > 0 and p.event_id not in unknown],
-            [p for p in base if p.event_id not in unknown],
-            base,
-        ):
+        tiers = [[p for p in base if p.ev > 0 and p.event_id not in unknown], [p for p in base if p.ev > 0]]
+        if settings.fill:
+            tiers += [[p for p in base if p.event_id not in unknown], base]
+        for tier_pool in tiers:
             if tier_pool:
                 return tier_pool
         return []
+    heads = settings.fill or settings.daily_heads
     if "lock" not in taken:
         locks = [p for p in soon if p.american >= LOCK_MIN_ODDS and solid(p)]
         if locks:
             chosen.append(("lock", max(locks, key=lambda p: (p.win_prob, p.ev))))
-        elif (settings.fill or settings.daily_lock) and "lock_lean" not in taken:
+        elif (heads or settings.daily_lock) and "lock_lean" not in taken:
             # A Lock every day: the most likely winner on today's board (-170 or better, injuries
             # known, our model and the market agreeing first). With no real edge it carries no
             # units, and every daily Lock keeps its own record.
@@ -256,7 +257,7 @@ def build_cards(
                 return (p.market_prob is not None and p.market_prob >= 0.5
                         and abs(p.model_prob - p.market_prob) <= LOCK_MAX_GAP)
             near = lean_pool(lambda p: p.market in ("h2h", "spreads") and p.win_prob >= 0.5,
-                             source=None if settings.fill else every)
+                             source=None if heads else every)
             if near:
                 lock = max(near, key=lambda p: (agree(p), p.win_prob, p.ev))
                 chosen.append(("lock", lock))
@@ -266,7 +267,7 @@ def build_cards(
         dogs = [p for p in soon if DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS and id(p) not in used_now]
         if dogs:
             chosen.append(("dog", max(dogs, key=lambda p: p.ev)))
-        elif settings.fill and "dog_lean" not in taken:
+        elif heads and "dog_lean" not in taken:
             near = lean_pool(lambda p: p.market == "h2h" and DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS
                              and id(p) not in used_now)
             if near:
