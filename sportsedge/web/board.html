@@ -213,6 +213,13 @@ button, select { font: inherit; color: inherit; }
 .move-good { color: var(--win); font-weight: 600; } .move-bad { color: var(--muted); }
 .live-dot { color: var(--accent-2); font-weight: 700; }
 .live-dot::before { content: "● "; }
+.leg-tag { display: inline-block; font-size: .72em; padding: 1px 7px; border-radius: 999px; border: 1px solid rgba(127,127,127,.4); color: var(--muted, #888); vertical-align: middle; }
+.leg-tag.unit { border-color: #2e9e5b; color: #2e9e5b; }
+.leg-tag.weak { border-color: #d98a2b; color: #d98a2b; }
+.leg-tag.top { border-color: #d4a64a; color: #d4a64a; margin: 4px 0; }
+.parlay.top-rated { outline: 2px solid #d4a64a; }
+.grade { display: inline-block; min-width: 1.6em; text-align: center; font-weight: 800; border-radius: 6px; padding: 0 5px; color: #111; }
+.grade.gA { background: #2e9e5b; color: #fff; } .grade.gB { background: #8cc152; } .grade.gC { background: #d4a64a; } .grade.gD { background: #c0392b; color: #fff; }
 .scores { list-style: none; padding: 0; margin: 6px 0 0; }
 .scores li { padding: 6px 0; border-bottom: 1px solid rgba(127,127,127,.18); }
 details.more summary { cursor: pointer; color: var(--silver); font-size: 14px; font-weight: 700; list-style: none; }
@@ -438,24 +445,36 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   // Parlays of the day: posted once, from the best bets, one leg per game.
   const byId = () => new Map(DATA.entries.map((e) => [e.id, e]));
   const PSTATUS = { won: "Won", lost: "Lost", push: "Push", void: "Void", live: "In play", pending: "Open" };
-  function parlayCard(p, ids) {
+  // How we rate a parlay: its edge on our numbers (our chance to hit x the payout, minus the
+  // stake), graded A-D, plus each leg's win chance against what its price needs.
+  const parlayEdge = (p) => p.hit_prob * p.decimal - 1;
+  const grade = (x) => (x >= 0.10 ? "A" : x >= 0.03 ? "B" : x >= -0.05 ? "C" : "D");
+  function parlayCard(p, ids, top) {
+    const margin = (e, i) => e.win_prob - implied(p.leg_odds[i]);
+    const live = p.legs.map((id, i) => [ids.get(id), i]).filter(([e]) => e);
+    const weakest = live.length > 1 ? live.reduce((a, b) => (margin(b[0], b[1]) < margin(a[0], a[1]) ? b : a))[0] : null;
     const legs = p.legs.map((id, i) => {
       const e = ids.get(id);
       if (!e) return `<li><small>leg no longer shown</small></li>`;
       const c = SETTLED[e.status] ? e.status.replace("half_", "") : "";
-      return `<li class="${c}"><b>${esc(e.selection)}</b> ${odds(p.leg_odds[i])}<br><small>${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}${SETTLED[e.status] ? " · " + SETTLED[e.status] : ""}</small></li>`;
+      const kind = e.units > 0 ? `<span class="leg-tag unit">Unit pick</span>` : `<span class="leg-tag">Lean</span>`;
+      const weak = e === weakest && !SETTLED[e.status] ? ` <span class="leg-tag weak">weakest leg</span>` : "";
+      return `<li class="${c}"><b>${esc(e.selection)}</b> ${odds(p.leg_odds[i])} ${kind}${weak}<br><small>wins ${pct(e.win_prob)} · needs ${pct(implied(p.leg_odds[i]))} · ${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}${SETTLED[e.status] ? " · " + SETTLED[e.status] : ""}</small></li>`;
     }).join("");
     const st = PSTATUS[p.status] || p.status;
     const res = p.profit != null ? ` ${signed(p.profit, 2)}u` : "";
-    return `<div class="parlay">${p.status === "won" ? `<span class="stamp">Cashed</span>` : ""}<span class="kind">${p.kind === "dabble" ? "Wanna Dabble?" : "🔥 The Heat"} · ${p.size}-team</span>
+    const ed = parlayEdge(p), g = grade(ed);
+    return `<div class="parlay${top ? " top-rated" : ""}">${p.status === "won" ? `<span class="stamp">Cashed</span>` : ""}<span class="kind">${p.kind === "dabble" ? "Wanna Dabble?" : "🔥 The Heat"} · ${p.size}-team</span>
+      ${top ? `<span class="leg-tag top">⭐ Top rated today</span>` : ""}
       <div class="price"><b>${odds(p.american)}</b><span class="muted">${p.units > 0 ? p.units + "u" : "no units, tracked"} · $10 pays $${(10 * p.decimal).toFixed(2)}</span></div>
-      <p class="small"><b>Hits ${pct(p.hit_prob, p.hit_prob < 0.1 ? 1 : 0)}</b> of the time on our numbers <span class="muted">(about 1 in ${Math.max(1, Math.round(1 / p.hit_prob))})</span></p>
+      <p class="small"><span class="grade g${g}">${g}</span> <b>Edge ${signed(ed * 100, 1)}%</b> on our numbers · <b>hits ${pct(p.hit_prob, p.hit_prob < 0.1 ? 1 : 0)}</b> <span class="muted">(about 1 in ${Math.max(1, Math.round(1 / p.hit_prob))})</span></p>
       <ol>${legs}</ol>
       <div class="meta"><span class="tag ${p.status}">${st}</span><span class="muted">${res}</span></div></div>`;
   }
   function viewParlays() {
     const ps = DATA.parlays || [], ids = byId();
-    const todays = ps.filter((p) => p.day === today()).sort((a, b) => (a.kind === "dabble") - (b.kind === "dabble") || a.size - b.size);
+    const todays = ps.filter((p) => p.day === today()).sort((a, b) => parlayEdge(b) - parlayEdge(a));  // best rated first
+    const topId = todays.length > 1 ? todays[0].id : null;
     const earlier = ps.filter((p) => p.day !== today()).sort((a, b) => b.day.localeCompare(a.day) || a.size - b.size);
     const note = "";
     const st = (DATA.stats && DATA.stats.parlays) || {};
@@ -464,8 +483,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       .map(([n, name]) => { const s = st[n] || { won: 0, lost: 0, units: 0 };
       return `<tr><td>${name}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 2)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("");
     return panel("Parlays of the day", "The Heat when every leg is a unit play · Wanna Dabble? every day · most likely winners first",
-        (todays.length ? `<div class="grid two">${todays.map((p) => parlayCard(p, ids)).join("")}</div>` : "") + note
-        + `<p class="small muted"><b>🔥 The Heat</b>: every leg is a real unit play, so it's rare. Stakes stay small: ½u on a 2-team, ¼u on a 3- or 4-team, 0.1u on an 8-team. <b>Wanna Dabble?</b>: a 2-, 3-, 4-, 5- and 8-team every day when possible, ½u each, leans filling in where the unit plays run out. Every leg has to win, so parlays lose more often than straight bets.</p>`)
+        (todays.length ? `<div class="grid two">${todays.map((p) => parlayCard(p, ids, p.id === topId)).join("")}</div>` : "") + note
+        + `<p class="small muted"><b>🔥 The Heat</b>: every leg is a real unit play, so it's rare. Stakes stay small: ½u on a 2-team, ¼u on a 3- or 4-team, 0.1u on an 8-team. <b>Wanna Dabble?</b>: a 2-, 3-, 4-, 5- and 8-team every day when possible, no units, leans filling in where the unit plays run out. Best rated first: the grade is the parlay's edge on our numbers (A +10% or more, B +3%, C about even, D below −5%), and each leg shows its win chance against what its price needs. Every leg has to win, so parlays lose more often than straight bets.</p>`)
       + panel("Parlay record", "Kept apart from the straight-bet record",
         `<div class="table-wrap"><table><thead><tr><th>Parlay</th><th>Record</th><th>Profit</th><th>ROI</th></tr></thead><tbody>${rows}</tbody></table></div>`)
       + (earlier.length ? panel("Earlier parlays", "Last 7 days", `<div class="grid two">${earlier.map((p) => parlayCard(p, ids)).join("")}</div>`) : "");
