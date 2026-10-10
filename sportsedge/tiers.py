@@ -319,6 +319,10 @@ def build_cards(
     ranked = sorted(contenders, key=lambda p: scores[id(p)][0], reverse=True)[:slots]
     best_rank = {id(p): best_taken + i + 1 for i, p in enumerate(ranked)}
 
+    def earns_units(pick: Pick, spots: list[str]) -> bool:
+        """Proven blind: its sport and bet type, or a spot it is in (e.g. the NFL windy under)."""
+        return is_proven(pick, settings) or any(f"{pick.sport}:{k}" in settings.spot_weights for k in spots)
+
     cards = []
     for tier, pick in chosen:
         scan = by_event.get(pick.event_id)
@@ -347,7 +351,17 @@ def build_cards(
             if (kind := losing_kind(pick, settings)) and not best_rank.get(id(pick)):
                 bullets.append(f"Left out of Top bets: {kind} bets in this sport lost in the blind study "
                                "by more than luck.")
-        if tier in UNIT_TIERS and not is_proven(pick, settings):
+        if settings.units_proven_only and tier in UNIT_TIERS and id(pick) not in lean_ids \
+                and not earns_units(pick, in_spots):
+            # Money only on proven bet types: this one posts with no units until it proves out.
+            bullets.insert(0, "No units: this sport and bet type hasn't beaten the closing line in a blind "
+                              "test yet, so it is tracked as a lean until it proves itself.")
+            if tier in ("lock", "dog"):
+                lean_ids.add(id(pick))  # still today's Lock/Dog, with no units
+            else:
+                tier = "lean"
+            best_rank.pop(id(pick), None)
+        elif tier in UNIT_TIERS and not is_proven(pick, settings):
             bullets.append("Sized at ½ unit: this sport and bet type hasn't beaten the closing line in a blind test yet.")
         if ctx and ctx.injuries_unknown:
             bullets.insert(0, f"No bet: no injury report for {', '.join(ctx.injuries_unknown)}, "
