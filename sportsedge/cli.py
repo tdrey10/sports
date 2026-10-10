@@ -255,6 +255,7 @@ class Workspace:
             )
         if not self.demo:
             self.settings = self._with_nfl_wind(self.settings, data_dir)
+            self.settings = self._with_history_spots(self.settings, data_dir)
 
     @staticmethod
     def _with_nfl_wind(settings, data_dir):
@@ -274,6 +275,22 @@ class Workspace:
         if weight <= 0 or key in settings.spot_weights:
             return settings
         return replace(settings, spot_weights={**settings.spot_weights, key: weight})
+
+    @staticmethod
+    def _with_history_spots(settings, data_dir):
+        """Spots proven on eight seasons of NBA/NHL/MLB/college hoops lines (espn_history.json)
+        set their weight unless the live study already has one."""
+        import json
+        from dataclasses import replace
+
+        from .espnhist import spot_weights
+
+        try:
+            res = json.loads((data_dir / "espn_history.json").read_text())
+        except (OSError, ValueError):
+            return settings
+        new = {k: w for k, w in spot_weights(res).items() if k not in settings.spot_weights}
+        return replace(settings, spot_weights={**settings.spot_weights, **new}) if new else settings
 
     def _first_seen(self, sports):
         """The first moneyline we logged for every upcoming game, to spot early money on a dog."""
@@ -577,6 +594,29 @@ def cmd_ncaaf_history(args) -> int:
     return 0
 
 
+def cmd_espn_history(args) -> int:
+    from . import espnhist
+
+    data_dir = Path(args.data_dir)
+    src = Path(args.src) if args.src else None
+    if args.fetch:
+        try:
+            src = espnhist.fetch(data_dir / "_src" / "espn-archive")
+        except Exception as exc:  # keep testing on the saved seasons when the source is unreachable
+            print(f"could not fetch {espnhist.REPO}: {exc}")
+    out = {}
+    for sport in args.sports:
+        folder = data_dir / "lines" / sport
+        if src is not None and (src / sport).exists():
+            print(f"{espnhist.build(src / sport, folder, sport)} {sport.upper()} games saved")
+        if not any(folder.glob("*.csv.gz")):
+            continue
+        out[sport] = espnhist.run(folder, sport)
+        print(espnhist.report(out[sport], sport) + "\n")
+    (data_dir / "espn_history.json").write_text(json.dumps(out, indent=1, default=str))
+    return 0
+
+
 def cmd_sports(_args) -> int:
     rows = [[k, c.name, c.odds_key, c.espn_path, len(c.props)] for k, c in SPORTS.items()]
     print(report.table(["Key", "Name", "Odds API key", "ESPN path", "Prop markets"], rows, "llllr"))
@@ -716,6 +756,13 @@ def build_parser() -> argparse.ArgumentParser:
     nc = sub.add_parser("ncaaf-history", help="college football blind test on 2006-2022 lines (cfbfastR, free)")
     nc.add_argument("--data-dir", default="data")
     nc.set_defaults(func=cmd_ncaaf_history)
+
+    eh = sub.add_parser("espn-history", help="NBA/NHL/MLB/college hoops blind test on 2018+ closing lines")
+    eh.add_argument("sports", nargs="*", default=["nba", "nhl", "mlb", "ncaab"])
+    eh.add_argument("--fetch", action="store_true", help="refresh the seasons from the public source archive first")
+    eh.add_argument("--src", help="a local copy of the source's data/sports/games folder")
+    eh.add_argument("--data-dir", default="data")
+    eh.set_defaults(func=cmd_espn_history)
 
     sub.add_parser("sports", help="list supported sports").set_defaults(func=cmd_sports)
     return p

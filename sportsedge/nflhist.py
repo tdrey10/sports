@@ -22,6 +22,7 @@ These are closing lines, so they show whether a spot beat the close, not the ope
 from __future__ import annotations
 
 import csv
+import gzip
 import itertools
 import math
 from collections import defaultdict
@@ -128,8 +129,10 @@ class Game:
 
 def load(folder: Path) -> list[Game]:
     games = []
-    for f in sorted(Path(folder).glob("*.csv")):
-        for r in csv.DictReader(open(f, newline="")):
+    files = sorted(Path(folder).glob("*.csv")) + sorted(Path(folder).glob("*.csv.gz"))
+    for f in files:
+        opener = gzip.open if f.suffix == ".gz" else open
+        for r in csv.DictReader(opener(f, "rt", newline="")):
             games.append(Game(
                 season=int(r["season"]), week=int(r["week"]), day=date.fromisoformat(r["gameday"]),
                 weekday=r["weekday"], home=r["home_team"], away=r["away_team"],
