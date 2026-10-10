@@ -344,7 +344,8 @@ class Workspace:
             if sharp.due(now) or getattr(self.args, "sharp_now", False):
                 trust = {k: v["factor"] for k, v in self.ledger.clv_trust(now).items()}
                 added = self.ledger.publish(sharp.run(resolve([",".join(sharp.SPORTS)]), self.provider, now,
-                                                      clv_trust=trust), now)
+                                                      clv_trust=trust,
+                                                      force=getattr(self.args, "sharp_now", False)), now)
                 print(f"sharp value: posted {len(added)}")
         from . import archive
 
@@ -668,7 +669,7 @@ def build_parser() -> argparse.ArgumentParser:
     rn = sub.add_parser("run", help="one cycle: scan, publish picks, track lines, grade, build the dashboard")
     board_opts(rn)
     rn.add_argument("--sharp-now", action="store_true",
-                    help="check sharp value (Pinnacle vs US books) now, not just at its two daily times")
+                    help="check sharp value (Pinnacle vs US books) now, not just at its daily times")
     rn.add_argument("--scores-only", action="store_true",
                     help="only update live scores and grade (ESPN only, no odds credits)")
     rn.set_defaults(func=cmd_run)

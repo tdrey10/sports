@@ -42,14 +42,62 @@ def test_sharp_cards_match_the_espn_game_and_pause_on_bad_clv():
     assert cards(SPORTS["nfl"], [EVENT], [], NOW) == []  # no matching ESPN game: not gradeable, not posted
 
 
-def test_checks_twice_a_day():
-    assert due(NOW) and not due(NOW.replace(hour=20)) and not due(NOW.replace(minute=50))
-
-
-def test_extra_saturday_morning_check_for_early_college_kickoffs():
+def test_checks_up_to_four_times_a_day():
     from datetime import datetime, timezone
 
+    day = datetime(2026, 10, 14, 0, 15, tzinfo=timezone.utc)  # a Wednesday
+    assert [h for h in range(24) if due(day.replace(hour=h))] == [0, 15, 19, 22]
+    assert not due(day.replace(minute=50))
+
+
+def test_saturday_morning_check_is_core_for_early_college_kickoffs():
+    from datetime import datetime, timezone
+
+    from sportsedge.sharp import is_core
+
     sat = datetime(2026, 10, 10, 15, 15, tzinfo=timezone.utc)  # a Saturday, 8:15 AM Pacific
-    assert due(sat)
-    assert not due(sat.replace(day=9))  # Friday at the same hour: no
-    assert due(sat.replace(hour=19)) and due(sat.replace(day=9, hour=19))  # the usual checks stay
+    assert due(sat) and is_core(sat)
+    assert due(sat.replace(day=9)) and not is_core(sat.replace(day=9))  # Friday 8 AM: an extra
+    assert is_core(sat.replace(hour=19)) and is_core(sat.replace(day=9, hour=0))
+
+
+def test_extra_checks_only_when_the_month_can_afford_them():
+    from datetime import datetime, timezone
+
+    from sportsedge.sharp import CREDIT_FLOOR, affordable
+
+    now = datetime(2026, 10, 20, 22, 0, tzinfo=timezone.utc)  # 12 days left in October
+    need = 4 * 12 * 4  # 4 sports x 12 days x 4 checks
+    assert affordable(CREDIT_FLOOR + need, 4, now, core=False)
+    assert not affordable(CREDIT_FLOOR + need - 1, 4, now, core=False)  # extras pause first
+    assert affordable(CREDIT_FLOOR + 4, 4, now, core=True)  # core checks run to the floor
+    assert not affordable(CREDIT_FLOOR + 3, 4, now, core=True)
+    assert not affordable(None, 4, now, core=False) and affordable(None, 4, now, core=True)
+
+
+def test_run_spends_requests_only_on_sports_with_games_soon():
+    from datetime import datetime, timedelta, timezone
+
+    from sportsedge.sharp import run
+
+    now = datetime(2026, 10, 14, 19, 5, tzinfo=timezone.utc)
+
+    class Client:
+        api_key, remaining, calls = "k", 400.0, []
+
+        def active(self):
+            return {SPORTS["nfl"].odds_key, SPORTS["nhl"].odds_key}
+
+        def odds(self, cfg):
+            self.calls.append(cfg.key)
+            self.remaining -= 1
+            return []
+
+    class Provider:
+        def game_results(self, cfg, start, end):
+            soon = now + timedelta(hours=5 if cfg.key == "nhl" else 72)  # NFL's next game is days away
+            return [type("G", (), {"date": soon, "home": "H", "away": "A", "event_id": "1"})()]
+
+    c = Client()
+    assert run([SPORTS["nfl"], SPORTS["nhl"]], Provider(), now, client=c) == []
+    assert c.calls == ["nhl"]  # no request spent on the NFL today
