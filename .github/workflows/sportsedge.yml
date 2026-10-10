@@ -92,6 +92,13 @@ jobs:
         continue-on-error: true
         run: hambino ncaaf-history
 
+      # NBA, NHL, MLB and college basketball blind tests on 2018+ closing lines
+      # (public ESPN archive, refreshed each run; saved in data/lines/<sport>).
+      - name: NBA/NHL/MLB/college hoops history test
+        if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
+        continue-on-error: true
+        run: hambino espn-history --fetch
+
       - name: Full engine cycle
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}  # optional: sharp value (Pinnacle vs US books)
@@ -114,7 +121,7 @@ jobs:
           git config user.email "sportsedge-bot@users.noreply.github.com"
           git add data/ledger.json data/brain.json
           # One path at a time: git add fails as a whole if any path is missing.
-          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
+          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
             if [ -e "$p" ]; then git add "$p"; fi
           done
           git diff --cached --quiet || git commit -m "Update pick ledger"
