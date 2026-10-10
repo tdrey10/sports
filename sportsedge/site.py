@@ -11,7 +11,7 @@ from pathlib import Path
 from .brain import BrainReport
 from .spots import SPOTS
 from .ledger import Ledger
-from .sports import SportConfig
+from .sports import SPORTS, SportConfig
 
 KEEP_DAYS = 30  # settled picks shown in "latest results" (stats always use the full ledger)
 
@@ -44,6 +44,8 @@ def build_data(
         "demo": demo,
         "live_note": live_note,
         "sports": [{"key": c.key, "name": c.name} for c in shown],
+        # ESPN scoreboard paths, so the page can pull live scores itself between engine runs.
+        "espn": {k: {"path": c.espn_path, "groups": c.espn_groups} for k, c in SPORTS.items()},
         "entries": entries,
         "stats": ledger.stats(now),
         "brains": [b.to_dict() for b in brains.values()],

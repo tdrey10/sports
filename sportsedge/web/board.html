@@ -274,6 +274,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 (function () {
   "use strict";
   let DATA = JSON.parse(document.getElementById("edge-data").textContent);
+  const SCORES = {};  // ESPN event id (and "away|home") -> {home, away, detail, final}: pulled by the page itself
+  const gameKey = (away, home) => `${(away || "").toLowerCase()}|${(home || "").toLowerCase()}`;
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
@@ -337,6 +339,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const c = e.status.replace("half_", "");
       const p = e.units > 0 && e.profit != null ? ` ${signed(e.profit, 2)}u` : "";
       return `<span class="tag ${c}">${SETTLED[e.status]}</span> <span class="muted">${esc(e.final || "")}${e.result_value != null ? " · finished " + e.result_value : ""}${p}</span>`;
+    }
+    const s = SCORES[e.event_id] || SCORES[gameKey(e.away, e.home)];
+    if (s && !SETTLED[e.status] && e.status !== "void") {
+      return s.final
+        ? `<span class="muted">Final: ${esc(e.away)} ${s.away ?? ""}, ${esc(e.home)} ${s.home ?? ""} · grading soon</span>`
+        : `<span class="live-dot">${esc(e.away)} ${s.away ?? ""}, ${esc(e.home)} ${s.home ?? ""} · ${esc(s.detail || "")}</span>`;
     }
     if (e.status === "live" && e.live) return `<span class="live-dot">${esc(e.away)} ${e.live.away ?? ""}, ${esc(e.home)} ${e.live.home ?? ""} · ${esc(e.live.detail || "")}</span>`;
     return "";
@@ -628,5 +636,45 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   if (location.protocol.startsWith("http")) {
     setInterval(async () => { try { const r = await fetch("data.json", { cache: "no-store" }); if (r.ok) { DATA = await r.json(); render(); } } catch (e) {} }, 60000);
   }
+
+  // Live scores: every 30 seconds, for picks whose game has started and isn't graded yet, read
+  // ESPN's free public scoreboard straight from the browser (the engine itself only runs every
+  // 30-60 minutes). One request per sport and game day; nothing is fetched when no game is on.
+  const espnDay = (iso) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric",
+    month: "2-digit", day: "2-digit" }).format(new Date(iso)).replaceAll("-", "");
+  async function pollScores() {
+    const now = Date.now();
+    const boards = {};
+    for (const e of DATA.entries || []) {
+      const t = new Date(e.commence_time).getTime();
+      if (SETTLED[e.status] || e.status === "void" || t > now || now - t > 10 * 3600e3) continue;
+      const s = (DATA.espn || {})[e.sport];
+      if (!s) continue;
+      const day = espnDay(e.commence_time);
+      boards[`${s.path}|${day}`] = { s, day };
+    }
+    const before = JSON.stringify(SCORES);
+    await Promise.all(Object.values(boards).map(async ({ s, day }) => {
+      try {
+        const q = new URLSearchParams({ dates: day, limit: "500" });
+        if (s.groups) q.set("groups", s.groups);
+        const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${s.path}/scoreboard?${q}`);
+        if (!r.ok) return;
+        for (const ev of (await r.json()).events || []) {
+          const c = (ev.competitions || [])[0] || {};
+          const side = (w) => (c.competitors || []).find((x) => x.homeAway === w) || {};
+          const st = (ev.status || {}).type || {};
+          if (st.state === "pre") continue;
+          const score = { home: side("home").score, away: side("away").score,
+            detail: st.shortDetail || st.detail || "", final: !!st.completed };
+          SCORES[ev.id] = score;
+          SCORES[gameKey((side("away").team || {}).displayName, (side("home").team || {}).displayName)] = score;
+        }
+      } catch (err) {}  // no live score this time: the card keeps the engine's last one
+    }));
+    if (JSON.stringify(SCORES) !== before) render();
+  }
+  pollScores();
+  setInterval(pollScores, 30000);
 })();
 </script>

@@ -383,3 +383,14 @@ def test_withdraw_uses_the_settings_favorite_limit():
     from sportsedge.ledger import Ledger
     src = inspect.getsource(Ledger.withdraw)
     assert "settings.max_favorite" in src and "-150" not in src
+
+
+def test_page_data_carries_espn_scoreboards_for_live_scores():
+    # The page pulls live scores from ESPN itself between engine runs; it needs each sport's path.
+    from datetime import datetime, timezone
+
+    data = build_data(Ledger(), {}, {}, resolve("nhl,ncaaf"), datetime(2026, 10, 10, tzinfo=timezone.utc))
+    assert data["espn"]["nhl"] == {"path": "hockey/nhl", "groups": None}
+    assert data["espn"]["ncaaf"]["groups"] == "80"  # college boards need the division group
+    html = render_html(data)
+    assert "site.api.espn.com/apis/site/v2/sports/" in html and "pollScores" in html
