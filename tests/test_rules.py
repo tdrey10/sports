@@ -311,10 +311,30 @@ def test_money_only_on_proven_bet_types():
     first = open_cards[0].pick
     proven_one = Settings(proven={market_key(first)})
     cards = build_cards(scans, proven_one, provider.now)
-    money = [c for c in cards if c.units > 0]
+    money = [c for c in cards if c.units > 0 and c.tier != "lock"]  # the daily Lock: see the next test
     assert money and all(market_key(c.pick) == market_key(first) for c in money)  # only the proven kind
-    unproven = [c for c in cards if market_key(c.pick) != market_key(first) and not c.pick.is_prop]
+    unproven = [c for c in cards if market_key(c.pick) != market_key(first) and not c.pick.is_prop
+                and c.tier != "lock"]
     assert unproven and all(c.units == 0 for c in unproven)  # still posted, as no-unit leans
     assert all(c.tier in ("lean", "lock", "dog") for c in unproven)
-    old_way = build_cards(scans, Settings(proven={market_key(first)}, units_proven_only=False), provider.now)
+    old_way = build_cards(scans, Settings(proven={market_key(first)}, units_proven_only=False, lock_units=0),
+                          provider.now)
     assert any(c.units == 0.5 and market_key(c.pick) != market_key(first) for c in old_way)  # ½ unit before
+
+
+def test_the_lock_is_never_a_lean_when_it_passes_every_rule():
+    """Owner's rule: an unproven Lock still carries a small stake (never a lean), but only if it
+    passes every bet rule; it is kept out of the Top bets, and lock_units=0 restores the lean."""
+    from sportsedge.ledger import break_even
+
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    nothing_proven = Settings(proven=set())
+    (lock,) = [c for c in build_cards(scans, nothing_proven, provider.now) if c.tier == "lock"]
+    assert lock.units == 0.5 and lock.best_rank is None
+    assert lock.pick.ev > 0 and lock.pick.american >= -170
+    assert lock.pick.win_prob > break_even(lock.pick.american)
+    assert lock.reasons[0].startswith(("Small stake", "Today's best Lock"))
+    (off,) = [c for c in build_cards(scans, Settings(proven=set(), lock_units=0), provider.now) if c.tier == "lock"]
+    assert off.units == 0

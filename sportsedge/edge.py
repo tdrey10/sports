@@ -51,6 +51,10 @@ class Settings:
     # A Lock and a Dog of the Day every day: when none qualifies for units, the best side that
     # still beats its price's break-even (EV > 0) posts as a no-unit lean, clearly labeled.
     daily_heads: bool = True
+    # The owner's rule: the Lock of the Day is never a lean. When it isn't a proven bet type it
+    # still carries this small stake, as long as it passes every bet rule (-170 or better, a
+    # positive edge that beats the price's break-even, injuries known). 0 turns it off.
+    lock_units: float = 0.5
     # Optional hold: before this local hour, runs watch the lines but post no picks. Off (None)
     # by default: a pick posts the moment an edge is found, day or night.
     board_hour: int | None = None
