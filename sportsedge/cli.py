@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
 import sys
@@ -528,6 +529,27 @@ def cmd_ufc(args) -> int:
     return 0
 
 
+def cmd_data(args) -> int:
+    from . import audit
+
+    keys = None if args.sports == ["all"] else args.sports
+    print(audit.report(audit.audit(Path(args.data_dir), keys)))
+    return 0
+
+
+def cmd_nfl_history(args) -> int:
+    from . import nflhist
+
+    folder = Path(args.data_dir) / "lines" / "nfl"
+    if args.fetch:
+        print(f"{nflhist.fetch(folder)} NFL games saved from nflverse")
+    res = nflhist.run(nflhist.load(folder))
+    print(nflhist.report(res))
+    out = Path(args.data_dir) / "nfl_history.json"
+    out.write_text(json.dumps(res, indent=1, default=str))
+    return 0
+
+
 def cmd_sports(_args) -> int:
     rows = [[k, c.name, c.odds_key, c.espn_path, len(c.props)] for k, c in SPORTS.items()]
     print(report.table(["Key", "Name", "Odds API key", "ESPN path", "Prop markets"], rows, "llllr"))
@@ -653,6 +675,16 @@ def build_parser() -> argparse.ArgumentParser:
     uf = sub.add_parser("ufc", help="UFC: refresh fights and lines, replay fighter ratings (research until proven)")
     uf.add_argument("--data-dir", default="data")
     uf.set_defaults(func=cmd_ufc)
+
+    da = sub.add_parser("data", help="audit the data archive: games, closing lines, snapshots, props, box scores")
+    da.add_argument("sports", nargs="*", default=["all"], help="sport keys (default: every archived sport)")
+    da.add_argument("--data-dir", default="data")
+    da.set_defaults(func=cmd_data)
+
+    nh = sub.add_parser("nfl-history", help="NFL blind test on every season of closing lines since 2006 (nflverse)")
+    nh.add_argument("--fetch", action="store_true", help="download the latest nflverse games first")
+    nh.add_argument("--data-dir", default="data")
+    nh.set_defaults(func=cmd_nfl_history)
 
     sub.add_parser("sports", help="list supported sports").set_defaults(func=cmd_sports)
     return p
