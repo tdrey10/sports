@@ -53,4 +53,8 @@ jobs:
           git config user.email "sportsedge-bot@users.noreply.github.com"
           git add data/ledger.json data/brain.json
           git diff --cached --quiet || git commit -m "Update pick ledger (live session)"
-          git pull --rebase --autostash && git push
+          for i in 1 2 3 4 5; do
+            git pull --rebase --autostash -X theirs && git push && exit 0
+            echo "save attempt $i failed; retrying"; git rebase --abort 2>/dev/null || true; sleep $((i * 5))
+          done
+          exit 1

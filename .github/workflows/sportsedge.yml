@@ -119,7 +119,12 @@ jobs:
           done
           git diff --cached --quiet || git commit -m "Update pick ledger"
           # If another run saved in the meantime, this run's data wins any clash (it is newer).
-          git pull --rebase --autostash -X theirs && git push
+          # Retry: main can move while we push (another run, or a merged change).
+          for i in 1 2 3 4 5; do
+            git pull --rebase --autostash -X theirs && git push && exit 0
+            echo "save attempt $i failed; retrying"; git rebase --abort 2>/dev/null || true; sleep $((i * 5))
+          done
+          exit 1
 
       # The Home Screen site on Cloudflare Pages (free): the duck as the app icon, "Hambino" as
       # its name. Runs once the repository secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are set.
@@ -137,7 +142,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           funky page --out "$RUNNER_TEMP/page.html" --app-dir "$RUNNER_TEMP/hambino"
-          npx --yes wrangler@3.114.0 pages project create hambino --production-branch=main || true
+          # The project already exists after the first run; that "error" is expected, so it is silenced.
+          npx --yes wrangler@3.114.0 pages project create hambino --production-branch=main >/dev/null 2>&1 || true
           npx --yes wrangler@3.114.0 pages deploy "$RUNNER_TEMP/hambino" --project-name=hambino --branch=main --commit-dirty=true
 
       - name: Keep the dashboard as a private download
