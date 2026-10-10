@@ -1905,7 +1905,7 @@
    "live": {
     "home": 7.0,
     "away": 0.0,
-    "detail": "15:00 - 2nd"
+    "detail": "9:08 - 2nd"
    },
    "final": null,
    "result_value": null,
@@ -1976,7 +1976,7 @@
    "live": {
     "home": 7.0,
     "away": 0.0,
-    "detail": "11:42 - 1st"
+    "detail": "4:42 - 1st"
    },
    "final": null,
    "result_value": null,
@@ -2106,8 +2106,12 @@
    ],
    "close_odds": -112.0,
    "close_fair": 0.5046406578888563,
-   "status": "pending",
-   "live": null,
+   "status": "live",
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "12:59 - 1st"
+   },
    "final": null,
    "result_value": null,
    "profit": null,
@@ -2227,6 +2231,68 @@
    "graded_at": "2026-10-08T22:59:32.781350+00:00"
   },
   {
+   "id": "b81b9c8f53890628",
+   "created_at": "2026-10-10T16:55:27.379430+00:00",
+   "day": "2026-10-10",
+   "tier": "lean",
+   "units": 0.0,
+   "sport": "ncaaf",
+   "sport_name": "College Football",
+   "event_id": "401869843",
+   "commence_time": "2026-10-10T17:00:00+00:00",
+   "home": "App State Mountaineers",
+   "away": "Old Dominion Monarchs",
+   "matchup": "Old Dominion Monarchs @ App State Mountaineers",
+   "market": "spreads",
+   "market_label": "Spread",
+   "side": "home",
+   "point": -8.5,
+   "player": null,
+   "selection": "App State Mountaineers -8.5",
+   "headline": "We project App State Mountaineers to win by 15.1; laying 8.5 at -112 covers 53% of the time.",
+   "reasons": [
+    "Projected score: Old Dominion Monarchs 19.3 - App State Mountaineers 34.3.",
+    "Old Dominion Monarchs (1-4) @ App State Mountaineers (3-1).",
+    "App State Mountaineers coming off a 31-41 loss to NC State Wolfpack (Sat 9/26).",
+    "Rest edge: App State Mountaineers (14 days vs 7).",
+    "Season goals per game: Old Dominion Monarchs 19.8 scored / 32.4 allowed; App State Mountaineers 34.8 scored / 22.2 allowed.",
+    "Last 5: Old Dominion Monarchs 1-4 (avg margin -12.6); App State Mountaineers 3-1 (avg margin +12.5).",
+    "Splits: App State Mountaineers 2-0 at home; Old Dominion Monarchs 0-2 on the road.",
+    "Power rank: Old Dominion Monarchs #106 vs App State Mountaineers #78 (of 138).",
+    "Upset risk: 24% chance Old Dominion Monarchs wins outright.",
+    "Track record: teams we gave a 75% chance to win outright won 74% of the time (117 recent games tested).",
+    "Model 61% \u00b7 market (no-vig) 50% \u00b7 blended 53% \u2192 fair -113.",
+    "Best price -112 at DraftKings (1 books compared)."
+   ],
+   "book": "draftkings",
+   "odds": -112.0,
+   "model_prob": 0.6085182116334367,
+   "win_prob": 0.5306100463250014,
+   "ev": 0.004369016258038372,
+   "market_prob": 0.5046406578888563,
+   "best_rank": null,
+   "score": 19.9,
+   "spots": [],
+   "current_odds": -112.0,
+   "current_point": -8.5,
+   "current_book": "draftkings",
+   "history": [
+    [
+     "2026-10-10T16:55:27.379430+00:00",
+     -112.0,
+     -8.5
+    ]
+   ],
+   "close_odds": -112.0,
+   "close_fair": 0.5046406578888563,
+   "status": "pending",
+   "live": null,
+   "final": null,
+   "result_value": null,
+   "profit": null,
+   "graded_at": null
+  },
+  {
    "id": "b897a544d2e46755",
    "created_at": "2026-10-09T19:24:10.769165+00:00",
    "day": "2026-10-09",
@@ -2270,7 +2336,7 @@
    "best_rank": null,
    "score": 19.8,
    "spots": [],
-   "current_odds": -135.0,
+   "current_odds": -148.0,
    "current_point": null,
    "current_book": "draftkings",
    "history": [
@@ -2278,10 +2344,15 @@
      "2026-10-09T19:24:10.769165+00:00",
      -135.0,
      null
+    ],
+    [
+     "2026-10-10T16:55:27.379430+00:00",
+     -148.0,
+     null
     ]
    ],
-   "close_odds": -135.0,
-   "close_fair": 0.5546704790957865,
+   "close_odds": -148.0,
+   "close_fair": 0.5767508206681559,
    "status": "pending",
    "live": null,
    "final": null,
@@ -2331,7 +2402,7 @@
    "best_rank": null,
    "score": 17.3,
    "spots": [],
-   "current_odds": -108.0,
+   "current_odds": -112.0,
    "current_point": 44.5,
    "current_book": "draftkings",
    "history": [
@@ -2339,10 +2410,15 @@
      "2026-10-10T16:25:10.446850+00:00",
      -108.0,
      44.5
+    ],
+    [
+     "2026-10-10T16:55:27.379430+00:00",
+     -112.0,
+     44.5
     ]
    ],
-   "close_odds": -108.0,
-   "close_fair": 0.4953593421111437,
+   "close_odds": -112.0,
+   "close_fair": 0.5046406578888563,
    "status": "pending",
    "live": null,
    "final": null,
