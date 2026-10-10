@@ -43,13 +43,15 @@ MAX_EV = 0.15  # bigger than this is almost always a stale or wrong price
 MAX_FAVORITE = -170
 MAX_UNITS = 1.0  # new method: small until its CLV record is in
 CHECK_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific
+SATURDAY_HOUR_UTC = 15  # plus about 8 AM Pacific on Saturdays, before the early college football kickoffs
 CREDIT_FLOOR = 40
 CREDITS_PER_SPORT = 1  # one market, up to ten books
 
 
 def due(now: datetime) -> bool:
-    """Twice a day: the first run in each check hour."""
-    return now.hour in CHECK_HOURS_UTC and now.minute < 35
+    """Twice a day (three times on Saturdays): the first run in each check hour."""
+    hours = CHECK_HOURS_UTC + ((SATURDAY_HOUR_UTC,) if now.weekday() == 5 else ())
+    return now.hour in hours and now.minute < 35
 
 
 class SharpClient:

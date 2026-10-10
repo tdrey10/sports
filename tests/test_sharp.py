@@ -44,3 +44,12 @@ def test_sharp_cards_match_the_espn_game_and_pause_on_bad_clv():
 
 def test_checks_twice_a_day():
     assert due(NOW) and not due(NOW.replace(hour=20)) and not due(NOW.replace(minute=50))
+
+
+def test_extra_saturday_morning_check_for_early_college_kickoffs():
+    from datetime import datetime, timezone
+
+    sat = datetime(2026, 10, 10, 15, 15, tzinfo=timezone.utc)  # a Saturday, 8:15 AM Pacific
+    assert due(sat)
+    assert not due(sat.replace(day=9))  # Friday at the same hour: no
+    assert due(sat.replace(hour=19)) and due(sat.replace(day=9, hour=19))  # the usual checks stay
