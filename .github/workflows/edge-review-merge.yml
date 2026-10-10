@@ -1,0 +1,44 @@
+# The daily edge review routine pushes its change to an edge-review/<date> branch.
+# This merges it into main only if every test passes, then deletes the branch.
+# Free (GitHub Actions), and the routine needs no GitHub connector.
+name: Merge daily edge review
+
+on:
+  push:
+    branches: ["edge-review/**"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: edge-review-merge
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -e . pytest
+
+      - name: Tests on the branch
+        run: python -m pytest -q
+
+      - name: Merge into main and test again
+        run: |
+          git config user.name "sportsedge-bot"
+          git config user.email "sportsedge-bot@users.noreply.github.com"
+          git checkout main
+          git pull --ff-only origin main
+          git merge --no-ff "origin/${GITHUB_REF_NAME}" -m "Merge ${GITHUB_REF_NAME} (daily edge review)"
+          python -m pytest -q
+          git push origin main
+          git push origin --delete "${GITHUB_REF_NAME}"
