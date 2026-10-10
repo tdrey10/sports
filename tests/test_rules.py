@@ -164,8 +164,12 @@ def test_only_bets_backed_by_a_blind_test_are_posted():
     assert build_cards(scans, Settings(), provider.now)  # no studies loaded: open
     strict = dict(require_proven=True)
     assert build_cards(scans, Settings(proven=set(), **strict), provider.now) == []  # nothing proven
-    only = [c for c in build_cards(scans, Settings(proven={"nba:spreads"}, **strict), provider.now) if c.units > 0]
-    assert only and all(c.pick.sport == "nba" and c.pick.market == "spreads" for c in only)
+    from sportsedge.tiers import market_key
+
+    kind = market_key(next(c for c in build_cards(scans, Settings(), provider.now) if c.units > 0).pick)
+    only = [c for c in build_cards(scans, Settings(proven={kind}, lock_units=0, **strict), provider.now)
+            if c.units > 0]
+    assert only and all(market_key(c.pick) == kind for c in only)
 
 
 def test_a_lock_must_pass_every_strict_check():
@@ -293,7 +297,8 @@ def test_daily_lock_weighs_the_edge_not_just_the_favorite():
         p.ev, p.warnings = -0.05, []
     fav, edge = sorted(sides, key=lambda p: p.american)[:2]
     fav.american, fav.win_prob, fav.ev = -165, 0.63, 0.002  # the favorite: barely beats -165
-    edge.american, edge.win_prob, edge.ev = 105, 0.53, 0.087  # a coin flip with a real edge
+    edge.american, edge.win_prob, edge.ev = -125, 0.59, 0.062  # a smaller favorite with a real edge
+    fav.market = edge.market = "h2h"  # a Lock is a moneyline favorite, never a spread
     for p in (fav, edge):
         p.market_prob, p.model_prob = p.win_prob - 0.01, p.win_prob
     lock = next(c for c in build_cards(scans, settings, provider.now) if c.tier == "lock")
@@ -338,3 +343,23 @@ def test_the_lock_is_never_a_lean_when_it_passes_every_rule():
     assert lock.reasons[0].startswith(("Small stake", "Today's best Lock"))
     (off,) = [c for c in build_cards(scans, Settings(proven=set(), lock_units=0), provider.now) if c.tier == "lock"]
     assert off.units == 0
+
+
+def test_a_lock_is_a_moneyline_favorite_and_overreaching_spreads_never_post():
+    from sportsedge.tiers import LOCK_MAX_ODDS, LOCK_MIN_ODDS, overreach
+
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb,nfl")]
+    # The Florida -10.5 case: our model 62%, the market 50% on a spread.
+    florida = make_pick(market="spreads", american=-115, win_prob=0.54, market_prob=0.50)
+    florida.model_prob = 0.62
+    assert overreach(florida)
+    ok = make_pick(market="spreads", american=-110, win_prob=0.54, market_prob=0.52)
+    ok.model_prob = 0.57
+    assert not overreach(ok)
+    cards = build_cards(scans, Settings(), provider.now)
+    for c in cards:
+        if c.tier == "lock":
+            assert c.pick.market == "h2h" and LOCK_MIN_ODDS <= c.pick.american <= LOCK_MAX_ODDS
+        assert not overreach(c.pick)

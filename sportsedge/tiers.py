@@ -27,6 +27,10 @@ LIVE_TIERS = ("live", "live_win", "live_plus")
 UNIT_TIERS = ("lock", "dog", "prop", "value", "early") + LIVE_TIERS
 
 LOCK_MIN_ODDS = -170  # never bet worse than -170, the Lock included
+LOCK_MAX_ODDS = -120  # and a real favorite: the Lock is a moneyline the team is expected to win
+# Spread bets where our model rates a side 6+ points above the market lost 4-7% in every sport
+# blind (18,000+ games, 2018+ lines): the market was right. They are never posted, not even as leans.
+SPREAD_MAX_OVERREACH = 0.06
 # The Lock of the Day is the safest pick, not the biggest edge, so it must clear every check:
 LOCK_MIN_PROB = 0.62  # our model alone gives it at least this
 LOCK_MIN_MARKET = 0.55  # and the market (no vig) also has it as a clear favorite
@@ -163,6 +167,17 @@ def units_for(pick: Pick, settings: Settings | None = None) -> float:
     return min(max(units, 0.5), cap)
 
 
+def overreach(p: Pick) -> bool:
+    """A spread where our model sits 6+ points above the market: a proven loser blind."""
+    return p.market == "spreads" and p.market_prob is not None and p.model_prob - p.market_prob > SPREAD_MAX_OVERREACH
+
+
+def is_lock_price(p: Pick) -> bool:
+    """A Lock is a moneyline favorite from -170 to -120 (it wins 55-62% of the time at those
+    prices), never a spread or total: those are built to be coin flips."""
+    return p.market == "h2h" and not p.is_prop and LOCK_MIN_ODDS <= p.american <= LOCK_MAX_ODDS
+
+
 def build_cards(
     scans: list[SportScan],
     settings: Settings,
@@ -184,9 +199,9 @@ def build_cards(
     for scan in scans:
         for ev_id in scan.contexts:
             by_event[ev_id] = scan
-        every.extend(p for p in scan.picks if not p.is_prop)
+        every.extend(p for p in scan.picks if not p.is_prop and not overreach(p))
         # Only bets backed by a blind test: no maybes on the board.
-        game.extend(p for p in scan.picks if not p.is_prop and backed(p, settings))
+        game.extend(p for p in scan.picks if not p.is_prop and backed(p, settings) and not overreach(p))
         props.extend(p for p in scan.picks if p.is_prop and backed(p, settings))
 
     # No bet on a game where either team's injury report is unknown; those picks can
@@ -246,7 +261,7 @@ def build_cards(
         return []
     heads = settings.fill or settings.daily_heads
     if "lock" not in taken:
-        locks = [p for p in soon if p.american >= LOCK_MIN_ODDS and solid(p)]
+        locks = [p for p in soon if is_lock_price(p) and solid(p)]
         if locks:
             # Best edge AND likely to win (the edge score), not just the biggest favorite.
             chosen.append(("lock", max(locks, key=lambda p: (edge_score(p, settings)[0], p.win_prob))))
@@ -257,8 +272,7 @@ def build_cards(
             def agree(p: Pick) -> bool:
                 return (p.market_prob is not None and p.market_prob >= 0.5
                         and abs(p.model_prob - p.market_prob) <= LOCK_MAX_GAP)
-            near = lean_pool(lambda p: p.market in ("h2h", "spreads") and p.win_prob >= 0.5,
-                             source=None if heads else every)
+            near = lean_pool(lambda p: is_lock_price(p) and p.win_prob >= 0.5, source=None if heads else every)
             if near:
                 # Weigh everything (the edge score blends the edge with the chance to win),
                 # not just who is favored.
