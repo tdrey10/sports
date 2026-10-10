@@ -1,54 +1,56 @@
-"""Temporary probe: where does ESPN publish college football injuries?"""
+"""Temporary probe #2: more free places college football injuries might live."""
 import json
+import re
 
 import requests
 
 S = requests.Session()
-S.headers["User-Agent"] = "Mozilla/5.0"
+S.headers["User-Agent"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/126 Safari/537.36"
+GAME, MSU, ILL = "401858480", "127", "356"
 
 
 def get(url, **params):
     try:
-        r = S.get(url, params=params, timeout=20)
-        return r.status_code, (r.json() if r.headers.get("content-type", "").startswith("application/json") else r.text[:200])
+        r = S.get(url, params=params, timeout=25)
+        ct = r.headers.get("content-type", "")
+        return r.status_code, (r.json() if "json" in ct else r.text)
     except Exception as exc:  # noqa: BLE001
         return "ERR", str(exc)
 
 
-SITE = "https://site.api.espn.com/apis/site/v2/sports/football/college-football"
-CORE = "https://sports.core.api.espn.com/v2/sports/football/leagues/college-football"
+def show(name, code, data, keys=("injuries",)):
+    if isinstance(data, dict):
+        print(f"{name}: {code} keys={list(data)[:25]}")
+        for k in keys:
+            if k in data:
+                print(f"   {k}:", json.dumps(data[k])[:1200])
+    else:
+        print(f"{name}: {code} text[{len(data)}]")
+        for w in ("Burt", "Chappell", "Keshawn", "injur"):
+            i = data.find(w)
+            if i >= 0:
+                print(f"   found {w!r}:", re.sub(r"\s+", " ", data[max(0, i - 150): i + 250]))
 
-code, sb = get(f"{SITE}/scoreboard", groups="80", limit=300)
-events = sb.get("events", []) if isinstance(sb, dict) else []
-print("scoreboard", code, len(events))
-target = None
-for ev in events:
-    if any(k in ev.get("name", "") for k in ("Purdue", "Michigan State")):
-        target = ev
-        print("game", ev["id"], ev["name"])
-        break
 
-print("\n== league injuries endpoint")
-code, data = get(f"{SITE}/injuries")
-print(code, (list(data)[:10] if isinstance(data, dict) else data), len(data.get("injuries", [])) if isinstance(data, dict) else "")
-
-if target:
-    print("\n== game summary keys")
-    code, summ = get(f"{SITE}/summary", event=target["id"])
-    print(code, list(summ)[:40] if isinstance(summ, dict) else summ)
-    inj = summ.get("injuries") if isinstance(summ, dict) else None
-    print("summary.injuries:", json.dumps(inj)[:1500] if inj else inj)
-    for c in target["competitions"][0]["competitors"]:
-        tid = c["team"]["id"]
-        print(f"\n== core team injuries {c['team']['displayName']} ({tid})")
-        code, ti = get(f"{CORE}/teams/{tid}/injuries", limit=100)
-        print(code, json.dumps(ti)[:600])
-        items = ti.get("items", []) if isinstance(ti, dict) else []
-        for it in items[:3]:
-            code, one = get(it["$ref"])
-            print("  item", code, json.dumps(one)[:500])
-        code, roster = get(f"{SITE}/teams/{tid}/roster")
-        if isinstance(roster, dict):
-            ath = [a for g in roster.get("athletes", []) for a in (g.get("items", []) if isinstance(g, dict) else [g])]
-            hurt = [(a.get("displayName"), a.get("injuries")) for a in ath if a.get("injuries")]
-            print("  roster", code, len(ath), "athletes; with injuries:", hurt[:6])
+code, d = get("https://site.web.api.espn.com/apis/site/v2/sports/football/college-football/summary", event=GAME)
+show("site.web summary", code, d)
+code, d = get("https://cdn.espn.com/core/college-football/game", xhr=1, gameId=GAME)
+if isinstance(d, dict):
+    gp = d.get("gamepackageJSON", {})
+    show("cdn gamepackage", code, gp)
+else:
+    show("cdn gamepackage", code, d)
+code, d = get(f"https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/{MSU}/injuries")
+show("site team injuries MSU", code, d)
+code, d = get(f"https://site.web.api.espn.com/apis/common/v3/sports/football/college-football/teams/{MSU}/injuries")
+show("common v3 team injuries MSU", code, d)
+code, d = get(f"https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/{MSU}/depthcharts")
+show("depth chart MSU", code, d, keys=("depthchart", "items"))
+code, d = get("https://www.espn.com/college-football/game/_/gameId/" + GAME)
+show("espn.com game page", code, d)
+code, d = get("https://www.cbssports.com/college-football/injuries/")
+show("cbssports injuries", code, d)
+code, d = get("https://www.covers.com/sport/football/ncaaf/injuries")
+show("covers injuries", code, d)
+code, d = get("https://api.collegefootballdata.com/player/portal")
+show("cfbd (needs key)", code, d)
