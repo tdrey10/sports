@@ -6,9 +6,10 @@ pays more than that fair price by 2%+ (and -170 or better), the bet is +EV witho
 relying on our own model. It's the standard method of value-betting software.
 
 Odds come from The Odds API (free plan: 500 requests a month, key in
-ODDS_API_KEY). One check of one sport's moneylines and spreads across Pinnacle and
-up to nine US books costs 1 request (moneylines), so checks run twice a day for the
-big five in season (about 10 requests a day) and stop well before the monthly limit. Each pick is matched to its ESPN
+ODDS_API_KEY). One check of one sport's moneylines across Pinnacle and up to nine US
+books costs 1 request, spent only on sports in season with a game in the next 36 hours.
+Checks run at about 8 AM, noon, 3 PM and 5 PM Pacific: noon and 5 PM (and Saturday 8 AM)
+always, the others only while the month's budget can carry every check to month end. Each pick is matched to its ESPN
 game so it is graded and its closing line value tracked like every other pick; the
 adaptive layer pauses sharp value in a sport whose picks keep losing to the close.
 """
@@ -42,16 +43,36 @@ MIN_EV = 0.02
 MAX_EV = 0.15  # bigger than this is almost always a stale or wrong price
 MAX_FAVORITE = -170
 MAX_UNITS = 1.0  # new method: small until its CLV record is in
-CHECK_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific
-SATURDAY_HOUR_UTC = 15  # plus about 8 AM Pacific on Saturdays, before the early college football kickoffs
+CORE_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific: always checked (credits allowing)
+EXTRA_HOURS_UTC = (15, 22)  # about 8 AM and 3 PM Pacific: checked when the month's budget can carry them
+SATURDAY_HOUR_UTC = 15  # on Saturdays the 8 AM check is core: the early college football kickoffs
+CHECK_HOURS_UTC = CORE_HOURS_UTC + EXTRA_HOURS_UTC
+UPCOMING_HOURS = 36  # only spend a request on a sport with a game starting within this window
 CREDIT_FLOOR = 40
 CREDITS_PER_SPORT = 1  # one market, up to ten books
 
 
 def due(now: datetime) -> bool:
-    """Twice a day (three times on Saturdays): the first run in each check hour."""
-    hours = CHECK_HOURS_UTC + ((SATURDAY_HOUR_UTC,) if now.weekday() == 5 else ())
-    return now.hour in hours and now.minute < 35
+    """Up to four checks a day (8 AM, noon, 3 PM, 5 PM Pacific): the first run in each check hour."""
+    return now.hour in CHECK_HOURS_UTC and now.minute < 35
+
+
+def is_core(now: datetime) -> bool:
+    return now.hour in CORE_HOURS_UTC or (now.weekday() == 5 and now.hour == SATURDAY_HOUR_UTC)
+
+
+def affordable(remaining: float | None, cost: int, now: datetime, core: bool) -> bool:
+    """Core checks run while credits last (above the floor). Extra checks run only when what is
+    left would still pay for every check, extras included, through the end of the month, so the
+    free plan never runs dry before it resets."""
+    if remaining is None:
+        return core
+    spare = remaining - CREDIT_FLOOR
+    if core:
+        return spare >= cost
+    nxt = datetime(now.year + now.month // 12, now.month % 12 + 1, 1, tzinfo=now.tzinfo)
+    days_left = max((nxt.date() - now.date()).days, 1)
+    return spare >= cost * days_left * len(CHECK_HOURS_UTC)
 
 
 class SharpClient:
@@ -178,31 +199,47 @@ def cards(cfg: SportConfig, events: list[dict], espn_games: list, now: datetime,
 
 
 def run(sports: list[SportConfig], provider, now: datetime, clv_trust: dict | None = None,
-        client: SharpClient | None = None) -> list[Card]:
-    """One check across the sports in season, within the free plan's limit."""
+        client: SharpClient | None = None, force: bool = False) -> list[Card]:
+    """One check across the sports in season, within the free plan's limit.
+
+    The sports list and ESPN schedules are free; a request is only spent on a sport in season
+    with a game starting soon. Extra (non-core) checks only run when the budget allows."""
     client = client or SharpClient()
     if not client.api_key:
         return []
     try:
-        active = client.active()
+        active = client.active()  # free, and it reports the requests left this month
     except requests.RequestException as exc:
         log.warning("Odds API unavailable: %s", exc)
         return []
-    out = []
+    todo = []
     for cfg in sports:
         if cfg.key not in SPORTS or cfg.odds_key not in active:
             continue
+        try:
+            games = provider.game_results(cfg, now - timedelta(hours=6), now + timedelta(days=2))
+        except requests.RequestException as exc:
+            log.warning("sharp value %s schedule failed: %s", cfg.key, exc)
+            continue
+        if any(now < g.date <= now + timedelta(hours=UPCOMING_HOURS) for g in games):
+            todo.append((cfg, games))
+    core = force or is_core(now)
+    if not affordable(client.remaining, len(todo) * CREDITS_PER_SPORT, now, core):
+        left = "unknown" if client.remaining is None else f"{client.remaining:.0f}"
+        print(f"sharp value: extra check skipped to save the month's requests ({left} left)")
+        return []
+    out = []
+    for cfg, games in todo:
         if client.remaining is not None and client.remaining - CREDITS_PER_SPORT < CREDIT_FLOOR:
             print(f"sharp value: stopping, {client.remaining:.0f} Odds API requests left this month")
             break
         try:
             events = client.odds(cfg)
-            games = provider.game_results(cfg, now - timedelta(hours=6), now + timedelta(days=2))
         except requests.RequestException as exc:
             log.warning("sharp value %s failed: %s", cfg.key, exc)
             continue
         paused = (clv_trust or {}).get(f"{cfg.key}:sharp") == 0.0
         out += cards(cfg, events, games, now, paused=paused)
     if client.remaining is not None:
-        print(f"sharp value: {len(out)} picks; {client.remaining:.0f} Odds API requests left this month")
+        print(f"sharp value: {len(out)} picks from {len(todo)} sports; {client.remaining:.0f} Odds API requests left this month")
     return out
