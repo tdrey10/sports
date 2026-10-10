@@ -128,6 +128,10 @@ class EspnClient:
 
         None when there is no report (no feed for the sport, or the request failed):
         that means injuries are UNKNOWN, not that everyone is healthy."""
+        if cfg.key == "ncaaf":  # ESPN's college report is nearly empty: Covers has every team
+            from .covers import college_injuries
+
+            return college_injuries(self.cache, self.session)
         if not cfg.has_injury_feed:
             return None
         try:
