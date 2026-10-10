@@ -2896,9 +2896,9 @@
    "close_fair": 0.22414486037190884,
    "status": "live",
    "live": {
-    "home": 10.0,
+    "home": 13.0,
     "away": 14.0,
-    "detail": "1:51 - 3rd"
+    "detail": "4:12 - 4th"
    },
    "final": null,
    "result_value": null,
@@ -2982,9 +2982,9 @@
    "close_fair": 0.4883955455032602,
    "status": "live",
    "live": {
-    "home": 47.0,
+    "home": 50.0,
     "away": 10.0,
-    "detail": "3:16 - 3rd"
+    "detail": "3:20 - 4th"
    },
    "final": null,
    "result_value": null,
@@ -3053,7 +3053,7 @@
    "live": {
     "home": 0.0,
     "away": 16.0,
-    "detail": "5:24 - 3rd"
+    "detail": "6:48 - 4th"
    },
    "final": null,
    "result_value": null,
@@ -3129,8 +3129,8 @@
    "status": "live",
    "live": {
     "home": 6.0,
-    "away": 10.0,
-    "detail": "7:45 - 3rd"
+    "away": 17.0,
+    "detail": "13:17 - 4th"
    },
    "final": null,
    "result_value": null,
@@ -3193,9 +3193,9 @@
    "close_fair": 0.4953593421111437,
    "status": "live",
    "live": {
-    "home": 10.0,
+    "home": 13.0,
     "away": 14.0,
-    "detail": "1:51 - 3rd"
+    "detail": "4:12 - 4th"
    },
    "final": null,
    "result_value": null,
@@ -3269,16 +3269,12 @@
    ],
    "close_odds": -108.0,
    "close_fair": 0.4953593421111437,
-   "status": "live",
-   "live": {
-    "home": 4.0,
-    "away": 1.0,
-    "detail": "8:10 - 3rd"
-   },
-   "final": null,
+   "status": "lost",
+   "live": null,
+   "final": "Vancouver Canucks 1 @ New Jersey Devils 4",
    "result_value": null,
-   "profit": null,
-   "graded_at": null
+   "profit": -1.0,
+   "graded_at": "2026-10-10T22:27:11.652229+00:00"
   },
   {
    "id": "8dfd7c6206bb43f7",
@@ -3395,7 +3391,7 @@
    "live": {
     "home": 0.0,
     "away": 16.0,
-    "detail": "5:24 - 3rd"
+    "detail": "6:48 - 4th"
    },
    "final": null,
    "result_value": null,
@@ -3530,9 +3526,9 @@
    "close_fair": 0.5546704790957865,
    "status": "live",
    "live": {
-    "home": 0.0,
-    "away": 1.0,
-    "detail": "20:00 - 3rd"
+    "home": 1.0,
+    "away": 3.0,
+    "detail": "4:50 - 3rd"
    },
    "final": null,
    "result_value": null,
@@ -3649,9 +3645,9 @@
    "close_fair": 0.4883955455032602,
    "status": "live",
    "live": {
-    "home": 0.0,
+    "home": 14.0,
     "away": 7.0,
-    "detail": "Halftime"
+    "detail": "4:28 - 3rd"
    },
    "final": null,
    "result_value": null,
@@ -3719,8 +3715,12 @@
    ],
    "close_odds": 114.0,
    "close_fair": 0.44532952090421346,
-   "status": "pending",
-   "live": null,
+   "status": "live",
+   "live": {
+    "home": 0.0,
+    "away": 2.0,
+    "detail": "10:17 - 1st"
+   },
    "final": null,
    "result_value": null,
    "profit": null,
@@ -3795,8 +3795,12 @@
    ],
    "close_odds": -112.0,
    "close_fair": 0.5046406578888563,
-   "status": "pending",
-   "live": null,
+   "status": "live",
+   "live": {
+    "home": 7.0,
+    "away": 0.0,
+    "detail": "6:48 - 1st"
+   },
    "final": null,
    "result_value": null,
    "profit": null,
@@ -5276,7 +5280,7 @@
    "best_rank": null,
    "score": 20.1,
    "spots": [],
-   "current_odds": -135.0,
+   "current_odds": -130.0,
    "current_point": null,
    "current_book": "draftkings",
    "history": [
@@ -5289,10 +5293,15 @@
      "2026-10-10T21:27:12.636632+00:00",
      -135.0,
      null
+    ],
+    [
+     "2026-10-10T22:27:12.132477+00:00",
+     -130.0,
+     null
     ]
    ],
-   "close_odds": -135.0,
-   "close_fair": 0.5546704790957865,
+   "close_odds": -130.0,
+   "close_fair": 0.545402735448801,
    "status": "pending",
    "live": null,
    "final": null,
@@ -5423,6 +5432,69 @@
    "result_value": null,
    "profit": 0.0,
    "graded_at": "2026-10-08T22:59:32.781350+00:00"
+  },
+  {
+   "id": "4c69319ada5340a8",
+   "created_at": "2026-10-10T22:27:12.132477+00:00",
+   "day": "2026-10-10",
+   "tier": "lean",
+   "units": 0.0,
+   "sport": "nhl",
+   "sport_name": "NHL",
+   "event_id": "401892483",
+   "commence_time": "2026-10-11T22:00:00+00:00",
+   "home": "New York Rangers",
+   "away": "Vancouver Canucks",
+   "matchup": "Vancouver Canucks @ New York Rangers",
+   "market": "totals",
+   "market_label": "Total",
+   "side": "over",
+   "point": 5.5,
+   "player": null,
+   "selection": "Over 5.5",
+   "headline": "We project 6.5 total; Over 5.5 hits 56% of the time.",
+   "reasons": [
+    "Projected score: Vancouver Canucks 2.4 - New York Rangers 4.0.",
+    "Vancouver Canucks (2-4) @ New York Rangers (4-2).",
+    "Vancouver Canucks coming off a 1-4 loss to New Jersey Devils (Sat 10/10).",
+    "Vancouver Canucks on the second night of a back-to-back.",
+    "Starting goalies: Leevi Merilainen (0.888 career save %, 852 shots) vs Dylan Garand (0.954 career save %, 130 shots).",
+    "Season goals per game: Vancouver Canucks 3.7 scored / 4.8 allowed; New York Rangers 2.8 scored / 1.8 allowed.",
+    "Last 5: Vancouver Canucks 1-4 (avg margin -1.6); New York Rangers 4-1 (avg margin +1.8).",
+    "Splits: New York Rangers 3-0 at home; Vancouver Canucks 1-2 on the road.",
+    "Power rank: Vancouver Canucks #31 vs New York Rangers #10 (of 32).",
+    "Model 63% \u00b7 market (no-vig) 53% \u00b7 blended 56% \u2192 fair -126.",
+    "Best price -125 at DraftKings (1 books compared).",
+    "New York Rangers missing: Igor Shesterkin, Joe Veleno, Joonas Korpisalo, Aidan Thompson +1 more.",
+    "Vancouver Canucks missing: Jack Thompson, Akil Thomas, Mackenzie MacEachern, Thatcher Demko +1 more."
+   ],
+   "book": "draftkings",
+   "odds": -125.0,
+   "model_prob": 0.6300896834061099,
+   "win_prob": 0.5584620914248453,
+   "ev": 0.005231764564721519,
+   "market_prob": 0.5345862274310904,
+   "best_rank": null,
+   "score": 19.7,
+   "spots": [],
+   "current_odds": -125.0,
+   "current_point": 5.5,
+   "current_book": "draftkings",
+   "history": [
+    [
+     "2026-10-10T22:27:12.132477+00:00",
+     -125.0,
+     5.5
+    ]
+   ],
+   "close_odds": -125.0,
+   "close_fair": 0.5345862274310904,
+   "status": "pending",
+   "live": null,
+   "final": null,
+   "result_value": null,
+   "profit": null,
+   "graded_at": null
   },
   {
    "id": "18cc3b978c7dd258",
