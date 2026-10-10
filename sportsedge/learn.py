@@ -9,7 +9,7 @@ features turn into a true win/cover chance; the newer games stay blind.
 
 It only matters if it beats the market: on the blind games the learned chance
 must have a lower log loss than the market's own no-vig chance, and betting
-its 2%+ edges at -150 or better must make money beyond luck over 60+ bets.
+its 2%+ edges at -170 or better must make money beyond luck over 60+ bets.
 """
 
 from __future__ import annotations
@@ -37,7 +37,7 @@ FEATURES = (
 )
 MIN_ROWS = 600
 HALF_LIFE_DAYS = 365  # older games count less: a game a season ago counts half as much
-MIN_EV, MAX_EV, MAX_FAVORITE = 0.02, 0.20, -150
+MIN_EV, MAX_EV, MAX_FAVORITE = 0.02, 0.20, -170
 PROVEN_BETS = 60
 
 
@@ -180,7 +180,7 @@ def evaluate(tune: list["Side"], blind: list["Side"], close_fair: dict | None = 
     except Exception as exc:  # comparison only
         log.info("neural net comparison failed: %s", exc)
 
-    # The bets it would have made: best 2%+ edge per game, -150 or better, at the closing price.
+    # The bets it would have made: best 2%+ edge per game, -170 or better, at the closing price.
     best: dict[str, tuple[float, "Side"]] = {}
     for s, q in zip(b_keep, learned):
         if s.american < MAX_FAVORITE:

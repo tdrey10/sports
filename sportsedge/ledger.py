@@ -277,8 +277,8 @@ class Ledger:
             key = (e.sport, e.home, e.away, e.start.date().isoformat(), e.market, e.side, e.player)
             if key in seen:
                 why = "the same bet was already posted"
-            elif e.odds < -150:
-                why = f"{e.odds:+.0f} is worse than the -150 limit"
+            elif e.odds < settings.max_favorite:
+                why = f"{e.odds:+.0f} is worse than the {settings.max_favorite:+.0f} limit"
             elif e.player is None and e.market_prob is None:
                 why = "no market price to check our number against"
             elif e.tier in ("value", "early") and e.win_prob < LEGIT_MIN_WIN:

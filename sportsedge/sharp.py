@@ -2,7 +2,7 @@
 
 Pinnacle takes big bets from professionals, so its no-vig price is about the most
 accurate probability there is. When DraftKings, FanDuel, BetMGM or another US book
-pays more than that fair price by 2%+ (and -150 or better), the bet is +EV without
+pays more than that fair price by 2%+ (and -170 or better), the bet is +EV without
 relying on our own model. It's the standard method of value-betting software.
 
 Odds come from The Odds API (free plan: 500 requests a month, key in
@@ -40,7 +40,7 @@ MARKETS = ("h2h",)  # moneylines only: one request per sport keeps the free plan
 SPORTS = ("nfl", "nba", "nhl", "mlb", "ncaaf")  # the biggest markets, where Pinnacle's line is sharpest
 MIN_EV = 0.02
 MAX_EV = 0.15  # bigger than this is almost always a stale or wrong price
-MAX_FAVORITE = -150
+MAX_FAVORITE = -170
 MAX_UNITS = 1.0  # new method: small until its CLV record is in
 CHECK_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific
 CREDIT_FLOOR = 40
