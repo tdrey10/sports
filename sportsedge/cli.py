@@ -219,11 +219,7 @@ class Workspace:
         self.provider = _provider(args)
         names = args.sports if args.sports != ["all"] or not self.demo else [DEMO_SPORTS]
         self.sports = resolve(names)
-        self.settings = _settings(args)
-        if not self.demo:
-            from dataclasses import replace as _replace
-
-            self.settings = _replace(self.settings, board_hour=8)  # the board drops at 8 AM local
+        self.settings = _settings(args)  # no board hold: a pick posts the moment an edge is found
         self.studies = self._load_studies(data_dir)
         if self.studies:
             from .study import apply_studies
