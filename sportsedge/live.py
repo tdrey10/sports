@@ -225,7 +225,9 @@ class LiveScanner:
 
 
 # ------------------------------------------------------------------- publishing
-from .edge import best_per_event  # noqa: E402
+from dataclasses import replace  # noqa: E402
+
+from .edge import best_per_event, edge_score  # noqa: E402
 from .odds import implied_prob  # noqa: E402
 from .tiers import Card, units_for  # noqa: E402
 
@@ -248,8 +250,10 @@ def live_cards(
 
     - ``live_win``: the bet most likely to cash that still has an edge (EV >= 0, at least 60% to
       cash on our numbers, odds -300 or longer);
-    - ``live_plus``: the best plus-money bet: the biggest edge from +100 to +2000 (EV at least
-      the live minimum, at most the stale-price cap, with our model agreeing with the market).
+    - ``live_plus``: the best plus-money bet from +100 to +2000 (EV at least the live minimum,
+      at most the stale-price cap, with our model agreeing with the market).
+
+    Both slots go to the highest edge score: best edge and likely to win, together.
 
     ``taken`` holds (event_id, tier) pairs already posted, so each game gets at most one of each.
     """
@@ -263,11 +267,16 @@ def live_cards(
     ]
     plus = [p for p in ok if 100 <= p.american <= LIVE_PLUS_MAX_ODDS
             and p.ev >= scanner.settings.min_ev and (p.event_id, "live_plus") not in taken]
+    # Best edge AND likely to win: the edge score (60 points for the edge, 40 for the chance to
+    # cash; a long shot's edge points shrink) picks both slots. Pregame calibration is left out:
+    # it was measured on pregame lines, not live ones.
+    no_cal = replace(scanner.settings, calibration={})
+    rank = lambda p: (edge_score(p, no_cal)[0], p.win_prob)  # noqa: E731
     chosen: list[tuple[str, Pick]] = []
     if win:
-        chosen.append(("live_win", max(win, key=lambda p: (p.win_prob, p.ev))))
+        chosen.append(("live_win", max(win, key=rank)))
     if plus:
-        best_plus = max(plus, key=lambda p: (p.ev, p.win_prob))  # the best bet: biggest edge first
+        best_plus = max(plus, key=rank)
         if not chosen or best_plus is not chosen[0][1]:
             chosen.append(("live_plus", best_plus))
 
