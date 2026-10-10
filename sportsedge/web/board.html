@@ -22,23 +22,23 @@
 * { box-sizing: border-box; }
 html { background: var(--bg); }
 body { margin: 0; background: transparent; color: var(--fg); font: 16px/1.45 var(--body); }
-/* The Great Hambino photo sits behind the whole engine, tinted black so the picks stay readable,
-   and fades into the black page below it (the photo is 3:4, hence the 4 / 3 height).
-   A fixed layer (not background-attachment) so it also stays put on phones. */
-.photo-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(var(--tint), .45) 0%, rgba(var(--tint), .3) 28%, rgba(var(--tint), .62) 52%, rgba(var(--tint), .9) 78%, rgba(var(--tint), .96) 100%),
-    linear-gradient(180deg, transparent 70%, var(--bg)) 50% 0% / max(100vw, 520px) calc(max(100vw, 520px) * 4 / 3) no-repeat,
-    var(--mascot) 50% 0% / max(100vw, 520px) auto no-repeat, var(--bg); }
-/* Wide screens (and the gallery thumbnail): frame the portrait by height, centered on the face. */
-/* Wide screens (and the gallery thumbnail): the Hambino duck in his smoking jacket stands to
-   the right of the title, on his red damask wall, fading into the black page. Phones keep the photo. */
+/* The background photo (Yosemite Sam and Elmer, guns drawn, Space Jam) sits behind the whole
+   engine, tinted black so the picks stay readable, and fades into the black page below it.
+   It is landscape, so it is sized by height (--mh) and centered: on a phone the two of them stay
+   in frame between the guns. A fixed layer (not background-attachment) so it stays put on phones. */
+.photo-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; --mh: max(62vh, 460px);
+  --my: calc(var(--mh) * -0.36);  /* lifted so the two of them sit above the title, not behind it */
+  background: linear-gradient(180deg, rgba(var(--tint), .25) 0%, rgba(var(--tint), .15) 20%, rgba(var(--tint), .62) 40%, rgba(var(--tint), .9) 70%, rgba(var(--tint), .96) 100%),
+    linear-gradient(180deg, transparent 65%, var(--bg)) 50% var(--my) / 100% var(--mh) no-repeat,
+    var(--mascot) 50% var(--my) / auto var(--mh) no-repeat, var(--bg); }
+/* Wide screens: the photo spans the top of the page, fading into black below. */
 @media (min-width: 761px) {
-  .photo-bg { --ph: max(100vh, 680px); --pw: calc(var(--ph) * 0.7); --px: calc(50% + min(24vw, 300px));
-    background: linear-gradient(180deg, rgba(var(--tint), .05) 0%, rgba(var(--tint), .1) 40%, rgba(var(--tint), .7) 70%, rgba(var(--tint), .95) 90%),
-      linear-gradient(90deg, var(--bg), transparent 22%, transparent 85%, var(--bg)) var(--px) 0 / var(--pw) var(--ph) no-repeat,
-      linear-gradient(180deg, transparent 55%, var(--bg)) var(--px) 0 / var(--pw) var(--ph) no-repeat,
-      var(--thumb) var(--px) 0 / var(--pw) var(--ph) no-repeat, var(--bg); }
-  /* The cover is just the name and the duck (it is the gallery thumbnail); the day's picks start below it. */
+  .photo-bg { --mh: max(100vh, 680px);
+    background: linear-gradient(180deg, rgba(var(--tint), .25) 0%, rgba(var(--tint), .2) 35%, rgba(var(--tint), .7) 70%, rgba(var(--tint), .95) 90%),
+      linear-gradient(90deg, var(--bg), transparent 15%, transparent 85%, var(--bg)) 50% 0 / calc(var(--mh) * 1.62) var(--mh) no-repeat,
+      linear-gradient(180deg, transparent 55%, var(--bg)) 50% 0 / 100% var(--mh) no-repeat,
+      var(--mascot) 50% 0 / auto var(--mh) no-repeat, var(--bg); }
+  /* The cover is just the name over the photo; the day's picks start below it. */
   #hero { display: none; }
   main .mast { min-height: clamp(460px, 82vh, 760px); padding-bottom: 6vh; }
 }
