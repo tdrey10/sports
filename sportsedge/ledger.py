@@ -154,6 +154,24 @@ class Ledger:
     def live_taken(self) -> set[tuple[str, str]]:
         return {(e.event_id, e.tier) for e in self.entries.values() if e.tier in LIVE_TIERS}
 
+    def live_proven(self, min_bets: int = 60) -> set[str]:
+        """Live tiers whose own graded record passes the blueprint bar: 60+ bets, flat ROI minus
+        one standard error above zero, and the older half of the bets profitable too. Live bets
+        have no blind pregame test, so this record is their proof."""
+        out = set()
+        for tier in LIVE_TIERS:
+            done = sorted((e for e in self.entries.values() if e.tier == tier and e.settled and e.status != "void"
+                           and e.profit is not None), key=lambda e: e.commence_time)
+            flat = [e.profit / (e.units if e.units > 0 else 1.0) for e in done]
+            n = len(flat)
+            if n < min_bets:
+                continue
+            mean = sum(flat) / n
+            se = math.sqrt(sum((x - mean) ** 2 for x in flat) / (n - 1) / n)
+            if mean - se > 0 and sum(flat[: n // 2]) > 0:
+                out.add(tier)
+        return out
+
     def best_taken(self, now: datetime) -> int:
         today = self.day_of(now)
         return sum(1 for e in self.entries.values() if e.day == today and e.best_rank)

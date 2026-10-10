@@ -204,3 +204,37 @@ def test_live_picks_one_likely_winner_and_the_best_plus_money_bet():
     assert [c.tier for c in cards] == ["live_plus"]
     cards = live_cards([coin], S(), {"nfl": "NFL"})
     assert [c.tier for c in cards] == ["live_plus"]
+
+
+def test_live_bets_get_no_units_until_their_own_record_proves_out():
+    from tests.test_ledger import make_pick
+
+    class S:
+        settings = Settings(min_ev=0.0, max_ev=1.0, hide_flagged=False)
+        states = {}
+
+    good = make_pick(event_id="b", american=+120, win_prob=0.50, market_prob=0.46, ev=0.10, kelly=0.03)
+    good.model_prob = 0.60
+    assert live_cards([good], S(), {"nfl": "NFL"}, proven=None)[0].units == 1.0  # no record kept: unchanged
+    lean = live_cards([good], S(), {"nfl": "NFL"}, proven=set())[0]
+    assert lean.units == 0.0 and lean.reasons[0].startswith("No units")
+    assert live_cards([good], S(), {"nfl": "NFL"}, proven={"live_plus"})[0].units == 1.0
+
+
+def test_ledger_live_record_must_beat_luck_and_hold_in_both_halves():
+    from tests.test_ledger import card, make_pick
+    from sportsedge.ledger import Ledger
+
+    def ledger(results):
+        L = Ledger()
+        for i, won in enumerate(results):
+            p = make_pick(event_id=f"e{i}", american=+100)
+            p.commence_time = NOW + timedelta(minutes=i)
+            (e,) = L.publish([card(p, tier="live_plus", units=0.0)], NOW)
+            e.status, e.profit = ("won", 1.0) if won else ("lost", -1.0)
+        return L
+
+    assert ledger([True, True, False] * 40).live_proven() == {"live_plus"}  # 120 bets, +33%
+    assert ledger([True, True, False] * 10).live_proven() == set()  # too few bets
+    assert ledger([False] * 60 + [True] * 60 + [True] * 10).live_proven() == set()  # older half lost
+    assert ledger([True, False] * 40).live_proven() == set()  # break-even: not beyond luck

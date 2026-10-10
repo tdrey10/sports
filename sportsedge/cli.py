@@ -486,7 +486,7 @@ def cmd_live(args) -> int:
             except Exception as exc:  # keep the session alive through one bad poll
                 print(f"{cfg.name}: live scan failed: {exc}")
                 continue
-            cards = {(c.pick.event_id, c.tier): c for c in live_cards(picks, scanner, names, ws.ledger.live_taken())}
+            cards = {(c.pick.event_id, c.tier): c for c in live_cards(picks, scanner, names, ws.ledger.live_taken(), ws.ledger.live_proven())}
             for entry in ws.ledger.publish(list(cards.values()), now):
                 card = cards[(entry.event_id, entry.tier)]
                 print(f"{entry.tier.upper()} {entry.sport_name}: {entry.selection} {entry.odds:+.0f} "
