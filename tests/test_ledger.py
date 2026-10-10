@@ -394,3 +394,16 @@ def test_page_data_carries_espn_scoreboards_for_live_scores():
     assert data["espn"]["ncaaf"]["groups"] == "80"  # college boards need the division group
     html = render_html(data)
     assert "site.api.espn.com/apis/site/v2/sports/" in html and "pollScores" in html
+
+
+def test_daily_lock_promotes_a_side_already_posted_as_a_lean():
+    from datetime import timedelta
+
+    now = START - timedelta(hours=5)
+    led = Ledger()
+    p = make_pick(event_id="a", american=-120, win_prob=0.58)
+    led.publish([card(p, tier="lean", units=0.0)], now)
+    added = led.publish([card(p, tier="lock", units=0.0)], now + timedelta(minutes=30))
+    (e,) = led.entries.values()
+    assert e.tier == "lock" and added == [e]  # the lean became today's Lock, not a skipped duplicate
+    assert "lock_lean" in led.taken_today(now)
