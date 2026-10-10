@@ -197,6 +197,14 @@ class Ledger:
                     existing.tier, existing.units, existing.day = "lock", card.units, today
                     existing.headline, existing.reasons = card.headline, card.reasons
                     continue
+                # Today's Lock or Dog can be a side already posted as a lean: promote that lean
+                # (same bet, same price) instead of skipping it, or the day has no Lock/Dog.
+                if card.tier in ("lock", "dog") and existing.tier == "lean" and existing.status == "pending" \
+                        and existing.start > now:
+                    existing.tier, existing.units, existing.day = card.tier, card.units, today
+                    existing.headline, existing.reasons = card.headline, card.reasons
+                    added.append(existing)
+                    continue
                 # Promote an open unit play that is now one of today's best bets.
                 if card.best_rank and not existing.best_rank and existing.is_unit_play \
                         and existing.status == "pending" and existing.start > now and next_rank <= BEST_BETS:
