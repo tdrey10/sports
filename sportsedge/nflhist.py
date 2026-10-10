@@ -44,6 +44,7 @@ TUNE_LAST = 2017  # settings are chosen on 2006-2017 (2006 itself only warms the
 WARMUP_LAST = 2006
 MIN_EDGE = 0.02
 MAX_FAVORITE = -150
+MAX_UNDERDOG = 300  # long shots are noise: one +8000 upset would swamp a whole test
 DOG_RANGE = (100, 220)
 MARGIN_CAP = 24  # a 45-point win teaches no more than a 24-point one
 PROVEN_BETS = 60
@@ -114,6 +115,7 @@ class Game:
     away_qb: str
     wind: float | None = None  # mph at kickoff (nflverse); None indoors or unknown
     outdoors: bool = True
+    gid: str = ""  # game id (nflverse game_id, or the ESPN id for college)
 
     @property
     def done(self) -> bool:
@@ -137,7 +139,7 @@ def load(folder: Path) -> list[Game]:
                 home_spread_odds=_f(r["home_spread_odds"]), away_spread_odds=_f(r["away_spread_odds"]),
                 total=_f(r["total_line"]), over_odds=_f(r["over_odds"]), under_odds=_f(r["under_odds"]),
                 home_qb=r["home_qb_id"], away_qb=r["away_qb_id"],
-                wind=_f(r["wind"]), outdoors=r["roof"] in ("outdoors", "open"),
+                wind=_f(r["wind"]), outdoors=r["roof"] in ("outdoors", "open"), gid=r.get("game_id", ""),
             ))
     return sorted(games, key=lambda g: (g.day, g.home))
 
@@ -382,7 +384,7 @@ def bet(rs: list[Row], trust: float, min_edge: float = MIN_EDGE) -> Record:
         for side in ("home", "away"):
             read = trust * r.model[side] + (1 - trust) * r.fair[side]
             edge = read - r.fair[side]
-            if r.price[side] >= MAX_FAVORITE and edge >= min_edge and (best is None or edge > best[0]):
+            if MAX_FAVORITE <= r.price[side] <= MAX_UNDERDOG and edge >= min_edge and (best is None or edge > best[0]):
                 best = (edge, side, read)
         if best:
             _, side, read = best
@@ -458,12 +460,27 @@ def calibration(pairs: list[tuple[float, int]], bins: int = 10) -> list[dict]:
     return out
 
 
-def run(games: list[Game], tune_last: int = TUNE_LAST, grid: dict = GRID) -> dict:
+@dataclass
+class Fit:
+    params: Params
+    preds: list[Pred]
+    cal: tuple[float, float]
+    sd: float
+
+
+def fit(games: list[Game], tune_last: int = TUNE_LAST, grid: dict = GRID) -> Fit:
+    """Ratings settings, calibration and margin spread, all from the tuning seasons only."""
     p = tune(games, tune_last, grid)
     preds = replay(games, p)
     tune_preds = [x for x in preds if x.game.done and WARMUP_LAST < x.game.season <= tune_last and x.game.margin]
     cal = fit_logistic([x.margin for x in tune_preds], [int(x.game.margin > 0) for x in tune_preds])
     sd = math.sqrt(sum((x.game.margin - x.margin) ** 2 for x in tune_preds) / len(tune_preds))
+    return Fit(p, preds, cal, sd)
+
+
+def run(games: list[Game], tune_last: int = TUNE_LAST, grid: dict = GRID, fitted: Fit | None = None) -> dict:
+    f = fitted or fit(games, tune_last, grid)
+    p, preds, cal, sd = f.params, f.preds, f.cal, f.sd
     all_rows = [r for r in rows(preds, cal, sd) if r.pred.game.season > WARMUP_LAST]
     out = {"params": p.__dict__, "calibration_fit": cal, "margin_sd": sd, "tune_seasons": f"2007-{tune_last}",
            "blind_seasons": f"{tune_last + 1}-{max(g.season for g in games)}", "markets": {}}
@@ -489,13 +506,21 @@ def run(games: list[Game], tune_last: int = TUNE_LAST, grid: dict = GRID) -> dic
     return out
 
 
-def report(res: dict) -> str:
+def held_up(rec: dict) -> str:
+    """PROVEN only when the blind seasons pass AND the tuning seasons made money too:
+    an idea that lost in one period and won in the other is a coin flip, not an edge."""
+    ins = rec.get("in_sample") or {}
+    ok = rec["blind"]["proven"] and (ins.get("flat_roi") or 0) > 0
+    return "  PROVEN" if ok else ("  (blind only: lost in the tuning seasons)" if rec["blind"]["proven"] else "")
+
+
+def report(res: dict, league: str = "NFL") -> str:
     def rec(d):
         roi = f"{d['flat_roi']:+.1%} ± {d['se']:.1%}" if d["flat_roi"] is not None and d["se"] else "-"
         return f"{d['bets']:>5} bets  {d['won']}-{d['lost']}-{d['push']}  {d['units']:+.1f}u  ROI {roi}"
 
     p = res["params"]
-    lines = [f"NFL ratings (chosen on {res['tune_seasons']}): speed {p['k']}, home field {p['hfa']} pts, "
+    lines = [f"{league} ratings (chosen on {res['tune_seasons']}): speed {p['k']}, home field {p['hfa']} pts, "
              f"rest {p['rest']} pts/day, new QB -{p['qb']} pts, carryover {p['carry']}; margin sd {res['margin_sd']:.1f}",
              f"Blind seasons: {res['blind_seasons']}", ""]
     for m, d in res["markets"].items():
@@ -503,18 +528,18 @@ def report(res: dict) -> str:
         lines += [f"{name}: trust in model {d['trust']:.2f}; blind log loss model {d['log_loss_model']:.4f} "
                   f"vs market {d['log_loss_market']:.4f} ({d['blind_games']} games)",
                   f"  in-sample       {rec(d['in_sample'])}",
-                  f"  BLIND           {rec(d['blind'])}" + ("  PROVEN" if d["blind"]["proven"] else ""),
+                  f"  BLIND           {rec(d['blind'])}" + held_up(d),
                   f"  blind, model only {rec(d['blind_model_only'])}"]
         lines.append("  calibration (blind, model): " + "  ".join(
             f"{c['bin']} said {c['said']:.0%} won {c['won']:.0%} (n={c['games']})" for c in d["calibration_blind"]))
         lines.append("")
-    w = res["wind_unders"]
-    lines += [f"Totals: under in outdoor games with {WIND_MPH}+ mph wind (closing total and price)",
+    w = res.get("wind_unders")
+    lines += [] if w is None else [f"Totals: under in outdoor games with {WIND_MPH}+ mph wind (closing total and price)",
               f"    in-sample {rec(w['in_sample'])}",
-              f"    BLIND     {rec(w['blind'])}" + ("  PROVEN" if w["blind"]["proven"] else ""), ""]
+              f"    BLIND     {rec(w['blind'])}" + held_up(w), ""]
     lines.append("Early-bet spots (dog moneyline +100 to +220, at the closing price):")
     for spot, d in sorted(res["spots"].items()):
         lines.append(f"  {spot}")
         lines.append(f"    in-sample {rec(d['in_sample'])}")
-        lines.append(f"    BLIND     {rec(d['blind'])}" + ("  PROVEN" if d["blind"]["proven"] else ""))
+        lines.append(f"    BLIND     {rec(d['blind'])}" + held_up(d))
     return "\n".join(lines)

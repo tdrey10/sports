@@ -550,6 +550,15 @@ def cmd_nfl_history(args) -> int:
     return 0
 
 
+def cmd_ncaaf_history(args) -> int:
+    from . import cfbhist
+
+    res = cfbhist.run(Path(args.data_dir) / "lines" / "ncaaf")
+    print(cfbhist.report(res))
+    (Path(args.data_dir) / "ncaaf_history.json").write_text(json.dumps(res, indent=1, default=str))
+    return 0
+
+
 def cmd_sports(_args) -> int:
     rows = [[k, c.name, c.odds_key, c.espn_path, len(c.props)] for k, c in SPORTS.items()]
     print(report.table(["Key", "Name", "Odds API key", "ESPN path", "Prop markets"], rows, "llllr"))
@@ -685,6 +694,10 @@ def build_parser() -> argparse.ArgumentParser:
     nh.add_argument("--fetch", action="store_true", help="download the latest nflverse games first")
     nh.add_argument("--data-dir", default="data")
     nh.set_defaults(func=cmd_nfl_history)
+
+    nc = sub.add_parser("ncaaf-history", help="college football blind test on 2006-2022 lines (cfbfastR, free)")
+    nc.add_argument("--data-dir", default="data")
+    nc.set_defaults(func=cmd_ncaaf_history)
 
     sub.add_parser("sports", help="list supported sports").set_defaults(func=cmd_sports)
     return p
