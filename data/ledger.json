@@ -1904,8 +1904,8 @@
    "status": "live",
    "live": {
     "home": 7.0,
-    "away": 0.0,
-    "detail": "9:08 - 2nd"
+    "away": 3.0,
+    "detail": "3:13 - 2nd"
    },
    "final": null,
    "result_value": null,
@@ -1974,9 +1974,9 @@
    "close_fair": 0.5185754937203745,
    "status": "live",
    "live": {
-    "home": 7.0,
+    "home": 14.0,
     "away": 0.0,
-    "detail": "4:42 - 1st"
+    "detail": "14:27 - 2nd"
    },
    "final": null,
    "result_value": null,
@@ -2108,9 +2108,9 @@
    "close_fair": 0.5046406578888563,
    "status": "live",
    "live": {
-    "home": 0.0,
+    "home": 7.0,
     "away": 0.0,
-    "detail": "12:59 - 1st"
+    "detail": "6:39 - 1st"
    },
    "final": null,
    "result_value": null,
@@ -2285,8 +2285,12 @@
    ],
    "close_odds": -112.0,
    "close_fair": 0.5046406578888563,
-   "status": "pending",
-   "live": null,
+   "status": "live",
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "11:33 - 1st"
+   },
    "final": null,
    "result_value": null,
    "profit": null,
@@ -2353,8 +2357,12 @@
    ],
    "close_odds": -148.0,
    "close_fair": 0.5767508206681559,
-   "status": "pending",
-   "live": null,
+   "status": "live",
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "18:57 - 1st"
+   },
    "final": null,
    "result_value": null,
    "profit": null,
@@ -2786,6 +2794,66 @@
    "graded_at": "2026-10-08T22:59:32.781350+00:00"
   },
   {
+   "id": "8da30e303dc395f3",
+   "created_at": "2026-10-10T17:11:12.582172+00:00",
+   "day": "2026-10-10",
+   "tier": "lean",
+   "units": 0.0,
+   "sport": "laliga",
+   "sport_name": "La Liga",
+   "event_id": "401882848",
+   "commence_time": "2026-10-10T19:00:00+00:00",
+   "home": "Real Madrid",
+   "away": "Villarreal",
+   "matchup": "Villarreal @ Real Madrid",
+   "market": "totals",
+   "market_label": "Total",
+   "side": "under",
+   "point": 3.5,
+   "player": null,
+   "selection": "Under 3.5",
+   "headline": "We project 3.5 total; Under 3.5 hits 45% of the time.",
+   "reasons": [
+    "No bet: no injury report for Real Madrid, Villarreal, so injuries are unknown. Tracked as a lean only.",
+    "Projected score: Villarreal 1.2 - Real Madrid 2.3.",
+    "Villarreal (2-3-2) @ Real Madrid (5-2).",
+    "Villarreal fresh off a 3-1 win over Levante (Sun 9/20).",
+    "Season goals per game: Villarreal 1.9 scored / 1.7 allowed; Real Madrid 2.6 scored / 1.1 allowed.",
+    "Last 5: Villarreal 2-3 (avg margin +0.2); Real Madrid 3-2 (avg margin +1.2).",
+    "Splits: Real Madrid 3-0 at home; Villarreal 1-1-2 on the road.",
+    "Power rank: Villarreal #4 vs Real Madrid #2 (of 23).",
+    "Model 53% \u00b7 market (no-vig) 43% \u00b7 blended 45% \u2192 fair +120.",
+    "Best price +120 at DraftKings (1 books compared)."
+   ],
+   "book": "draftkings",
+   "odds": 120.0,
+   "model_prob": 0.5304782808435827,
+   "win_prob": 0.45496864209678145,
+   "ev": 0.0009310126129192797,
+   "market_prob": 0.4297987625145143,
+   "best_rank": null,
+   "score": 9.3,
+   "spots": [],
+   "current_odds": 120.0,
+   "current_point": 3.5,
+   "current_book": "draftkings",
+   "history": [
+    [
+     "2026-10-10T17:11:12.582172+00:00",
+     120.0,
+     3.5
+    ]
+   ],
+   "close_odds": 120.0,
+   "close_fair": 0.4297987625145143,
+   "status": "pending",
+   "live": null,
+   "final": null,
+   "result_value": null,
+   "profit": null,
+   "graded_at": null
+  },
+  {
    "id": "46b170b2d00a7f38",
    "created_at": "2026-10-10T07:30:21.467743+00:00",
    "day": "2026-10-10",
@@ -2828,8 +2896,8 @@
    "best_rank": null,
    "score": 21.3,
    "spots": [],
-   "current_odds": -105.0,
-   "current_point": -28.5,
+   "current_odds": -110.0,
+   "current_point": -27.5,
    "current_book": "draftkings",
    "history": [
     [
@@ -2851,6 +2919,11 @@
      "2026-10-10T16:25:10.446850+00:00",
      -105.0,
      -28.5
+    ],
+    [
+     "2026-10-10T17:11:12.582172+00:00",
+     -110.0,
+     -27.5
     ]
    ],
    "close_odds": -105.0,
@@ -3216,7 +3289,7 @@
    "best_rank": null,
    "score": 14.6,
    "spots": [],
-   "current_odds": -118.0,
+   "current_odds": -122.0,
    "current_point": 6.5,
    "current_book": "draftkings",
    "history": [
@@ -3229,10 +3302,15 @@
      "2026-10-10T10:29:01.188667+00:00",
      -118.0,
      6.5
+    ],
+    [
+     "2026-10-10T17:11:12.582172+00:00",
+     -122.0,
+     6.5
     ]
    ],
-   "close_odds": -118.0,
-   "close_fair": 0.5185754937203745,
+   "close_odds": -122.0,
+   "close_fair": 0.5278394447972194,
    "status": "pending",
    "live": null,
    "final": null,
@@ -4705,6 +4783,131 @@
    "graded_at": "2026-10-08T22:59:32.781350+00:00"
   },
   {
+   "id": "642a7609047da1df",
+   "created_at": "2026-10-10T17:11:12.582172+00:00",
+   "day": "2026-10-10",
+   "tier": "lean",
+   "units": 0.0,
+   "sport": "nfl",
+   "sport_name": "NFL",
+   "event_id": "401872984",
+   "commence_time": "2026-10-11T17:00:00+00:00",
+   "home": "Tennessee Titans",
+   "away": "Houston Texans",
+   "matchup": "Houston Texans @ Tennessee Titans",
+   "market": "spreads",
+   "market_label": "Spread",
+   "side": "home",
+   "point": 7.0,
+   "player": null,
+   "selection": "Tennessee Titans +7",
+   "headline": "We project Tennessee Titans to lose by 3.6; getting 7 at -110 covers 53% of the time.",
+   "reasons": [
+    "Projected score: Houston Texans 21.1 - Tennessee Titans 17.6.",
+    "Houston Texans (0-4) @ Tennessee Titans (0-4).",
+    "Tennessee Titans coming off a 18-24 loss to Baltimore Ravens (Sun 10/4).",
+    "Season points per game: Houston Texans 21.0 scored / 27.2 allowed; Tennessee Titans 13.8 scored / 20.8 allowed.",
+    "Last 5: Houston Texans 0-4 (avg margin -6.2); Tennessee Titans 0-4 (avg margin -7.0).",
+    "Power rank: Houston Texans #15 vs Tennessee Titans #32 (of 32).",
+    "Upset chance: Tennessee Titans wins outright 39% of the time on our numbers.",
+    "Track record: teams we gave a 56% chance to win outright won 47% of the time (17 recent games tested).",
+    "Model 61% \u00b7 market (no-vig) 50% \u00b7 blended 53% \u2192 fair -112.",
+    "Best price -110 at DraftKings (1 books compared).",
+    "Tennessee Titans missing: Amani Hooker, Joshua Williams.",
+    "Houston Texans missing: M.J. Stewart, Tank Dell, Braden Smith, Kayden McDonald +1 more."
+   ],
+   "book": "draftkings",
+   "odds": -110.0,
+   "model_prob": 0.6148440463393279,
+   "win_prob": 0.5287110115848319,
+   "ev": 0.008926874367366777,
+   "market_prob": 0.5,
+   "best_rank": null,
+   "score": 14.1,
+   "spots": [],
+   "current_odds": -110.0,
+   "current_point": 7.0,
+   "current_book": "draftkings",
+   "history": [
+    [
+     "2026-10-10T17:11:12.582172+00:00",
+     -110.0,
+     7.0
+    ]
+   ],
+   "close_odds": -110.0,
+   "close_fair": 0.5,
+   "status": "pending",
+   "live": null,
+   "final": null,
+   "result_value": null,
+   "profit": null,
+   "graded_at": null
+  },
+  {
+   "id": "6a51960987940d13",
+   "created_at": "2026-10-10T17:11:12.582172+00:00",
+   "day": "2026-10-10",
+   "tier": "lean",
+   "units": 0.0,
+   "sport": "nfl",
+   "sport_name": "NFL",
+   "event_id": "401872987",
+   "commence_time": "2026-10-11T17:00:00+00:00",
+   "home": "New Orleans Saints",
+   "away": "Minnesota Vikings",
+   "matchup": "Minnesota Vikings @ New Orleans Saints",
+   "market": "h2h",
+   "market_label": "Moneyline",
+   "side": "away",
+   "point": null,
+   "player": null,
+   "selection": "Minnesota Vikings ML",
+   "headline": "Minnesota Vikings wins 59% of the time on our numbers; -142 only asks for 59%.",
+   "reasons": [
+    "Projected score: Minnesota Vikings 24.1 - New Orleans Saints 18.4.",
+    "Minnesota Vikings (4-0) @ New Orleans Saints (1-3).",
+    "Minnesota Vikings fresh off a 15-10 win over Miami Dolphins (Sun 10/4).",
+    "Season points per game: Minnesota Vikings 21.5 scored / 12.8 allowed; New Orleans Saints 26.2 scored / 32.0 allowed.",
+    "Last 5: Minnesota Vikings 4-0 (avg margin +8.8); New Orleans Saints 1-3 (avg margin -5.8).",
+    "Splits: New Orleans Saints 0-2 at home; Minnesota Vikings 2-0 on the road.",
+    "Power rank: Minnesota Vikings #8 vs New Orleans Saints #27 (of 32).",
+    "Upset risk: 33% chance New Orleans Saints wins outright.",
+    "Track record: teams we gave a 44% chance to win outright won 53% of the time (17 recent games tested).",
+    "Model 67% \u00b7 market (no-vig) 57% \u00b7 blended 59% \u2192 fair -145.",
+    "Best price -142 at DraftKings (1 books compared).",
+    "New Orleans Saints missing: Jeremiah Wright, Anfernee Jennings, Kaden Elliss, Jaylan Ford +1 more.",
+    "Minnesota Vikings missing: Charles Demmings, Christian Darrisaw, Ben Yurosek, Michael Jurgens +2 more."
+   ],
+   "book": "draftkings",
+   "odds": -142.0,
+   "model_prob": 0.6653058636274303,
+   "win_prob": 0.5919038701662165,
+   "ev": 0.00873758155087595,
+   "market_prob": 0.5674365390124785,
+   "best_rank": null,
+   "score": 20.1,
+   "spots": [],
+   "current_odds": -142.0,
+   "current_point": null,
+   "current_book": "draftkings",
+   "history": [
+    [
+     "2026-10-10T17:11:12.582172+00:00",
+     -142.0,
+     null
+    ]
+   ],
+   "close_odds": -142.0,
+   "close_fair": 0.5674365390124785,
+   "status": "pending",
+   "live": null,
+   "final": null,
+   "result_value": null,
+   "profit": null,
+   "graded_at": null
+  },
+  {
    "id": "668b2f03b2a4eb6c",
    "created_at": "2026-10-08T19:00:18.238450+00:00",
    "day": "2026-10-08",
@@ -4954,6 +5157,125 @@
    "units": 0.0,
    "decimal": 12.3515,
    "hit_prob": 0.0838,
+   "kind": "dabble",
+   "extra": {}
+  },
+  {
+   "id": "b48cad7312b7db6e",
+   "day": "2026-10-10",
+   "created_at": "2026-10-10T17:11:12.582172+00:00",
+   "size": 2,
+   "legs": [
+    "845a15971347b060",
+    "6a51960987940d13"
+   ],
+   "leg_odds": [
+    -160.0,
+    -142.0
+   ],
+   "units": 0.0,
+   "decimal": 2.7694,
+   "hit_prob": 0.3601,
+   "kind": "dabble",
+   "extra": {}
+  },
+  {
+   "id": "f895d0384b490a67",
+   "day": "2026-10-10",
+   "created_at": "2026-10-10T17:11:12.582172+00:00",
+   "size": 3,
+   "legs": [
+    "845a15971347b060",
+    "6a51960987940d13",
+    "f515057d0758b221"
+   ],
+   "leg_odds": [
+    -160.0,
+    -142.0,
+    -120.0
+   ],
+   "units": 0.0,
+   "decimal": 5.0772,
+   "hit_prob": 0.198,
+   "kind": "dabble",
+   "extra": {}
+  },
+  {
+   "id": "751fdea438a8387c",
+   "day": "2026-10-10",
+   "created_at": "2026-10-10T17:11:12.582172+00:00",
+   "size": 4,
+   "legs": [
+    "845a15971347b060",
+    "6a51960987940d13",
+    "f515057d0758b221",
+    "cde964e77e244750"
+   ],
+   "leg_odds": [
+    -160.0,
+    -142.0,
+    -120.0,
+    -115.0
+   ],
+   "units": 0.0,
+   "decimal": 9.4921,
+   "hit_prob": 0.1059,
+   "kind": "dabble",
+   "extra": {}
+  },
+  {
+   "id": "094fbed9a18f105a",
+   "day": "2026-10-10",
+   "created_at": "2026-10-10T17:11:12.582172+00:00",
+   "size": 5,
+   "legs": [
+    "845a15971347b060",
+    "6a51960987940d13",
+    "f515057d0758b221",
+    "cde964e77e244750",
+    "c8eca641b49f9499"
+   ],
+   "leg_odds": [
+    -160.0,
+    -142.0,
+    -120.0,
+    -115.0,
+    -108.0
+   ],
+   "units": 0.0,
+   "decimal": 18.2811,
+   "hit_prob": 0.0565,
+   "kind": "dabble",
+   "extra": {}
+  },
+  {
+   "id": "9da3745232fab8d7",
+   "day": "2026-10-10",
+   "created_at": "2026-10-10T17:11:12.582172+00:00",
+   "size": 8,
+   "legs": [
+    "845a15971347b060",
+    "6a51960987940d13",
+    "f515057d0758b221",
+    "cde964e77e244750",
+    "c8eca641b49f9499",
+    "c47e1bbd27181a99",
+    "46b170b2d00a7f38",
+    "5fd441ee25e81bbe"
+   ],
+   "leg_odds": [
+    -160.0,
+    -142.0,
+    -120.0,
+    -115.0,
+    -108.0,
+    -112.0,
+    -105.0,
+    -105.0
+   ],
+   "units": 0.0,
+   "decimal": 131.9013,
+   "hit_prob": 0.0085,
    "kind": "dabble",
    "extra": {}
   }
