@@ -213,6 +213,8 @@ button, select { font: inherit; color: inherit; }
 .move-good { color: var(--win); font-weight: 600; } .move-bad { color: var(--muted); }
 .live-dot { color: var(--accent-2); font-weight: 700; }
 .live-dot::before { content: "● "; }
+.scores { list-style: none; padding: 0; margin: 6px 0 0; }
+.scores li { padding: 6px 0; border-bottom: 1px solid rgba(127,127,127,.18); }
 details.more summary { cursor: pointer; color: var(--silver); font-size: 14px; font-weight: 700; list-style: none; }
 details.more summary::-webkit-details-marker { display: none; }
 details.more summary::after { content: " ›"; }
@@ -275,6 +277,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   "use strict";
   let DATA = JSON.parse(document.getElementById("edge-data").textContent);
   const SCORES = {};  // ESPN event id (and "away|home") -> {home, away, detail, final}: pulled by the page itself
+  const BOARD = {};  // sport key -> every game on today's ESPN scoreboard (for the Live tab's scoreboard)
   const gameKey = (away, home) => `${(away || "").toLowerCase()}|${(home || "").toLowerCase()}`;
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
@@ -458,12 +461,30 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const st = (DATA.stats && DATA.stats.parlays) || {};
     const rows = [2, 3, 4, 8].map((n) => { const s = st[n] || { won: 0, lost: 0, units: 0 };
       return `<tr><td>${n}-team</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 2)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("");
-    return panel("Parlays of the day", "Most likely winners first, one leg per game · posted once a day",
+    return panel("Parlays of the day", "A 2- and 3-team every day when possible · most likely winners first, one leg per game",
         (todays.length ? `<div class="grid two">${todays.map((p) => parlayCard(p, ids)).join("")}</div>` : "") + note
         + `<p class="small muted">Every leg has to win, and the book's edge stacks on every leg, so parlays lose more often than straight bets. Stakes stay small: ½u on a 2-team, ¼u on a 3- or 4-team, 0.1u on an 8-team.</p>`)
       + panel("Parlay record", "Kept apart from the straight-bet record",
         `<div class="table-wrap"><table><thead><tr><th>Parlay</th><th>Record</th><th>Profit</th><th>ROI</th></tr></thead><tbody>${rows}</tbody></table></div>`)
       + (earlier.length ? panel("Earlier parlays", "Last 7 days", `<div class="grid two">${earlier.map((p) => parlayCard(p, ids)).join("")}</div>`) : "");
+  }
+
+  // Every game on today's scoreboards: live first, then upcoming, then final. Pulled from ESPN.
+  function scoreboard() {
+    const order = { in: 0, pre: 1, post: 2 };
+    const sports = (DATA.sports || []).filter((sp) => (BOARD[sp.key] || []).length);
+    if (!sports.length) return "";
+    const line = (g) => {
+      const tail = g.state === "pre" ? fmt(g.when, { hour: "numeric", minute: "2-digit" }) : esc(g.detail);
+      const sc = g.state === "pre" ? "" : ` <b>${esc(g.as ?? "")}-${esc(g.hs ?? "")}</b>`;
+      return `<li class="${g.state === "in" ? "live-dot" : ""}">${esc(g.away)} @ ${esc(g.home)}${sc} <span class="muted">· ${tail}</span></li>`;
+    };
+    const body = sports.map((sp) => {
+      const games = [...BOARD[sp.key]].sort((a, b) => (order[a.state] ?? 1) - (order[b.state] ?? 1) || new Date(a.when) - new Date(b.when));
+      return `<div><span class="kind">${esc(sp.name)}</span><ul class="scores">${games.map(line).join("")}</ul></div>`;
+    }).join("");
+    const live = sports.reduce((n, sp) => n + BOARD[sp.key].filter((g) => g.state === "in").length, 0);
+    return panel("Scores", live ? `${live} live now · updates every 30 seconds` : "Today's games", `<div class="grid two">${body}</div>`);
   }
 
   function viewLive() {
@@ -473,7 +494,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       return `<div class="slot ${extra}"><span class="kind">${title}</span>${e ? row(e, { matchup: true }) : `<p class="empty">Bet on it, the heat is coming</p>`}</div>`; };
     const shown = new Set([latest("live_win"), latest("live_plus")].filter(Boolean).map((e) => e.id));
     const earlier = items.filter((e) => !shown.has(e.id));
-    return panel("Live right now", items.length ? `${items.length} live bets today` : "",
+    return scoreboard() + panel("Live right now", items.length ? `${items.length} live bets today` : "",
         `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money · +100 to +200", "plus")}</div>`)
       + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "");
   }
@@ -628,7 +649,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   document.addEventListener("click", (ev) => {
     const t = ev.target.closest("button");
     if (!t) return;
-    if (t.dataset.tab) { state.tab = t.dataset.tab; save(); render(); }
+    if (t.dataset.tab) { state.tab = t.dataset.tab; save(); render(); if (state.tab === "live") pollScores(); }
     else if (t.dataset.sport) { state.sport = t.dataset.sport; save(); render(); }
     else if (t.dataset.market) { state.market = t.dataset.market; save(); render(); }
   });
@@ -651,16 +672,32 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const s = (DATA.espn || {})[e.sport];
       if (!s) continue;
       const day = espnDay(e.commence_time);
-      boards[`${s.path}|${day}`] = { s, day };
+      boards[`${s.path}|${day}`] = { s, day, sport: e.sport };
     }
-    const before = JSON.stringify(SCORES);
-    await Promise.all(Object.values(boards).map(async ({ s, day }) => {
+    if (state.tab === "live") {  // the whole scoreboard, for every sport on the page
+      const day = espnDay(new Date().toISOString());
+      for (const sp of DATA.sports || []) {
+        const s = (DATA.espn || {})[sp.key];
+        if (s) boards[`${s.path}|${day}`] = { s, day, sport: sp.key, all: true };
+      }
+    }
+    const before = JSON.stringify(SCORES) + JSON.stringify(BOARD);
+    await Promise.all(Object.values(boards).map(async ({ s, day, sport, all }) => {
       try {
         const q = new URLSearchParams({ dates: day, limit: "500" });
         if (s.groups) q.set("groups", s.groups);
         const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${s.path}/scoreboard?${q}`);
         if (!r.ok) return;
-        for (const ev of (await r.json()).events || []) {
+        const events = (await r.json()).events || [];
+        if (all) BOARD[sport] = events.map((ev) => {
+          const c = (ev.competitions || [])[0] || {};
+          const side = (w) => (c.competitors || []).find((x) => x.homeAway === w) || {};
+          const st = (ev.status || {}).type || {};
+          const name = (x) => (x.team || {}).shortDisplayName || (x.team || {}).displayName || "";
+          return { id: ev.id, away: name(side("away")), home: name(side("home")), as: side("away").score,
+            hs: side("home").score, state: st.state, detail: st.shortDetail || st.detail || "", when: ev.date };
+        });
+        for (const ev of events) {
           const c = (ev.competitions || [])[0] || {};
           const side = (w) => (c.competitors || []).find((x) => x.homeAway === w) || {};
           const st = (ev.status || {}).type || {};
@@ -672,7 +709,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         }
       } catch (err) {}  // no live score this time: the card keeps the engine's last one
     }));
-    if (JSON.stringify(SCORES) !== before) render();
+    if (JSON.stringify(SCORES) + JSON.stringify(BOARD) !== before) render();
   }
   pollScores();
   setInterval(pollScores, 30000);

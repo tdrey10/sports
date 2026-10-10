@@ -49,11 +49,30 @@ def test_parlay_settles_from_its_legs(tmp_path):
     assert again.stats(START)["parlays"]["2"]["won"] == 1
 
 
-def test_no_filler_legs_on_a_short_board():
-    from sportsedge.parlays import build
+def test_daily_two_and_three_team_fill_with_leans_but_never_the_big_ones():
+    from sportsedge.parlays import FILL_HOUR, build
 
     now = START - timedelta(hours=6)
     led = Ledger()
     picks = [make_pick(event_id=f"g{i}", american=-120, win_prob=0.55 + i * 0.01) for i in range(9)]
     led.publish([card(p, tier="lean", units=0.0) for p in picks], now)
-    assert build(led.entries.values(), [], now, led.day_of(now), local_hour=12) == []
+    day = led.day_of(now)
+    assert build(led.entries.values(), [], now, day, local_hour=FILL_HOUR - 1) == []  # too early: wait for real picks
+    out = build(led.entries.values(), [], now, day, local_hour=FILL_HOUR)
+    assert [p.size for p in out] == [2, 3]  # 4- and 8-team never use filler
+    assert all(p.units == 0 for p in out)  # filler parlays carry no units
+    assert [led.entries[i].event_id for i in out[1].legs] == ["g8", "g7", "g6"]  # most likely winners first
+
+
+def test_filler_skips_coin_flips_and_negative_edges_and_unit_plays_lead():
+    from sportsedge.parlays import FILL_HOUR, build
+
+    now = START - timedelta(hours=6)
+    led = Ledger()
+    real = make_pick(event_id="u1", american=-110, win_prob=0.58)
+    led.publish([card(real)], now)
+    led.publish([card(make_pick(event_id="l1", american=-130, win_prob=0.6), tier="lean", units=0.0),
+                 card(make_pick(event_id="l2", american=120, win_prob=0.48), tier="lean", units=0.0)], now)
+    out = build(led.entries.values(), [], now, led.day_of(now), local_hour=FILL_HOUR)
+    assert [p.size for p in out] == [2]  # the 48% lean never fills a leg
+    assert [led.entries[i].event_id for i in out[0].legs] == ["u1", "l1"]
