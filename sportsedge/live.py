@@ -232,8 +232,7 @@ from .tiers import Card, units_for  # noqa: E402
 
 LIVE_WIN_MIN_ODDS = -170  # never bet worse than -170, live included
 LIVE_WIN_MIN_PROB = 0.60  # and it has to be a bet we expect to cash at least 60% of the time
-LIVE_PLUS_MAX_ODDS = 200  # plus money, but a real chance to win: +100 to +200 only
-LIVE_PLUS_MIN_PROB = 0.42  # and at least 42% on our numbers (break-even at +200 is 33%)
+LIVE_PLUS_MAX_ODDS = 2000  # plus money from even (+100) up to +2000 (the owner's range)
 
 
 def _trusted(p: Pick) -> bool:
@@ -249,8 +248,8 @@ def live_cards(
 
     - ``live_win``: the bet most likely to cash that still has an edge (EV >= 0, at least 60% to
       cash on our numbers, odds -300 or longer);
-    - ``live_plus``: the plus-money bet most likely to win (+100 to +200, 42%+ on our numbers,
-      with a real edge: EV >= the live minimum).
+    - ``live_plus``: the best plus-money bet: the biggest edge from +100 to +2000 (EV at least
+      the live minimum, at most the stale-price cap, with our model agreeing with the market).
 
     ``taken`` holds (event_id, tier) pairs already posted, so each game gets at most one of each.
     """
@@ -262,13 +261,13 @@ def live_cards(
         if p.ev > 0 and p.win_prob >= LIVE_WIN_MIN_PROB and p.american >= LIVE_WIN_MIN_ODDS
         and (p.event_id, "live_win") not in taken
     ]
-    plus = [p for p in ok if 100 <= p.american <= LIVE_PLUS_MAX_ODDS and p.win_prob >= LIVE_PLUS_MIN_PROB
+    plus = [p for p in ok if 100 <= p.american <= LIVE_PLUS_MAX_ODDS
             and p.ev >= scanner.settings.min_ev and (p.event_id, "live_plus") not in taken]
     chosen: list[tuple[str, Pick]] = []
     if win:
         chosen.append(("live_win", max(win, key=lambda p: (p.win_prob, p.ev))))
     if plus:
-        best_plus = max(plus, key=lambda p: (p.win_prob, p.ev))  # most likely winner first
+        best_plus = max(plus, key=lambda p: (p.ev, p.win_prob))  # the best bet: biggest edge first
         if not chosen or best_plus is not chosen[0][1]:
             chosen.append(("live_plus", best_plus))
 

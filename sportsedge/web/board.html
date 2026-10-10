@@ -515,8 +515,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       return `<div class="slot ${extra}"><span class="kind">${title}</span>${e ? row(e, { matchup: true }) : `<p class="empty">Bet on it, the heat is coming</p>`}</div>`; };
     const shown = new Set([latest("live_win"), latest("live_plus")].filter(Boolean).map((e) => e.id));
     const earlier = items.filter((e) => !shown.has(e.id));
-    return scoreboard() + panel("Live right now", items.length ? `${items.length} live bets today` : "",
-        `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money · +100 to +200", "plus")}</div>`)
+    // The one live bet we'd take right now: the open one with the best edge score.
+    const open = items.filter((e) => !SETTLED[e.status]);
+    const top = open.length ? open.reduce((a, b) => (score(b) > score(a) ? b : a)) : null;
+    const best = top ? panel("Best live bet", "The one we'd take right now · highest edge score", row(top, { matchup: true })) : "";
+    return best + scoreboard() + panel("Live right now", items.length ? `${items.length} live bets today` : "",
+        `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money · +100 to +2000 · biggest edge", "plus")}</div>`)
       + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "");
   }
 
