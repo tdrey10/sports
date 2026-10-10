@@ -244,7 +244,8 @@ def _trusted(p: Pick) -> bool:
 
 
 def live_cards(
-    picks: list[Pick], scanner: LiveScanner, sport_names: dict[str, str], taken: set[tuple[str, str]] = frozenset()
+    picks: list[Pick], scanner: LiveScanner, sport_names: dict[str, str], taken: set[tuple[str, str]] = frozenset(),
+    proven: set[str] | None = None,
 ) -> list[Card]:
     """Up to two live bets per check, across every game in progress:
 
@@ -256,6 +257,8 @@ def live_cards(
     Both slots go to the highest edge score: best edge and likely to win, together.
 
     ``taken`` holds (event_id, tier) pairs already posted, so each game gets at most one of each.
+    ``proven``: live tiers whose own graded record proved out (Ledger.live_proven). With money only
+    on proven bets, the others post with no units until they do. None: no record kept (old behavior).
     """
     # Live bets post on their own checks (model agrees with the market's direction, real edge),
     # not the pregame blind test.
@@ -294,8 +297,13 @@ def live_cards(
             if p.market_prob is not None else f"Model {p.model_prob:.0%}.",
             f"Best live price {p.american:+.0f} at {p.book}. Live lines move fast: confirm the score and price before betting.",
         ]
+        units = min(units_for(p, scanner.settings), LIVE_MAX_UNITS)
+        if proven is not None and scanner.settings.units_proven_only and tier not in proven:
+            units = 0.0
+            reasons.insert(0, "No units: live bets haven't proven themselves yet (60+ graded live bets, "
+                              "profitable beyond luck), so this one is tracked as a lean until they do.")
         cards.append(Card(
-            tier=tier, units=min(units_for(p, scanner.settings), LIVE_MAX_UNITS), headline=headline, reasons=reasons, sport=p.sport,
+            tier=tier, units=units, headline=headline, reasons=reasons, sport=p.sport,
             sport_name=sport_names.get(p.sport, p.sport), pick=p,
             home=game.home if game else "", away=game.away if game else "",
         ))
