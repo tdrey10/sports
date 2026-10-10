@@ -10,7 +10,7 @@ on:
     inputs:
       sports:
         description: "Sports to watch (comma separated: nfl, nba, mlb, nhl, soccer)"
-        default: "nfl,nba,mlb,nhl,soccer"
+        default: "nfl,ncaaf,nba,mlb,nhl,soccer"
       hours:
         description: "How many hours to watch (max 5)"
         default: "3"

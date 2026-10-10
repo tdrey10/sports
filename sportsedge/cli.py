@@ -690,7 +690,7 @@ def build_parser() -> argparse.ArgumentParser:
     lv.set_defaults(func=cmd_live, hours=3)
 
     pg = sub.add_parser("page", help="write the dashboard page from the saved ledger")
-    pg.add_argument("sports", nargs="*", default=["nfl,nba,mlb,nhl,soccer"])
+    pg.add_argument("sports", nargs="*", default=["nfl,ncaaf,nba,mlb,nhl,soccer"])
     pg.add_argument("--data-dir", default="data")
     pg.add_argument("--tz", default="America/Los_Angeles")
     pg.add_argument("--out", default="great-hambino.html")
