@@ -8,10 +8,10 @@
 :root {
   /* Trail Blazers night: black, Blazers red, silver. One committed dark look. */
   --bg: #0b0b0c; --surface: #161618; --surface-2: #1f1f22; --line: #2b2b30; --line-2: #3b3b41;
-  --fg: #f4f4f5; --muted: #a3a9ac; --silver: #c4cacd; --accent: #e03a3e; --accent-2: #ff5a5e; --accent-soft: #3a1618;
-  --win: #e9ecee; --win-soft: #2a2c2f; --loss: #ff6b6e; --loss-soft: #3a1a1c;
-  --live: #e03a3e; --live-soft: #3a1618; --info: #c4cacd; --info-soft: #26272b;
-  --ticket: #f2f0ec; --ticket-ink: #121214; --ticket-muted: #5d5f63;
+  --fg: #f4f4f5; --muted: #ffffff; --silver: #ffffff; --accent: #e03a3e; --accent-2: #ff5a5e; --accent-soft: #3a1618;
+  --win: #ffffff; --win-soft: #2a2c2f; --loss: #ff6b6e; --loss-soft: #3a1a1c;
+  --live: #e03a3e; --live-soft: #3a1618; --info: #ffffff; --info-soft: #26272b;
+  --ticket: #f2f0ec; --ticket-ink: #121214; --ticket-muted: #121214;
   --tint: 11, 11, 12;
   --display: "Big Shoulders Display", "Oswald", "Arial Narrow", Impact, sans-serif;
   --body: "Barlow", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -256,6 +256,13 @@ td { font-variant-numeric: tabular-nums; }
 .calib { width: 100%; max-width: 360px; height: auto; display: block; }
 
 footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 12px; }
+/* No dull gray text: everything that was gray is bold white (bold dark ink on the light ticket). */
+.muted, .empty, .board small, .panel-head .muted, .bet .price small, .bet .sub, .potd p, .parlay li small, .game-head,
+.row .odds small, .why, .move-bad, .stat small, .pill.wait, footer, .leg-tag, .scores li, small, .small { color: #fff; font-weight: 700; }
+.board span, .seg button, .tabs button, .slot .kind, .stat span, th { color: #fff; }  /* already heavy type */
+.meter .lbl small { opacity: 1; font-weight: 700; }
+.eyebrow, details.more summary, details.more ul, details.more li, .pos { color: #fff; font-weight: 700; }
+.ticket .t-sport, .ticket .t-pay, .ticket .muted, .ticket .move-bad, .ticket small, .ticket .small { color: var(--ticket-ink); font-weight: 700; }
 </style>
 
 <div class="photo-bg" aria-hidden="true" style="--mascot: url('__MASCOT__'); --thumb: url('__THUMB__')"></div>
