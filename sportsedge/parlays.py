@@ -1,7 +1,7 @@
 """Parlays of the day, in two kinds, built from the day's best bets.
 
 - The Heat (2, 3, 4 and 8 legs): every leg is a unit play. Rare.
-- Wanna Dabble? (2, 3, 4, 5 and 8 legs, half a unit each): posted every day when
+- Wanna Dabble? (2, 3, 4, 5 and 8 legs, no units, tracked): posted every day when
   possible from FILL_HOUR on. Unit plays first, then the most likely leans that still
   show an edge and win 50%+ fill the open legs.
 
@@ -26,7 +26,7 @@ from .odds import american_to_decimal
 SIZES = (2, 3, 4, 8)  # The Heat
 STAKE = {2: 0.5, 3: 0.25, 4: 0.25, 8: 0.1}  # units: small on purpose, every leg has to win
 DABBLE_SIZES = (2, 3, 4, 5, 8)  # Wanna Dabble?
-DABBLE_STAKE = 0.5
+DABBLE_STAKE = 0.0  # no units: tracked, for fun
 LEG_TIERS = ("lock", "dog", "value", "prop", "sharp")  # unit plays
 FILL_TIERS = ("lean",)  # small edges with no units: fill the Wanna Dabble? parlays
 FILL_HOUR = 10  # local time: give the day's real picks a chance to post before filling with leans

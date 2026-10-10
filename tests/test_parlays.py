@@ -60,7 +60,7 @@ def test_wanna_dabble_fills_with_leans_at_half_a_unit_and_the_heat_never_does():
     assert build(led.entries.values(), [], now, day, local_hour=FILL_HOUR - 1) == []  # too early: wait for real picks
     out = build(led.entries.values(), [], now, day, local_hour=FILL_HOUR)
     assert [(p.kind, p.size) for p in out] == [("dabble", n) for n in (2, 3, 4, 5, 8)]  # no Heat from leans
-    assert all(p.units == DABBLE_STAKE == 0.5 for p in out)
+    assert all(p.units == DABBLE_STAKE == 0.0 for p in out)  # no units: tracked, for fun
     assert [led.entries[i].event_id for i in out[1].legs] == ["g8", "g7", "g6"]  # most likely winners first
     assert build(led.entries.values(), out, now, day, local_hour=FILL_HOUR + 2) == []  # posted once a day
 
