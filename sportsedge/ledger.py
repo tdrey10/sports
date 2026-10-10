@@ -25,7 +25,7 @@ from .models.props import PlayerGame, stat_value
 from .models.ratings import GameResult
 from .odds import american_to_decimal
 from .sports import SPORTS
-from .parlays import SIZES as PARLAY_SIZES, Parlay, build as build_parlays, settle
+from .parlays import DABBLE_SIZES, SIZES as PARLAY_SIZES, Parlay, build as build_parlays, settle
 from .tiers import BEST_BETS, LIVE_TIERS, Card
 
 DAY_TIERS = ("lock", "dog", "prop")
@@ -294,19 +294,19 @@ class Ledger:
                 e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
                 e.reasons = [f"Withdrawn before the game: {why}."] + list(e.reasons)
                 pulled.append(e)
-        # A parlay that hasn't started and has a withdrawn leg (or no units) comes off too.
+        # A parlay that hasn't started and has a withdrawn leg comes off too.
         keep = []
         for p in self.parlays:
             legs = [self.entries.get(i) for i in p.legs]
             started = any(e is None or e.start <= now or e.status not in ("pending", "void") for e in legs)
-            if not started and (p.units <= 0 or any(e.status == "void" for e in legs)):
+            if not started and any(e.status == "void" for e in legs):
                 continue
             keep.append(p)
         self.parlays = keep
         return pulled
 
     def post_parlays(self, now: datetime) -> list[Parlay]:
-        """Today's 2-, 3-, 4- and 8-leg parlays, each posted once when enough legs are on the board."""
+        """Today's parlays (The Heat and Wanna Dabble?), each posted once when enough legs are on the board."""
         new = build_parlays(self.entries.values(), self.parlays, now, self.day_of(now),
                             local_hour=now.astimezone(self.tz).hour)
         self.parlays.extend(new)
@@ -534,11 +534,13 @@ class Ledger:
     def _parlay_stats(self) -> dict:
         views = [v for v in self.parlay_views() if v["status"] in ("won", "lost", "push")]
         out = {}
-        for size in PARLAY_SIZES:
-            vs = [v for v in views if v["size"] == size]
+        groups = [("heat", size, str(size)) for size in PARLAY_SIZES]  # The Heat keeps its old keys
+        groups += [("dabble", size, f"dabble{size}") for size in DABBLE_SIZES]
+        for kind, size, key in groups:
+            vs = [v for v in views if v["size"] == size and v.get("kind", "heat") == kind]
             risked = sum(v["units"] or 1.0 for v in vs)  # no-unit parlays count as 1 unit
             profit = sum(v["profit"] for v in vs)
-            out[str(size)] = {
+            out[key] = {
                 "won": sum(1 for v in vs if v["status"] == "won"),
                 "lost": sum(1 for v in vs if v["status"] == "lost"),
                 "push": sum(1 for v in vs if v["status"] == "push"),
