@@ -37,7 +37,7 @@ class Settings:
     hide_flagged: bool = True  # leave out picks where model and market disagree by > disagreement_warning
     max_odds: float = 600  # skip extreme longshots (e.g. +1500 props)
     max_ev: float = 0.20  # EV above this is almost always stale data / news the model can't see
-    max_favorite: float = -150  # never bet a price worse than this: big favorites kill ROI
+    max_favorite: float = -170  # never bet a price worse than this: big favorites kill ROI
     spot_weights: dict[str, float] = field(default_factory=dict)  # "sport:spot" -> win-chance bump, proven spots only
     proven: set[str] | None = None  # "sport:market" proven blind; None = no studies loaded (no sizing cap)
     # Blind study records: "sport:moneyline" / "sport:coin flips (-149 to +149)" ->

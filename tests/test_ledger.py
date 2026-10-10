@@ -374,3 +374,12 @@ def test_board_drops_at_8am_local():
     assert held.published == 0  # before the board drops: lines watched, nothing posted
     open_ = run_cycle(provider, resolve("nba,nhl"), Ledger(), Settings(board_hour=hour), provider.now)
     assert open_.published > 0
+
+
+def test_withdraw_uses_the_settings_favorite_limit():
+    # The limit lives in one place (Settings.max_favorite); the ledger must not hard-code its own.
+    import inspect
+
+    from sportsedge.ledger import Ledger
+    src = inspect.getsource(Ledger.withdraw)
+    assert "settings.max_favorite" in src and "-150" not in src

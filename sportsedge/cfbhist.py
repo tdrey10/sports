@@ -287,7 +287,7 @@ def bet_with_clv(pairs: list[tuple[Row, dict]], trust: float) -> dict:
 
 
 def sharp_value(games: list[nflhist.Game], ex: dict, blind_from: int) -> dict[str, Record]:
-    """Bet the best other-book price that beats Pinnacle's no-vig price by 2%-15%, -150 or better."""
+    """Bet the best other-book price that beats Pinnacle's no-vig price by 2%-15%, -170 or better."""
     out = {"in_sample": Record(), "blind": Record()}
     for g in games:
         e = ex.get(g.gid, {})
@@ -343,7 +343,7 @@ def report(res: dict) -> str:
         f"  BLIND             {rec(o['blind'])}" + nflhist.held_up(o),
         f"  blind, model only {rec(o['blind_model_only'])}",
         "",
-        "Sharp value: best other-book moneyline vs Pinnacle's no-vig price (2%-15% edge, -150 or better):",
+        "Sharp value: best other-book moneyline vs Pinnacle's no-vig price (2%-15% edge, -170 or better):",
         f"  2007-{TUNE_LAST}         {rec(s['in_sample'])}",
         f"  {TUNE_LAST + 1}-2022         {rec(s['blind'])}" + nflhist.held_up(s),
         f"\n{res['lined_games']} games with closing moneylines.",

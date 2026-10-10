@@ -10,7 +10,7 @@ sports. Instead:
 - every scan saves each upcoming fight's DraftKings line; the last line before
   the fight is its close. Once fights are graded, the same blind test as the
   other sports runs on them: the blend of our number and the market's, at
-  -150 or better, 2%+ edge, judged on ROI over 60+ bets.
+  -170 or better, 2%+ edge, judged on ROI over 60+ bets.
 
 Nothing is posted as a UFC bet until that test is passed. Until then the Model
 tab shows the research: each fight's market and model numbers, and the record.
@@ -40,7 +40,7 @@ START_ELO = 1500.0
 K_NEW, K_SETTLED, NEW_FIGHTS = 40.0, 28.0, 3
 MARKET_WEIGHT = 0.75  # same trust in the market as the other sports start with
 MIN_EV = 0.02
-MAX_FAVORITE = -150
+MAX_FAVORITE = -170
 PROVEN_BETS = 60
 
 
@@ -284,7 +284,7 @@ def study(fights: list[Fight], lines: dict[str, dict], now: datetime) -> dict:
 
 
 def _pick(f: Fight, p: float, line: dict) -> tuple[str, float] | None:
-    """The bet the blind test makes: blended edge of 2%+ at -150 or better."""
+    """The bet the blind test makes: blended edge of 2%+ at -170 or better."""
     a_ml, b_ml = line[f.a_id]["ml"], line[f.b_id]["ml"]
     m = no_vig(a_ml, b_ml)
     q = (1 - MARKET_WEIGHT) * p + MARKET_WEIGHT * m

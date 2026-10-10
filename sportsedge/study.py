@@ -47,7 +47,7 @@ OPEN_BOOK = "draftkings_open"
 MIN_CALIBRATION_SIDES = 300
 STUDY_DAYS = 730  # about two seasons: judge a sport on thousands of games, never a few nights
 BLIND_SHARE = 0.4
-MAX_FAVORITE = -150  # the newest 40% of games are kept blind: settings are tuned on the older 60% only
+MAX_FAVORITE = -170  # the newest 40% of games are kept blind: settings are tuned on the older 60% only
 DEFAULT_WEIGHT = 0.75
 # Closing lines are sharper than the lines we actually bet hours earlier, so the
 # weight they favor is an upper bound on how much to trust the market. Keep the
@@ -127,7 +127,7 @@ def select(sides: list[Side], w: float, min_ev: float, max_ev: float = 0.20, gap
     best: dict[str, tuple[float, Side]] = {}
     for s in sides:
         if s.american < MAX_FAVORITE:
-            continue  # never bet worse than -150, in the backtest as live
+            continue  # never bet worse than -170, in the backtest as live
         if s.market_prob is not None and abs(s.model_prob - s.market_prob) > gap:
             continue  # the live engine hides these too
         ev = s.ev(w)

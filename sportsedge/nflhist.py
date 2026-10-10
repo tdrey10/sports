@@ -8,7 +8,7 @@ is thousands of games with lines, enough to test the blueprint properly:
    regression to the mean between seasons. Every prediction uses only games before it.
 2. Calibration: rating gap -> win chance through a logistic fit, checked bin by bin.
 3. Market blend: read = trust * model + (1 - trust) * market no-vig; trust learned.
-4. Edge = read - market. Bet when the edge is 2%+ and the price is -150 or better,
+4. Edge = read - market. Bet when the edge is 2%+ and the price is -170 or better,
    quarter-Kelly units (1 unit = 1% of bankroll, 0.5 minimum).
 
 Every setting (rating speed, home field, rest, QB, carryover, calibration, trust) is
@@ -43,7 +43,7 @@ FIRST_SEASON = 2006  # closing lines start here
 TUNE_LAST = 2017  # settings are chosen on 2006-2017 (2006 itself only warms the ratings up)
 WARMUP_LAST = 2006
 MIN_EDGE = 0.02
-MAX_FAVORITE = -150
+MAX_FAVORITE = -170
 MAX_UNDERDOG = 300  # long shots are noise: one +8000 upset would swamp a whole test
 DOG_RANGE = (100, 220)
 MARGIN_CAP = 24  # a 45-point win teaches no more than a 24-point one
@@ -377,7 +377,7 @@ class Record:
 
 
 def bet(rs: list[Row], trust: float, min_edge: float = MIN_EDGE) -> Record:
-    """Best side per game and market with edge >= min_edge at -150 or better."""
+    """Best side per game and market with edge >= min_edge at -170 or better."""
     rec = Record()
     for r in rs:
         best = None

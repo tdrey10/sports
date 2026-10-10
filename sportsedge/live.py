@@ -230,7 +230,7 @@ from .odds import implied_prob  # noqa: E402
 from .tiers import Card, units_for  # noqa: E402
 
 
-LIVE_WIN_MIN_ODDS = -150  # never bet worse than -150, live included
+LIVE_WIN_MIN_ODDS = -170  # never bet worse than -170, live included
 LIVE_WIN_MIN_PROB = 0.60  # and it has to be a bet we expect to cash at least 60% of the time
 LIVE_PLUS_MAX_ODDS = 200  # plus money, but a real chance to win: +100 to +200 only
 LIVE_PLUS_MIN_PROB = 0.42  # and at least 42% on our numbers (break-even at +200 is 33%)

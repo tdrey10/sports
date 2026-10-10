@@ -26,7 +26,7 @@ TIER_LABELS = {
 LIVE_TIERS = ("live", "live_win", "live_plus")
 UNIT_TIERS = ("lock", "dog", "prop", "value", "early") + LIVE_TIERS
 
-LOCK_MIN_ODDS = -150  # never bet worse than -150, the Lock included
+LOCK_MIN_ODDS = -170  # never bet worse than -170, the Lock included
 # The Lock of the Day is the safest pick, not the biggest edge, so it must clear every check:
 LOCK_MIN_PROB = 0.62  # our model alone gives it at least this
 LOCK_MIN_MARKET = 0.55  # and the market (no vig) also has it as a clear favorite
@@ -249,7 +249,7 @@ def build_cards(
         if locks:
             chosen.append(("lock", max(locks, key=lambda p: (p.win_prob, p.ev))))
         elif (settings.fill or settings.daily_lock) and "lock_lean" not in taken:
-            # A Lock every day: the most likely winner on today's board (-150 or better, injuries
+            # A Lock every day: the most likely winner on today's board (-170 or better, injuries
             # known, our model and the market agreeing first). With no real edge it carries no
             # units, and every daily Lock keeps its own record.
             def agree(p: Pick) -> bool:
@@ -360,7 +360,7 @@ def build_cards(
             bullets.insert(0, f"Passed every Lock check: our model {pick.model_prob:.0%} and the market "
                               f"{pick.market_prob:.0%} both make it a clear favorite and agree, it cashes "
                               f"{cash:.0%} after calibration with a real edge (score {sc:.0f}), injuries are "
-                              f"known, -150 or better, and both teams have {LOCK_MIN_GAMES}+ games this season.")
+                              f"known, -170 or better, and both teams have {LOCK_MIN_GAMES}+ games this season.")
         ctx = scan.contexts.get(pick.event_id) if scan else None
         cards.append(
             Card(
