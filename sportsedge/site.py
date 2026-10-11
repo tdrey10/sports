@@ -28,6 +28,12 @@ def _forecast_record(ledger):
     return record(getattr(ledger, "forecasts", {}))
 
 
+def _teaser_record(ledger):
+    from .teasers import record
+
+    return record(getattr(ledger, "teasers", []))
+
+
 def build_data(
     ledger: Ledger,
     brains: dict[str, BrainReport],
@@ -63,6 +69,9 @@ def build_data(
         "forecasts": [{**f.to_dict(), "score": list(_whole(f))} for f in getattr(ledger, "forecasts", {}).values()
                       if f.status != "void" and (f.status != "final" or now - f.start < timedelta(days=2))],
         "forecast_record": _forecast_record(ledger),
+        # The daily NFL 6-point teasers (proven leg kind only) and their record.
+        "teasers": [t.to_dict() for t in getattr(ledger, "teasers", []) if now - datetime.fromisoformat(t.created_at) < timedelta(days=KEEP_DAYS)],
+        "teaser_record": _teaser_record(ledger),
         "stats": ledger.stats(now),
         "brains": [b.to_dict() for b in brains.values()],
         "weights": weights,

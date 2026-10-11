@@ -33,6 +33,9 @@ def refresh_scores(provider, ledger: Ledger, now: datetime) -> int:
     results_for = lambda sport, start, end: provider.game_results(SPORTS[sport], start, end)  # noqa: E731
     graded = ledger.refresh(results_for, lambda sport, game: provider.box_score(SPORTS[sport], game), now)
     forecasts.grade(ledger.forecasts, results_for, now)
+    from . import teasers
+
+    teasers.grade(ledger.teasers, results_for, now)
     return graded
 
 
@@ -50,6 +53,7 @@ def run_cycle(
     props_hours: float | None = None,
     weather=None,
     first_seen=None,
+    teaser_study: dict | None = None,
 ) -> CycleResult:
     """``props_sports`` limits player props to those sport keys (None = every sport)."""
     out = CycleResult()
@@ -89,6 +93,13 @@ def run_cycle(
     from . import forecasts
 
     forecasts.merge(ledger.forecasts, forecasts.build(out.scans, settings, now), now)
+    if not held:
+        from . import teasers
+
+        ledger.teasers.extend(teasers.build(out.scans, ledger.teasers, teaser_study, now, ledger.day_of(now)))
+        keep_after = now - timedelta(days=30)
+        ledger.teasers = [t for t in ledger.teasers
+                          if t.status in ("pending", "live") or datetime.fromisoformat(t.created_at) >= keep_after]
     out.graded = refresh_scores(provider, ledger, now)
     return out
 

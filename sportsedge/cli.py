@@ -257,6 +257,13 @@ class Workspace:
             self.settings = self._with_nfl_wind(self.settings, data_dir)
             self.settings = self._with_history_spots(self.settings, data_dir)
 
+    def _nfl_history(self):
+        """The 20-season NFL test (teaser legs, windy unders), rerun every morning."""
+        try:
+            return json.loads((self.data_dir / "nfl_history.json").read_text())
+        except (OSError, ValueError):
+            return None
+
     @staticmethod
     def _with_nfl_wind(settings, data_dir):
         """The NFL windy under is proven on 20 seasons of closing lines (nfl_history.json), far more
@@ -349,6 +356,7 @@ class Workspace:
             props_sports=props_sports, props_hours=self.args.props_hours, prop_markets=prop_markets,
             weather=None if self.demo else self._weather(),
             first_seen=self._first_seen(sports),
+            teaser_study=None if self.demo else self._nfl_history(),
         )
         self.brains.update(res.brains)
         self.weights = res.weights
