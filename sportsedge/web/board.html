@@ -562,7 +562,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + (st.lock_all ? `<tr><td>Lock of the day, every day (bet or not)</td><td>${rec(st.lock_all)}</td><td class="${cls(st.lock_all.units)}">${signed(st.lock_all.units, 1)}u</td><td>${st.lock_all.roi == null ? "–" : signed(st.lock_all.roi * 100, 0) + "%"}</td></tr>` : "");
     const typeRows = [["spreads", "Spreads"], ["totals", "Over/Under"], ["props", "Props"], ["moneyline", "Moneyline"]]
       .map(([k, n]) => { const s = st.by_market[k]; return `<tr><td>${n}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`; }).join("");
-    const sportRows = Object.entries(st.by_sport).map(([k, s]) => `<tr><td>${esc(s.name)}</td><td>${rec(s)}</td><td>${pct(s.win_pct)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td></tr>`).join("");
+    const sportRows = Object.entries(st.by_sport).map(([k, s]) => { const a = s.all || s;
+      const money = s.won + s.lost + s.push ? `${rec(s)} <span class="${cls(s.units)}">${signed(s.units, 1)}u</span>` : "–";
+      return `<tr><td>${esc(s.name)}</td><td>${rec(a)}</td><td>${pct(a.win_pct)}</td><td class="${cls(a.units)}">${signed(a.units, 1)}u</td><td>${money}</td></tr>`; }).join("");
     const b = st.best || { won: 0, lost: 0, units: 0 };
     const labels = DATA.spot_labels || {};
     const spotRows = Object.entries(st.by_spot || {}).map(([k, s]) => `<tr><td>${esc(labels[k] || k)}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`).join("");
@@ -579,7 +581,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
          <div class="stat"><span>Last 7 days</span><b class="${cls(st.last7.units)}">${signed(st.last7.units, 1)}u</b><small>${rec(st.last7)}</small></div></div>${chart(st.curve, st.start_bankroll)}`)
       + panel("By pick type", "", `<div class="table-wrap"><table><thead><tr><th>Pick</th><th>W-L</th><th>Units</th><th>ROI</th></tr></thead><tbody>${tierRows}</tbody></table></div>`)
       + panel("By bet type", "CLV: our price vs the closing line", `<div class="table-wrap"><table><thead><tr><th>Bet</th><th>W-L</th><th>Units</th><th>CLV</th></tr></thead><tbody>${typeRows}</tbody></table></div>`)
-      + (sportRows ? panel("By sport", "", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>W-L</th><th>Win</th><th>Units</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
+      + (sportRows ? panel("By sport", "Every graded pick (leans count as 1u) · and the real-money plays", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>All picks W-L</th><th>Win</th><th>Profit</th><th>Unit plays</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
       + panel("By early-bet spot", "Each spot keeps its own record · leans count as 1u", spotRows
           ? `<div class="table-wrap"><table><thead><tr><th>Spot</th><th>W-L</th><th>Units</th><th>CLV</th></tr></thead><tbody>${spotRows}</tbody></table></div>`
           : empty("No graded picks in a spot yet."))
