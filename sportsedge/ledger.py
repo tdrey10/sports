@@ -528,6 +528,8 @@ class Ledger:
             "start_bankroll": self.start_bankroll,
             "bankroll": round(self.start_bankroll + sum(e.profit or 0 for e in plays) * unit, 2),
             "overall": summary(plays),
+            # Every graded pick we put out, bet or not (leans count as 1 unit). Parlays stay separate.
+            "all_picks": summary(settled),
             "last7": summary([e for e in plays if e.start >= week_ago]),
             "by_tier": by_tier,
             "best": summary([e for e in plays if e.best_rank]),
