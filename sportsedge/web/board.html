@@ -195,9 +195,22 @@ button, select { font: inherit; color: inherit; }
 .parlay ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
 .parlay li small { color: var(--muted); }
 .parlay li.won { color: var(--win); } .parlay li.lost { color: var(--loss); }
-.parlay .mark { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 8px; border-radius: 50%;
+.fc { position: relative; display: grid; gap: 6px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; }
+.fc.ok { border-color: #22a85a; } .fc.miss { border-color: #e5484d; }
+.fc-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.fc-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 16px; }
+.fc-row b { font: 700 24px/1 var(--mono); }
+.fc-row.pick span { font-weight: 800; } .fc-row.pick b { color: var(--accent); }
+.fc-bar { display: flex; height: 6px; border-radius: 4px; overflow: hidden; background: var(--accent); }
+.fc-bar i { display: block; background: #fff; } .fc-bar i.d { background: #8a8f98; }
+.fc-pick, .fc-final { margin: 0; font-size: 14px; }
+.fc details summary { cursor: pointer; font-size: 13px; font-weight: 700; }
+.fc details ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; display: grid; gap: 3px; }
+.fc .mark, .parlay .mark { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 8px; border-radius: 50%;
   font: 900 15px/1 var(--body); color: #fff; vertical-align: 1px; }
-.parlay .mark.win { background: #22a85a; } .parlay .mark.loss { background: #e5484d; }
+.parlay .mark.win, .fc .mark.win { background: #22a85a; } .parlay .mark.loss, .fc .mark.loss { background: #e5484d; }
+.chip-recs { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 10px; }
+.chip-rec { font: 700 12px/1 var(--body); padding: 6px 9px; border: 1px solid var(--line); border-radius: 999px; }
 
 /* ---------- board rows ---------- */
 .game { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
@@ -309,7 +322,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
-  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["scores", "Scores"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
+  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["scores", "Scores"], ["predict", "Predictions"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
   const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
     live: "Live", live_win: "Live · likely winner", live_plus: "Live · plus money", sharp: "Sharp value" };
   const state = { tab: "today", sport: "all", market: "all" };
@@ -536,6 +549,47 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     return panel("Scores", live ? `${live} live now · updates every 30 seconds` : "Today's games", `<div class="grid two">${body}</div>`);
   }
 
+  // Predictions: every game, not just the picks. Projected score and who we think wins.
+  function viewPredict() {
+    const all = (DATA.forecasts || []).filter((f) => pickedSport(f.sport));
+    const now = Date.now();
+    const recent = all.filter((f) => f.status !== "final" || now - new Date(f.commence_time).getTime() < 2 * 86400e3);
+    const order = { live: 0, pending: 1, final: 2 };
+    recent.sort((a, b) => (order[a.status] ?? 1) - (order[b.status] ?? 1) || new Date(a.commence_time) - new Date(b.commence_time));
+    const name = (f, side) => (side === "home" ? f.home : side === "away" ? f.away : "Draw");
+    const card = (f) => {
+      const [hs, as] = f.score || [Math.round(f.home_score), Math.round(f.away_score)];
+      const prob = f.winner === "home" ? f.p_home : f.winner === "away" ? f.p_away : f.p_draw;
+      const team = (side, sc) => `<div class="fc-row${f.winner === side ? " pick" : ""}"><span>${side === "home" ? "@ " : ""}${esc(name(f, side))}</span><b>${sc}</b></div>`;
+      let status = `<span class="muted">${timeOf(f)}</span>`;
+      if (f.status === "live" && f.live) status = `<span class="live-dot">Live ${esc(f.live.away ?? "")}-${esc(f.live.home ?? "")} · ${esc(f.live.detail || "")}</span>`;
+      const sc = SCORES[f.event_id];
+      if (f.status === "pending" && sc && !sc.final) status = `<span class="live-dot">Live ${esc(sc.away)}-${esc(sc.home)} · ${esc(sc.detail)}</span>`;
+      let result = "";
+      if (f.status === "final") {
+        const mark = f.correct ? `<span class="mark win">✓</span>` : `<span class="mark loss">✗</span>`;
+        result = `<p class="fc-final">${mark}Final: ${esc(f.away)} ${f.final_away} – ${esc(f.home)} ${f.final_home}</p>`;
+      }
+      const draw = f.p_draw > 0 ? ` · draw ${pct(f.p_draw)}` : "";
+      const bar = `<div class="fc-bar" title="${esc(f.away)} ${pct(f.p_away)} · ${esc(f.home)} ${pct(f.p_home)}"><i style="width:${(f.p_away * 100).toFixed(1)}%"></i>${f.p_draw > 0 ? `<i class="d" style="width:${(f.p_draw * 100).toFixed(1)}%"></i>` : ""}</div>`;
+      const facts = (f.facts || []).length ? `<details><summary>Why · stats &amp; facts</summary><ul>${f.facts.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></details>` : "";
+      const mkt = f.market_home != null ? ` · market ${pct(f.winner === "away" ? 1 - f.market_home - (f.p_draw ? f.p_draw : 0) : f.market_home)}` : "";
+      return `<article class="fc ${f.status === "final" ? (f.correct ? "ok" : "miss") : ""}">
+        <div class="fc-head"><span class="kind">${esc(f.sport_name)}</span>${status}</div>
+        ${team("away", as)}${team("home", hs)}${bar}
+        <p class="fc-pick">We say <b>${esc(name(f, f.winner))}</b> ${f.winner === "draw" ? "" : "win"} ${pct(prob)}${draw}</p>
+        ${result}${facts}</article>`;
+    };
+    const rec = DATA.forecast_record || {};
+    const o = rec.overall || {};
+    const head = o.right + o.wrong
+      ? `${o.right}-${o.wrong} picking winners (${pct(o.pct)}) · scores off by ${o.score_error == null ? "–" : o.score_error.toFixed(1)} a team`
+      : "Graded after every final";
+    const bySport = Object.values(rec.by_sport || {}).map((s) => `<span class="chip-rec">${esc(s.name)} ${s.right}-${s.wrong}</span>`).join("");
+    const intro = `<p class="small muted">Not picks: our read on every game. Win chances blend our ratings (rest, injuries, starters) with the betting market, at the weight the studies learned; the score blends our projection with the spread and total. Each one locks at kickoff and is graded on the final.</p>${bySport ? `<div class="chip-recs">${bySport}</div>` : ""}`;
+    return panel("Predictions", head, intro + (recent.length ? `<div class="grid two">${recent.map(card).join("")}</div>` : empty("No games to predict yet: they show up as soon as lines post.")));
+  }
+
   function viewLive() {
     const items = DATA.entries.filter((e) => isLive(e) && onBoard(e)).sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     const latest = (t) => items.find((e) => e.tier === t);
@@ -687,7 +741,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b><small>from ${money(st.start_bankroll)}</small></div>
       <div><span>Beat the close</span><b>${pct(o.beat_close)}</b><small>avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</small></div>`;
     const counts = { today: bestToday().length, parlays: (DATA.parlays || []).filter((p) => p.day === today()).length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
-      early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length, scores: liveGames() };
+      early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length, scores: liveGames(),
+      predict: (DATA.forecasts || []).filter((f) => f.status === "pending" && pickedSport(f.sport)).length };
     $("tabs").innerHTML = TABS.map(([k, n]) => `<button role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${n}${counts[k] ? `<span class="count">${counts[k]}</span>` : ""}</button>`).join("");
     $("sports").innerHTML = SPORTS.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${state.sport === k}">${n}</button>`).join("");
     $("markets").innerHTML = MARKETS.map(([k, n]) => `<button data-market="${k}" aria-pressed="${state.market === k}">${n}</button>`).join("");
@@ -697,7 +752,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     renderTop();
     renderHero();
     const views = {
-      today: viewToday, parlays: viewParlays, live: viewLive, scores: viewScores, results: viewResults,
+      today: viewToday, parlays: viewParlays, live: viewLive, scores: viewScores, predict: viewPredict, results: viewResults,
       props: () => viewList((e) => e.player, "Player props", "Best edge first · priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
       early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves", "Nothing early yet."),
     };
@@ -724,9 +779,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   async function pollScores() {
     const now = Date.now();
     const boards = {};
-    for (const e of DATA.entries || []) {
+    for (const e of [...(DATA.entries || []), ...(DATA.forecasts || [])]) {
       const t = new Date(e.commence_time).getTime();
-      if (SETTLED[e.status] || e.status === "void" || t > now || now - t > 10 * 3600e3) continue;
+      if (SETTLED[e.status] || e.status === "void" || e.status === "final" || t > now || now - t > 10 * 3600e3) continue;
       const s = (DATA.espn || {})[e.sport];
       if (!s) continue;
       const day = espnDay(e.commence_time);

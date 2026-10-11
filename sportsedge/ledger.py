@@ -117,6 +117,7 @@ class Ledger:
     def __init__(self, entries: Iterable[Entry] = (), tz: str = "America/Los_Angeles", start_bankroll: float = 1000.0):
         self.entries: dict[str, Entry] = {e.id: e for e in entries}
         self.parlays: list[Parlay] = []
+        self.forecasts: dict = {}  # id -> forecasts.Forecast: a prediction for every game (not picks)
         self.tz = ZoneInfo(tz)
         self.start_bankroll = start_bankroll
 
@@ -133,6 +134,9 @@ class Ledger:
         ledger = cls(entries, **kw)
         pnames = {f.name for f in fields(Parlay)}
         ledger.parlays = [Parlay(**{k: v for k, v in p.items() if k in pnames}) for p in data.get("parlays", [])]
+        from .forecasts import Forecast
+
+        ledger.forecasts = {d["id"]: Forecast.from_dict(d) for d in data.get("forecasts", [])}
         return ledger
 
     def save(self, path: str | os.PathLike) -> None:
@@ -142,6 +146,7 @@ class Ledger:
             "start_bankroll": self.start_bankroll,
             "entries": [asdict(e) for e in sorted(self.entries.values(), key=lambda e: (e.commence_time, e.id))],
             "parlays": [asdict(p) for p in sorted(self.parlays, key=lambda p: (p.day, p.size))],
+            "forecasts": [f.to_dict() for f in sorted(self.forecasts.values(), key=lambda f: (f.commence_time, f.id))],
         }
         tmp = path.with_suffix(".tmp")
         tmp.write_text(json.dumps(data, indent=1))

@@ -28,11 +28,12 @@ class CycleResult:
 
 def refresh_scores(provider, ledger: Ledger, now: datetime) -> int:
     """Live scores + grading only. Uses ESPN only, so it is free to run often."""
-    return ledger.refresh(
-        lambda sport, start, end: provider.game_results(SPORTS[sport], start, end),
-        lambda sport, game: provider.box_score(SPORTS[sport], game),
-        now,
-    )
+    from . import forecasts
+
+    results_for = lambda sport, start, end: provider.game_results(SPORTS[sport], start, end)  # noqa: E731
+    graded = ledger.refresh(results_for, lambda sport, game: provider.box_score(SPORTS[sport], game), now)
+    forecasts.grade(ledger.forecasts, results_for, now)
+    return graded
 
 
 def run_cycle(
@@ -85,6 +86,9 @@ def run_cycle(
     if not held:
         ledger.post_parlays(now)
     ledger.update_prices(out.scans, now)
+    from . import forecasts
+
+    forecasts.merge(ledger.forecasts, forecasts.build(out.scans, settings, now), now)
     out.graded = refresh_scores(provider, ledger, now)
     return out
 
