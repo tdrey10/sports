@@ -31,6 +31,12 @@ LOCK_MAX_ODDS = -120  # and a real favorite: the Lock is a moneyline the team is
 # Spread bets where our model rates a side 6+ points above the market lost 4-7% in every sport
 # blind (18,000+ games, 2018+ lines): the market was right. They are never posted, not even as leans.
 SPREAD_MAX_OVERREACH = 0.06
+# Favorites our model likes 2+ points more than the market lost blind: moneylines -5.2% across six
+# sports (NFL -11 to -13%, college football -14 to -27%), football spreads -12% (college). Dogs the
+# model liked did better (-3.9% overall, college football +1 to +4%). So a lean never goes to a
+# favorite on the model's word alone: that game's lean is the best other side, often the dog.
+FAVORITE_OVERREACH = 0.02
+FOOTBALL = ("nfl", "ncaaf")
 # The Lock of the Day is the safest pick, not the biggest edge, so it must clear every check:
 LOCK_MIN_PROB = 0.62  # our model alone gives it at least this
 LOCK_MIN_MARKET = 0.55  # and the market (no vig) also has it as a clear favorite
@@ -172,9 +178,20 @@ def overreach(p: Pick) -> bool:
     return p.market == "spreads" and p.market_prob is not None and p.model_prob - p.market_prob > SPREAD_MAX_OVERREACH
 
 
+def favorite_overreach(p: Pick) -> bool:
+    """A favorite whose edge is only our model liking it 2+ points more than the market."""
+    if p.market_prob is None or p.model_prob - p.market_prob < FAVORITE_OVERREACH:
+        return False
+    if p.market == "h2h":
+        return p.american < 0
+    return p.market == "spreads" and p.sport in FOOTBALL and p.point is not None and p.point < 0
+
+
 def is_lock_price(p: Pick) -> bool:
     """A Lock is a moneyline favorite from -170 to -120 (it wins 55-62% of the time at those
     prices), never a spread or total: those are built to be coin flips."""
+    if p.sport in FOOTBALL and favorite_overreach(p):
+        return False  # football favorites on the model's word alone lost 11-27% blind
     return p.market == "h2h" and not p.is_prop and LOCK_MIN_ODDS <= p.american <= LOCK_MAX_ODDS
 
 
@@ -308,11 +325,11 @@ def build_cards(
     leans = [
         p for p in game
         if p.event_id not in covered and 0 < p.ev < settings.min_ev and not p.warnings
-        and p.american >= settings.max_favorite and p.win_prob >= LEGIT_MIN_WIN
+        and p.american >= settings.max_favorite and p.win_prob >= LEGIT_MIN_WIN and not favorite_overreach(p)
     ] + [
         p for p in blocked
         if not p.is_prop and p.ev > 0 and not p.warnings and p.american >= settings.max_favorite
-        and p.win_prob >= LEGIT_MIN_WIN
+        and p.win_prob >= LEGIT_MIN_WIN and not favorite_overreach(p)
     ]
     leans = [p for p in leans if p.commence_time <= soon_cut]  # today's slate only, not next week's
     best_lean: dict[str, Pick] = {}

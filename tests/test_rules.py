@@ -363,3 +363,26 @@ def test_a_lock_is_a_moneyline_favorite_and_overreaching_spreads_never_post():
         if c.tier == "lock":
             assert c.pick.market == "h2h" and LOCK_MIN_ODDS <= c.pick.american <= LOCK_MAX_ODDS
         assert not overreach(c.pick)
+
+
+def test_leans_never_go_to_a_favorite_on_the_models_word_alone():
+    from sportsedge.tiers import favorite_overreach, is_lock_price
+
+    def pick(market, american, model, mkt, sport="nfl", point=None):
+        p = make_pick(market=market, american=american, sport=sport, point=point, market_prob=mkt)
+        p.model_prob = model
+        return p
+
+    assert favorite_overreach(pick("h2h", -142, 0.665, 0.567))  # the Vikings lean: model 10 pts above
+    assert not favorite_overreach(pick("h2h", 130, 0.48, 0.42))  # a dog the model likes: fine
+    assert not favorite_overreach(pick("h2h", -142, 0.58, 0.567))  # model and market agree
+    assert favorite_overreach(pick("spreads", -110, 0.56, 0.52, point=-4.0))  # football favorite laying points
+    assert not favorite_overreach(pick("spreads", -110, 0.56, 0.52, sport="nba", point=-4.0))  # not football
+    assert not is_lock_price(pick("h2h", -142, 0.665, 0.567))  # no football Lock on the model's word alone
+    assert is_lock_price(pick("h2h", -142, 0.665, 0.567, sport="nhl"))
+
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb,nfl")]
+    leans = [c for c in build_cards(scans, Settings(), provider.now) if c.tier == "lean"]
+    assert leans and not any(favorite_overreach(c.pick) for c in leans)
