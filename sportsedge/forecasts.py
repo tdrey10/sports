@@ -1,13 +1,12 @@
 """Predictions for every game on the board: a projected score and who we think wins.
 
-Not picks: no price has to be beaten. Each forecast is the engine's honest read of the
-game, built the same way as the picks:
+Not picks: no price has to be beaten. Each forecast is our own educated read of the game,
+not the betting line repeated back:
 
-- win chances: our ratings (rest, injuries, starting pitchers and goalies) blended with
-  the market's no-vig price, at the weight the studies learned for that sport;
-- projected score: our margin and total blended with the market's spread and total at
-  that same weight, so the score and the win chance tell one story;
-- the facts behind it: records, form, rest, starters, injuries, head-to-head.
+- projected score and win chances: our team ratings (points scored and allowed, home
+  field, rest, injuries, starting pitchers and goalies), calibrated by the studies;
+- the Vegas spread, total and win chance beside it, with where we disagree;
+- the facts behind it: records, form, splits, power rank, rest, starters, weather, injuries.
 
 A forecast keeps updating until the game starts, then it is frozen and graded against the
 final score: did we pick the winner, and how far off was the score.
@@ -102,34 +101,42 @@ def _whole(home: float, away: float, winner: str) -> tuple[int, int]:
     return h, a
 
 
+def _vegas_line(f_home: str, f_away: str, home_line: float | None, total_line: float | None) -> str | None:
+    parts = []
+    if home_line is not None:
+        fav, pts = (f_home, -home_line) if home_line < 0 else (f_away, home_line)
+        parts.append(f"{fav} -{pts:g}" if pts else "pick'em")
+    if total_line is not None:
+        parts.append(f"O/U {total_line:g}")
+    return " · ".join(parts) if parts else None
+
+
 def build(scans: list[SportScan], settings: Settings, now: datetime) -> list[Forecast]:
+    """Our own read of every game: the ratings' projected score and win chances (scoring,
+    defense, home field, rest, injuries, starting pitchers and goalies), not the betting
+    line. The market's spread and total are shown beside it, so the disagreements stand out."""
     out = []
     for scan in scans:
         cfg = scan.sport
-        w = settings.weight_for(cfg.key, False)  # the market's share of the blend
         for ev_id, pred in scan.predictions.items():
             ctx = scan.contexts.get(ev_id)
             if ctx is None or ctx.event.commence_time <= now:
                 continue
             quotes = ctx.event.quotes
             sides = ("home", "away", "draw") if cfg.draws else ("home", "away")
-            model = {"home": pred.p_home, "away": pred.p_away, "draw": pred.p_draw}
-            market = _consensus_ml(quotes, sides)
-            if market:
-                p = {s: (1 - w) * model[s] + w * market[s] for s in sides}
-            else:
-                p = {s: model[s] for s in sides}
-            norm = sum(p.values()) or 1.0
+            p = {"home": pred.p_home, "away": pred.p_away, "draw": pred.p_draw}
+            # The studies' calibration of our win chances, when the engine applied it to the picks.
+            for side in sides:
+                pk = next((x for x in scan.picks if x.event_id == ev_id and x.market == "h2h" and x.side == side
+                           and not x.is_prop), None)
+                if pk is not None:
+                    p[side] = pk.model_prob
+            norm = sum(p[s] for s in sides) or 1.0
             p = {s: p[s] / norm for s in sides}
             winner = max(p, key=p.get)
+            market = _consensus_ml(quotes, sides)
 
             margin, total = pred.exp_margin, pred.exp_total
-            home_line = _median_point(quotes, "spreads", "home")
-            if home_line is not None:
-                margin = (1 - w) * margin + w * -home_line
-            total_line = _median_point(quotes, "totals", "over")
-            if total_line is not None:
-                total = (1 - w) * total + w * total_line
             if winner == "home" and margin <= 0:
                 margin = 0.5
             elif winner == "away" and margin >= 0:
@@ -137,12 +144,33 @@ def build(scans: list[SportScan], settings: Settings, now: datetime) -> list[For
             home_score, away_score = max((total + margin) / 2, 0.0), max((total - margin) / 2, 0.0)
 
             facts: list[str] = []
+            home_line = _median_point(quotes, "spreads", "home")
+            total_line = _median_point(quotes, "totals", "over")
+            vegas = _vegas_line(ctx.home, ctx.away, home_line, total_line)
+            if vegas:
+                diff = []
+                if home_line is not None:
+                    d = pred.exp_margin - (-home_line)
+                    if abs(d) >= 1:
+                        diff.append(f"we have {ctx.home if d > 0 else ctx.away} {abs(d):.1f} better than the spread")
+                if total_line is not None:
+                    d = pred.exp_total - total_line
+                    if abs(d) >= 1:
+                        diff.append(f"{abs(d):.1f} {'more' if d > 0 else 'fewer'} total than the line")
+                facts.append(f"Vegas: {vegas}" + (f" ({'; '.join(diff)})." if diff else " (we agree)."))
+            if market:
+                facts.append(f"Market win chance: {ctx.away} {market['away']:.0%} · {ctx.home} {market['home']:.0%}"
+                             + (f" · draw {market['draw']:.0%}" if 'draw' in market else "") + ".")
+            if ctx.wind_mph is not None:
+                facts.append(f"Wind forecast {ctx.wind_mph:.0f} mph at an outdoor stadium"
+                             + (": windy games score less (the NFL windy under is proven over 20 seasons)."
+                                if ctx.wind_mph >= 15 else "."))
             side = winner if winner != "draw" else "home"
             pick = next((x for x in scan.picks if x.event_id == ev_id and x.market == "h2h" and x.side == side
                          and not x.is_prop), None)
             if pick is not None:
                 _, bullets = reasons(pick, scan)
-                facts = [b for b in bullets if not b.startswith(DROP)]
+                facts += [b for b in bullets if not b.startswith(DROP)]
             out.append(Forecast(
                 id=f"{cfg.key}:{ev_id}", sport=cfg.key, sport_name=cfg.name, event_id=ev_id,
                 commence_time=ctx.event.commence_time.isoformat(), home=ctx.home, away=ctx.away,
@@ -150,7 +178,7 @@ def build(scans: list[SportScan], settings: Settings, now: datetime) -> list[For
                 p_home=round(p["home"], 4), p_away=round(p["away"], 4), p_draw=round(p.get("draw", 0.0), 4),
                 winner=winner, model_home=round(pred.p_home, 4),
                 market_home=round(market["home"], 4) if market else None,
-                facts=facts[:8], updated_at=now.isoformat(),
+                facts=facts[:10], updated_at=now.isoformat(),
             ))
     return out
 

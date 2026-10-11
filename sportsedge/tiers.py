@@ -235,7 +235,6 @@ def build_cards(
     # calibrated edge. Value and early plays must also be realistic winners.
     candidates = [p for p in best_per_event(game, settings) if not not_legit(p, settings)]
     soon = [p for p in candidates if p.commence_time <= soon_cut]
-    later = [p for p in candidates if p.commence_time > soon_cut]
     chosen: list[tuple[str, Pick]] = []
 
     def solid(p: Pick) -> bool:
@@ -310,7 +309,18 @@ def build_cards(
                 lean_ids.add(id(dog))
     used = {id(p) for _, p in chosen}
     chosen += [("value", p) for p in soon if id(p) not in used and p.win_prob >= LEGIT_MIN_WIN][:max_value]
-    chosen += [("early", p) for p in later if p.win_prob >= LEGIT_MIN_WIN and not favorite_overreach(p)][:max_early]
+    # Early: any game more than a day out where our number beats the price (a real edge, however
+    # small) on a realistic winner, so the line can be taken before it moves. Best side per game.
+    early_pool = [
+        p for p in game
+        if p.commence_time > soon_cut and p.ev > 0 and not p.warnings and p.american >= settings.max_favorite
+        and p.win_prob >= LEGIT_MIN_WIN and not favorite_overreach(p) and not not_legit(p, settings)
+    ]
+    best_early: dict[str, Pick] = {}
+    for p in sorted(early_pool, key=lambda p: p.ev, reverse=True):
+        if id(p) not in used:
+            best_early.setdefault(p.event_id, p)
+    chosen += [("early", p) for p in list(best_early.values())[:max_early]]
 
     prop_picks = qualifying(props, settings)
     lo, hi = PROP_ODDS_RANGE
