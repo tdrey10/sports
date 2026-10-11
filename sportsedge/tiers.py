@@ -310,7 +310,7 @@ def build_cards(
                 lean_ids.add(id(dog))
     used = {id(p) for _, p in chosen}
     chosen += [("value", p) for p in soon if id(p) not in used and p.win_prob >= LEGIT_MIN_WIN][:max_value]
-    chosen += [("early", p) for p in later if p.win_prob >= LEGIT_MIN_WIN][:max_early]
+    chosen += [("early", p) for p in later if p.win_prob >= LEGIT_MIN_WIN and not favorite_overreach(p)][:max_early]
 
     prop_picks = qualifying(props, settings)
     lo, hi = PROP_ODDS_RANGE
@@ -355,6 +355,7 @@ def build_cards(
         return is_proven(pick, settings) or any(f"{pick.sport}:{k}" in settings.spot_weights for k in spots)
 
     cards = []
+    no_units: set[int] = set()
     for tier, pick in chosen:
         scan = by_event.get(pick.event_id)
         headline, bullets = reasons(pick, scan) if scan else ("", [])
@@ -403,6 +404,8 @@ def build_cards(
                               "test yet, so it is tracked as a lean until it proves itself.")
             if tier in ("lock", "dog"):
                 lean_ids.add(id(pick))  # still today's Lock/Dog, with no units
+            elif tier == "early":
+                no_units.add(id(pick))  # still early value (bet it before the line moves), with no units
             else:
                 tier = "lean"
             best_rank.pop(id(pick), None)
@@ -429,7 +432,8 @@ def build_cards(
             Card(
                 tier=tier,
                 units=(settings.lock_units if small_lock
-                       else units_for(pick, settings) if tier in UNIT_TIERS and id(pick) not in lean_ids else 0.0),
+                       else units_for(pick, settings)
+                       if tier in UNIT_TIERS and id(pick) not in lean_ids and id(pick) not in no_units else 0.0),
                 headline=headline,
                 reasons=bullets,
                 sport=pick.sport,
