@@ -118,6 +118,7 @@ class Ledger:
         self.entries: dict[str, Entry] = {e.id: e for e in entries}
         self.parlays: list[Parlay] = []
         self.forecasts: dict = {}  # id -> forecasts.Forecast: a prediction for every game (not picks)
+        self.teasers: list = []  # teasers.Teaser: the daily NFL 6-point teasers
         self.tz = ZoneInfo(tz)
         self.start_bankroll = start_bankroll
 
@@ -137,6 +138,9 @@ class Ledger:
         from .forecasts import Forecast
 
         ledger.forecasts = {d["id"]: Forecast.from_dict(d) for d in data.get("forecasts", [])}
+        from .teasers import Teaser
+
+        ledger.teasers = [Teaser.from_dict(d) for d in data.get("teasers", [])]
         return ledger
 
     def save(self, path: str | os.PathLike) -> None:
@@ -147,6 +151,7 @@ class Ledger:
             "entries": [asdict(e) for e in sorted(self.entries.values(), key=lambda e: (e.commence_time, e.id))],
             "parlays": [asdict(p) for p in sorted(self.parlays, key=lambda p: (p.day, p.size))],
             "forecasts": [f.to_dict() for f in sorted(self.forecasts.values(), key=lambda f: (f.commence_time, f.id))],
+            "teasers": [t.to_dict() for t in sorted(self.teasers, key=lambda t: (t.day, t.size))],
         }
         tmp = path.with_suffix(".tmp")
         tmp.write_text(json.dumps(data, indent=1))

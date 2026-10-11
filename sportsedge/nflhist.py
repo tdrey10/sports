@@ -466,6 +466,60 @@ def wind_under_weight(res: dict | None) -> float:
     return max(0.0, (blind["flat_roi"] - (blind.get("se") or 0)) / WIND_DECIMAL)
 
 
+# ------------------------------------------------------------------ teasers
+
+TEASE = 6.0  # a 6-point NFL teaser
+TEASER_BREAK_EVEN = {2: 0.7385, 3: 0.7272}  # leg cover rate a 2-team at -120 / 3-team at +160 needs
+TEASER_LOW_TOTAL = 49.0
+TEASER_LEGS = {  # leg kind -> (lowest, highest) closing line from the bettor's side
+    "wong_dog": (1.5, 2.5),  # a small dog teased up through 3 and 7
+    "wong_fav": (-8.5, -7.5),  # a favorite teased down through 7 and 3
+}
+
+
+def teaser_kind(line: float, total: float | None) -> list[str]:
+    out = []
+    for kind, (lo, hi) in TEASER_LEGS.items():
+        if lo <= line <= hi:
+            out.append(kind)
+            if total is not None and total <= TEASER_LOW_TOTAL:
+                out.append(kind + "_low_total")
+    return out
+
+
+def teaser_legs(games: list[Game], blind_from: int) -> dict[str, dict]:
+    """Each 6-point teaser leg kind's cover rate at the closing spread, tuning vs blind seasons.
+
+    PROVEN when both periods beat what a 2-team teaser at -120 needs (73.85%) and the blind
+    rate minus its standard error does too."""
+    tally: dict[str, dict[str, list[int]]] = defaultdict(lambda: {"in_sample": [0, 0], "blind": [0, 0]})
+    for g in games:
+        if not g.done or g.spread is None or g.season <= WARMUP_LAST:
+            continue
+        period = "blind" if g.season >= blind_from else "in_sample"
+        for line, margin in ((-g.spread, g.margin), (g.spread, -g.margin)):
+            res = margin + line + TEASE
+            if res == 0:
+                continue  # a push: the leg drops out of the teaser
+            for kind in teaser_kind(line, g.total):
+                t = tally[kind][period]
+                t[0] += 1
+                t[1] += res > 0
+    out = {}
+    for kind, periods in tally.items():
+        d = {}
+        for period, (n, w) in periods.items():
+            rate = w / n if n else None
+            se = math.sqrt(rate * (1 - rate) / n) if n else None
+            d[period] = {"legs": n, "won": w, "rate": rate, "se": se}
+        b, t = d["blind"], d["in_sample"]
+        need = TEASER_BREAK_EVEN[2]
+        d["proven"] = bool(b["legs"] >= PROVEN_BETS and t["rate"] and t["rate"] > need
+                           and b["rate"] - b["se"] > need)
+        out[kind] = d
+    return out
+
+
 # ------------------------------------------------------------------- the test
 
 def calibration(pairs: list[tuple[float, int]], bins: int = 10) -> list[dict]:
@@ -520,6 +574,7 @@ def run(games: list[Game], tune_last: int = TUNE_LAST, grid: dict = GRID, fitted
             "calibration_blind": calibration([(r.model["home"], int(r.won["home"])) for r in scored]),
         }
     out["wind_unders"] = {k: v.to_dict() for k, v in wind_unders(games, tune_last + 1).items()}
+    out["teasers"] = teaser_legs(games, tune_last + 1)
     out["spots"] = {k: {s: rec.to_dict() for s, rec in v.items()}
                     for k, v in spot_records(preds, tune_last + 1).items()}
     return out
@@ -556,6 +611,13 @@ def report(res: dict, league: str = "NFL") -> str:
     lines += [] if w is None else [f"Totals: under in outdoor games with {WIND_MPH}+ mph wind (closing total and price)",
               f"    in-sample {rec(w['in_sample'])}",
               f"    BLIND     {rec(w['blind'])}" + held_up(w), ""]
+    for kind, d in sorted((res.get("teasers") or {}).items()):
+        t, bl = d["in_sample"], d["blind"]
+        if t["legs"] and bl["legs"]:
+            lines.append(f"6-point teaser legs, {kind}: in-sample {t['won']}/{t['legs']} ({t['rate']:.1%}), "
+                         f"BLIND {bl['won']}/{bl['legs']} ({bl['rate']:.1%} ± {bl['se']:.1%})"
+                         + ("  PROVEN" if d["proven"] else ""))
+    lines.append("")
     lines.append("Early-bet spots (dog moneyline +100 to +220, at the closing price):")
     for spot, d in sorted(res["spots"].items()):
         lines.append(f"  {spot}")
