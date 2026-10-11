@@ -195,6 +195,9 @@ button, select { font: inherit; color: inherit; }
 .parlay ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
 .parlay li small { color: var(--muted); }
 .parlay li.won { color: var(--win); } .parlay li.lost { color: var(--loss); }
+.parlay .mark { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 8px; border-radius: 50%;
+  font: 900 15px/1 var(--body); color: #fff; vertical-align: 1px; }
+.parlay .mark.win { background: #22a85a; } .parlay .mark.loss { background: #e5484d; }
 
 /* ---------- board rows ---------- */
 .game { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
@@ -477,7 +480,11 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const c = SETTLED[e.status] ? e.status.replace("half_", "") : "";
       const kind = e.units > 0 ? `<span class="leg-tag unit">Unit pick</span>` : `<span class="leg-tag">Lean</span>`;
       const weak = e === weakest && !SETTLED[e.status] ? ` <span class="leg-tag weak">weakest leg</span>` : "";
-      return `<li class="${c}"><b>${esc(e.selection)}</b> ${odds(p.leg_odds[i])} ${kind}${weak}<br><small>wins ${pct(e.win_prob)} · needs ${pct(implied(p.leg_odds[i]))} · ${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}${SETTLED[e.status] ? " · " + SETTLED[e.status] : ""}</small></li>`;
+      // A check mark for a leg that won, an X for one that lost; push and void stay in words.
+      const mark = ["won", "half_won"].includes(e.status) ? `<span class="mark win" aria-label="Won">✓</span>`
+        : ["lost", "half_lost"].includes(e.status) ? `<span class="mark loss" aria-label="Lost">✗</span>` : "";
+      const other = ["push", "void"].includes(e.status) ? " · " + SETTLED[e.status] : "";
+      return `<li class="${c}">${mark}<b>${esc(e.selection)}</b> ${odds(p.leg_odds[i])} ${kind}${weak}<br><small>wins ${pct(e.win_prob)} · needs ${pct(implied(p.leg_odds[i]))} · ${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}${other}</small></li>`;
     }).join("");
     const st = PSTATUS[p.status] || p.status;
     const res = p.profit != null ? ` ${signed(p.profit, 2)}u` : "";
