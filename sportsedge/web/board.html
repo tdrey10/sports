@@ -202,6 +202,8 @@ button, select { font: inherit; color: inherit; }
   font: 900 clamp(26px, 7vw, 46px)/1 var(--display); letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
   color: #3ddc84; border: 4px solid #3ddc84; border-radius: 10px; padding: 6px 16px; pointer-events: none;
   background: color-mix(in srgb, var(--bg) 55%, transparent); box-shadow: 0 0 16px color-mix(in srgb, #3ddc84 35%, transparent); }
+.stamp.loss { font-size: clamp(56px, 16vw, 96px); padding: 0 22px; color: #ff4d4f; border-color: #ff4d4f;
+  box-shadow: 0 0 16px color-mix(in srgb, #ff4d4f 35%, transparent); }
 @media (prefers-reduced-motion: no-preference) { .stamp { animation: slam .35s cubic-bezier(.2, .8, .2, 1.4) both; } }
 @keyframes slam { from { transform: translate(-50%, -50%) rotate(-11deg) scale(2.2); opacity: 0; } }
 .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 8px 0; }
@@ -372,8 +374,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
   const addBtn = () => "";  // straight bets only: no parlay slip
   const more = (e) => (e.reasons && e.reasons.length ? `<details class="more"><summary>Stats &amp; why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "");
-  // A won bet gets a green "Cashed" stamp across it.
+  // A won bet gets a green "Cashed" stamp across it; a lost one gets a big red L.
   function stamp(e) {
+    if (["lost", "half_lost"].includes(e.status)) return `<span class="stamp loss" aria-label="Lost">L</span>`;
     return ["won", "half_won"].includes(e.status) ? `<span class="stamp">Cashed</span>` : "";
   }
   function row(e, opts = {}) {
@@ -475,7 +478,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const st = PSTATUS[p.status] || p.status;
     const res = p.profit != null ? ` ${signed(p.profit, 2)}u` : "";
     const ed = parlayEdge(p), g = grade(ed);
-    return `<div class="parlay${top ? " top-rated" : ""}">${p.status === "won" ? `<span class="stamp">Cashed</span>` : ""}<span class="kind">${p.kind === "dabble" ? "Wanna Dabble?" : "🔥 The Heat"} · ${p.size}-team</span>
+    return `<div class="parlay${top ? " top-rated" : ""}">${p.status === "won" ? `<span class="stamp">Cashed</span>` : p.status === "lost" ? `<span class="stamp loss" aria-label="Lost">L</span>` : ""}<span class="kind">${p.kind === "dabble" ? "Wanna Dabble?" : "🔥 The Heat"} · ${p.size}-team</span>
       ${top ? `<span class="leg-tag top">⭐ Top rated today</span>` : ""}
       <div class="price"><b>${odds(p.american)}</b><span class="muted">${p.units > 0 ? p.units + "u" : "no units, tracked"} · $10 pays $${(10 * p.decimal).toFixed(2)}</span></div>
       <p class="small"><span class="grade g${g}">${g}</span> <b>Edge ${signed(ed * 100, 1)}%</b> on our numbers · <b>hits ${pct(p.hit_prob, p.hit_prob < 0.1 ? 1 : 0)}</b> <span class="muted">(about 1 in ${Math.max(1, Math.round(1 / p.hit_prob))})</span></p>
