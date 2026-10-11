@@ -302,6 +302,8 @@ class Ledger:
                 daily_lock = daily_lock or (e.tier in ("lock", "dog") and getattr(settings, "daily_heads", False)
                                             and e.win_prob > break_even(e.odds))
                 lean = e.tier == "lean" and getattr(settings, "show_leans", True) and e.win_prob >= LEGIT_MIN_WIN
+                # No-unit early value stays while it is a realistic winner that still beats its break-even.
+                lean = lean or (e.tier == "early" and e.win_prob >= LEGIT_MIN_WIN and e.win_prob > break_even(e.odds))
                 if not getattr(settings, "fill", False) and not daily_lock and not lean:  # no maybes: no-unit posts come off the board
                     e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
                     e.reasons = ["Withdrawn before the game: only bets backed by the data are posted."] + list(e.reasons)

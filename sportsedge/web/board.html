@@ -754,7 +754,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const views = {
       today: viewToday, parlays: viewParlays, live: viewLive, scores: viewScores, predict: viewPredict, results: viewResults,
       props: () => viewList((e) => e.player, "Player props", "Best edge first · priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
-      early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves", "Nothing early yet."),
+      early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves · no units until early bets prove out", "Nothing early yet: an early pick needs a real edge on a realistic winner (45%+ to cash)."),
     };
     $("view").innerHTML = (views[state.tab] || viewToday)();
   }

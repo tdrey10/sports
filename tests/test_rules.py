@@ -386,3 +386,20 @@ def test_leans_never_go_to_a_favorite_on_the_models_word_alone():
     scans = [engine.scan(c) for c in resolve("nba,nhl,mlb,nfl")]
     leans = [c for c in build_cards(scans, Settings(), provider.now) if c.tier == "lean"]
     assert leans and not any(favorite_overreach(c.pick) for c in leans)
+
+
+def test_unproven_early_value_stays_early_with_no_units_and_is_kept_on_the_board():
+    from datetime import timedelta
+
+    from sportsedge.ledger import Ledger
+
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb,nfl")]
+    early_now = provider.now - timedelta(days=3)  # every game is more than 24 hours out
+    cards = [c for c in build_cards(scans, Settings(proven=set()), early_now) if c.tier == "early"]
+    assert cards and all(c.units == 0 and c.pick.win_prob >= 0.45 for c in cards)
+    L = Ledger()
+    entries = L.publish(cards, early_now)
+    assert entries
+    assert not L.withdraw(Settings(proven=set()), early_now)  # no-unit early value is not pulled
