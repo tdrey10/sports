@@ -212,6 +212,113 @@
     ]
    }
   },
+  "teasers": {
+   "wong_fav": {
+    "in_sample": {
+     "legs": 566,
+     "won": 398,
+     "rate": 0.7031802120141343,
+     "se": 0.019203108251326807
+    },
+    "blind": {
+     "legs": 598,
+     "won": 434,
+     "rate": 0.725752508361204,
+     "se": 0.018243787826597687
+    },
+    "proven": false
+   },
+   "big_dog": {
+    "in_sample": {
+     "legs": 1616,
+     "won": 1118,
+     "rate": 0.6918316831683168,
+     "se": 0.011486125006129881
+    },
+    "blind": {
+     "legs": 2002,
+     "won": 1395,
+     "rate": 0.6968031968031968,
+     "se": 0.010272717368928205
+    },
+    "proven": false
+   },
+   "fav_3_7": {
+    "in_sample": {
+     "legs": 1997,
+     "won": 1355,
+     "rate": 0.6785177766649975,
+     "se": 0.010451293988130491
+    },
+    "blind": {
+     "legs": 1980,
+     "won": 1308,
+     "rate": 0.6606060606060606,
+     "se": 0.010641202875363652
+    },
+    "proven": false
+   },
+   "dog_3_7": {
+    "in_sample": {
+     "legs": 2224,
+     "won": 1585,
+     "rate": 0.7126798561151079,
+     "se": 0.009595395675361816
+    },
+    "blind": {
+     "legs": 2195,
+     "won": 1561,
+     "rate": 0.7111617312072893,
+     "se": 0.009673737391165334
+    },
+    "proven": false
+   },
+   "wong_dog": {
+    "in_sample": {
+     "legs": 839,
+     "won": 583,
+     "rate": 0.6948748510131109,
+     "se": 0.01589685887528903
+    },
+    "blind": {
+     "legs": 835,
+     "won": 568,
+     "rate": 0.6802395209580838,
+     "se": 0.016139871968743297
+    },
+    "proven": false
+   },
+   "small_fav": {
+    "in_sample": {
+     "legs": 1248,
+     "won": 808,
+     "rate": 0.6474358974358975,
+     "se": 0.013524155032710001
+    },
+    "blind": {
+     "legs": 1234,
+     "won": 771,
+     "rate": 0.6247974068071313,
+     "se": 0.013783037729589217
+    },
+    "proven": false
+   },
+   "big_fav": {
+    "in_sample": {
+     "legs": 1044,
+     "won": 733,
+     "rate": 0.7021072796934866,
+     "se": 0.014154073087164683
+    },
+    "blind": {
+     "legs": 1413,
+     "won": 1008,
+     "rate": 0.7133757961783439,
+     "se": 0.012029415751225118
+    },
+    "proven": false
+   }
+  },
   "spots": {
    "home dog": {
     "in_sample": {
@@ -496,6 +603,68 @@
     ]
    }
   },
+  "teasers": {
+   "small_fav": {
+    "in_sample": {
+     "legs": 4612,
+     "won": 4548,
+     "rate": 0.9861231569817867,
+     "se": 0.0017225279083572628
+    },
+    "blind": {
+     "legs": 5484,
+     "won": 5404,
+     "rate": 0.9854121079504011,
+     "se": 0.0016190359586164967
+    },
+    "proven": true
+   },
+   "small_fav_low_total": {
+    "in_sample": {
+     "legs": 4609,
+     "won": 4545,
+     "rate": 0.9861141245389455,
+     "se": 0.0017236412085410882
+    },
+    "blind": {
+     "legs": 5484,
+     "won": 5404,
+     "rate": 0.9854121079504011,
+     "se": 0.0016190359586164967
+    },
+    "proven": true
+   },
+   "wong_dog": {
+    "in_sample": {
+     "legs": 4611,
+     "won": 4607,
+     "rate": 0.9991325092170895,
+     "se": 0.00043355721557155485
+    },
+    "blind": {
+     "legs": 5484,
+     "won": 5478,
+     "rate": 0.9989059080962801,
+     "se": 0.0004464167382600928
+    },
+    "proven": true
+   },
+   "wong_dog_low_total": {
+    "in_sample": {
+     "legs": 4608,
+     "won": 4604,
+     "rate": 0.9991319444444444,
+     "se": 0.0004338393567670474
+    },
+    "blind": {
+     "legs": 5484,
+     "won": 5478,
+     "rate": 0.9989059080962801,
+     "se": 0.0004464167382600928
+    },
+    "proven": true
+   }
+  },
   "spots": {
    "home dog": {
     "in_sample": {
@@ -772,6 +941,218 @@
       "won": 0.5384615384615384
      }
     ]
+   }
+  },
+  "teasers": {
+   "small_fav": {
+    "in_sample": {
+     "legs": 7714,
+     "won": 6932,
+     "rate": 0.8986258750324086,
+     "se": 0.003436475102444108
+    },
+    "blind": {
+     "legs": 12195,
+     "won": 10955,
+     "rate": 0.8983189831898319,
+     "se": 0.0027368079740620415
+    },
+    "proven": true
+   },
+   "small_fav_low_total": {
+    "in_sample": {
+     "legs": 7705,
+     "won": 6925,
+     "rate": 0.8987670343932511,
+     "se": 0.0034363566017675718
+    },
+    "blind": {
+     "legs": 12195,
+     "won": 10955,
+     "rate": 0.8983189831898319,
+     "se": 0.0027368079740620415
+    },
+    "proven": true
+   },
+   "wong_dog": {
+    "in_sample": {
+     "legs": 7705,
+     "won": 7211,
+     "rate": 0.935885788449059,
+     "se": 0.002790629993326785
+    },
+    "blind": {
+     "legs": 12180,
+     "won": 11416,
+     "rate": 0.9372742200328408,
+     "se": 0.002197013506857924
+    },
+    "proven": true
+   },
+   "wong_dog_low_total": {
+    "in_sample": {
+     "legs": 7696,
+     "won": 7203,
+     "rate": 0.9359407484407485,
+     "se": 0.002791146155590192
+    },
+    "blind": {
+     "legs": 12180,
+     "won": 11416,
+     "rate": 0.9372742200328408,
+     "se": 0.002197013506857924
+    },
+    "proven": true
+   },
+   "fav_3_7": {
+    "in_sample": {
+     "legs": 1,
+     "won": 1,
+     "rate": 1.0,
+     "se": 0.0
+    },
+    "blind": {
+     "legs": 16,
+     "won": 16,
+     "rate": 1.0,
+     "se": 0.0
+    },
+    "proven": false
+   },
+   "fav_3_7_low_total": {
+    "in_sample": {
+     "legs": 1,
+     "won": 1,
+     "rate": 1.0,
+     "se": 0.0
+    },
+    "blind": {
+     "legs": 16,
+     "won": 16,
+     "rate": 1.0,
+     "se": 0.0
+    },
+    "proven": false
+   },
+   "dog_3_7": {
+    "in_sample": {
+     "legs": 1,
+     "won": 1,
+     "rate": 1.0,
+     "se": 0.0
+    },
+    "blind": {
+     "legs": 16,
+     "won": 15,
+     "rate": 0.9375,
+     "se": 0.06051536478449089
+    },
+    "proven": false
+   },
+   "dog_3_7_low_total": {
+    "in_sample": {
+     "legs": 1,
+     "won": 1,
+     "rate": 1.0,
+     "se": 0.0
+    },
+    "blind": {
+     "legs": 16,
+     "won": 15,
+     "rate": 0.9375,
+     "se": 0.06051536478449089
+    },
+    "proven": false
+   },
+   "wong_fav": {
+    "in_sample": {
+     "legs": 0,
+     "won": 0,
+     "rate": null,
+     "se": null
+    },
+    "blind": {
+     "legs": 3,
+     "won": 3,
+     "rate": 1.0,
+     "se": 0.0
+    },
+    "proven": false
+   },
+   "wong_fav_low_total": {
+    "in_sample": {
+     "legs": 0,
+     "won": 0,
+     "rate": null,
+     "se": null
+    },
+    "blind": {
+     "legs": 3,
+     "won": 3,
+     "rate": 1.0,
+     "se": 0.0
+    },
+    "proven": false
+   },
+   "big_dog": {
+    "in_sample": {
+     "legs": 0,
+     "won": 0,
+     "rate": null,
+     "se": null
+    },
+    "blind": {
+     "legs": 4,
+     "won": 3,
+     "rate": 0.75,
+     "se": 0.21650635094610965
+    },
+    "proven": false
+   },
+   "big_dog_low_total": {
+    "in_sample": {
+     "legs": 0,
+     "won": 0,
+     "rate": null,
+     "se": null
+    },
+    "blind": {
+     "legs": 4,
+     "won": 3,
+     "rate": 0.75,
+     "se": 0.21650635094610965
+    },
+    "proven": false
+   },
+   "big_fav": {
+    "in_sample": {
+     "legs": 0,
+     "won": 0,
+     "rate": null,
+     "se": null
+    },
+    "blind": {
+     "legs": 1,
+     "won": 1,
+     "rate": 1.0,
+     "se": 0.0
+    },
+    "proven": false
+   },
+   "big_fav_low_total": {
+    "in_sample": {
+     "legs": 0,
+     "won": 0,
+     "rate": null,
+     "se": null
+    },
+    "blind": {
+     "legs": 1,
+     "won": 1,
+     "rate": 1.0,
+     "se": 0.0
+    },
+    "proven": false
    }
   },
   "spots": {
@@ -1086,6 +1467,113 @@
       "won": 1.0
      }
     ]
+   }
+  },
+  "teasers": {
+   "wong_fav": {
+    "in_sample": {
+     "legs": 1273,
+     "won": 958,
+     "rate": 0.7525530243519246,
+     "se": 0.012094709064107393
+    },
+    "blind": {
+     "legs": 1613,
+     "won": 1187,
+     "rate": 0.735895846249225,
+     "se": 0.010976872201336089
+    },
+    "proven": false
+   },
+   "big_dog": {
+    "in_sample": {
+     "legs": 5593,
+     "won": 4062,
+     "rate": 0.7262649740747362,
+     "se": 0.005961977406405175
+    },
+    "blind": {
+     "legs": 6901,
+     "won": 4938,
+     "rate": 0.7155484712360527,
+     "se": 0.0054308480459463945
+    },
+    "proven": false
+   },
+   "big_fav": {
+    "in_sample": {
+     "legs": 4312,
+     "won": 3082,
+     "rate": 0.7147495361781077,
+     "se": 0.0068762355393619775
+    },
+    "blind": {
+     "legs": 5275,
+     "won": 3773,
+     "rate": 0.715260663507109,
+     "se": 0.0062136197560895366
+    },
+    "proven": false
+   },
+   "dog_3_7": {
+    "in_sample": {
+     "legs": 5255,
+     "won": 3837,
+     "rate": 0.7301617507136061,
+     "se": 0.006123150506348537
+    },
+    "blind": {
+     "legs": 5705,
+     "won": 4157,
+     "rate": 0.7286590709903593,
+     "se": 0.00588697263842321
+    },
+    "proven": false
+   },
+   "fav_3_7": {
+    "in_sample": {
+     "legs": 4582,
+     "won": 3228,
+     "rate": 0.7044958533391532,
+     "se": 0.006740521028667396
+    },
+    "blind": {
+     "legs": 5280,
+     "won": 3667,
+     "rate": 0.6945075757575757,
+     "se": 0.006339014641382159
+    },
+    "proven": false
+   },
+   "wong_dog": {
+    "in_sample": {
+     "legs": 2134,
+     "won": 1556,
+     "rate": 0.7291471415182755,
+     "se": 0.009620044764054873
+    },
+    "blind": {
+     "legs": 2931,
+     "won": 2138,
+     "rate": 0.7294438758103037,
+     "se": 0.008205720430492388
+    },
+    "proven": false
+   },
+   "small_fav": {
+    "in_sample": {
+     "legs": 3210,
+     "won": 2148,
+     "rate": 0.6691588785046729,
+     "se": 0.008304659837871405
+    },
+    "blind": {
+     "legs": 3684,
+     "won": 2489,
+     "rate": 0.6756243213897937,
+     "se": 0.007712887000241524
+    },
+    "proven": false
    }
   },
   "spots": {
