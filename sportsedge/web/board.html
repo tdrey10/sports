@@ -518,7 +518,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const legs = t.legs.map((l) => {
         const mark = l.status === "won" ? `<span class="mark win" aria-label="Won">✓</span>` : l.status === "lost" ? `<span class="mark loss" aria-label="Lost">✗</span>` : "";
         const teased = `${l.teased > 0 ? "+" : ""}${l.teased}`;
-        return `<li class="${l.status === "won" ? "won" : l.status === "lost" ? "lost" : ""}">${mark}<b>${esc(l.team)} ${teased}</b> <small class="muted">(was ${l.point > 0 ? "+" : ""}${l.point})</small><br><small>covers ${pct(t.leg_rate)} historically${l.low_total ? " · low total" : ""} · our model ${pct(l.model_cover)} · ${esc(l.away)} @ ${esc(l.home)} · ${timeOf(l)}${l.status === "push" ? " · Push (leg drops out)" : ""}${l.final ? " · " + esc(l.final) : ""}</small></li>`;
+        return `<li class="${l.status === "won" ? "won" : l.status === "lost" ? "lost" : ""}">${mark}<b>${esc(l.team)} ${teased}</b> <small class="muted">(was ${l.point > 0 ? "+" : ""}${l.point})</small><br><small>covers ${pct(l.rate ?? t.leg_rate)} historically${l.proven === false ? " (not a proven leg)" : ""}${l.low_total ? " · low total" : ""} · our model ${pct(l.model_cover)} · ${esc(l.away)} @ ${esc(l.home)} · ${timeOf(l)}${l.status === "push" ? " · Push (leg drops out)" : ""}${l.final ? " · " + esc(l.final) : ""}</small></li>`;
       }).join("");
       const stamp = t.status === "won" ? `<span class="stamp">Cashed</span>` : t.status === "lost" ? `<span class="stamp loss" aria-label="Lost">L</span>` : "";
       const stake = t.units > 0 ? `${t.units}u` : "no units";
@@ -529,8 +529,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     };
     const st = DATA.teaser_record || {};
     const r2 = st["2"] || { won: 0, lost: 0, units: 0 }, r3 = st["3"] || { won: 0, lost: 0, units: 0 };
-    const recLine = `2-team ${r2.won}-${r2.lost} (${signed(r2.units, 1)}u) · 3-team ${r3.won}-${r3.lost} (${signed(r3.units, 1)}u)`;
-    const how = `<p class="small muted">Only one kind of teaser leg has beaten the price in 20 NFL seasons: a dog of +1.5 to +2.5 teased 6 points to +7.5/+8.5, across 3 and 7, the most common margins (77% blind since 2018, 79% with a total of 49 or less). A 2-team teaser at −120 needs 73.9% a leg, a 3-team at +160 needs 72.7%. Favorites teased through 7 and 3 stopped working, so they're left out. Rechecked every morning. Prices vary by book.</p>`;
+    const r6 = st["6"] || { won: 0, lost: 0, units: 0 };
+    const recLine = `2-team ${r2.won}-${r2.lost} (${signed(r2.units, 1)}u) · 3-team ${r3.won}-${r3.lost} (${signed(r3.units, 1)}u) · 6-team ${r6.won}-${r6.lost} (${signed(r6.units, 1)}u)`;
+    const how = `<p class="small muted">Only one kind of teaser leg has beaten the price in 20 NFL seasons: a dog of +1.5 to +2.5 teased 6 points to +7.5/+8.5, across 3 and 7, the most common margins (77% blind since 2018, 79% with a total of 49 or less). A 2-team teaser at −120 needs 73.9% a leg, a 3-team at +160 needs 72.7%. Favorites teased through 7 and 3 stopped working, so they're left out of the 2- and 3-team. The 6-team at +550 (needs 15.4%, about 73.2% a leg) leads with those dogs and fills with the next-best leg kinds by their 20-season record, and only posts when the legs together beat +550; units only if every leg is a proven one. Rechecked every morning. Prices vary by book.</p>`;
     const body = how + (open.length ? `<div class="grid two">${open.map(card).join("")}</div>` : empty("No teaser today: it needs two or more NFL dogs at +1.5 to +2.5 on the board."))
       + (done.length ? `<h3 class="small">Recent</h3><div class="grid two">${done.map(card).join("")}</div>` : "");
     return panel("Best teasers", recLine, body);

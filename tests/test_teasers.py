@@ -5,14 +5,16 @@ from sportsedge.ledger import Ledger
 from sportsedge.models.ratings import GameResult
 
 NOW = datetime(2026, 10, 11, 12, tzinfo=timezone.utc)
-STUDY = {"teasers": {"wong_dog": {"proven": True, "blind": {"rate": 0.772, "legs": 381}}}}
+STUDY = {"teasers": {"wong_dog": {"proven": True, "in_sample": {"rate": 0.764, "legs": 292},
+                                   "blind": {"rate": 0.772, "legs": 381}}}}
 
 
-def _leg(i, side="away", point=2.5, low=True, cover=0.8):
+def _leg(i, side="away", point=2.5, low=True, cover=0.8, kind="wong_dog", rate=0.764, proven=True):
     t = NOW + timedelta(hours=5)
     return {"event_id": f"e{i}", "team": f"T{i}", "side": side, "home": f"H{i}", "away": f"A{i}",
             "commence_time": t.isoformat(), "point": point, "teased": point + 6, "total": 44.5,
-            "low_total": low, "model_cover": cover, "status": "pending", "final": None}
+            "low_total": low, "model_cover": cover, "status": "pending", "final": None,
+            "kind": kind, "rate": rate, "proven": proven}
 
 
 def test_teaser_legs_study_finds_small_dogs_and_flags_proven():
@@ -24,19 +26,20 @@ def test_teaser_legs_study_finds_small_dogs_and_flags_proven():
     res = nflhist.teaser_legs(games, 2018)
     assert res["wong_dog"]["blind"]["rate"] == 1.0 and res["wong_dog"]["proven"]
     assert "wong_dog_low_total" in res
-    assert nflhist.teaser_kind(2.5, 44) == ["wong_dog", "wong_dog_low_total"] and nflhist.teaser_kind(3.0, 44) == []
+    assert nflhist.teaser_kind(2.5, 44) == ["wong_dog", "wong_dog_low_total"] and nflhist.teaser_kind(3.0, 44) == ["dog_3_7", "dog_3_7_low_total"]
+    assert nflhist.teaser_kind(0.0, 44) == []
 
 
 def test_builds_one_2_and_3_team_a_day_without_reusing_legs(monkeypatch):
     legs = [_leg(i) for i in range(4)]
-    monkeypatch.setattr(teasers, "candidate_legs", lambda scans, now: [dict(x) for x in legs])
+    monkeypatch.setattr(teasers, "candidate_legs", lambda scans, now, rates=None: [dict(x) for x in legs])
     made = teasers.build([], [], STUDY, NOW, "2026-10-11")
     assert [t.size for t in made] == [2, 3] and made[0].units == 1.0 and made[1].units == 0.5
     assert teasers.build([], made, STUDY, NOW, "2026-10-11") == []  # once a day
     later = teasers.build([], made, STUDY, NOW, "2026-10-12")
     assert later == []  # every leg is already in an open teaser
     assert teasers.build([], [], None, NOW, "2026-10-11") == []  # no study: no teaser
-    unproven = {"teasers": {"wong_dog": {"proven": False, "blind": {"rate": 0.75}}}}
+    unproven = {"teasers": {"wong_dog": {"proven": False, "in_sample": {"rate": 0.75}, "blind": {"rate": 0.75}}}}
     assert all(t.units == 0 for t in teasers.build([], [], unproven, NOW, "2026-10-11"))
 
 
@@ -61,4 +64,23 @@ def test_grading_leg_by_leg_with_a_push_dropping_out(tmp_path):
     L.teasers = [t, lose, push]
     L.save(tmp_path / "l.json")
     assert {x.id: x.status for x in Ledger.load(tmp_path / "l.json").teasers} == {"x": "won", "y": "lost", "z": "push"}
-    assert teasers.record([t, lose, push]) == {"2": {"won": 0, "lost": 1, "units": -1.0}, "3": {"won": 1, "lost": 0, "units": 0.8}}
+    assert teasers.record([t, lose, push]) == {"2": {"won": 0, "lost": 1, "units": -1.0}, "3": {"won": 1, "lost": 0, "units": 0.8},
+                                               "6": {"won": 0, "lost": 0, "units": 0}}
+
+
+def test_six_team_at_550_only_when_the_legs_records_beat_the_price(monkeypatch):
+    dogs = [_leg(i) for i in range(4)]  # 76.4% each
+    others = [_leg(10 + i, point=4.0, kind="dog_3_7", rate=0.691, proven=False) for i in range(4)]
+    monkeypatch.setattr(teasers, "candidate_legs", lambda scans, now, rates=None: [dict(x) for x in dogs + others])
+    made = {t.size: t for t in teasers.build([], [], STUDY, NOW, "2026-10-11")}
+    six = made[6]
+    assert six.odds == 550.0 and six.units == 0  # filled with unproven legs: no units
+    assert abs(six.hit - 0.764 ** 4 * 0.691 ** 2) < 1e-4 and six.hit * 6.5 > 1
+    assert sum(leg["kind"] == "wong_dog" for leg in six.legs) == 4  # the proven dogs lead
+    two_dogs = dogs[:2] + others
+    monkeypatch.setattr(teasers, "candidate_legs", lambda scans, now, rates=None: [dict(x) for x in two_dogs])
+    assert 6 not in {t.size for t in teasers.build([], [], STUDY, NOW, "2026-10-12")}  # 0.764^2 0.691^4 x 6.5 < 1
+    six_dogs = [_leg(20 + i) for i in range(6)]
+    monkeypatch.setattr(teasers, "candidate_legs", lambda scans, now, rates=None: [dict(x) for x in six_dogs])
+    big = {t.size: t for t in teasers.build([], [], STUDY, NOW, "2026-10-13")}[6]
+    assert big.units == 0.25 and big.proven
