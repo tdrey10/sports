@@ -492,7 +492,7 @@ class Ledger:
             won = sum(1 for e in items if e.status in ("won", "half_won"))
             lost = sum(1 for e in items if e.status in ("lost", "half_lost"))
             push = sum(1 for e in items if e.status == "push")
-            risked = sum(e.units for e in items)
+            risked = sum(e.units if e.units > 0 else 1.0 for e in items)  # leans count as 1 unit
             profit = sum(e.profit or 0 for e in items)
             clvs = [e.clv for e in items if e.clv is not None]
             return {
@@ -509,10 +509,12 @@ class Ledger:
         week_ago = now - timedelta(days=7)
         by_tier = {t: summary([e for e in plays if e.tier == t]) for t in ("lock", "dog", "prop", "value", "early", "live_win", "live_plus")}
         by_tier["live"] = summary([e for e in plays if e.tier in LIVE_TIERS])
+        # Each sport's record: its unit plays, and every graded pick (leans count as 1 unit).
         by_sport = {}
-        for sport in sorted({e.sport for e in plays}):
+        for sport in sorted({e.sport for e in settled}):
+            mine = [e for e in settled if e.sport == sport]
             by_sport[sport] = {"name": SPORTS[sport].name if sport in SPORTS else sport,
-                               **summary([e for e in plays if e.sport == sport])}
+                               **summary([e for e in mine if e.is_unit_play]), "all": summary(mine)}
 
         curve, bank = [], self.start_bankroll
         for e in sorted(plays, key=lambda e: e.graded_at or ""):

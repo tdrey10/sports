@@ -417,3 +417,17 @@ def test_a_small_stake_lock_stays_while_it_beats_break_even():
     assert not L.withdraw(s, NOW)  # unproven, but the Lock's small stake is the owner's rule
     e.win_prob = 0.55  # -130 needs 56.5%
     assert L.withdraw(s, NOW) == [e] and e.status == "void"
+
+
+def test_record_by_sport_counts_every_graded_pick_and_the_unit_plays():
+    L = Ledger()
+    picks = [("nfl", 1.0, "won", 0.91), ("nfl", 0.0, "lost", -1.0), ("nhl", 0.0, "won", 1.2), ("nhl", 0.0, "void", 0.0)]
+    for i, (sport, units, status, profit) in enumerate(picks):
+        p = make_pick(event_id=f"e{i}", sport=sport)
+        (e,) = L.publish([card(p, tier="value" if units else "lean", units=units)], NOW)
+        e.status, e.profit = status, profit
+    by = L.stats(NOW)["by_sport"]
+    assert (by["nfl"]["won"], by["nfl"]["lost"]) == (1, 0)  # unit plays
+    assert (by["nfl"]["all"]["won"], by["nfl"]["all"]["lost"]) == (1, 1)  # every graded pick
+    assert by["nhl"]["won"] + by["nhl"]["lost"] == 0 and by["nhl"]["all"]["won"] == 1  # void left out
+    assert abs(by["nhl"]["all"]["roi"] - 1.2) < 1e-9  # a lean counts as 1 unit risked
