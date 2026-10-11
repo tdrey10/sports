@@ -16,6 +16,18 @@ from .sports import SPORTS, SportConfig
 KEEP_DAYS = 30  # settled picks shown in "latest results" (stats always use the full ledger)
 
 
+def _whole(f):
+    from .forecasts import whole_score
+
+    return whole_score(f)
+
+
+def _forecast_record(ledger):
+    from .forecasts import record
+
+    return record(getattr(ledger, "forecasts", {}))
+
+
 def build_data(
     ledger: Ledger,
     brains: dict[str, BrainReport],
@@ -47,6 +59,10 @@ def build_data(
         # ESPN scoreboard paths, so the page can pull live scores itself between engine runs.
         "espn": {k: {"path": c.espn_path, "groups": c.espn_groups} for k, c in SPORTS.items()},
         "entries": entries,
+        # A prediction for every game (not picks), and how the predictions have done.
+        "forecasts": [{**f.to_dict(), "score": list(_whole(f))} for f in getattr(ledger, "forecasts", {}).values()
+                      if f.status != "void" and (f.status != "final" or now - f.start < timedelta(days=2))],
+        "forecast_record": _forecast_record(ledger),
         "stats": ledger.stats(now),
         "brains": [b.to_dict() for b in brains.values()],
         "weights": weights,
