@@ -34,13 +34,17 @@ def test_every_game_gets_a_forecast_whose_score_names_the_same_winner():
     assert any(f.p_draw > 0 for f in fs if f.sport == "epl") and all(f.p_draw == 0 for f in fs if f.sport == "nba")
 
 
-def test_blend_leans_on_the_market_at_the_learned_weight():
+def test_forecasts_are_our_own_read_not_the_betting_line():
     provider, scans = _scans()
-    all_market = forecasts.build(scans, Settings(market_weight=1.0), provider.now)
-    priced = [f for f in all_market if f.market_home is not None and f.sport != "epl"]
-    assert priced and all(abs(f.p_home - f.market_home) < 1e-3 for f in priced)
-    model_only = forecasts.build(scans, Settings(market_weight=0.0), provider.now)
-    assert all(abs(f.p_home - f.model_home) < 1e-3 for f in model_only if f.sport != "epl")
+    leaning = forecasts.build(scans, Settings(market_weight=1.0), provider.now)
+    ignoring = forecasts.build(scans, Settings(market_weight=0.0), provider.now)
+    assert [(f.home_score, f.p_home) for f in leaning] == [(f.home_score, f.p_home) for f in ignoring]
+    preds = {ev: pr for s in scans for ev, pr in s.predictions.items()}
+    for f in leaning:
+        pr = preds[f.event_id]
+        if (pr.exp_margin > 0) == (f.winner == "home") or f.winner == "draw":
+            assert abs(f.home_score + f.away_score - pr.exp_total) < 0.2  # our projected total, not the O/U
+    assert any(x.startswith("Vegas:") for f in leaning for x in f.facts)  # the line shown beside ours
 
 
 def test_forecasts_freeze_at_kickoff_grade_on_the_final_and_survive_save(tmp_path):

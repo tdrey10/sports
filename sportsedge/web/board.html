@@ -203,7 +203,7 @@ button, select { font: inherit; color: inherit; }
 .fc-row.pick span { font-weight: 800; } .fc-row.pick b { color: var(--accent); }
 .fc-bar { display: flex; height: 6px; border-radius: 4px; overflow: hidden; background: var(--accent); }
 .fc-bar i { display: block; background: #fff; } .fc-bar i.d { background: #8a8f98; }
-.fc-pick, .fc-final { margin: 0; font-size: 14px; }
+.fc-pick, .fc-final, .fc-vegas { margin: 0; font-size: 14px; } .fc-vegas { font-size: 13px; }
 .fc details summary { cursor: pointer; font-size: 13px; font-weight: 700; }
 .fc details ul { margin: 6px 0 0; padding-left: 18px; font-size: 13px; display: grid; gap: 3px; }
 .fc .mark, .parlay .mark { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 8px; border-radius: 50%;
@@ -572,13 +572,15 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       }
       const draw = f.p_draw > 0 ? ` · draw ${pct(f.p_draw)}` : "";
       const bar = `<div class="fc-bar" title="${esc(f.away)} ${pct(f.p_away)} · ${esc(f.home)} ${pct(f.p_home)}"><i style="width:${(f.p_away * 100).toFixed(1)}%"></i>${f.p_draw > 0 ? `<i class="d" style="width:${(f.p_draw * 100).toFixed(1)}%"></i>` : ""}</div>`;
-      const facts = (f.facts || []).length ? `<details><summary>Why · stats &amp; facts</summary><ul>${f.facts.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></details>` : "";
+      const vegas = (f.facts || []).find((x) => x.startsWith("Vegas:"));
+      const rest = (f.facts || []).filter((x) => x !== vegas);
+      const facts = rest.length ? `<details><summary>Why · stats &amp; facts</summary><ul>${rest.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></details>` : "";
       const mkt = f.market_home != null ? ` · market ${pct(f.winner === "away" ? 1 - f.market_home - (f.p_draw ? f.p_draw : 0) : f.market_home)}` : "";
       return `<article class="fc ${f.status === "final" ? (f.correct ? "ok" : "miss") : ""}">
         <div class="fc-head"><span class="kind">${esc(f.sport_name)}</span>${status}</div>
         ${team("away", as)}${team("home", hs)}${bar}
         <p class="fc-pick">We say <b>${esc(name(f, f.winner))}</b> ${f.winner === "draw" ? "" : "win"} ${pct(prob)}${draw}</p>
-        ${result}${facts}</article>`;
+        ${vegas ? `<p class="fc-vegas small muted">${esc(vegas)}</p>` : ""}${result}${facts}</article>`;
     };
     const rec = DATA.forecast_record || {};
     const o = rec.overall || {};
@@ -586,7 +588,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       ? `${o.right}-${o.wrong} picking winners (${pct(o.pct)}) · scores off by ${o.score_error == null ? "–" : o.score_error.toFixed(1)} a team`
       : "Graded after every final";
     const bySport = Object.values(rec.by_sport || {}).map((s) => `<span class="chip-rec">${esc(s.name)} ${s.right}-${s.wrong}</span>`).join("");
-    const intro = `<p class="small muted">Not picks: our read on every game. Win chances blend our ratings (rest, injuries, starters) with the betting market, at the weight the studies learned; the score blends our projection with the spread and total. Each one locks at kickoff and is graded on the final.</p>${bySport ? `<div class="chip-recs">${bySport}</div>` : ""}`;
+    const intro = `<p class="small muted">Not picks: our own educated read on every game, not the betting line repeated back. The score and win chance come from our team ratings (points scored and allowed, home field, rest, injuries, starting pitchers and goalies), calibrated by the studies; the Vegas line sits beside it so you can see where we disagree. Each one locks at kickoff and is graded on the final.</p>${bySport ? `<div class="chip-recs">${bySport}</div>` : ""}`;
     return panel("Predictions", head, intro + (recent.length ? `<div class="grid two">${recent.map(card).join("")}</div>` : empty("No games to predict yet: they show up as soon as lines post.")));
   }
 
