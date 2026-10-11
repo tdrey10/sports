@@ -471,9 +471,14 @@ def wind_under_weight(res: dict | None) -> float:
 TEASE = 6.0  # a 6-point NFL teaser
 TEASER_BREAK_EVEN = {2: 0.7385, 3: 0.7272}  # leg cover rate a 2-team at -120 / 3-team at +160 needs
 TEASER_LOW_TOTAL = 49.0
-TEASER_LEGS = {  # leg kind -> (lowest, highest) closing line from the bettor's side
+TEASER_LEGS = {  # leg kind -> (lowest, highest) closing line from the bettor's side (non-overlapping)
     "wong_dog": (1.5, 2.5),  # a small dog teased up through 3 and 7
     "wong_fav": (-8.5, -7.5),  # a favorite teased down through 7 and 3
+    "dog_3_7": (3.0, 7.0),
+    "fav_3_7": (-7.0, -3.5),
+    "small_fav": (-3.0, -1.0),
+    "big_dog": (7.5, 99.0),
+    "big_fav": (-99.0, -9.0),
 }
 
 
