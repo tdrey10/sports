@@ -431,3 +431,15 @@ def test_record_by_sport_counts_every_graded_pick_and_the_unit_plays():
     assert (by["nfl"]["all"]["won"], by["nfl"]["all"]["lost"]) == (1, 1)  # every graded pick
     assert by["nhl"]["won"] + by["nhl"]["lost"] == 0 and by["nhl"]["all"]["won"] == 1  # void left out
     assert abs(by["nhl"]["all"]["roi"] - 1.2) < 1e-9  # a lean counts as 1 unit risked
+
+
+def test_overall_record_counts_every_pick_put_out():
+    L = Ledger()
+    for i, (units, status, profit) in enumerate([(1.0, "won", 0.91), (0.0, "lost", -1.0), (0.0, "won", 1.5),
+                                                  (0.0, "void", 0.0)]):
+        (e,) = L.publish([card(make_pick(event_id=f"e{i}"), tier="value" if units else "lean", units=units)], NOW)
+        e.status, e.profit = status, profit
+    st = L.stats(NOW)
+    assert (st["all_picks"]["won"], st["all_picks"]["lost"]) == (2, 1)  # void left out
+    assert (st["overall"]["won"], st["overall"]["lost"]) == (1, 0)  # money plays only
+    assert abs(st["all_picks"]["units"] - 1.41) < 1e-9
