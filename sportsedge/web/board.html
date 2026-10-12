@@ -136,6 +136,7 @@ button, select { font: inherit; color: inherit; }
 .tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
 .tabs .count { font: 700 11px var(--mono); margin-left: 5px; padding: 2px 5px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-2); vertical-align: 2px; }
 .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.filters[hidden] { display: none; }
 .seg { display: inline-flex; background: color-mix(in srgb, var(--surface) 90%, transparent); border: 1px solid var(--line); border-radius: 999px; padding: 3px; overflow-x: auto; max-width: 100%; }
 .seg button { flex: none; background: none; border: 0; border-radius: 999px; padding: 6px 12px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); }
 .seg button:hover { color: var(--fg); }
@@ -302,7 +303,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   <section id="hero" aria-label="Today's number one pick"></section>
   <section class="board" id="scoreboard" aria-label="Season record"></section>
   <nav class="tabs" id="tabs" role="tablist" aria-label="Sections"></nav>
-  <div class="filters"><div class="seg" id="sports" aria-label="Sport"></div><div class="seg" id="markets" aria-label="Bet type"></div></div>
+  <div class="filters" id="filters"><div class="seg" id="sports" aria-label="Sport"></div><div class="seg" id="markets" aria-label="Bet type"></div></div>
   <div id="view" class="grid"></div>
   <div class="drops"><span aria-hidden="true">⚡</span> <b>Picks drop the moment we find an edge</b> — day or night. The engine watches every line around the clock, so check back anytime.</div>
   <footer>
@@ -340,7 +341,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"], ["tennis", "Tennis"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
-  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["scores", "Scores"], ["predict", "Predictions"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
+  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["scores", "Live Scores"], ["predict", "Predictions"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
   const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
     live: "Live", live_win: "Live · likely winner", live_plus: "Live · plus money", sharp: "Sharp value" };
   const state = { tab: "today", sport: "all", market: "all" };
@@ -577,12 +578,14 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   // Every game on today's scoreboards: live first, then upcoming, then final. Pulled from ESPN.
   const pickedSport = (key) => state.sport === "all" || state.sport === key || (state.sport === "soccer" && SOCCER.has(key))
     || (state.sport === "tennis" && String(key).startsWith("tennis"));
-  const liveGames = () => allSports().filter((sp) => pickedSport(sp.key))
+  const liveGames = () => allSports()
     .reduce((n, sp) => n + (BOARD[sp.key] || []).filter((g) => g.state === "in").length, 0);
   function viewScores() {
     const order = { in: 0, pre: 1, post: 2 };
-    const sports = allSports().filter((sp) => pickedSport(sp.key) && (BOARD[sp.key] || []).length);
-    if (!sports.length) return panel("Scores", "Today's games", empty("Loading today's scores from ESPN…"));
+    // Every sport on one page, no filter: the sports with games on right now first.
+    const liveIn = (sp) => BOARD[sp.key].filter((g) => g.state === "in").length;
+    const sports = allSports().filter((sp) => (BOARD[sp.key] || []).length).sort((a, b) => (liveIn(b) > 0) - (liveIn(a) > 0));
+    if (!sports.length) return panel("Live scores", "Today's games", empty("Loading today's scores from ESPN…"));
     const line = (g) => {
       const tail = g.state === "pre" ? fmt(g.when, { hour: "numeric", minute: "2-digit" }) : esc(g.detail);
       const sc = g.state === "pre" ? "" : ` <b>${esc(g.as ?? "")}-${esc(g.hs ?? "")}</b>`;
@@ -593,7 +596,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       return `<div><span class="kind">${esc(sp.name)}</span><ul class="scores">${games.map(line).join("")}</ul></div>`;
     }).join("");
     const live = liveGames();
-    return panel("Scores", live ? `${live} live now · updates every 30 seconds` : "Today's games", `<div class="grid two">${body}</div>`);
+    return panel("Live scores", live ? `${live} live now · updates every 30 seconds` : "Today's games", `<div class="grid two">${body}</div>`);
   }
 
   // Predictions: every game, not just the picks. Projected score and who we think wins.
@@ -795,6 +798,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       predict: (DATA.forecasts || []).filter((f) => f.status === "pending" && pickedSport(f.sport)).length };
     $("tabs").innerHTML = TABS.map(([k, n]) => `<button role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${n}${counts[k] ? `<span class="count">${counts[k]}</span>` : ""}</button>`).join("");
     $("sports").innerHTML = SPORTS.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${state.sport === k}">${n}</button>`).join("");
+    $("filters").hidden = state.tab === "scores";  // live scores: every sport at once, no filter chips
     $("markets").innerHTML = MARKETS.map(([k, n]) => `<button data-market="${k}" aria-pressed="${state.market === k}">${n}</button>`).join("");
   }
 
@@ -856,7 +860,10 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         for (const ev of (await r.json()).events || []) {
           for (const gr of ev.groupings || []) {
             const gname = ((gr.grouping || {}).displayName || "");
-            if (!gname.includes("Singles") || gname.includes("Women") !== (tour === "wta")) continue;
+            // Men's singles on the ATP board, women's singles on the WTA board: no doubles, mixed, juniors or wheelchair.
+            const g = gname.toLowerCase(), women = g.includes("women");
+            if (!g.includes("singles") || /doubles|mixed|junior|boys|girls|wheelchair|legends/.test(g)
+              || (tour === "wta" ? !women : women || !/\bmen/.test(g))) continue;
             for (const c of gr.competitions || []) {
               const cs = c.competitors || [];
               if (cs.length !== 2) continue;
