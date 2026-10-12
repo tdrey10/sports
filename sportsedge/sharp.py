@@ -262,7 +262,7 @@ TENNIS_MAX_UNITS = 0.5
 
 
 def tennis_cards(key: str, events: list[dict], now: datetime, proven: bool = False,
-                 scheduled: set | None = None) -> list[Card]:
+                 scheduled: set | None = None, rows: list[dict] | None = None) -> list[Card]:
     """``scheduled``: player pairs on ESPN's schedule. A match the books list but ESPN doesn't is
     skipped: late draw changes (a lucky loser in, a withdrawal) leave stale prices behind."""
     from .tennis import norm
@@ -307,13 +307,20 @@ def tennis_cards(key: str, events: list[dict], now: datetime, proven: bool = Fal
             "Bet it at this book and price or better; the edge is gone if the price moves. "
             "The match must start for the bet to stand (retirement rules vary by book).",
         ]
+        if rows:
+            from .insights import MAX_FACTS
+            from .tennis import match_facts
+
+            facts = match_facts(rows, away, home, start, tour)
+            reasons = reasons[:3] + facts[:max(MAX_FACTS - len(reasons), 8)] + reasons[3:]
         out.append(Card(tier="sharp", units=units, headline=headline, reasons=reasons, sport=cfg.key,
                         sport_name=f"Tennis · {tour.upper()}", pick=pick, home=home, away=away))
     return out
 
 
 def run_tennis(now: datetime, client: SharpClient | None = None, force: bool = False,
-               clv_trust: dict | None = None, proven: bool = False, scheduled: set | None = None) -> list[Card]:
+               clv_trust: dict | None = None, proven: bool = False, scheduled: set | None = None,
+               rows: list[dict] | None = None) -> list[Card]:
     """Tennis sharp value on the core checks (or when forced), a few tournaments at most."""
     client = client or SharpClient()
     if not client.api_key or not (force or is_core(now)) or scheduled is None:
@@ -336,7 +343,7 @@ def run_tennis(now: datetime, client: SharpClient | None = None, force: bool = F
         except requests.RequestException as exc:
             log.warning("tennis sharp value %s failed: %s", key, exc)
             continue
-        out += tennis_cards(key, events, now, proven=proven, scheduled=scheduled)
+        out += tennis_cards(key, events, now, proven=proven, scheduled=scheduled, rows=rows)
     print(f"tennis sharp value: {len(out)} picks from {min(len(active), TENNIS_MAX_KEYS)} tournaments"
           + (f"; {client.remaining:.0f} requests left" if client.remaining is not None else ""))
     return out

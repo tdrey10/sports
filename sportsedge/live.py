@@ -144,6 +144,7 @@ class LiveScanner:
         self.settings = live_settings(settings)
         self._ratings: dict[str, tuple[datetime, TeamRatings, list[str]]] = {}
         self.states: dict[str, GameResult] = {}  # event id -> ESPN live state used
+        self.results: dict[str, list[GameResult]] = {}  # sport -> season results (for the card's facts)
 
     def _ratings_for(self, cfg: SportConfig, now: datetime) -> tuple[TeamRatings, list[str]]:
         cached = self._ratings.get(cfg.key)
@@ -156,6 +157,7 @@ class LiveScanner:
         )
         teams = sorted(set(ratings.off) | {g.home for g in results} | {g.away for g in results})
         self._ratings[cfg.key] = (now, ratings, teams)
+        self.results[cfg.key] = results
         return ratings, teams
 
     def in_progress(self, cfg: SportConfig) -> list[GameResult]:
@@ -297,6 +299,13 @@ def live_cards(
             if p.market_prob is not None else f"Model {p.model_prob:.0%}.",
             f"Best live price {p.american:+.0f} at {p.book}. Live lines move fast: confirm the score and price before betting.",
         ]
+        if game is not None:
+            from .insights import MAX_FACTS, matchup_facts
+
+            cached = scanner._ratings.get(p.sport)
+            facts = matchup_facts(scanner.results.get(p.sport, []), game.home, game.away, game.date, p.sport,
+                                  cached[1] if cached else None, neutral=game.neutral)
+            reasons = reasons[:2] + facts[:MAX_FACTS - len(reasons)] + reasons[2:]
         units = min(units_for(p, scanner.settings), LIVE_MAX_UNITS)
         if proven is not None and scanner.settings.units_proven_only and tier not in proven:
             units = 0.0
