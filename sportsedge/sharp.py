@@ -247,10 +247,13 @@ def run(sports: list[SportConfig], provider, now: datetime, clv_trust: dict | No
 
 
 # ---------------------------------------------------------------------- tennis
-# The tennis blind test (tennishist, 2012+ ATP/WTA closing odds) found one edge that held in the
-# tuning and blind seasons: the best market price beating Pinnacle's no-vig price by 2%-15%
-# (+6.8% blind over 5,335 bets, STRONG; its "best" includes some stale prices, so stakes stay
-# small). Each live tournament is one request a check, so tennis runs on core checks only and
+# The tennis blind test (tennishist, 2012+ ATP/WTA closing odds) found the best price across ~40
+# books beating Pinnacle's no-vig price by 2%-15% made money (+6.8% blind, STRONG), but that
+# "best" is often a stale price at an obscure book. The test closest to what we can bet, one big
+# book (Bet365) against Pinnacle, did not prove out (-0.6% tuning, +2.7% blind). So tennis value
+# picks carry no units until their own graded record proves out (Ledger.tennis_proven: 60+
+# picks, ROI minus one standard error above zero, the older half profitable too).
+# Each live tournament is one request a check, so tennis runs on core checks only and
 # on at most TENNIS_MAX_KEYS tournaments.
 TENNIS_PREFIXES = ("tennis_atp_", "tennis_wta_")
 TENNIS_MAX_KEYS = 3
@@ -258,7 +261,7 @@ TENNIS_HOURS = 24
 TENNIS_MAX_UNITS = 0.5
 
 
-def tennis_cards(key: str, events: list[dict], now: datetime) -> list[Card]:
+def tennis_cards(key: str, events: list[dict], now: datetime, proven: bool = False) -> list[Card]:
     from .tennis import norm
 
     tour = "atp" if key.startswith("tennis_atp") else "wta"
@@ -284,15 +287,18 @@ def tennis_cards(key: str, events: list[dict], now: datetime) -> list[Card]:
             win_prob=v["fair"], push_prob=0.0, fair_american=round(decimal_to_american(1 / v["fair"])),
             ev=v["ev"], kelly=kelly, stake=None, projection="", books=len(_prices(ev)),
         )
-        units = min(max(round(kelly * 100 * 2) / 2, 0.5), TENNIS_MAX_UNITS)
+        units = min(max(round(kelly * 100 * 2) / 2, 0.5), TENNIS_MAX_UNITS) if proven else 0.0
         headline = (f"{book} pays {v['price']:+.0f} on {player}; Pinnacle's fair price is {pick.fair_american:+.0f} "
                     f"({v['fair']:.0%}). That's a {v['ev']:.1%} edge.")
         reasons = [
             f"Pinnacle (the sharpest book) has {player} at {v['sharp_price']:+.0f}; without its margin that's "
             f"{v['fair']:.1%} to win.",
             f"{book} pays {v['price']:+.0f}: {v['ev']:+.1%} expected value per bet.",
-            "Tennis blind test, 2012+: a price beating Pinnacle's fair line by 2-15% made +6.8% over 5,335 "
-            "blind bets (and +1.6% in the tuning seasons). Kept to half a unit: some of those prices were stale.",
+            f"Win chance {v['fair']:.0%}: this is a price edge, not a prediction that {player} wins. "
+            f"Even a good price loses {1 - v['fair']:.0%} of the time; the edge only shows over many bets.",
+            ("Units: our tennis value picks proved out on their own graded record." if proven else
+             "No units yet: the 2012+ test of one big book (Bet365) against Pinnacle did not prove out, so tennis "
+             "value picks stay leans until their own record does (60+ picks, profitable beyond luck)."),
             "Bet it at this book and price or better; the edge is gone if the price moves. "
             "The match must start for the bet to stand (retirement rules vary by book).",
         ]
@@ -302,7 +308,7 @@ def tennis_cards(key: str, events: list[dict], now: datetime) -> list[Card]:
 
 
 def run_tennis(now: datetime, client: SharpClient | None = None, force: bool = False,
-               clv_trust: dict | None = None) -> list[Card]:
+               clv_trust: dict | None = None, proven: bool = False) -> list[Card]:
     """Tennis sharp value on the core checks (or when forced), a few tournaments at most."""
     client = client or SharpClient()
     if not client.api_key or not (force or is_core(now)):
@@ -325,7 +331,7 @@ def run_tennis(now: datetime, client: SharpClient | None = None, force: bool = F
         except requests.RequestException as exc:
             log.warning("tennis sharp value %s failed: %s", key, exc)
             continue
-        out += tennis_cards(key, events, now)
+        out += tennis_cards(key, events, now, proven=proven)
     print(f"tennis sharp value: {len(out)} picks from {min(len(active), TENNIS_MAX_KEYS)} tournaments"
           + (f"; {client.remaining:.0f} requests left" if client.remaining is not None else ""))
     return out

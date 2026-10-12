@@ -381,7 +381,8 @@ class Workspace:
                                                       force=getattr(self.args, "sharp_now", False)), now)
                 print(f"sharp value: posted {len(added)}")
                 tennis_added = self.ledger.publish(sharp.run_tennis(now, force=getattr(self.args, "sharp_now", False),
-                                                                    clv_trust=trust), now)
+                                                                    clv_trust=trust,
+                                                                    proven=self.ledger.tennis_proven()), now)
                 print(f"tennis sharp value: posted {len(tennis_added)}")
         from . import archive
 

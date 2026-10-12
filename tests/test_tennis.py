@@ -77,7 +77,10 @@ def test_tennis_sharp_value_card_and_grading():
                                                                      {"name": "Bo Weak", "price": 175}]}]},
         {"key": "draftkings", "markets": [{"key": "h2h", "outcomes": [{"name": "Ana Strong", "price": -250},
                                                                        {"name": "Bo Weak", "price": 210}]}]}]}
-    (card,) = sharp.tennis_cards("tennis_atp_shanghai", [ev], NOW)
+    (lean,) = sharp.tennis_cards("tennis_atp_shanghai", [ev], NOW)
+    assert lean.units == 0.0  # no units until tennis value picks prove out on their own record
+    assert Ledger().tennis_proven() is False
+    (card,) = sharp.tennis_cards("tennis_atp_shanghai", [ev], NOW, proven=True)
     assert card.pick.selection == "Bo Weak ML" and card.pick.american == 210 and card.units == 0.5
     assert card.sport == "tennis_atp" and 0.02 <= card.pick.ev <= 0.15
     L = Ledger()
