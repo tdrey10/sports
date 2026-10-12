@@ -100,6 +100,12 @@ jobs:
         continue-on-error: true
         run: hambino espn-history --fetch
 
+      # Tennis blind test on 2012+ ATP/WTA closing odds (public archive), with the other studies.
+      - name: Tennis history test
+        if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
+        continue-on-error: true
+        run: hambino tennis-history --fetch
+
       - name: Full engine cycle
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}  # optional: sharp value (Pinnacle vs US books)
@@ -112,6 +118,11 @@ jobs:
 
       # UFC research: fights, DraftKings lines (ESPN drops them after each fight, so they are saved
       # here), fighter ratings. No UFC bets are posted until the blind test is passed.
+      # Tennis: a prediction for every ATP/WTA match with a line, graded on the results.
+      - name: Tennis predictions
+        continue-on-error: true
+        run: hambino tennis
+
       - name: UFC lines and ratings
         continue-on-error: true
         run: hambino ufc
@@ -122,7 +133,7 @@ jobs:
           git config user.email "sportsedge-bot@users.noreply.github.com"
           git add data/ledger.json data/brain.json
           # One path at a time: git add fails as a whole if any path is missing.
-          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/line_studies.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
+          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/line_studies.json data/tennis_history.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
             if [ -e "$p" ]; then git add "$p"; fi
           done
           git diff --cached --quiet || git commit -m "Update pick ledger"
