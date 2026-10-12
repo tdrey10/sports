@@ -32,3 +32,20 @@ def test_sharp_card_gets_game_facts_from_the_scan():
     assert 5 <= len(card.reasons) <= 10
     assert card.reasons[:2] == ["price 1", "price 2"] and card.reasons[-1] == "Bet it at this book."
     assert any(r.startswith("Our projected score") for r in card.reasons)
+
+
+def test_open_picks_posted_before_the_facts_get_them():
+    from tests.test_ledger import card as make_card
+    from sportsedge.insights import backfill
+    from sportsedge.ledger import Ledger
+
+    provider = SampleProvider(seed=5)
+    scan = Engine(provider, Settings(), now=provider.now).scan(resolve("nba")[0])
+    pick = scan.picks[0]
+    ctx = scan.contexts[pick.event_id]
+    c = make_card(pick, tier="sharp", units=0.5)
+    c.home, c.away, c.reasons = ctx.home, ctx.away, ["price 1", "price 2", "Bet it."]
+    L = Ledger()
+    (e,) = L.publish([c], provider.now)
+    assert backfill(L.entries.values(), [scan]) == 1 and len(e.reasons) >= 8 and e.reasons[-1] == "Bet it."
+    assert backfill(L.entries.values(), [scan]) == 0  # once only

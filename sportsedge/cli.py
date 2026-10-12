@@ -384,6 +384,11 @@ class Workspace:
         )
         self.brains.update(res.brains)
         self.weights = res.weights
+        from .insights import backfill
+
+        filled = backfill(self.ledger.entries.values(), res.scans)
+        if filled:
+            print(f"added game facts to {filled} open picks")
         for w in dict.fromkeys(res.warnings):
             print("warning:", w)
         print(f"published {res.published} new picks, graded {res.graded}")

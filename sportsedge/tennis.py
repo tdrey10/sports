@@ -357,6 +357,13 @@ def run(ledger, src: Path, study: dict | None, now: datetime | None = None) -> t
     fresh = build(odds, rows, p, now, note)
     forecasts.merge(ledger.forecasts, fresh, now)
     graded = grade(ledger.forecasts, rows, now)
+    for e in ledger.entries.values():  # tennis picks posted before the facts get them
+        if e.sport.startswith("tennis_") and not e.settled and e.status != "void" and len(e.reasons or []) < 6:
+            from .insights import merge_facts
+
+            facts = match_facts(rows, e.away, e.home, e.start, e.sport.split("_", 1)[1])
+            if facts:
+                e.reasons = merge_facts(list(e.reasons or []), facts)
     grade_entries(ledger, rows, now)
     return len(fresh), graded
 
