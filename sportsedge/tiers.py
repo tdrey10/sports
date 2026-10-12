@@ -215,6 +215,7 @@ def build_cards(
     max_props: int = 8,
     posted_today: int | None = None,
     daily_min: int = DAILY_MIN,
+    posted_events: set[str] | None = None,
 ) -> list[Card]:
     """``taken_today`` holds day-level tiers (lock/dog/prop) already published
     today, so a Lock of the Day is never swapped out mid-day."""
@@ -362,7 +363,7 @@ def build_cards(
     card_ids: set[int] = set()
     if posted_today is not None:
         have = posted_today + sum(1 for _, p in chosen if p.commence_time <= soon_cut)
-        covered = {p.event_id for _, p in chosen}
+        covered = {p.event_id for _, p in chosen} | set(posted_events or ())
         fill = [
             p for p in game
             if p.event_id not in covered and p.commence_time <= soon_cut and not p.warnings
