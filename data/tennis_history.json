@@ -1,0 +1,282 @@
+{
+ "params": {
+  "k": 150.0,
+  "surface_weight": 0.3
+ },
+ "trust": 0.0,
+ "log_loss_blind": {
+  "model": 0.6238621953624645,
+  "market": 0.5923043006482959,
+  "blend": 0.5923043006482959
+ },
+ "matches": 66777,
+ "rows": [
+  {
+   "study": "01 model blend at Pinnacle (2%+ edge)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 1,
+    "won": 0,
+    "lost": 1,
+    "push": 0,
+    "units": -1.0,
+    "roi": -1.0,
+    "flat_roi": -1.0,
+    "se": null,
+    "proven": false
+   },
+   "blind": {
+    "bets": 0,
+    "won": 0,
+    "lost": 0,
+    "push": 0,
+    "units": 0.0,
+    "roi": null,
+    "flat_roi": null,
+    "se": null,
+    "proven": false
+   }
+  },
+  {
+   "study": "02 Bet365 beats Pinnacle no-vig by 2-15%",
+   "verdict": "",
+   "in_sample": {
+    "bets": 847,
+    "won": 345,
+    "lost": 502,
+    "push": 0,
+    "units": -5.14,
+    "roi": -0.006068476977567865,
+    "flat_roi": -0.006068476977567873,
+    "se": 0.04298740037090625,
+    "proven": false
+   },
+   "blind": {
+    "bets": 974,
+    "won": 423,
+    "lost": 551,
+    "push": 0,
+    "units": 26.39,
+    "roi": 0.02709445585215607,
+    "flat_roi": 0.02709445585215606,
+    "se": 0.03968066485376766,
+    "proven": false
+   }
+  },
+  {
+   "study": "03 best price beats Pinnacle no-vig by 2-15% (caveat: stale prices)",
+   "verdict": "STRONG",
+   "in_sample": {
+    "bets": 7552,
+    "won": 3376,
+    "lost": 4176,
+    "push": 0,
+    "units": 121.42,
+    "roi": 0.016077860169491462,
+    "flat_roi": 0.016077860169491524,
+    "se": 0.01374092287473191,
+    "proven": true
+   },
+   "blind": {
+    "bets": 5335,
+    "won": 2546,
+    "lost": 2789,
+    "push": 0,
+    "units": 361.19,
+    "roi": 0.06770196813495774,
+    "flat_roi": 0.06770196813495782,
+    "se": 0.01614759308862776,
+    "proven": true
+   }
+  },
+  {
+   "study": "04 Pinnacle band: dog +100..+150",
+   "verdict": "",
+   "in_sample": {
+    "bets": 9315,
+    "won": 4175,
+    "lost": 5140,
+    "push": 0,
+    "units": -12.34,
+    "roi": -0.0013247450348899575,
+    "flat_roi": -0.0013247450348899614,
+    "se": 0.01152512480178701,
+    "proven": false
+   },
+   "blind": {
+    "bets": 7680,
+    "won": 3425,
+    "lost": 4255,
+    "push": 0,
+    "units": -27.47,
+    "roi": -0.003576822916666682,
+    "flat_roi": -0.0035768229166666665,
+    "se": 0.012721773573808886,
+    "proven": false
+   }
+  },
+  {
+   "study": "04 Pinnacle band: dog +151..+220",
+   "verdict": "",
+   "in_sample": {
+    "bets": 7507,
+    "won": 2606,
+    "lost": 4901,
+    "push": 0,
+    "units": -209.28,
+    "roi": -0.02787798055148527,
+    "flat_roi": -0.027877980551485285,
+    "se": 0.015444341949931557,
+    "proven": false
+   },
+   "blind": {
+    "bets": 6024,
+    "won": 2040,
+    "lost": 3984,
+    "push": 0,
+    "units": -322.69,
+    "roi": -0.053567397078353056,
+    "flat_roi": -0.05356739707835325,
+    "se": 0.017102853103183296,
+    "proven": false
+   }
+  },
+  {
+   "study": "04 Pinnacle band: dog +221..+300",
+   "verdict": "",
+   "in_sample": {
+    "bets": 4808,
+    "won": 1276,
+    "lost": 3532,
+    "push": 0,
+    "units": -291.1,
+    "roi": -0.060544925124792016,
+    "flat_roi": -0.06054492512479201,
+    "se": 0.022605186953018573,
+    "proven": false
+   },
+   "blind": {
+    "bets": 3431,
+    "won": 931,
+    "lost": 2500,
+    "push": 0,
+    "units": -103.58,
+    "roi": -0.030189449140192316,
+    "flat_roi": -0.030189449140192365,
+    "se": 0.027211943556604442,
+    "proven": false
+   }
+  },
+  {
+   "study": "04 Pinnacle band: fav -100..-130",
+   "verdict": "",
+   "in_sample": {
+    "bets": 5427,
+    "won": 2798,
+    "lost": 2629,
+    "push": 0,
+    "units": -197.18,
+    "roi": -0.036333149069467406,
+    "flat_roi": -0.036333149069467476,
+    "se": 0.012697378176490923,
+    "proven": false
+   },
+   "blind": {
+    "bets": 4161,
+    "won": 2149,
+    "lost": 2012,
+    "push": 0,
+    "units": -145.88,
+    "roi": -0.03505888007690449,
+    "flat_roi": -0.03505888007690459,
+    "se": 0.01449461230427105,
+    "proven": false
+   }
+  },
+  {
+   "study": "04 Pinnacle band: fav -131..-170",
+   "verdict": "",
+   "in_sample": {
+    "bets": 6128,
+    "won": 3508,
+    "lost": 2620,
+    "push": 0,
+    "units": -265.22,
+    "roi": -0.04328002610966044,
+    "flat_roi": -0.04328002610966058,
+    "se": 0.01057444766019555,
+    "proven": false
+   },
+   "blind": {
+    "bets": 5138,
+    "won": 2931,
+    "lost": 2207,
+    "push": 0,
+    "units": -235.6,
+    "roi": -0.04585441806150256,
+    "flat_roi": -0.04585441806150253,
+    "se": 0.011564247182936378,
+    "proven": false
+   }
+  },
+  {
+   "study": "05 model 6+ pts above market: dog",
+   "verdict": "",
+   "in_sample": {
+    "bets": 7046,
+    "won": 2571,
+    "lost": 4475,
+    "push": 0,
+    "units": -190.2,
+    "roi": -0.0269940391711609,
+    "flat_roi": -0.02699403917116094,
+    "se": 0.015724792122907033,
+    "proven": false
+   },
+   "blind": {
+    "bets": 5690,
+    "won": 2059,
+    "lost": 3631,
+    "push": 0,
+    "units": -214.77,
+    "roi": -0.03774516695957812,
+    "flat_roi": -0.03774516695957821,
+    "se": 0.017428338144347452,
+    "proven": false
+   }
+  },
+  {
+   "study": "05 model 6+ pts above market: favorite",
+   "verdict": "",
+   "in_sample": {
+    "bets": 2292,
+    "won": 1240,
+    "lost": 1052,
+    "push": 0,
+    "units": -93.4,
+    "roi": -0.04075043630017447,
+    "flat_roi": -0.040750436300174525,
+    "se": 0.018543347832844104,
+    "proven": false
+   },
+   "blind": {
+    "bets": 1982,
+    "won": 1063,
+    "lost": 919,
+    "push": 0,
+    "units": -98.88,
+    "roi": -0.04988900100908169,
+    "flat_roi": -0.04988900100908174,
+    "se": 0.019936385357989538,
+    "proven": false
+   }
+  }
+ ],
+ "control": {
+  "spots": 200,
+  "passed": 1,
+  "strong": 0
+ },
+ "tune_seasons": "2013-2019",
+ "blind_seasons": "2021+"
+}

@@ -630,6 +630,53 @@ def cmd_espn_history(args) -> int:
     return 0
 
 
+def cmd_tennis_history(args) -> int:
+    from . import tennishist
+
+    data_dir = Path(args.data_dir)
+    path = data_dir / "lines" / "tennis" / "hist_odds.csv.gz"
+    if args.fetch:
+        import requests
+
+        try:
+            r = requests.get("https://raw.githubusercontent.com/D503therapper/autonomous-crypto-engine/main/"
+                             "data/sports/tennis/hist_odds.csv.gz", timeout=120)
+            r.raise_for_status()
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(r.content)
+        except Exception as exc:  # keep testing on the saved seasons
+            print(f"could not refresh tennis odds history: {exc}")
+    res = tennishist.run(tennishist.load(path))
+    print(tennishist.report(res))
+    (data_dir / "tennis_history.json").write_text(json.dumps(res, indent=1, default=str))
+    return 0
+
+
+def cmd_tennis(args) -> int:
+    """Tennis predictions for every ATP/WTA match with a line, graded on the results."""
+    from . import tennis
+    from .ledger import Ledger
+
+    data_dir = Path(args.data_dir)
+    src = data_dir / "_src" / "tennis"
+    try:
+        tennis.fetch(src)
+    except Exception as exc:
+        print(f"could not fetch tennis lines: {exc}")
+        if not (src / "odds.json").exists():
+            return 0
+    try:
+        study = json.loads((data_dir / "tennis_history.json").read_text())
+    except (OSError, ValueError):
+        study = None
+    path = data_dir / "ledger.json"
+    ledger = Ledger.load(path, tz=args.tz)
+    posted, graded = tennis.run(ledger, src, study)
+    ledger.save(path)
+    print(f"tennis: {posted} match predictions, {graded} graded")
+    return 0
+
+
 def cmd_sports(_args) -> int:
     rows = [[k, c.name, c.odds_key, c.espn_path, len(c.props)] for k, c in SPORTS.items()]
     print(report.table(["Key", "Name", "Odds API key", "ESPN path", "Prop markets"], rows, "llllr"))
@@ -776,6 +823,16 @@ def build_parser() -> argparse.ArgumentParser:
     eh.add_argument("--src", help="a local copy of the source's data/sports/games folder")
     eh.add_argument("--data-dir", default="data")
     eh.set_defaults(func=cmd_espn_history)
+
+    th = sub.add_parser("tennis-history", help="tennis blind test on 2012+ closing odds (ATP and WTA)")
+    th.add_argument("--fetch", action="store_true", help="refresh the odds history from the public archive first")
+    th.add_argument("--data-dir", default="data")
+    th.set_defaults(func=cmd_tennis_history)
+
+    tn = sub.add_parser("tennis", help="tennis predictions for every match with a line, graded on results")
+    tn.add_argument("--data-dir", default="data")
+    tn.add_argument("--tz", default="America/Los_Angeles")
+    tn.set_defaults(func=cmd_tennis)
 
     sub.add_parser("sports", help="list supported sports").set_defaults(func=cmd_sports)
     return p

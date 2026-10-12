@@ -320,7 +320,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const BOARD = {};  // sport key -> every game on today's ESPN scoreboard (for the Scores tab)
   const gameKey = (away, home) => `${(away || "").toLowerCase()}|${(home || "").toLowerCase()}`;
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
-  const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"]];
+  const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"], ["tennis", "Tennis"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
   const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["scores", "Scores"], ["predict", "Predictions"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
   const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
@@ -557,7 +557,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
 
   // Every game on today's scoreboards: live first, then upcoming, then final. Pulled from ESPN.
-  const pickedSport = (key) => state.sport === "all" || state.sport === key || (state.sport === "soccer" && SOCCER.has(key));
+  const pickedSport = (key) => state.sport === "all" || state.sport === key || (state.sport === "soccer" && SOCCER.has(key))
+    || (state.sport === "tennis" && String(key).startsWith("tennis"));
   const liveGames = () => (DATA.sports || []).filter((sp) => pickedSport(sp.key))
     .reduce((n, sp) => n + (BOARD[sp.key] || []).filter((g) => g.state === "in").length, 0);
   function viewScores() {
@@ -588,7 +589,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const card = (f) => {
       const [hs, as] = f.score || [Math.round(f.home_score), Math.round(f.away_score)];
       const prob = f.winner === "home" ? f.p_home : f.winner === "away" ? f.p_away : f.p_draw;
-      const team = (side, sc) => `<div class="fc-row${f.winner === side ? " pick" : ""}"><span>${side === "home" ? "@ " : ""}${esc(name(f, side))}</span><b>${sc}</b></div>`;
+      const team = (side, sc) => `<div class="fc-row${f.winner === side ? " pick" : ""}"><span>${side === "home" ? (f.sport.startsWith("tennis") ? "vs " : "@ ") : ""}${esc(name(f, side))}</span><b>${sc}</b></div>`;
       let status = `<span class="muted">${timeOf(f)}</span>`;
       if (f.status === "live" && f.live) status = `<span class="live-dot">Live ${esc(f.live.away ?? "")}-${esc(f.live.home ?? "")} · ${esc(f.live.detail || "")}</span>`;
       const sc = SCORES[f.event_id];

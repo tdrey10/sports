@@ -199,7 +199,8 @@ def grade(stored: dict[str, Forecast], results_for, now: datetime) -> int:
     """Live scores and final grading against ESPN results. Returns forecasts graded."""
     from .ledger import find_game
 
-    open_ = [f for f in stored.values() if f.status in ("pending", "live") and f.start <= now]
+    open_ = [f for f in stored.values() if f.status in ("pending", "live") and f.start <= now
+             and not f.sport.startswith("tennis_")]  # tennis is graded from its own results (tennis.grade)
     by_sport: dict[str, list[Forecast]] = {}
     for f in open_:
         by_sport.setdefault(f.sport, []).append(f)
