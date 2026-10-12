@@ -84,7 +84,8 @@ def run_cycle(
     _funnel(out.scans, settings)
     held = settings.board_hour is not None and now.astimezone(ledger.tz).hour < settings.board_hour
     cards = [] if held else build_cards(
-        out.scans, settings, now, taken_today=ledger.taken_today(now), best_taken=ledger.best_taken(now)
+        out.scans, settings, now, taken_today=ledger.taken_today(now), best_taken=ledger.best_taken(now),
+        posted_today=ledger.posted_today(now),
     )
     out.published = len(ledger.publish(cards, now))
     ledger.withdraw(settings, now)

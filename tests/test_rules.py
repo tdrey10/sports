@@ -403,3 +403,26 @@ def test_unproven_early_value_stays_early_with_no_units_and_is_kept_on_the_board
     entries = L.publish(cards, early_now)
     assert entries
     assert not L.withdraw(Settings(proven=set()), early_now)  # no-unit early value is not pulled
+
+
+def test_daily_card_fills_the_board_to_five_with_no_units():
+    from datetime import timedelta
+
+    from sportsedge.tiers import DAILY_FLOOR_EV, DAILY_MIN
+
+    provider = SampleProvider(seed=5)
+    settings = Settings(min_ev=0.5, show_leans=False, daily_lock=False, daily_heads=False)  # an empty board
+    engine = Engine(provider, settings, now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    base = build_cards(scans, settings, provider.now)
+    filled = build_cards(scans, settings, provider.now, posted_today=0)
+    card = [c for c in filled if c.reasons and c.reasons[0].startswith("Daily card")]
+    assert card and len(filled) > len(base)
+    soon = [c for c in filled if c.pick.commence_time <= provider.now + timedelta(hours=24)]
+    assert len(soon) >= min(DAILY_MIN, len({p.event_id for s in scans for p in s.picks}))
+    for c in card:
+        assert c.tier == "lean" and c.units == 0 and c.pick.ev >= DAILY_FLOOR_EV and c.pick.win_prob >= 0.45
+        assert -170 <= c.pick.american <= 300
+    assert len({c.pick.event_id for c in card}) == len(card)  # one per game
+    full = build_cards(scans, settings, provider.now, posted_today=DAILY_MIN)
+    assert not any(c.reasons and c.reasons[0].startswith("Daily card") for c in full)
