@@ -261,7 +261,10 @@ TENNIS_HOURS = 24
 TENNIS_MAX_UNITS = 0.5
 
 
-def tennis_cards(key: str, events: list[dict], now: datetime, proven: bool = False) -> list[Card]:
+def tennis_cards(key: str, events: list[dict], now: datetime, proven: bool = False,
+                 scheduled: set | None = None) -> list[Card]:
+    """``scheduled``: player pairs on ESPN's schedule. A match the books list but ESPN doesn't is
+    skipped: late draw changes (a lucky loser in, a withdrawal) leave stale prices behind."""
     from .tennis import norm
 
     tour = "atp" if key.startswith("tennis_atp") else "wta"
@@ -271,11 +274,13 @@ def tennis_cards(key: str, events: list[dict], now: datetime, proven: bool = Fal
         start = datetime.fromisoformat(ev["commence_time"].replace("Z", "+00:00"))
         if start <= now or start > now + timedelta(hours=TENNIS_HOURS):
             continue
+        home, away = ev["home_team"], ev["away_team"]
+        if scheduled is not None and tuple(sorted((norm(home), norm(away)))) not in scheduled:
+            continue
         found = [v for v in find_value(cfg, ev, now) if v["market"] == "h2h"]
         if not found:
             continue
         v = max(found, key=lambda x: x["ev"])
-        home, away = ev["home_team"], ev["away_team"]
         player = home if v["side"] == "home" else away
         dec = american_to_decimal(v["price"])
         kelly = 0.25 * kelly_fraction(v["fair"], 1 - v["fair"], dec)
@@ -308,11 +313,11 @@ def tennis_cards(key: str, events: list[dict], now: datetime, proven: bool = Fal
 
 
 def run_tennis(now: datetime, client: SharpClient | None = None, force: bool = False,
-               clv_trust: dict | None = None, proven: bool = False) -> list[Card]:
+               clv_trust: dict | None = None, proven: bool = False, scheduled: set | None = None) -> list[Card]:
     """Tennis sharp value on the core checks (or when forced), a few tournaments at most."""
     client = client or SharpClient()
-    if not client.api_key or not (force or is_core(now)):
-        return []
+    if not client.api_key or not (force or is_core(now)) or scheduled is None:
+        return []  # no ESPN schedule to confirm the draw: no tennis picks
     try:
         active = sorted(k for k in client.active() if k.startswith(TENNIS_PREFIXES))
     except requests.RequestException as exc:
@@ -331,7 +336,7 @@ def run_tennis(now: datetime, client: SharpClient | None = None, force: bool = F
         except requests.RequestException as exc:
             log.warning("tennis sharp value %s failed: %s", key, exc)
             continue
-        out += tennis_cards(key, events, now, proven=proven)
+        out += tennis_cards(key, events, now, proven=proven, scheduled=scheduled)
     print(f"tennis sharp value: {len(out)} picks from {min(len(active), TENNIS_MAX_KEYS)} tournaments"
           + (f"; {client.remaining:.0f} requests left" if client.remaining is not None else ""))
     return out

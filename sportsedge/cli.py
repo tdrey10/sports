@@ -264,6 +264,20 @@ class Workspace:
         except (OSError, ValueError):
             return None
 
+    def _tennis_schedule(self):
+        """Player pairs on ESPN's current tennis schedule (draws change late: lucky losers, withdrawals)."""
+        from . import tennis
+
+        src = self.data_dir / "_src" / "tennis"
+        try:
+            tennis.fetch(src)
+        except Exception as exc:
+            print(f"could not fetch the ESPN tennis schedule: {exc}")
+        try:
+            return tennis.scheduled_pairs(tennis.read_matches(src / "matches.csv"))
+        except OSError:
+            return None
+
     def _forecast_study(self):
         """The blind prediction study (how far to move the Vegas line toward our ratings), rerun every morning."""
         try:
@@ -382,7 +396,8 @@ class Workspace:
                 print(f"sharp value: posted {len(added)}")
                 tennis_added = self.ledger.publish(sharp.run_tennis(now, force=getattr(self.args, "sharp_now", False),
                                                                     clv_trust=trust,
-                                                                    proven=self.ledger.tennis_proven()), now)
+                                                                    proven=self.ledger.tennis_proven(),
+                                                                    scheduled=self._tennis_schedule()), now)
                 print(f"tennis sharp value: posted {len(tennis_added)}")
         from . import archive
 
@@ -671,6 +686,19 @@ def cmd_tennis_history(args) -> int:
             print(f"could not refresh tennis odds history: {exc}")
     res = tennishist.run(tennishist.load(path))
     print(tennishist.report(res))
+    src = data_dir / "_src" / "tennis"
+    if args.fetch:
+        from . import tennis
+
+        try:
+            tennis.fetch(src)
+        except Exception as exc:
+            print(f"could not refresh ESPN tennis results: {exc}")
+    if (src / "matches.csv").exists():
+        from . import tennisform
+
+        res["form"] = tennisform.run(src / "matches.csv", path)
+        print(tennisform.report(res["form"]))
     (data_dir / "tennis_history.json").write_text(json.dumps(res, indent=1, default=str))
     return 0
 
