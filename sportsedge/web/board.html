@@ -319,6 +319,24 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const SCORES = {};  // ESPN event id (and "away|home") -> {home, away, detail, final}: pulled by the page itself
   const BOARD = {};  // sport key -> every game on today's ESPN scoreboard (for the Scores tab)
   const gameKey = (away, home) => `${(away || "").toLowerCase()}|${(home || "").toLowerCase()}`;
+  // Tennis: ESPN's ATP/WTA scoreboards (matches grouped under each tournament, scored by set).
+  const TENNIS = [["tennis_atp", "Tennis · ATP", "atp"], ["tennis_wta", "Tennis · WTA", "wta"]];
+  const normName = (x) => String(x || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+    .replace(/[-.]/g, " ").replace(/\s+/g, " ").trim();
+  const pairKey = (a, b) => "t:" + [normName(a), normName(b)].sort().join("|");
+  const allSports = () => [...(DATA.sports || []), ...TENNIS.map(([key, name]) => ({ key, name }))];
+  // The live score for a pick or prediction, oriented to its away/home (tennis: by player name).
+  function scoreFor(e) {
+    if (String(e.sport || "").startsWith("tennis")) {
+      const t = SCORES[pairKey(e.away, e.home)];
+      if (!t) return null;
+      const a = t.players[normName(e.away)], h = t.players[normName(e.home)];
+      if (!a || !h) return null;
+      const sets = a.games.map((g, i) => `${g}-${h.games[i] ?? ""}`).join(" ");
+      return { away: a.sets, home: h.sets, final: t.final, detail: [sets, t.detail].filter(Boolean).join(" · ") };
+    }
+    return SCORES[e.event_id] || SCORES[gameKey(e.away, e.home)] || null;
+  }
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"], ["tennis", "Tennis"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
@@ -383,7 +401,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const p = e.units > 0 && e.profit != null ? ` ${signed(e.profit, 2)}u` : "";
       return `<span class="tag ${c}">${SETTLED[e.status]}</span> <span class="muted">${esc(e.final || "")}${e.result_value != null ? " · finished " + e.result_value : ""}${p}</span>`;
     }
-    const s = SCORES[e.event_id] || SCORES[gameKey(e.away, e.home)];
+    const s = scoreFor(e);
     if (s && !SETTLED[e.status] && e.status !== "void") {
       return s.final
         ? `<span class="muted">Final: ${esc(e.away)} ${s.away ?? ""}, ${esc(e.home)} ${s.home ?? ""} · grading soon</span>`
@@ -559,16 +577,16 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   // Every game on today's scoreboards: live first, then upcoming, then final. Pulled from ESPN.
   const pickedSport = (key) => state.sport === "all" || state.sport === key || (state.sport === "soccer" && SOCCER.has(key))
     || (state.sport === "tennis" && String(key).startsWith("tennis"));
-  const liveGames = () => (DATA.sports || []).filter((sp) => pickedSport(sp.key))
+  const liveGames = () => allSports().filter((sp) => pickedSport(sp.key))
     .reduce((n, sp) => n + (BOARD[sp.key] || []).filter((g) => g.state === "in").length, 0);
   function viewScores() {
     const order = { in: 0, pre: 1, post: 2 };
-    const sports = (DATA.sports || []).filter((sp) => pickedSport(sp.key) && (BOARD[sp.key] || []).length);
+    const sports = allSports().filter((sp) => pickedSport(sp.key) && (BOARD[sp.key] || []).length);
     if (!sports.length) return panel("Scores", "Today's games", empty("Loading today's scores from ESPN…"));
     const line = (g) => {
       const tail = g.state === "pre" ? fmt(g.when, { hour: "numeric", minute: "2-digit" }) : esc(g.detail);
       const sc = g.state === "pre" ? "" : ` <b>${esc(g.as ?? "")}-${esc(g.hs ?? "")}</b>`;
-      return `<li class="${g.state === "in" ? "live-dot" : ""}">${esc(g.away)} @ ${esc(g.home)}${sc} <span class="muted">· ${tail}</span></li>`;
+      return `<li class="${g.state === "in" ? "live-dot" : ""}">${esc(g.away)} ${g.vs ? "vs" : "@"} ${esc(g.home)}${sc} <span class="muted">· ${tail}</span></li>`;
     };
     const body = sports.map((sp) => {
       const games = [...BOARD[sp.key]].sort((a, b) => (order[a.state] ?? 1) - (order[b.state] ?? 1) || new Date(a.when) - new Date(b.when));
@@ -592,8 +610,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const team = (side, sc) => `<div class="fc-row${f.winner === side ? " pick" : ""}"><span>${side === "home" ? (f.sport.startsWith("tennis") ? "vs " : "@ ") : ""}${esc(name(f, side))}</span><b>${sc}</b></div>`;
       let status = `<span class="muted">${timeOf(f)}</span>`;
       if (f.status === "live" && f.live) status = `<span class="live-dot">Live ${esc(f.live.away ?? "")}-${esc(f.live.home ?? "")} · ${esc(f.live.detail || "")}</span>`;
-      const sc = SCORES[f.event_id];
+      const sc = scoreFor(f);
       if (f.status === "pending" && sc && !sc.final) status = `<span class="live-dot">Live ${esc(sc.away)}-${esc(sc.home)} · ${esc(sc.detail)}</span>`;
+      if (f.status === "pending" && sc && sc.final) status = `<span class="muted">Final ${esc(sc.away)}-${esc(sc.home)} · ${esc(String(sc.detail).replace(/ · Final$/, ""))} · grading soon</span>`;
       let result = "";
       if (f.status === "final") {
         const mark = f.correct ? `<span class="mark win">✓</span>` : `<span class="mark loss">✗</span>`;
@@ -825,6 +844,42 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         if (s) boards[`${s.path}|${day}`] = { s, day, sport: sp.key, all: true };
       }
     }
+    const tennisOn = state.tab === "scores" || [...(DATA.entries || []), ...(DATA.forecasts || [])].some((e) => {
+      const t = new Date(e.commence_time).getTime();
+      return String(e.sport || "").startsWith("tennis") && !SETTLED[e.status] && e.status !== "final" && t <= now && now - t < 10 * 3600e3;
+    });
+    const tennis = tennisOn ? TENNIS.map(([key, , tour]) => (async () => {
+      try {
+        const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/tennis/${tour}/scoreboard`);
+        if (!r.ok) return;
+        const games = [];
+        for (const ev of (await r.json()).events || []) {
+          for (const gr of ev.groupings || []) {
+            const gname = ((gr.grouping || {}).displayName || "");
+            if (!gname.includes("Singles") || gname.includes("Women") !== (tour === "wta")) continue;
+            for (const c of gr.competitions || []) {
+              const cs = c.competitors || [];
+              if (cs.length !== 2) continue;
+              const st = (c.status || {}).type || {};
+              const nm = cs.map((x) => (x.athlete || {}).displayName || (x.athlete || {}).fullName || "?");
+              const games2 = cs.map((x) => (x.linescores || []).map((l) => Math.round(Number(l.value) || 0)));
+              const won = [0, 0];
+              games2[0].forEach((g, i) => { const o = games2[1][i] ?? 0;
+                if (Math.max(g, o) >= 6 && (Math.abs(g - o) >= 2 || Math.max(g, o) === 7)) won[g > o ? 0 : 1] += 1; });
+              const setStr = games2[0].map((g, i) => `${g}-${games2[1][i] ?? ""}`).join(" ");
+              const detail = st.shortDetail || st.detail || "";
+              games.push({ id: c.id, away: nm[0], home: nm[1], as: won[0], hs: won[1], state: st.state, vs: true,
+                detail: [setStr, detail].filter(Boolean).join(" · "), when: c.date || ev.date });
+              if (st.state !== "pre") {
+                SCORES[pairKey(nm[0], nm[1])] = { final: !!st.completed, detail,
+                  players: { [normName(nm[0])]: { sets: won[0], games: games2[0] }, [normName(nm[1])]: { sets: won[1], games: games2[1] } } };
+              }
+            }
+          }
+        }
+        BOARD[key] = games;
+      } catch (err) {}
+    })()) : [];
     const before = JSON.stringify(SCORES) + JSON.stringify(BOARD);
     await Promise.all(Object.values(boards).map(async ({ s, day, sport, all }) => {
       try {
@@ -853,6 +908,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         }
       } catch (err) {}  // no live score this time: the card keeps the engine's last one
     }));
+    await Promise.all(tennis);
     if (JSON.stringify(SCORES) + JSON.stringify(BOARD) !== before) render();
   }
   pollScores();
