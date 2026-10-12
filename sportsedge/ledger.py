@@ -198,10 +198,14 @@ class Ledger:
         today = self.day_of(now)
         return sum(1 for e in self.entries.values() if e.day == today and e.best_rank)
 
-    def posted_today(self, now: datetime) -> int:
-        """Picks on today's board (withdrawn ones don't count)."""
-        today = self.day_of(now)
-        return sum(1 for e in self.entries.values() if e.day == today and e.status != "void")
+    def posted_today(self, now: datetime, hours: float = 24) -> int:
+        """Picks on today's board for games in the next ``hours`` (or already under way today):
+        withdrawn picks, early value for later games and live bets don't count."""
+        from .tiers import LIVE_TIERS
+
+        today, cut = self.day_of(now), now + timedelta(hours=hours)
+        return sum(1 for e in self.entries.values() if e.day == today and e.status != "void"
+                   and e.tier != "early" and e.tier not in LIVE_TIERS and e.start <= cut)
 
     def taken_today(self, now: datetime) -> set[str]:
         today = self.day_of(now)
