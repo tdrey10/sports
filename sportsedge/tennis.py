@@ -184,6 +184,42 @@ def grade(stored: dict, rows: list[dict], now: datetime) -> int:
     return graded
 
 
+def grade_entries(ledger, rows: list[dict], now: datetime) -> int:
+    """Grade tennis picks (sharp value) on ESPN results: sets decide the moneyline; a retirement
+    or walkover voids the pick (books differ; void is the safe record)."""
+    from .ledger import grade as grade_entry
+    from .models.ratings import GameResult
+
+    by_pair: dict[tuple, list[dict]] = {}
+    for r in rows:
+        by_pair.setdefault(tuple(sorted((norm(r["p1_name"]), norm(r["p2_name"])))), []).append(r)
+    graded = 0
+    for e in ledger.entries.values():
+        if not e.sport.startswith("tennis_") or e.settled or e.start > now:
+            continue
+        home, away = norm(e.home), norm(e.away)
+        near = [r for r in by_pair.get(tuple(sorted((home, away))), [])
+                if r.get("start") and abs((_t(r["start"]) - e.start).total_seconds()) < 3 * 86400]
+        if not near:
+            if now - e.start > timedelta(days=4):
+                e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
+            continue
+        r = min(near, key=lambda r: abs((_t(r["start"]) - e.start).total_seconds()))
+        if r.get("status") in ("STATUS_RETIRED", "STATUS_WALKOVER", "STATUS_CANCELED", "STATUS_POSTPONED"):
+            e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
+            continue
+        if r.get("status") == "STATUS_FINAL" and r.get("winner") in ("1", "2"):
+            p1_home = norm(r["p1_name"]) == home
+            home_won = (r["winner"] == "1") == p1_home
+            game = GameResult(r.get("id", ""), e.start, e.home, e.away, 1.0 if home_won else 0.0,
+                              0.0 if home_won else 1.0, state="post")
+            grade_entry(e, game, None, now)
+            graded += 1
+        elif r.get("status") == "STATUS_IN_PROGRESS":
+            e.status = "live"
+    return graded
+
+
 def run(ledger, src: Path, study: dict | None, now: datetime | None = None) -> tuple[int, int]:
     """Refresh tennis forecasts in the ledger and grade finished ones. Returns (posted, graded)."""
     from . import forecasts
@@ -198,7 +234,9 @@ def run(ledger, src: Path, study: dict | None, now: datetime | None = None) -> t
             "a read, not a bet.") if ll.get("model") and ll.get("market") else "A read, not a bet."
     fresh = build(odds, rows, p, now, note)
     forecasts.merge(ledger.forecasts, fresh, now)
-    return len(fresh), grade(ledger.forecasts, rows, now)
+    graded = grade(ledger.forecasts, rows, now)
+    grade_entries(ledger, rows, now)
+    return len(fresh), graded
 
 
 __all__ = ["fetch", "norm", "build", "grade", "run"]

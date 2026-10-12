@@ -343,7 +343,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const fmt = (iso, o) => new Date(iso).toLocaleString(undefined, Object.assign({ timeZone: tz }, o));
   const dayOf = (iso) => new Date(iso).toLocaleDateString("en-CA", { timeZone: tz });
   const groupOf = (e) => (e.player ? "props" : e.market === "spreads" ? "spreads" : e.market === "totals" ? "totals" : "moneyline");
-  const sportGroup = (k) => (SOCCER.has(k) ? "soccer" : k);
+  const sportGroup = (k) => (SOCCER.has(k) ? "soccer" : String(k).startsWith("tennis") ? "tennis" : k);
   const isLive = (e) => (e.tier || "").startsWith("live");
   const isOpen = (e) => e.status === "pending" && new Date(e.commence_time) > new Date();
   const visible = (e) => (state.sport === "all" || sportGroup(e.sport) === state.sport) && (state.market === "all" || groupOf(e) === state.market);

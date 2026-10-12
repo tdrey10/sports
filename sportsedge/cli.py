@@ -372,6 +372,9 @@ class Workspace:
                                                       clv_trust=trust,
                                                       force=getattr(self.args, "sharp_now", False)), now)
                 print(f"sharp value: posted {len(added)}")
+                tennis_added = self.ledger.publish(sharp.run_tennis(now, force=getattr(self.args, "sharp_now", False),
+                                                                    clv_trust=trust), now)
+                print(f"tennis sharp value: posted {len(tennis_added)}")
         from . import archive
 
         prefix = "demo-" if self.demo else ""
