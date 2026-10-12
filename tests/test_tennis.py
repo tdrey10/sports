@@ -66,3 +66,23 @@ def test_tennis_blind_test_runs_on_odds_history(tmp_path):
                             "b365w": 1.38, "b365l": 2.9, "maxw": 1.45, "maxl": 3.2, "avgw": 1.4, "avgl": 2.9})
     res = tennishist.run(tennishist.load(path), grid={"k": (150.0,), "surface_weight": (0.3,)}, random_n=4)
     assert res["matches"] == 480 and res["rows"] and "model" in res["log_loss_blind"]
+
+
+def test_tennis_sharp_value_card_and_grading():
+    from sportsedge import sharp
+
+    start = (NOW + timedelta(hours=6)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    ev = {"commence_time": start, "home_team": "Ana Strong", "away_team": "Bo Weak", "bookmakers": [
+        {"key": "pinnacle", "markets": [{"key": "h2h", "outcomes": [{"name": "Ana Strong", "price": -200},
+                                                                     {"name": "Bo Weak", "price": 175}]}]},
+        {"key": "draftkings", "markets": [{"key": "h2h", "outcomes": [{"name": "Ana Strong", "price": -250},
+                                                                       {"name": "Bo Weak", "price": 210}]}]}]}
+    (card,) = sharp.tennis_cards("tennis_atp_shanghai", [ev], NOW)
+    assert card.pick.selection == "Bo Weak ML" and card.pick.american == 210 and card.units == 0.5
+    assert card.sport == "tennis_atp" and 0.02 <= card.pick.ev <= 0.15
+    L = Ledger()
+    (e,) = L.publish([card], NOW)
+    rows = _rows()[:-1] + [dict(_rows()[-1], start=start.replace(":00Z", "Z"), status="STATUS_FINAL", winner="2",
+                                sets1="4 3", sets2="6 6")]  # p2 = Bo Weak won
+    assert tennis.grade_entries(L, rows, NOW + timedelta(hours=10)) == 1
+    assert e.status == "won" and abs(e.profit - 0.5 * 2.1) < 1e-9

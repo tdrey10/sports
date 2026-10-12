@@ -397,7 +397,8 @@ class Ledger:
         now: datetime,
     ) -> int:
         """Update live scores and grade finished picks. Returns picks graded."""
-        open_entries = [e for e in self.entries.values() if not e.settled and e.start <= now]
+        open_entries = [e for e in self.entries.values() if not e.settled and e.start <= now
+                        and not e.sport.startswith("tennis_")]  # tennis: graded by tennis.grade_entries
         by_sport: dict[str, list[Entry]] = defaultdict(list)
         for e in open_entries:
             by_sport[e.sport].append(e)
