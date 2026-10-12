@@ -85,6 +85,12 @@ def _scheduled(rows: list[dict]) -> dict[tuple, dict]:
     return out
 
 
+def scheduled_pairs(rows: list[dict]) -> set[tuple[str, str]]:
+    """Every player pair ESPN lists as scheduled or in progress."""
+    return {tuple(sorted((norm(r["p1_name"]), norm(r["p2_name"])))) for r in rows
+            if r.get("status") in ("STATUS_SCHEDULED", "STATUS_IN_PROGRESS")}
+
+
 def _sets(p: float, bo: int) -> tuple[int, int]:
     """Predicted set score for the favorite: a clear favorite in straight sets, otherwise one dropped."""
     need = 3 if bo == 5 else 2
@@ -239,4 +245,4 @@ def run(ledger, src: Path, study: dict | None, now: datetime | None = None) -> t
     return len(fresh), graded
 
 
-__all__ = ["fetch", "norm", "build", "grade", "run"]
+__all__ = ["fetch", "norm", "build", "grade", "run", "scheduled_pairs"]

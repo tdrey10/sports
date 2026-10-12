@@ -89,3 +89,34 @@ def test_tennis_sharp_value_card_and_grading():
                                 sets1="4 3", sets2="6 6")]  # p2 = Bo Weak won
     assert tennis.grade_entries(L, rows, NOW + timedelta(hours=10)) == 1
     assert e.status == "won" and abs(e.profit - 0.5 * 2.1) < 1e-9
+
+
+def test_tennis_value_skips_matches_not_on_the_espn_schedule():
+    from sportsedge import sharp
+
+    start = (NOW + timedelta(hours=6)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    ev = {"commence_time": start, "home_team": "Ana Strong", "away_team": "Bo Weak", "bookmakers": [
+        {"key": "pinnacle", "markets": [{"key": "h2h", "outcomes": [{"name": "Ana Strong", "price": -200},
+                                                                     {"name": "Bo Weak", "price": 175}]}]},
+        {"key": "draftkings", "markets": [{"key": "h2h", "outcomes": [{"name": "Ana Strong", "price": -250},
+                                                                       {"name": "Bo Weak", "price": 210}]}]}]}
+    rows = [{"p1_name": "Bo Weak", "p2_name": "Cy Other", "status": "STATUS_SCHEDULED"}]  # the draw changed
+    assert sharp.tennis_cards("tennis_atp_x", [ev], NOW, scheduled=tennis.scheduled_pairs(rows)) == []
+    rows.append({"p1_name": "Ana Strong", "p2_name": "Bo Weak", "status": "STATUS_SCHEDULED"})
+    assert len(sharp.tennis_cards("tennis_atp_x", [ev], NOW, scheduled=tennis.scheduled_pairs(rows))) == 1
+    assert sharp.run_tennis(NOW, client=type("C", (), {"api_key": "k"})(), force=True, scheduled=None) == []
+
+
+def test_tennis_form_spots_and_the_proven_bar():
+    from sportsedge import tennisform
+
+    x = {"n": 30, "m3": 0, "days": 4.0, "w10": 8, "n10": 10, "surp10": 2.0, "qual_here": False, "lost_q_here": False}
+    o = {"n": 200, "m3": 2, "days": 1.0, "w10": 3, "n10": 10, "surp10": -1.5, "qual_here": True, "lost_q_here": True}
+    hits = [k for k, fn in tennisform.SPOTS.items() if fn(x, o)]
+    assert "rested vs opponent with 2+ matches in 3 days" in hits and "against a lucky loser" in hits
+    assert "hot vs cold, opponent played in the last 3 days" in hits and "the qualifier vs a direct entry" not in hits
+    rec = lambda n, roi, se: {"bets": n, "roi": roi, "se": se}  # noqa: E731
+    assert tennisform.proven(rec(100, 0.02, 0.05), rec(500, 0.05, 0.02))
+    assert not tennisform.proven(rec(100, -0.02, 0.05), rec(500, 0.05, 0.02))  # lost in tuning
+    assert not tennisform.proven(rec(0, None, None), rec(500, 0.03, 0.02))  # blind-only needs 2 SE
+    assert tennisform.proven(rec(0, None, None), rec(500, 0.05, 0.02))

@@ -278,5 +278,314 @@
   "strong": 0
  },
  "tune_seasons": "2013-2019",
- "blind_seasons": "2021+"
+ "blind_seasons": "2021+",
+ "form": {
+  "joined": 35586,
+  "rows": [
+   {
+    "study": "rested vs opponent with 2+ matches in 3 days",
+    "book": "Pinnacle close",
+    "in_sample": {
+     "bets": 75,
+     "roi": 0.0535,
+     "se": 0.1448
+    },
+    "blind": {
+     "bets": 860,
+     "roi": -0.0862,
+     "se": 0.0368
+    },
+    "proven": false
+   },
+   {
+    "study": "rested vs opponent with 2+ matches in 3 days",
+    "book": "Bet365",
+    "in_sample": {
+     "bets": 69,
+     "roi": -0.0084,
+     "se": 0.1545
+    },
+    "blind": {
+     "bets": 781,
+     "roi": -0.1139,
+     "se": 0.0384
+    },
+    "proven": false
+   },
+   {
+    "study": "rested 3+ days vs opponent who played in the last 3",
+    "book": "Pinnacle close",
+    "in_sample": {
+     "bets": 666,
+     "roi": -0.1725,
+     "se": 0.0417
+    },
+    "blind": {
+     "bets": 2288,
+     "roi": -0.1048,
+     "se": 0.0223
+    },
+    "proven": false
+   },
+   {
+    "study": "rested 3+ days vs opponent who played in the last 3",
+    "book": "Bet365",
+    "in_sample": {
+     "bets": 598,
+     "roi": -0.2331,
+     "se": 0.0434
+    },
+    "blind": {
+     "bets": 2099,
+     "roi": -0.1325,
+     "se": 0.0234
+    },
+    "proven": false
+   },
+   {
+    "study": "match-sharp (played in the last 3 days) vs opponent rested 3+",
+    "book": "Pinnacle close",
+    "in_sample": {
+     "bets": 918,
+     "roi": 0.0784,
+     "se": 0.042
+    },
+    "blind": {
+     "bets": 3373,
+     "roi": 0.0009,
+     "se": 0.0214
+    },
+    "proven": false
+   },
+   {
+    "study": "match-sharp (played in the last 3 days) vs opponent rested 3+",
+    "book": "Bet365",
+    "in_sample": {
+     "bets": 957,
+     "roi": 0.0167,
+     "se": 0.0413
+    },
+    "blind": {
+     "bets": 3461,
+     "roi": -0.0263,
+     "se": 0.0213
+    },
+    "proven": false
+   },
+   {
+    "study": "direct entry vs a qualifier",
+    "book": "Pinnacle close",
+    "in_sample": {
+     "bets": 0,
+     "roi": null,
+     "se": null
+    },
+    "blind": {
+     "bets": 1673,
+     "roi": -0.1168,
+     "se": 0.0252
+    },
+    "proven": false
+   },
+   {
+    "study": "direct entry vs a qualifier",
+    "book": "Bet365",
+    "in_sample": {
+     "bets": 0,
+     "roi": null,
+     "se": null
+    },
+    "blind": {
+     "bets": 1495,
+     "roi": -0.1446,
+     "se": 0.0267
+    },
+    "proven": false
+   },
+   {
+    "study": "the qualifier vs a direct entry",
+    "book": "Pinnacle close",
+    "in_sample": {
+     "bets": 0,
+     "roi": null,
+     "se": null
+    },
+    "blind": {
+     "bets": 2795,
+     "roi": 0.0084,
+     "se": 0.0238
+    },
+    "proven": false
+   },
+   {
+    "study": "the qualifier vs a direct entry",
+    "book": "Bet365",
+    "in_sample": {
+     "bets": 0,
+     "roi": null,
+     "se": null
+    },
+    "blind": {
+     "bets": 2876,
+     "roi": -0.0239,
+     "se": 0.0235
+    },
+    "proven": false
+   },
+   {
+    "study": "against a lucky loser",
+    "book": "Pinnacle close",
+    "in_sample": {
+     "bets": 0,
+     "roi": null,
+     "se": null
+    },
+    "blind": {
+     "bets": 223,
+     "roi": -0.1004,
+     "se": 0.0658
+    },
+    "proven": false
+   },
+   {
+    "study": "against a lucky loser",
+    "book": "Bet365",
+    "in_sample": {
+     "bets": 0,
+     "roi": null,
+     "se": null
+    },
+    "blind": {
+     "bets": 201,
+     "roi": -0.1306,
+     "se": 0.0687
+    },
+    "proven": false
+   },
+   {
+    "study": "hot (7+ of last 10) vs cold (4 or fewer)",
+    "book": "Pinnacle close",
+    "in_sample": {
+     "bets": 180,
+     "roi": -0.1304,
+     "se": 0.074
+    },
+    "blind": {
+     "bets": 783,
+     "roi": -0.0232,
+     "se": 0.0374
+    },
+    "proven": false
+   },
+   {
+    "study": "hot (7+ of last 10) vs cold (4 or fewer)",
+    "book": "Bet365",
+    "in_sample": {
+     "bets": 143,
+     "roi": -0.1698,
+     "se": 0.082
+    },
+    "blind": {
+     "bets": 705,
+     "roi": -0.0356,
+     "se": 0.0401
+    },
+    "proven": false
+   },
+   {
+    "study": "form 3+ wins better than ratings expected, vs opponent",
+    "book": "Pinnacle close",
+    "in_sample": {
+     "bets": 561,
+     "roi": -0.0799,
+     "se": 0.0465
+    },
+    "blind": {
+     "bets": 1886,
+     "roi": -0.0289,
+     "se": 0.0263
+    },
+    "proven": false
+   },
+   {
+    "study": "form 3+ wins better than ratings expected, vs opponent",
+    "book": "Bet365",
+    "in_sample": {
+     "bets": 524,
+     "roi": -0.1367,
+     "se": 0.0479
+    },
+    "blind": {
+     "bets": 1797,
+     "roi": -0.058,
+     "se": 0.0274
+    },
+    "proven": false
+   },
+   {
+    "study": "rising player (<60 matches, 7+ of last 10)",
+    "book": "Pinnacle close",
+    "in_sample": {
+     "bets": 129,
+     "roi": 0.0703,
+     "se": 0.1087
+    },
+    "blind": {
+     "bets": 624,
+     "roi": -0.073,
+     "se": 0.0473
+    },
+    "proven": false
+   },
+   {
+    "study": "rising player (<60 matches, 7+ of last 10)",
+    "book": "Bet365",
+    "in_sample": {
+     "bets": 131,
+     "roi": 0.0269,
+     "se": 0.1071
+    },
+    "blind": {
+     "bets": 632,
+     "roi": -0.0734,
+     "se": 0.0481
+    },
+    "proven": false
+   },
+   {
+    "study": "hot vs cold, opponent played in the last 3 days",
+    "book": "Pinnacle close",
+    "in_sample": {
+     "bets": 93,
+     "roi": -0.1424,
+     "se": 0.1038
+    },
+    "blind": {
+     "bets": 334,
+     "roi": 0.0078,
+     "se": 0.0567
+    },
+    "proven": false
+   },
+   {
+    "study": "hot vs cold, opponent played in the last 3 days",
+    "book": "Bet365",
+    "in_sample": {
+     "bets": 71,
+     "roi": -0.1483,
+     "se": 0.1193
+    },
+    "blind": {
+     "bets": 291,
+     "roi": 0.0253,
+     "se": 0.0617
+    },
+    "proven": false
+   }
+  ],
+  "control": {
+   "random_spots": 100,
+   "passed": 0
+  }
+ }
 }
