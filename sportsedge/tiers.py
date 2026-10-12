@@ -376,8 +376,20 @@ def build_cards(
         for p in list(best_fill.values())[:max(daily_min - have, 0)]:
             chosen.append(("lean", p))
             card_ids.add(id(p))
+        from collections import Counter
+
+        why = Counter()
+        for p in every:
+            if p.commence_time > soon_cut or p.event_id in covered:
+                continue
+            why[(p.sport, "unknown injuries" if p.event_id in unknown else "warning" if p.warnings
+                 else "odds" if not settings.max_favorite <= p.american <= DAILY_MAX_DOG
+                 else "under 45%" if p.win_prob < LEGIT_MIN_WIN else "edge below floor" if p.ev < DAILY_FLOOR_EV
+                 else "no market" if p.market_prob is None else "favorite overreach" if favorite_overreach(p)
+                 else "losing kind" if losing_kind(p, settings) else "not backed" if not backed(p, settings)
+                 else "ok")] += 1
         print(f"daily card: {have} picks up for the next {EARLY_HOURS}h, {len(best_fill)} games eligible, "
-              f"{len(card_ids)} added")
+              f"{len(card_ids)} added; sides by rule: " + ", ".join(f"{k[0]} {k[1]} {v}" for k, v in sorted(why.items())))
 
     # Best bets: today's unit plays ranked by edge score, only those that clear the bar.
     scores = {id(p): edge_score(p, settings) for _, p in chosen}
