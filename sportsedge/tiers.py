@@ -48,6 +48,14 @@ DOG_MIN_ODDS = 100  # the blueprint: dogs +100 to +220 only
 DOG_MAX_ODDS = 220
 PROP_ODDS_RANGE = (-200, 200)
 EARLY_HOURS = 24  # games further out than this are "early value"
+# The daily card (owner's rule: picks on the board every day). When fewer than DAILY_MIN picks
+# are up for the day, the best remaining sides fill it: every bet rule still applies (-170 max,
+# no dog over +300, injuries known, 45%+ to win, a bet type not losing blind, one per game), the
+# edge on our number is no worse than DAILY_FLOOR_EV (about even after the book's margin), and
+# they carry no units: tracked as leans so the record shows whether they earn money.
+DAILY_MIN = 5
+DAILY_FLOOR_EV = -0.02
+DAILY_MAX_DOG = 300
 MAX_UNITS = 3.0
 BEST_BETS = 10  # most daily top picks across spreads, totals, moneylines and props
 BEST_MIN_SCORE = 40  # a best bet needs this edge score (and a positive calibrated edge); fewer is fine
@@ -205,6 +213,8 @@ def build_cards(
     max_early: int = 10,
     max_leans: int = 10,
     max_props: int = 8,
+    posted_today: int | None = None,
+    daily_min: int = DAILY_MIN,
 ) -> list[Card]:
     """``taken_today`` holds day-level tiers (lock/dog/prop) already published
     today, so a Lock of the Day is never swapped out mid-day."""
@@ -348,6 +358,25 @@ def build_cards(
     if settings.fill or settings.show_leans:
         chosen += [("lean", p) for p in list(best_lean.values())[:max_leans]]
 
+    # The daily card: at least ``daily_min`` picks on the board each day (see DAILY_MIN).
+    card_ids: set[int] = set()
+    if posted_today is not None:
+        have = posted_today + sum(1 for _, p in chosen if p.commence_time <= soon_cut)
+        covered = {p.event_id for _, p in chosen}
+        fill = [
+            p for p in game
+            if p.event_id not in covered and p.commence_time <= soon_cut and not p.warnings
+            and settings.max_favorite <= p.american <= DAILY_MAX_DOG and p.win_prob >= LEGIT_MIN_WIN
+            and p.ev >= DAILY_FLOOR_EV and p.market_prob is not None and not favorite_overreach(p)
+            and not losing_kind(p, settings)
+        ]
+        best_fill: dict[str, Pick] = {}
+        for p in sorted(fill, key=lambda p: (p.ev, p.win_prob), reverse=True):
+            best_fill.setdefault(p.event_id, p)
+        for p in list(best_fill.values())[:max(daily_min - have, 0)]:
+            chosen.append(("lean", p))
+            card_ids.add(id(p))
+
     # Best bets: today's unit plays ranked by edge score, only those that clear the bar.
     scores = {id(p): edge_score(p, settings) for _, p in chosen}
     slots = max(BEST_BETS - best_taken, 0)
@@ -424,7 +453,12 @@ def build_cards(
         if ctx and ctx.injuries_unknown:
             bullets.insert(0, f"No bet: no injury report for {', '.join(ctx.injuries_unknown)}, "
                               "so injuries are unknown. Tracked as a lean only.")
-        if id(pick) in lean_ids and tier == "lock":
+        if id(pick) in card_ids:
+            bullets.insert(0, f"Daily card: one of today's best prices on the board. Our number makes it "
+                              f"{pick.win_prob:.0%} to win, and at {pick.american:+.0f} the edge is {pick.ev:+.1%} "
+                              "(about even after the book's margin), so it carries no units and is tracked "
+                              "with the leans.")
+        elif id(pick) in lean_ids and tier == "lock":
             bullets.insert(0, f"Today's most likely winner ({pick.win_prob:.0%} on our numbers, the market "
                               f"{pick.market_prob:.0%})" if pick.market_prob is not None else
                               f"Today's most likely winner ({pick.win_prob:.0%} on our numbers)")

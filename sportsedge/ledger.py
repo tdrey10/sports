@@ -198,6 +198,11 @@ class Ledger:
         today = self.day_of(now)
         return sum(1 for e in self.entries.values() if e.day == today and e.best_rank)
 
+    def posted_today(self, now: datetime) -> int:
+        """Picks on today's board (withdrawn ones don't count)."""
+        today = self.day_of(now)
+        return sum(1 for e in self.entries.values() if e.day == today and e.status != "void")
+
     def taken_today(self, now: datetime) -> set[str]:
         today = self.day_of(now)
         # A lean Lock/Dog (no units) doesn't block a real one later in the day.
