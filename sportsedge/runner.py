@@ -54,6 +54,7 @@ def run_cycle(
     weather=None,
     first_seen=None,
     teaser_study: dict | None = None,
+    forecast_study: dict | None = None,
 ) -> CycleResult:
     """``props_sports`` limits player props to those sport keys (None = every sport)."""
     out = CycleResult()
@@ -92,7 +93,7 @@ def run_cycle(
     ledger.update_prices(out.scans, now)
     from . import forecasts
 
-    forecasts.merge(ledger.forecasts, forecasts.build(out.scans, settings, now), now)
+    forecasts.merge(ledger.forecasts, forecasts.build(out.scans, settings, now, forecast_study), now)
     if not held:
         from . import teasers
 

@@ -264,6 +264,13 @@ class Workspace:
         except (OSError, ValueError):
             return None
 
+    def _forecast_study(self):
+        """The blind prediction study (how far to move the Vegas line toward our ratings), rerun every morning."""
+        try:
+            return json.loads((self.data_dir / "forecast_study.json").read_text())
+        except (OSError, ValueError):
+            return None
+
     @staticmethod
     def _with_nfl_wind(settings, data_dir):
         """The NFL windy under is proven on 20 seasons of closing lines (nfl_history.json), far more
@@ -357,6 +364,7 @@ class Workspace:
             weather=None if self.demo else self._weather(),
             first_seen=self._first_seen(sports),
             teaser_study=None if self.demo else self._nfl_history(),
+            forecast_study=None if self.demo else self._forecast_study(),
         )
         self.brains.update(res.brains)
         self.weights = res.weights
@@ -633,6 +641,17 @@ def cmd_espn_history(args) -> int:
     return 0
 
 
+def cmd_forecast_study(args) -> int:
+    """How much the predictions trust our ratings against Vegas: a blind test on 2018+ games."""
+    from . import forecaststudy
+
+    data_dir = Path(args.data_dir)
+    res = forecaststudy.run(data_dir / "lines" / "espn", args.sports)
+    print(forecaststudy.report(res))
+    (data_dir / "forecast_study.json").write_text(json.dumps(res, indent=1, default=str))
+    return 0
+
+
 def cmd_tennis_history(args) -> int:
     from . import tennishist
 
@@ -826,6 +845,11 @@ def build_parser() -> argparse.ArgumentParser:
     eh.add_argument("--src", help="a local copy of the source's data/sports/games folder")
     eh.add_argument("--data-dir", default="data")
     eh.set_defaults(func=cmd_espn_history)
+
+    fs = sub.add_parser("forecast-study", help="blind test of the predictions: how far to trust our ratings over Vegas")
+    fs.add_argument("--data-dir", default="data")
+    fs.add_argument("--sports", nargs="+", default=["mlb", "nhl", "nba", "nfl", "ncaaf", "ncaab"])
+    fs.set_defaults(func=cmd_forecast_study)
 
     th = sub.add_parser("tennis-history", help="tennis blind test on 2012+ closing odds (ATP and WTA)")
     th.add_argument("--fetch", action="store_true", help="refresh the odds history from the public archive first")

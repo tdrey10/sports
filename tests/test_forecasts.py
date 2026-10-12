@@ -68,3 +68,65 @@ def test_forecasts_freeze_at_kickoff_grade_on_the_final_and_survive_save(tmp_pat
     L.forecasts = stored
     L.save(tmp_path / "l.json")
     assert Ledger.load(tmp_path / "l.json").forecasts[f.id].status == "final"
+
+
+def _study(w_total, w_win, w_margin=0.0):
+    blind = {"winners": {"blend": 0.6, "vegas": 0.6, "ratings": 0.55}, "total_error": {"blend": 1.8, "ratings": 1.9}}
+    s = {"weights": {"total": w_total, "margin": w_margin, "win": w_win}, "margin_per_logit": 1.5,
+         "postseason_total_adj": 0.0, "blind": blind, "games": {"blind": 5000}, "blind_seasons": "2022-2025"}
+    return {"nba": s, "nhl": s}
+
+
+def test_forecasts_move_the_vegas_line_toward_our_ratings_by_the_tested_weight():
+    provider, scans = _scans()
+    raw = {f.id: f for f in forecasts.build(scans, Settings(), provider.now)}
+    vegas = {f.id: f for f in forecasts.build(scans, Settings(), provider.now, _study(0.0, 0.0))}
+    half = {f.id: f for f in forecasts.build(scans, Settings(), provider.now, _study(0.5, 0.5))}
+    preds = {(s.sport.key, ev): pr for s in scans for ev, pr in s.predictions.items()}
+    lines = {}
+    for s in scans:
+        for ev, ctx in s.contexts.items():
+            pts = [q.point for q in ctx.event.quotes if q.market == "totals" and q.side == "over" and q.point is not None]
+            if pts:
+                lines[(s.sport.key, ev)] = forecasts.statistics.median(pts)
+    checked = 0
+    for fid, f in vegas.items():
+        key = (f.sport, f.event_id)
+        if f.sport not in ("nba", "nhl") or key not in lines or f.market_home is None:
+            continue
+        assert abs(f.home_score + f.away_score - lines[key]) < 0.2  # all market: the O/U itself
+        mid = (lines[key] + preds[key].exp_total) / 2
+        assert abs(half[fid].home_score + half[fid].away_score - mid) < 0.2
+        assert abs(f.p_home - f.market_home) < 1e-3
+        assert any(x.startswith("Backed by 5,000 blind-tested games") for x in f.facts)
+        assert any(x.startswith("Our ratings alone:") for x in f.facts)
+        checked += 1
+    assert checked
+    # Soccer has no history test: it borrows the tested sports' average weights.
+    epl = [f for f in vegas.values() if f.sport == "epl" and f.market_home is not None]
+    assert epl and all(any("No history test" in x for x in f.facts) for f in epl)
+    assert raw.keys() == vegas.keys()
+
+
+def test_prediction_study_trusts_vegas_when_it_predicts_better():
+    import random
+
+    from sportsedge import forecaststudy
+
+    rng = random.Random(3)
+    rows = []
+    for i in range(4000):
+        true_total, true_margin = rng.uniform(6, 11), rng.gauss(0, 1.5)
+        hs = max(0, round((true_total + true_margin) / 2 + rng.gauss(0, 2)))
+        as_ = max(0, round((true_total - true_margin) / 2 + rng.gauss(0, 2)))
+        p = 1 / (1 + 2.718 ** (-true_margin / 2.4))
+        ml = lambda p: -100 * p / (1 - p) if p >= 0.5 else 100 * (1 - p) / p  # noqa: E731
+        rows.append({"season": 2018 + i // 500, "post": False, "hs": hs, "as": as_,
+                     "m_total": true_total + rng.gauss(0, 2.5), "m_margin": true_margin + rng.gauss(0, 2),
+                     "p_home": min(max(p + rng.gauss(0, 0.15), 0.05), 0.95),
+                     "total": true_total, "spread": -1.5, "ml": {"home": ml(p), "away": ml(1 - p)}})
+    res = forecaststudy.analyze(rows, "mlb")
+    assert res["weights"]["total"] <= 0.2 and res["weights"]["win"] <= 0.2
+    b = res["blind"]
+    assert b["total_error"]["blend"] <= b["total_error"]["ratings"]
+    assert res["margin_per_logit"] > 0
