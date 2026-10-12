@@ -51,10 +51,10 @@ EARLY_HOURS = 24  # games further out than this are "early value"
 # The daily card (owner's rule: picks on the board every day). When fewer than DAILY_MIN picks
 # are up for the day, the best remaining sides fill it: every bet rule still applies (-170 max,
 # no dog over +300, injuries known, 45%+ to win, a bet type not losing blind, one per game), the
-# edge on our number is no worse than DAILY_FLOOR_EV (about even after the book's margin), and
-# they carry no units: tracked as leans so the record shows whether they earn money.
+# price is fair on our number (the edge no worse than DAILY_FLOOR_EV, a normal book's margin at
+# -110), and they carry no units: tracked as leans so the record shows whether they earn money.
 DAILY_MIN = 8
-DAILY_FLOOR_EV = -0.02
+DAILY_FLOOR_EV = -0.045
 DAILY_MAX_DOG = 300
 MAX_UNITS = 3.0
 BEST_BETS = 10  # most daily top picks across spreads, totals, moneylines and props
@@ -457,9 +457,9 @@ def build_cards(
                               "so injuries are unknown. Tracked as a lean only.")
         if id(pick) in card_ids:
             bullets.insert(0, f"Daily card: one of today's best prices on the board. Our number makes it "
-                              f"{pick.win_prob:.0%} to win, and at {pick.american:+.0f} the edge is {pick.ev:+.1%} "
-                              "(about even after the book's margin), so it carries no units and is tracked "
-                              "with the leans.")
+                              f"{pick.win_prob:.0%} to win, and at {pick.american:+.0f} the edge is {pick.ev:+.1%}: "
+                              + ("a small edge" if pick.ev > 0 else "priced about right, with the book's usual cut")
+                              + ". No units: tracked with the leans so the record shows if these earn.")
         elif id(pick) in lean_ids and tier == "lock":
             bullets.insert(0, f"Today's most likely winner ({pick.win_prob:.0%} on our numbers, the market "
                               f"{pick.market_prob:.0%})" if pick.market_prob is not None else
