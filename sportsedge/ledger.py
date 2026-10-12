@@ -207,6 +207,10 @@ class Ledger:
         return sum(1 for e in self.entries.values() if e.day == today and e.status != "void"
                    and e.tier != "early" and e.tier not in LIVE_TIERS and e.start <= cut)
 
+    def open_events(self, now: datetime) -> set[str]:
+        """Games that already have a pick on the board (not withdrawn, not started)."""
+        return {e.event_id for e in self.entries.values() if e.status == "pending" and e.start > now}
+
     def taken_today(self, now: datetime) -> set[str]:
         today = self.day_of(now)
         # A lean Lock/Dog (no units) doesn't block a real one later in the day.
