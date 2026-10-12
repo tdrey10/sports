@@ -1,11 +1,13 @@
 """Predictions for every game on the board: a projected score and who we think wins.
 
-Not picks: no price has to be beaten. Each forecast is our own educated read of the game,
-not the betting line repeated back:
+Not picks: no price has to be beaten. Each forecast is the best read the data supports:
 
-- projected score and win chances: our team ratings (points scored and allowed, home
-  field, rest, injuries, starting pitchers and goalies), calibrated by the studies;
-- the Vegas spread, total and win chance beside it, with where we disagree;
+- projected score and win chances: the Vegas total, spread and moneyline, moved toward our
+  team ratings (points scored and allowed, home field, rest, injuries, starting pitchers and
+  goalies) by the weight our ratings earned in the blind prediction study (forecaststudy:
+  2018+ games, tuned through 2021, tested after). In every sport tested the closing line
+  beat our ratings alone, so the ratings move it only as far as they proved they should;
+- our ratings' own read beside it, so the disagreements stand out;
 - the facts behind it: records, form, splits, power rank, rest, starters, weather, injuries.
 
 A forecast keeps updating until the game starts, then it is frozen and graded against the
@@ -21,6 +23,7 @@ from datetime import datetime, timedelta
 from .edge import Settings
 from .engine import SportScan
 from .insights import reasons
+from .forecaststudy import COUNT, blend, logit
 from .odds import implied_prob, no_vig
 
 KEEP_DAYS = 14
@@ -111,13 +114,30 @@ def _vegas_line(f_home: str, f_away: str, home_line: float | None, total_line: f
     return " · ".join(parts) if parts else None
 
 
-def build(scans: list[SportScan], settings: Settings, now: datetime) -> list[Forecast]:
-    """Our own read of every game: the ratings' projected score and win chances (scoring,
-    defense, home field, rest, injuries, starting pitchers and goalies), not the betting
-    line. The market's spread and total are shown beside it, so the disagreements stand out."""
+def _default_blend(study: dict | None) -> dict | None:
+    """For a league with no history test (soccer): the average weights of the tested sports."""
+    tested = [blend(study, s) for s in (study or {})]
+    tested = [b for b in tested if b]
+    if not tested:
+        return None
+    avg = lambda k: round(sum(b[k] for b in tested) / len(tested), 2)  # noqa: E731
+    return {"total": avg("total"), "margin": avg("margin"), "win": avg("win"), "k": None, "post_adj": 0.0,
+            "blind": None, "games": 0, "seasons": ""}
+
+
+def _unit(key: str) -> str:
+    return {"mlb": "runs", "nhl": "goals"}.get(key, "goals" if key not in ("nfl", "ncaaf", "nba", "ncaab") else "points")
+
+
+def build(scans: list[SportScan], settings: Settings, now: datetime, study: dict | None = None) -> list[Forecast]:
+    """The best read the data supports for every game: the Vegas line, moved toward our ratings
+    (scoring, defense, home field, rest, injuries, starting pitchers and goalies) by the weight
+    they earned in the blind prediction study. Our ratings' own read is shown beside it."""
     out = []
+    fallback = _default_blend(study)
     for scan in scans:
         cfg = scan.sport
+        wts = blend(study, cfg.key) or fallback
         for ev_id, pred in scan.predictions.items():
             ctx = scan.contexts.get(ev_id)
             if ctx is None or ctx.event.commence_time <= now:
@@ -133,10 +153,25 @@ def build(scans: list[SportScan], settings: Settings, now: datetime) -> list[For
                     p[side] = pk.model_prob
             norm = sum(p[s] for s in sides) or 1.0
             p = {s: p[s] / norm for s in sides}
-            winner = max(p, key=p.get)
             market = _consensus_ml(quotes, sides)
-
+            home_line = _median_point(quotes, "spreads", "home")
+            total_line = _median_point(quotes, "totals", "over")
+            ratings_p = dict(p)
             margin, total = pred.exp_margin, pred.exp_total
+            if wts and market:
+                w = wts["win"]
+                p = {s: w * p[s] + (1 - w) * market[s] for s in sides}
+                if total_line is not None:
+                    total = wts["total"] * total + (1 - wts["total"]) * total_line
+                mkt_margin = None
+                if cfg.key in COUNT and wts.get("k"):
+                    mkt_margin = wts["k"] * logit(market["home"] / (market["home"] + market["away"]))
+                elif home_line is not None and cfg.key not in COUNT:
+                    mkt_margin = -home_line
+                if mkt_margin is not None:
+                    margin = wts["margin"] * margin + (1 - wts["margin"]) * mkt_margin
+            winner = max(p, key=p.get)
+
             if winner == "home" and margin <= 0:
                 margin = 0.5
             elif winner == "away" and margin >= 0:
@@ -144,20 +179,18 @@ def build(scans: list[SportScan], settings: Settings, now: datetime) -> list[For
             home_score, away_score = max((total + margin) / 2, 0.0), max((total - margin) / 2, 0.0)
 
             facts: list[str] = []
-            home_line = _median_point(quotes, "spreads", "home")
-            total_line = _median_point(quotes, "totals", "over")
             vegas = _vegas_line(ctx.home, ctx.away, home_line, total_line)
             if vegas:
                 diff = []
                 if home_line is not None:
                     d = pred.exp_margin - (-home_line)
                     if abs(d) >= 1:
-                        diff.append(f"we have {ctx.home if d > 0 else ctx.away} {abs(d):.1f} better than the spread")
+                        diff.append(f"our ratings have {ctx.home if d > 0 else ctx.away} {abs(d):.1f} better than the spread")
                 if total_line is not None:
                     d = pred.exp_total - total_line
                     if abs(d) >= 1:
-                        diff.append(f"{abs(d):.1f} {'more' if d > 0 else 'fewer'} total than the line")
-                facts.append(f"Vegas: {vegas}" + (f" ({'; '.join(diff)})." if diff else " (we agree)."))
+                        diff.append(f"our ratings have {abs(d):.1f} {'more' if d > 0 else 'fewer'} {_unit(cfg.key)} than the total")
+                facts.append(f"Vegas: {vegas}" + (f" ({'; '.join(diff)})." if diff else " (our ratings agree)."))
             if market:
                 facts.append(f"Market win chance: {ctx.away} {market['away']:.0%} · {ctx.home} {market['home']:.0%}"
                              + (f" · draw {market['draw']:.0%}" if 'draw' in market else "") + ".")
@@ -165,6 +198,21 @@ def build(scans: list[SportScan], settings: Settings, now: datetime) -> list[For
                 facts.append(f"Wind forecast {ctx.wind_mph:.0f} mph at an outdoor stadium"
                              + (": windy games score less (the NFL windy under is proven over 20 seasons)."
                                 if ctx.wind_mph >= 15 else "."))
+            if wts and market:
+                rh, ra = max((pred.exp_total + pred.exp_margin) / 2, 0), max((pred.exp_total - pred.exp_margin) / 2, 0)
+                facts.append(f"Our ratings alone: {ctx.away} {ra:.1f} @ {ctx.home} {rh:.1f}, "
+                             f"{ctx.home} {ratings_p['home']:.0%} to win. The prediction gives them "
+                             f"{wts['total']:.0%} of the say on the total and {wts['win']:.0%} on the winner, "
+                             "the weight they earned in testing.")
+                b = wts.get("blind")
+                if b:
+                    facts.append(f"Backed by {wts['games']:,} blind-tested games ({wts['seasons']}): this method picked "
+                                 f"{b['winners']['blend']:.1%} of winners (Vegas alone {b['winners']['vegas']:.1%}, our "
+                                 f"ratings alone {b['winners']['ratings']:.1%}) and missed the total by "
+                                 f"{b['total_error']['blend']} {_unit(cfg.key)} on average (ratings alone "
+                                 f"{b['total_error']['ratings']}).")
+                else:
+                    facts.append("No history test for this league yet: it uses the average weights of the tested sports.")
             side = winner if winner != "draw" else "home"
             pick = next((x for x in scan.picks if x.event_id == ev_id and x.market == "h2h" and x.side == side
                          and not x.is_prop), None)
@@ -178,7 +226,7 @@ def build(scans: list[SportScan], settings: Settings, now: datetime) -> list[For
                 p_home=round(p["home"], 4), p_away=round(p["away"], 4), p_draw=round(p.get("draw", 0.0), 4),
                 winner=winner, model_home=round(pred.p_home, 4),
                 market_home=round(market["home"], 4) if market else None,
-                facts=facts[:10], updated_at=now.isoformat(),
+                facts=facts[:12], updated_at=now.isoformat(),
             ))
     return out
 

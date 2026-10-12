@@ -1,0 +1,284 @@
+{
+ "mlb": {
+  "tune_seasons": "2018-2021",
+  "blind_seasons": "2022-2026",
+  "games": {
+   "tune": 7740,
+   "blind": 12335
+  },
+  "weights": {
+   "total": 0.2,
+   "margin": 0.1,
+   "win": 0.15000000000000002
+  },
+  "margin_per_logit": 2.399,
+  "postseason_total_adj": 0.01,
+  "blind": {
+   "total_error": {
+    "ratings": 3.54,
+    "vegas": 3.43,
+    "blend": 3.44
+   },
+   "margin_error": {
+    "ratings": 3.44,
+    "vegas": 3.4,
+    "blend": 3.4
+   },
+   "winners": {
+    "ratings": 0.561,
+    "vegas": 0.576,
+    "blend": 0.574
+   },
+   "log_loss": {
+    "ratings": 0.6815,
+    "vegas": 0.6742,
+    "blend": 0.6743
+   },
+   "score_error": {
+    "ratings": 2.46,
+    "blend": 2.4
+   }
+  },
+  "postseason": {
+   "games": 351,
+   "actual": 8.05,
+   "vegas": 7.76,
+   "ratings": 8.92
+  }
+ },
+ "nhl": {
+  "tune_seasons": "2018-2021",
+  "blind_seasons": "2022-2026",
+  "games": {
+   "tune": 4621,
+   "blind": 5513
+  },
+  "weights": {
+   "total": 0.30000000000000004,
+   "margin": 0.0,
+   "win": 0.0
+  },
+  "margin_per_logit": 1.464,
+  "postseason_total_adj": -0.05,
+  "blind": {
+   "total_error": {
+    "ratings": 1.85,
+    "vegas": 1.84,
+    "blend": 1.84
+   },
+   "margin_error": {
+    "ratings": 2.15,
+    "vegas": 2.11,
+    "blend": 2.11
+   },
+   "winners": {
+    "ratings": 0.578,
+    "vegas": 0.596,
+    "blend": 0.596
+   },
+   "log_loss": {
+    "ratings": 0.6727,
+    "vegas": 0.6629,
+    "blend": 0.6629
+   },
+   "score_error": {
+    "ratings": 1.39,
+    "blend": 1.38
+   }
+  },
+  "postseason": {
+   "games": 720,
+   "actual": 5.84,
+   "vegas": 5.73,
+   "ratings": 6.02
+  }
+ },
+ "nba": {
+  "tune_seasons": "2018-2021",
+  "blind_seasons": "2022-2025",
+  "games": {
+   "tune": 4948,
+   "blind": 5285
+  },
+  "weights": {
+   "total": 0.0,
+   "margin": 0.05,
+   "win": 0.05
+  },
+  "margin_per_logit": null,
+  "postseason_total_adj": -1.99,
+  "blind": {
+   "total_error": {
+    "ratings": 15.02,
+    "vegas": 14.18,
+    "blend": 14.18
+   },
+   "margin_error": {
+    "ratings": 11.06,
+    "vegas": 10.51,
+    "blend": 10.52
+   },
+   "winners": {
+    "ratings": 0.655,
+    "vegas": 0.681,
+    "blend": 0.68
+   },
+   "log_loss": {
+    "ratings": 0.62,
+    "vegas": 0.5934,
+    "blend": 0.5935
+   },
+   "score_error": {
+    "ratings": 9.41,
+    "blend": 8.93
+   }
+  },
+  "postseason": {
+   "games": 672,
+   "actual": 216.45,
+   "vegas": 217.56,
+   "ratings": 224.56
+  }
+ },
+ "nfl": {
+  "tune_seasons": "2018-2021",
+  "blind_seasons": "2022-2026",
+  "games": {
+   "tune": 1074,
+   "blind": 1203
+  },
+  "weights": {
+   "total": 0.0,
+   "margin": 0.15000000000000002,
+   "win": 0.0
+  },
+  "margin_per_logit": null,
+  "postseason_total_adj": -2.28,
+  "blind": {
+   "total_error": {
+    "ratings": 10.63,
+    "vegas": 10.2,
+    "blend": 10.2
+   },
+   "margin_error": {
+    "ratings": 10.02,
+    "vegas": 9.53,
+    "blend": 9.55
+   },
+   "winners": {
+    "ratings": 0.641,
+    "vegas": 0.672,
+    "blend": 0.672
+   },
+   "log_loss": {
+    "ratings": 0.6387,
+    "vegas": 0.6101,
+    "blend": 0.6101
+   },
+   "score_error": {
+    "ratings": 7.42,
+    "blend": 7.15
+   }
+  },
+  "postseason": {
+   "games": 101,
+   "actual": 47.48,
+   "vegas": 47.85,
+   "ratings": 48.03
+  }
+ },
+ "ncaaf": {
+  "tune_seasons": "2018-2021",
+  "blind_seasons": "2022-2026",
+  "games": {
+   "tune": 2478,
+   "blind": 3257
+  },
+  "weights": {
+   "total": 0.0,
+   "margin": 0.0,
+   "win": 0.05
+  },
+  "margin_per_logit": null,
+  "postseason_total_adj": -1.64,
+  "blind": {
+   "total_error": {
+    "ratings": 12.76,
+    "vegas": 12.37,
+    "blend": 12.37
+   },
+   "margin_error": {
+    "ratings": 14.3,
+    "vegas": 12.04,
+    "blend": 12.04
+   },
+   "winners": {
+    "ratings": 0.689,
+    "vegas": 0.748,
+    "blend": 0.747
+   },
+   "log_loss": {
+    "ratings": 0.5846,
+    "vegas": 0.4986,
+    "blend": 0.4996
+   },
+   "score_error": {
+    "ratings": 9.7,
+    "blend": 8.67
+   }
+  },
+  "postseason": {
+   "games": 265,
+   "actual": 53.87,
+   "vegas": 53.96,
+   "ratings": 50.61
+  }
+ },
+ "ncaab": {
+  "tune_seasons": "2018-2021",
+  "blind_seasons": "2022-2025",
+  "games": {
+   "tune": 13687,
+   "blind": 16041
+  },
+  "weights": {
+   "total": 0.15000000000000002,
+   "margin": 0.0,
+   "win": 0.0
+  },
+  "margin_per_logit": null,
+  "postseason_total_adj": -0.99,
+  "blind": {
+   "total_error": {
+    "ratings": 13.65,
+    "vegas": 12.96,
+    "blend": 12.98
+   },
+   "margin_error": {
+    "ratings": 10.7,
+    "vegas": 8.81,
+    "blend": 8.81
+   },
+   "winners": {
+    "ratings": 0.684,
+    "vegas": 0.726,
+    "blend": 0.726
+   },
+   "log_loss": {
+    "ratings": 0.6381,
+    "vegas": 0.5264,
+    "blend": 0.5264
+   },
+   "score_error": {
+    "ratings": 8.72,
+    "blend": 7.9
+   }
+  },
+  "postseason": {
+   "games": 646,
+   "actual": 144.08,
+   "vegas": 144.27,
+   "ratings": 142.13
+  }
+ }
+}
