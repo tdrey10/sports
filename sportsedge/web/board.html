@@ -581,22 +581,26 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const liveGames = () => allSports()
     .reduce((n, sp) => n + (BOARD[sp.key] || []).filter((g) => g.state === "in").length, 0);
   function viewScores() {
-    const order = { in: 0, pre: 1, post: 2 };
-    // Every sport on one page, no filter: the sports with games on right now first.
-    const liveIn = (sp) => BOARD[sp.key].filter((g) => g.state === "in").length;
-    const sports = allSports().filter((sp) => (BOARD[sp.key] || []).length).sort((a, b) => (liveIn(b) > 0) - (liveIn(a) > 0));
+    // Every sport on one page, no filter, in three blocks: live now on top, then coming up, then final.
+    const sports = allSports().filter((sp) => (BOARD[sp.key] || []).length);
     if (!sports.length) return panel("Live scores", "Today's games", empty("Loading today's scores from ESPN…"));
     const line = (g) => {
       const tail = g.state === "pre" ? fmt(g.when, { hour: "numeric", minute: "2-digit" }) : esc(g.detail);
       const sc = g.state === "pre" ? "" : ` <b>${esc(g.as ?? "")}-${esc(g.hs ?? "")}</b>`;
       return `<li class="${g.state === "in" ? "live-dot" : ""}">${esc(g.away)} ${g.vs ? "vs" : "@"} ${esc(g.home)}${sc} <span class="muted">· ${tail}</span></li>`;
     };
-    const body = sports.map((sp) => {
-      const games = [...BOARD[sp.key]].sort((a, b) => (order[a.state] ?? 1) - (order[b.state] ?? 1) || new Date(a.when) - new Date(b.when));
-      return `<div><span class="kind">${esc(sp.name)}</span><ul class="scores">${games.map(line).join("")}</ul></div>`;
-    }).join("");
-    const live = liveGames();
-    return panel("Live scores", live ? `${live} live now · updates every 30 seconds` : "Today's games", `<div class="grid two">${body}</div>`);
+    const block = (state, sort) => {
+      const groups = sports.map((sp) => [sp, BOARD[sp.key].filter((g) => (g.state === "in" || g.state === "post" ? g.state : "pre") === state).sort(sort)])
+        .filter(([, games]) => games.length).sort((a, b) => b[1].length - a[1].length);
+      return { n: groups.reduce((n, [, g]) => n + g.length, 0),
+        html: `<div class="grid two">${groups.map(([sp, games]) => `<div><span class="kind">${esc(sp.name)}</span><ul class="scores">${games.map(line).join("")}</ul></div>`).join("")}</div>` };
+    };
+    const byTime = (a, b) => new Date(a.when) - new Date(b.when);
+    const live = block("in", byTime), next = block("pre", byTime), done = block("post", (a, b) => byTime(b, a));
+    return panel("Live now", live.n ? `${live.n} game${live.n === 1 ? "" : "s"} on right now · updates every 30 seconds` : "Nothing live right now · updates every 30 seconds",
+        live.n ? live.html : empty("No games in progress. Coming up and finished games are below."))
+      + (next.n ? panel("Coming up", `${next.n} still to play today`, next.html) : "")
+      + (done.n ? panel("Final", `${done.n} finished · latest first`, done.html) : "");
   }
 
   // Predictions: every game, not just the picks. Projected score and who we think wins.
