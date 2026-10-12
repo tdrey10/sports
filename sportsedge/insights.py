@@ -272,22 +272,47 @@ def find_context(scan: SportScan, home: str, away: str, when: datetime) -> tuple
     return None
 
 
-def add_facts(card, scans: list[SportScan], keep_first: int = 2) -> None:
-    """Give a price-only card (sharp value) the game facts: up to MAX_FACTS lines in all, the
-    card's own price lines first and its closing note last."""
-    scan = next((s for s in scans if s.sport.key == card.sport), None)
-    if scan is None or not card.home:
-        return
-    found = find_context(scan, card.home, card.away, card.pick.commence_time)
+def game_facts(scans: list[SportScan], sport: str, home: str, away: str, when: datetime) -> list[str]:
+    scan = next((s for s in scans if s.sport.key == sport), None)
+    if scan is None or not home:
+        return []
+    found = find_context(scan, home, away, when)
     ctx = found[1] if found else None
     facts = []
     if found and found[0] in scan.predictions:
         pred = scan.predictions[found[0]]
-        facts.append(f"Our projected score: {card.away} {pred.exp_away:.1f} - {card.home} {pred.exp_home:.1f}.")
-    facts += matchup_facts(scan.results, card.home, card.away, card.pick.commence_time, scan.sport.key,
-                           scan.ratings, ctx, ctx.neutral if ctx else False)
-    room = max(MAX_FACTS - len(card.reasons), 0)
-    card.reasons = card.reasons[:keep_first] + facts[:room] + card.reasons[keep_first:]
+        facts.append(f"Our projected score: {away} {pred.exp_away:.1f} - {home} {pred.exp_home:.1f}.")
+    return facts + matchup_facts(scan.results, home, away, when, sport, scan.ratings, ctx,
+                                 ctx.neutral if ctx else False)
+
+
+def merge_facts(reasons: list[str], facts: list[str], keep_first: int = 2) -> list[str]:
+    """The card's own price lines first, the facts, then its closing note: MAX_FACTS lines or so."""
+    room = max(MAX_FACTS - len(reasons), 5)
+    return reasons[:keep_first] + facts[:room] + reasons[keep_first:]
+
+
+FEW = 6  # a pick with fewer reason lines than this was posted before the facts: it gets them
+
+
+def add_facts(card, scans: list[SportScan], keep_first: int = 2) -> None:
+    """Give a price-only card (sharp value) the game facts."""
+    facts = game_facts(scans, card.sport, card.home, card.away, card.pick.commence_time)
+    card.reasons = merge_facts(card.reasons, facts, keep_first)
+
+
+def backfill(entries, scans: list[SportScan]) -> int:
+    """Open game picks posted before the facts existed get them now. Returns picks updated."""
+    n = 0
+    for e in entries:
+        if e.settled or e.status == "void" or e.sport.startswith("tennis_") or e.player \
+                or len(e.reasons or []) >= FEW:
+            continue
+        facts = game_facts(scans, e.sport, e.home, e.away, e.start)
+        if facts:
+            e.reasons = merge_facts(list(e.reasons or []), facts)
+            n += 1
+    return n
 
 
 def _unit(sport: str) -> str:
