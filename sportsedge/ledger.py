@@ -182,6 +182,18 @@ class Ledger:
                 out.add(tier)
         return out
 
+    def tennis_proven(self, min_bets: int = 60) -> bool:
+        """Tennis value picks earn units only on their own graded record, by the live-bet bar."""
+        done = sorted((e for e in self.entries.values() if e.tier == "sharp" and e.sport.startswith("tennis_")
+                       and e.settled and e.status != "void" and e.profit is not None), key=lambda e: e.commence_time)
+        flat = [e.profit / (e.units if e.units > 0 else 1.0) for e in done]
+        n = len(flat)
+        if n < min_bets:
+            return False
+        mean = sum(flat) / n
+        se = math.sqrt(sum((x - mean) ** 2 for x in flat) / (n - 1) / n)
+        return mean - se > 0 and sum(flat[: n // 2]) > 0
+
     def best_taken(self, now: datetime) -> int:
         today = self.day_of(now)
         return sum(1 for e in self.entries.values() if e.day == today and e.best_rank)
