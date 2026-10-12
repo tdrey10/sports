@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from types import SimpleNamespace
 
 from .edge import Pick
 from .engine import EventContext, SportScan
@@ -64,6 +65,23 @@ def _blowout(a: float, b: float) -> bool:
     return a - b >= max(14, 0.25 * (a + b)) if a + b > 12 else a - b >= 3
 
 
+def _split_top(text: str) -> list[str]:
+    """Split on '; ' outside parentheses."""
+    out, depth, cur = [], 0, ""
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        depth += ch == "("
+        depth -= ch == ")"
+        if depth == 0 and text.startswith("; ", i):
+            out.append(cur.strip())
+            cur, i = "", i + 2
+            continue
+        cur += ch
+        i += 1
+    return [x for x in out + [cur.strip()] if x]
+
+
 def pick_team(pick: Pick, ctx: EventContext) -> str | None:
     return {"home": ctx.home, "away": ctx.away}.get(pick.side)
 
@@ -83,7 +101,12 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
             else f"No edge: we make this {our:.0%} to cash and {odds} needs {implied:.0%}."
         )
         if pick.projection:
-            bullets.append(f"Projection: {pick.projection}.")
+            parts = _split_top(pick.projection)
+            bullets.append(f"Projection: {parts[0]}.")
+            bullets += [x[0].upper() + x[1:] + "." for x in parts[1:] if x]
+        if ctx:
+            bullets += matchup_facts(scan.results, ctx.home, ctx.away, ctx.event.commence_time, scan.sport.key,
+                                     scan.ratings, None, ctx.neutral)[:5]
     else:
         team = pick_team(pick, ctx) if ctx else None
         if pick.market == "h2h" and team and pick.ev <= 0:
@@ -156,6 +179,115 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
 
 FORM_GAMES = 5
 UNIT = {"nfl": "points", "nba": "points", "mlb": "runs", "nhl": "goals"}
+MAX_FACTS = 10
+
+
+def streak(games: list[GameResult], team: str) -> tuple[str, int] | None:
+    """The team's current run: ("won", 4) or ("lost", 2)."""
+    out, n = None, 0
+    for g in reversed(games):
+        mine, theirs = (g.home_score, g.away_score) if g.home == team else (g.away_score, g.home_score)
+        r = "won" if mine > theirs else "lost" if mine < theirs else "tied"
+        if out is None:
+            out = r
+        if r != out:
+            break
+        n += 1
+    return (out, n) if out else None
+
+
+def matchup_facts(results: list[GameResult], home: str, away: str, before: datetime, sport: str,
+                  ratings=None, ctx: EventContext | None = None, neutral: bool = False) -> list[str]:
+    """Facts about a game from the season's results (and the ESPN context when there is one):
+    records, streaks, last games, scoring, form, splits, head to head, power rank, starters,
+    rest and injuries. For picks whose own reasons are about the price (sharp value, live)."""
+    out: list[str] = []
+    unit = _unit(sport)
+    hg, ag = season_games(results, home, before), season_games(results, away, before)
+    if hg or ag:
+        out.append(f"{away} ({fmt_record(record(ag, away))}) @ {home} ({fmt_record(record(hg, home))}).")
+    runs = []
+    for team, games in ((away, ag), (home, hg)):
+        s = streak(games, team)
+        if s and s[1] >= 2 and s[0] != "tied":
+            runs.append(f"{team} has {s[0]} {s[1]} straight")
+    if runs:
+        out.append("Streaks: " + "; ".join(runs) + ".")
+    for team, games in ((away, ag), (home, hg)):
+        line = last_game_line(games, team, team)
+        if line:
+            out.append(line)
+    sides = []
+    for team, games in ((away, ag), (home, hg)):
+        pg = _per_game(games, team)
+        if pg:
+            sides.append(f"{team} {pg[0]:.1f} scored / {pg[1]:.1f} allowed")
+    if sides:
+        out.append(f"Season {unit} per game: " + "; ".join(sides) + ".")
+    forms = [f for f in (_form(ag, away), _form(hg, home)) if f]
+    if forms:
+        out.append(f"Last {FORM_GAMES}: " + "; ".join(forms) + ".")
+    if not neutral:
+        hh, ar = [g for g in hg if g.home == home], [g for g in ag if g.away == away]
+        if len(hh) >= 2 and len(ar) >= 2:
+            out.append(f"Splits: {home} {fmt_record(record(hh, home))} at home; {away} {fmt_record(record(ar, away))} on the road.")
+    h2h = [g for g in hg if away in (g.home, g.away)]
+    if h2h:
+        g = h2h[-1]
+        out.append(f"Head to head this season: {home} {fmt_record(record(h2h, home))} "
+                   f"(last: {g.away} {g.away_score:.0f} - {g.home} {g.home_score:.0f}, {g.date:%-m/%-d}).")
+    if ratings is not None:
+        ranks = power_ranks(SimpleNamespace(ratings=ratings))
+        if home in ranks and away in ranks:
+            out.append(f"Power rank: {away} #{ranks[away]} vs {home} #{ranks[home]} (of {len(ranks)}).")
+    if ctx is not None:
+        rest = _rest_line(ctx)
+        if rest:
+            out.append(rest)
+        if ctx.home_pitcher or ctx.away_pitcher:
+            out.append(_starters(ctx, sport))
+        for team, players in ctx.injuries.items():
+            if players:
+                more = f" +{len(players) - 4} more" if len(players) > 4 else ""
+                out.append(f"{team} missing: {', '.join(players[:4])}{more}.")
+    return out
+
+
+def _starters(ctx: EventContext, sport: str) -> str:
+    def sp(name, era, sv):
+        if era is not None:
+            return f"{name} ({era:.2f} ERA)"
+        if sv:
+            return f"{name} ({sv[0]:.3f} career save %, {sv[1]:,.0f} shots)"
+        return name or "TBD"
+    label = "Starting goalies" if sport == "nhl" else "Starters"
+    return (f"{label}: {sp(ctx.away_pitcher, ctx.away_pitcher_era, ctx.away_goalie_sv)} vs "
+            f"{sp(ctx.home_pitcher, ctx.home_pitcher_era, ctx.home_goalie_sv)}.")
+
+
+def find_context(scan: SportScan, home: str, away: str, when: datetime) -> tuple[str, EventContext] | None:
+    for eid, c in scan.contexts.items():
+        if c.home == home and c.away == away and abs((c.event.commence_time - when).total_seconds()) < 12 * 3600:
+            return eid, c
+    return None
+
+
+def add_facts(card, scans: list[SportScan], keep_first: int = 2) -> None:
+    """Give a price-only card (sharp value) the game facts: up to MAX_FACTS lines in all, the
+    card's own price lines first and its closing note last."""
+    scan = next((s for s in scans if s.sport.key == card.sport), None)
+    if scan is None or not card.home:
+        return
+    found = find_context(scan, card.home, card.away, card.pick.commence_time)
+    ctx = found[1] if found else None
+    facts = []
+    if found and found[0] in scan.predictions:
+        pred = scan.predictions[found[0]]
+        facts.append(f"Our projected score: {card.away} {pred.exp_away:.1f} - {card.home} {pred.exp_home:.1f}.")
+    facts += matchup_facts(scan.results, card.home, card.away, card.pick.commence_time, scan.sport.key,
+                           scan.ratings, ctx, ctx.neutral if ctx else False)
+    room = max(MAX_FACTS - len(card.reasons), 0)
+    card.reasons = card.reasons[:keep_first] + facts[:room] + card.reasons[keep_first:]
 
 
 def _unit(sport: str) -> str:

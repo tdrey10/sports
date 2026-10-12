@@ -120,3 +120,35 @@ def test_tennis_form_spots_and_the_proven_bar():
     assert not tennisform.proven(rec(100, -0.02, 0.05), rec(500, 0.05, 0.02))  # lost in tuning
     assert not tennisform.proven(rec(0, None, None), rec(500, 0.03, 0.02))  # blind-only needs 2 SE
     assert tennisform.proven(rec(0, None, None), rec(500, 0.05, 0.02))
+
+
+def test_tennis_match_facts_and_value_card_reasons():
+    from sportsedge import sharp
+
+    start = NOW + timedelta(hours=6)
+    rows = []
+    for i in range(12):  # Ana wins 12 straight; Bo loses his last 3, the last one in qualifying here
+        rows.append({"id": f"a{i}", "tour": "atp", "start": (NOW - timedelta(days=40 - 3 * i)).strftime("%Y-%m-%dT%H:%MZ"),
+                     "event": "e0", "tourney": "Old Open", "round": "Round 1", "surface": "hard", "bo": "3",
+                     "p1_name": "Ana Strong", "p2_name": f"Opp {i}", "winner": "1", "sets1": "6 6", "sets2": "3 4",
+                     "status": "STATUS_FINAL"})
+    for i in range(3):
+        rows.append({"id": f"b{i}", "tour": "atp", "start": (NOW - timedelta(days=2 - i * 0.5)).strftime("%Y-%m-%dT%H:%MZ"),
+                     "event": "e1", "tourney": "Big Open", "round": "Qualifying Final" if i == 2 else "Round 1",
+                     "surface": "hard", "bo": "3", "p1_name": "Bo Weak", "p2_name": f"Foe {i}", "winner": "2",
+                     "sets1": "4 4", "sets2": "6 6", "status": "STATUS_FINAL"})
+    rows.append({"id": "m", "tour": "atp", "start": start.strftime("%Y-%m-%dT%H:%MZ"), "event": "e1", "tourney": "Big Open",
+                 "round": "Round 1", "surface": "hard", "bo": "3", "p1_name": "Bo Weak", "p2_name": "Ana Strong",
+                 "winner": "0", "sets1": "", "sets2": "", "status": "STATUS_SCHEDULED"})
+    facts = tennis.match_facts(rows, "Bo Weak", "Ana Strong", start, "atp")
+    text = " | ".join(facts)
+    assert "Big Open · Round 1" in text and "Ana Strong has won 12 straight" in text and "Bo Weak has lost 3 straight" in text
+    assert "Bo Weak got in as a lucky loser" in text and "First meeting" in text and "Our ratings:" in text
+    ev = {"commence_time": start.strftime("%Y-%m-%dT%H:%M:%SZ"), "home_team": "Ana Strong", "away_team": "Bo Weak",
+          "bookmakers": [
+              {"key": "pinnacle", "markets": [{"key": "h2h", "outcomes": [{"name": "Ana Strong", "price": -200},
+                                                                           {"name": "Bo Weak", "price": 175}]}]},
+              {"key": "draftkings", "markets": [{"key": "h2h", "outcomes": [{"name": "Ana Strong", "price": -250},
+                                                                             {"name": "Bo Weak", "price": 210}]}]}]}
+    (card,) = sharp.tennis_cards("tennis_atp_x", [ev], NOW, rows=rows)
+    assert 10 <= len(card.reasons) <= 13 and card.reasons[0].startswith("Pinnacle") and card.reasons[-1].startswith("Bet it")

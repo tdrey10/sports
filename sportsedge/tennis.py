@@ -91,6 +91,122 @@ def scheduled_pairs(rows: list[dict]) -> set[tuple[str, str]]:
             if r.get("status") in ("STATUS_SCHEDULED", "STATUS_IN_PROGRESS")}
 
 
+def _played(rows: list[dict], player: str, before: datetime) -> list[dict]:
+    """A player's finished matches before ``before``, oldest first (walkovers left out)."""
+    out = []
+    for r in rows:
+        if r.get("status") not in ("STATUS_FINAL", "STATUS_RETIRED") or r.get("winner") not in ("1", "2"):
+            continue
+        if not r.get("start") or _t(r["start"]) >= before or player not in (norm(r["p1_name"]), norm(r["p2_name"])):
+            continue
+        out.append(r)
+    return out
+
+
+def _won(r: dict, player: str) -> bool:
+    return (r["winner"] == "1") == (norm(r["p1_name"]) == player)
+
+
+def _score(r: dict, player: str) -> str:
+    s1, s2 = (r.get("sets1") or "").split(), (r.get("sets2") or "").split()
+    mine, theirs = (s1, s2) if norm(r["p1_name"]) == player else (s2, s1)
+    return " ".join(f"{a}-{b}" for a, b in zip(mine, theirs)) + (" ret." if r.get("status") == "STATUS_RETIRED" else "")
+
+
+def _days(d: float) -> str:
+    n = max(round(d), 0)
+    return f"{n} day" if n == 1 else f"{n} days"
+
+
+def match_facts(rows: list[dict], a: str, b: str, start: datetime, tour: str = "") -> list[str]:
+    """Facts about a tennis match from ESPN results: form, streaks, last matches, rest, the
+    season and surface records, head to head, ratings, and how each player got into the draw."""
+    na, nb = norm(a), norm(b)
+    out: list[str] = []
+    hist = {na: _played(rows, na, start), nb: _played(rows, nb, start)}
+    here = next((r for r in rows if r.get("start") and abs((_t(r["start"]) - start).total_seconds()) < 2 * 86400
+                 and {norm(r["p1_name"]), norm(r["p2_name"])} == {na, nb}), None)
+    if here and here.get("tourney"):
+        surface = (here.get("surface") or "").title()
+        out.append(f"{here['tourney']}{' · ' + here['round'] if here.get('round') else ''}"
+                   f"{' · ' + surface + ' court' if surface else ''}.")
+    form = []
+    for name, p in ((a, na), (b, nb)):
+        last = hist[p][-10:]
+        if last:
+            w = sum(_won(r, p) for r in last)
+            form.append(f"{name} {w}-{len(last) - w}")
+    if form:
+        out.append("Last 10 matches: " + "; ".join(form) + ".")
+    runs = []
+    for name, p in ((a, na), (b, nb)):
+        n, kind = 0, None
+        for r in reversed(hist[p]):
+            w = _won(r, p)
+            if kind is None:
+                kind = w
+            if w != kind:
+                break
+            n += 1
+        if n >= 2:
+            runs.append(f"{name} has {'won' if kind else 'lost'} {n} straight")
+    if runs:
+        out.append("Streaks: " + "; ".join(runs) + ".")
+    rest = []
+    for name, p in ((a, na), (b, nb)):
+        if hist[p]:
+            days = (start - _t(hist[p][-1]["start"])).total_seconds() / 86400
+            m3 = sum(1 for r in hist[p] if start - _t(r["start"]) <= timedelta(days=3))
+            rest.append(f"{name} {m3} match{'es' if m3 != 1 else ''} in the last 3 days ({_days(days)} since the last)"
+                        if m3 else f"{name} rested ({_days(days)} since the last match)")
+    if rest:
+        out.append("Rest: " + "; ".join(rest) + ".")
+    if here:
+        how = []
+        for name, p in ((a, na), (b, nb)):
+            q = [r for r in hist[p] if r.get("event") == here.get("event") and "Qualif" in (r.get("round") or "")]
+            if q and not _won(q[-1], p):
+                how.append(f"{name} got in as a lucky loser (lost the last qualifying round)")
+            elif q:
+                how.append(f"{name} came through qualifying ({len(q)} wins)")
+        if how:
+            out.append("Draw: " + "; ".join(how) + ".")
+    for name, p in ((a, na), (b, nb)):
+        last = hist[p][-3:]
+        if last:
+            bits = []
+            for r in reversed(last):
+                opp = r["p2_name"] if norm(r["p1_name"]) == p else r["p1_name"]
+                bits.append(f"{'beat' if _won(r, p) else 'lost to'} {opp} {_score(r, p)} ({_t(r['start']):%-m/%-d})")
+            out.append(f"{name} last 3: " + "; ".join(bits) + ".")
+    season = []
+    for name, p in ((a, na), (b, nb)):
+        yr = [r for r in hist[p] if _t(r["start"]).year == start.year]
+        if yr:
+            w = sum(_won(r, p) for r in yr)
+            surf = (here or {}).get("surface")
+            on = [r for r in yr if surf and r.get("surface") == surf]
+            ws = sum(_won(r, p) for r in on)
+            season.append(f"{name} {w}-{len(yr) - w}" + (f" ({ws}-{len(on) - ws} on {surf.lower()})" if on else ""))
+    if season:
+        out.append(f"{start.year} record: " + "; ".join(season) + ".")
+    h2h = [r for r in hist[na] if nb in (norm(r["p1_name"]), norm(r["p2_name"]))]
+    if h2h:
+        w = sum(_won(r, na) for r in h2h)
+        last = h2h[-1]
+        out.append(f"Head to head: {a} {w}-{len(h2h) - w} (last: {a} {'won' if _won(last, na) else 'lost'} "
+                   f"{_score(last, na)}, {_t(last['start']):%-m/%-d/%y}).")
+    else:
+        out.append("First meeting between these two.")
+    if tour:
+        elo = ratings(rows, Params(k=150.0, surface_weight=0.3), start)
+        surface = SURFACE.get(((here or {}).get("surface") or "hard").lower(), "Hard")
+        pa = elo.prob(Match(tour, 0, start.isoformat(), surface, int((here or {}).get("bo") or 3), na, nb, True))
+        out.append(f"Our ratings: {a} {pa:.0%} · {b} {1 - pa:.0%} ({elo.played[(tour, na)]} vs "
+                   f"{elo.played[(tour, nb)]} rated matches; ratings trail the market in the blind test).")
+    return out
+
+
 def _sets(p: float, bo: int) -> tuple[int, int]:
     """Predicted set score for the favorite: a clear favorite in straight sets, otherwise one dropped."""
     need = 3 if bo == 5 else 2
@@ -245,4 +361,4 @@ def run(ledger, src: Path, study: dict | None, now: datetime | None = None) -> t
     return len(fresh), graded
 
 
-__all__ = ["fetch", "norm", "build", "grade", "run", "scheduled_pairs"]
+__all__ = ["fetch", "norm", "build", "grade", "run", "scheduled_pairs", "match_facts"]

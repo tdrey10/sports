@@ -238,3 +238,16 @@ def test_ledger_live_record_must_beat_luck_and_hold_in_both_halves():
     assert ledger([True, True, False] * 10).live_proven() == set()  # too few bets
     assert ledger([False] * 60 + [True] * 60 + [True] * 10).live_proven() == set()  # older half lost
     assert ledger([True, False] * 40).live_proven() == set()  # break-even: not beyond luck
+
+
+def test_live_cards_carry_game_facts():
+    game = live_game("nfl", period=4, clock="10:00", live_home=27, live_away=10, detail="10:00 - 4th")
+    scanner = LiveScanner(FakeLiveProvider(game, make_event(-150, 125, -110, -110)), Settings())
+    picks = scanner.scan(SPORTS["nfl"], NOW)
+    for p in picks:
+        p.warnings = []  # the toy game's model is far from the market; the facts are what's tested here
+    cards = live_cards(picks, scanner, {"nfl": "NFL"})
+    assert cards
+    for c in cards:
+        assert 5 <= len(c.reasons) <= 10
+        assert any(r.startswith("Away Team (") for r in c.reasons) and any(r.startswith("Last 5:") for r in c.reasons)

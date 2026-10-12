@@ -274,9 +274,11 @@ class Workspace:
         except Exception as exc:
             print(f"could not fetch the ESPN tennis schedule: {exc}")
         try:
-            return tennis.scheduled_pairs(tennis.read_matches(src / "matches.csv"))
+            self._tennis_rows = tennis.read_matches(src / "matches.csv")
         except OSError:
+            self._tennis_rows = None
             return None
+        return tennis.scheduled_pairs(self._tennis_rows)
 
     def _forecast_study(self):
         """The blind prediction study (how far to move the Vegas line toward our ratings), rerun every morning."""
@@ -390,14 +392,19 @@ class Workspace:
 
             if sharp.due(now) or getattr(self.args, "sharp_now", False):
                 trust = {k: v["factor"] for k, v in self.ledger.clv_trust(now).items()}
-                added = self.ledger.publish(sharp.run(resolve([",".join(sharp.SPORTS)]), self.provider, now,
-                                                      clv_trust=trust,
-                                                      force=getattr(self.args, "sharp_now", False)), now)
+                from .insights import add_facts
+
+                value = sharp.run(resolve([",".join(sharp.SPORTS)]), self.provider, now, clv_trust=trust,
+                                  force=getattr(self.args, "sharp_now", False))
+                for card in value:
+                    add_facts(card, res.scans)  # records, streaks, form, starters, injuries
+                added = self.ledger.publish(value, now)
                 print(f"sharp value: posted {len(added)}")
                 tennis_added = self.ledger.publish(sharp.run_tennis(now, force=getattr(self.args, "sharp_now", False),
                                                                     clv_trust=trust,
                                                                     proven=self.ledger.tennis_proven(),
-                                                                    scheduled=self._tennis_schedule()), now)
+                                                                    scheduled=self._tennis_schedule(),
+                                                                    rows=self._tennis_rows), now)
                 print(f"tennis sharp value: posted {len(tennis_added)}")
         from . import archive
 
