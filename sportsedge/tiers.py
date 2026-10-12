@@ -53,7 +53,7 @@ EARLY_HOURS = 24  # games further out than this are "early value"
 # no dog over +300, injuries known, 45%+ to win, a bet type not losing blind, one per game), the
 # edge on our number is no worse than DAILY_FLOOR_EV (about even after the book's margin), and
 # they carry no units: tracked as leans so the record shows whether they earn money.
-DAILY_MIN = 5
+DAILY_MIN = 8
 DAILY_FLOOR_EV = -0.02
 DAILY_MAX_DOG = 300
 MAX_UNITS = 3.0
@@ -376,6 +376,8 @@ def build_cards(
         for p in list(best_fill.values())[:max(daily_min - have, 0)]:
             chosen.append(("lean", p))
             card_ids.add(id(p))
+        print(f"daily card: {have} picks up for the next {EARLY_HOURS}h, {len(best_fill)} games eligible, "
+              f"{len(card_ids)} added")
 
     # Best bets: today's unit plays ranked by edge score, only those that clear the bar.
     scores = {id(p): edge_score(p, settings) for _, p in chosen}
