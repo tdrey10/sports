@@ -607,7 +607,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function viewPredict() {
     const all = (DATA.forecasts || []).filter((f) => pickedSport(f.sport));
     const now = Date.now();
-    const recent = all.filter((f) => f.status !== "final" || now - new Date(f.commence_time).getTime() < 2 * 86400e3);
+    // Only games still to play or under way: a finished game comes off (its result counts in the record above).
+    const recent = all.filter((f) => (f.status === "pending" || f.status === "live") && !(scoreFor(f) || {}).final
+      && now - new Date(f.commence_time).getTime() < 12 * 3600e3);
     const order = { live: 0, pending: 1, final: 2 };
     recent.sort((a, b) => (order[a.status] ?? 1) - (order[b.status] ?? 1) || new Date(a.commence_time) - new Date(b.commence_time));
     const name = (f, side) => (side === "home" ? f.home : side === "away" ? f.away : "Draw");
@@ -643,8 +645,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       ? `${o.right}-${o.wrong} picking winners (${pct(o.pct)}) · scores off by ${o.score_error == null ? "–" : o.score_error.toFixed(1)} a team`
       : "Graded after every final";
     const bySport = Object.values(rec.by_sport || {}).map((s) => `<span class="chip-rec">${esc(s.name)} ${s.right}-${s.wrong}</span>`).join("");
-    const intro = `<p class="small muted">Not picks: our own educated read on every game, not the betting line repeated back. The score and win chance come from our team ratings (points scored and allowed, home field, rest, injuries, starting pitchers and goalies), calibrated by the studies; the Vegas line sits beside it so you can see where we disagree. Each one locks at kickoff and is graded on the final.</p>${bySport ? `<div class="chip-recs">${bySport}</div>` : ""}`;
-    return panel("Predictions", head, intro + (recent.length ? `<div class="grid two">${recent.map(card).join("")}</div>` : empty("No games to predict yet: they show up as soon as lines post.")));
+    const intro = `<p class="small muted">Not picks: our read on every game still to play. It starts from the Vegas line and moves toward our team ratings (scoring, defense, home field, rest, injuries, starters) as far as they earned in the blind tests; the facts behind it are under each card. Each one locks at kickoff, comes off the board when the game ends, and is graded in the record above.</p>${bySport ? `<div class="chip-recs">${bySport}</div>` : ""}`;
+    return panel("Predictions", head, intro + (recent.length ? `<div class="grid two">${recent.map(card).join("")}</div>` : empty("No games left to predict right now: new ones show up as soon as lines post.")));
   }
 
   function viewLive() {
