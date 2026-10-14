@@ -104,3 +104,31 @@ def test_unstarted_dabble_parlay_survives_withdraw():
     before = len(led.parlays)
     led.withdraw(Settings(), now)
     assert before and len(led.parlays) == before  # no-unit legs don't pull a Dabble parlay
+
+
+def test_dabble_fills_with_likely_daily_card_leans_on_a_light_day():
+    from sportsedge.parlays import build
+
+    now = START - timedelta(hours=3)
+    led = Ledger()
+    picks = [make_pick(event_id="c1", american=-130, win_prob=0.58, ev=-0.02),
+             make_pick(event_id="c2", american=-120, win_prob=0.56, ev=-0.03),
+             make_pick(event_id="c3", american=-110, win_prob=0.52, ev=-0.01),  # not likely enough
+             make_pick(event_id="c4", american=-150, win_prob=0.60, ev=-0.08)]  # price too far off fair
+    led.publish([card(p, tier="lean", units=0.0) for p in picks], now)
+    new = build(led.entries.values(), [], now, led.day_of(now), local_hour=12)
+    two = [p for p in new if p.kind == "dabble" and p.size == 2]
+    assert two and {led.entries[i].event_id for i in two[0].legs} == {"c1", "c2"}
+    assert not [p for p in new if p.size == 3]
+
+
+def test_no_injury_report_leans_come_off_the_board():
+    from sportsedge.edge import Settings
+
+    now = START - timedelta(hours=3)
+    led = Ledger()
+    c = card(make_pick(event_id="s1"), tier="lean", units=0.0)
+    c.reasons = ["No bet: no injury report for A, B, so injuries are unknown. Tracked as a lean only."]
+    (e,) = led.publish([c], now)
+    led.withdraw(Settings(), now)
+    assert e.status == "void" and e.reasons[0].startswith("Withdrawn before the game: no injury report")

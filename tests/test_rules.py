@@ -51,9 +51,8 @@ def test_unknown_injuries_mean_no_bet():
     nba = next(s for s in scans if s.sport.key == "nba")
     assert nba.contexts and not any(ctx.injuries_unknown for ctx in nba.contexts.values())
     cards = build_cards(scans, engine.settings, provider.now)
-    soccer = [c for c in cards if c.sport == "epl"]
-    assert all(c.tier == "lean" and c.units == 0 for c in soccer)
-    assert all(c.reasons[0].startswith("No bet: no injury report") for c in soccer)
+    assert not [c for c in cards if c.sport == "epl"]  # injuries unknown: nothing posted, not even a lean
+    assert not [c for c in build_cards(scans, engine.settings, provider.now, posted_today=0) if c.sport == "epl"]
     assert any(c.units > 0 for c in cards if c.sport == "nba")
 
 

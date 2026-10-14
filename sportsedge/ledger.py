@@ -326,6 +326,12 @@ class Ledger:
         for e in sorted(self.entries.values(), key=lambda e: (not e.event_id.isdigit(), e.created_at)):
             if e.status != "pending" or e.start <= now or e.tier in LIVE_TIERS or e.tier == "sharp":
                 continue  # live and sharp-value bets have their own checks (and their own CLV record)
+            if e.units <= 0 and (e.reasons or [""])[0].startswith("No bet: no injury report"):
+                # Injuries unknown: no bet, not even a lean (the owner's rule); it comes off the board.
+                e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
+                e.reasons = ["Withdrawn before the game: no injury report, so no bet."] + list(e.reasons)
+                pulled.append(e)
+                continue
             if e.units <= 0:
                 daily_lock = e.tier == "lock" and getattr(settings, "daily_lock", True)
                 # The daily Lock/Dog lean stays only while it still beats its price's break-even.

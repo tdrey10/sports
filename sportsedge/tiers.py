@@ -238,6 +238,9 @@ def build_cards(
         ev_id for scan in scans for ev_id, ctx in scan.contexts.items() if ctx.injuries_unknown
     }
     blocked = [p for p in game + props if p.event_id in unknown]
+    # The owner's rule: injuries unknown, no bet. Those games post nothing at all (not even a lean).
+    every = [p for p in every if p.event_id not in unknown]
+    blocked = []
     game = [p for p in game if p.event_id not in unknown]
     props = [p for p in props if p.event_id not in unknown]
 
