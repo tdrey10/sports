@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-10-14T17:48:17.606351+00:00",
+ "ran_at": "2026-10-14T18:50:31.240929+00:00",
  "fights": 4318,
  "called": 3624,
  "accuracy": 0.5825055187637969,
@@ -135,9 +135,9 @@
    "model_a": 0.5,
    "a_fights": 0,
    "b_fights": 0,
-   "a_ml": -105.0,
-   "b_ml": -115.0,
-   "market_a": 0.489
+   "a_ml": -108.0,
+   "b_ml": -112.0,
+   "market_a": 0.496
   },
   {
    "fight_id": "401897388",
@@ -424,19 +424,6 @@
    "b_fights": 1
   },
   {
-   "fight_id": "401928107",
-   "card": "UFC Fight Night: Moicano vs. Nolan",
-   "date": "2026-10-31T21:00Z",
-   "weight": "Welterweight",
-   "a": "Jean-Paul Lebosnoyani",
-   "a_record": "11-2-0",
-   "b": "Farman Hasanov",
-   "b_record": "6-0-0",
-   "model_a": 0.56,
-   "a_fights": 3,
-   "b_fights": 1
-  },
-  {
    "fight_id": "401928108",
    "card": "UFC Fight Night: Moicano vs. Nolan",
    "date": "2026-10-31T21:00Z",
@@ -513,6 +500,19 @@
    "model_a": 0.433,
    "a_fights": 10,
    "b_fights": 7
+  },
+  {
+   "fight_id": "401928107",
+   "card": "UFC Fight Night: Moicano vs. Nolan",
+   "date": "2026-11-01T00:00Z",
+   "weight": "Welterweight",
+   "a": "Jean-Paul Lebosnoyani",
+   "a_record": "11-2-0",
+   "b": "Farman Hasanov",
+   "b_record": "6-0-0",
+   "model_a": 0.56,
+   "a_fights": 3,
+   "b_fights": 1
   },
   {
    "fight_id": "401911642",
@@ -684,6 +684,45 @@
    "b_fights": 1
   },
   {
+   "fight_id": "401913648",
+   "card": "UFC 334: Gane vs. Hokit",
+   "date": "2026-11-14T22:00Z",
+   "weight": "Lightweight",
+   "a": "Nazim Sadykhov",
+   "a_record": "11-3-1",
+   "b": "Jefferson Nascimento",
+   "b_record": "13-1-0",
+   "model_a": 0.6,
+   "a_fights": 7,
+   "b_fights": 1
+  },
+  {
+   "fight_id": "401922645",
+   "card": "UFC 334: Gane vs. Hokit",
+   "date": "2026-11-14T22:00Z",
+   "weight": "W Bantamweight",
+   "a": "Macy Chiasson",
+   "a_record": "11-6-0",
+   "b": "Bia Mesquita",
+   "b_record": "8-0-0",
+   "model_a": 0.434,
+   "a_fights": 13,
+   "b_fights": 3
+  },
+  {
+   "fight_id": "401922646",
+   "card": "UFC 334: Gane vs. Hokit",
+   "date": "2026-11-14T22:00Z",
+   "weight": "Bantamweight",
+   "a": "Adrian Ya\u00f1ez",
+   "a_record": "18-6-1",
+   "b": "Juan Diaz",
+   "b_record": "16-1-1",
+   "model_a": 0.543,
+   "a_fights": 11,
+   "b_fights": 2
+  },
+  {
    "fight_id": "401913647",
    "card": "UFC 334: Gane vs. Hokit",
    "date": "2026-11-15T00:00Z",
@@ -695,19 +734,6 @@
    "model_a": 0.42,
    "a_fights": 9,
    "b_fights": 7
-  },
-  {
-   "fight_id": "401913648",
-   "card": "UFC 334: Gane vs. Hokit",
-   "date": "2026-11-15T00:00Z",
-   "weight": "Lightweight",
-   "a": "Nazim Sadykhov",
-   "a_record": "11-3-1",
-   "b": "Jefferson Nascimento",
-   "b_record": "13-1-0",
-   "model_a": 0.6,
-   "a_fights": 7,
-   "b_fights": 1
   },
   {
    "fight_id": "401922642",
@@ -747,32 +773,6 @@
    "model_a": 0.499,
    "a_fights": 4,
    "b_fights": 4
-  },
-  {
-   "fight_id": "401922645",
-   "card": "UFC 334: Gane vs. Hokit",
-   "date": "2026-11-15T00:00Z",
-   "weight": "W Bantamweight",
-   "a": "Bia Mesquita",
-   "a_record": "8-0-0",
-   "b": "Macy Chiasson",
-   "b_record": "11-6-0",
-   "model_a": 0.566,
-   "a_fights": 3,
-   "b_fights": 13
-  },
-  {
-   "fight_id": "401922646",
-   "card": "UFC 334: Gane vs. Hokit",
-   "date": "2026-11-15T00:00Z",
-   "weight": "Bantamweight",
-   "a": "Adrian Ya\u00f1ez",
-   "a_record": "18-6-1",
-   "b": "Juan Diaz",
-   "b_record": "16-1-1",
-   "model_a": 0.543,
-   "a_fights": 11,
-   "b_fights": 2
   },
   {
    "fight_id": "401913646",
