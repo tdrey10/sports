@@ -31,6 +31,10 @@ LEG_TIERS = ("lock", "dog", "value", "prop", "sharp")  # unit plays
 FILL_TIERS = ("lean",)  # small edges with no units: fill the Wanna Dabble? parlays
 FILL_HOUR = 10  # local time: give the day's real picks a chance to post before filling with leans
 FILL_MIN_WIN = 0.5
+# A daily-card lean (a fair price, edge no worse than a normal book margin) may fill a
+# Wanna Dabble? leg too, but only a likely one, so a light day still gets its parlays.
+FILL_CARD_MIN_WIN = 0.55
+FILL_CARD_FLOOR_EV = -0.045
 LEG_HOURS = 24  # legs start within a day of posting (today's slate, not next week's)
 # What one unit of a leg returns (stake included) once it settles.
 _RETURN = {"lost": 0.0, "half_lost": 0.5, "push": 1.0, "void": 1.0}
@@ -80,7 +84,9 @@ def fill_pool(entries, now: datetime, today: str, taken: set[str]) -> list:
     """Leans with an edge and 50%+ to win, one per game not already used, most likely first."""
     cut = now + timedelta(hours=LEG_HOURS)
     pool = sorted((e for e in entries if e.day == today and e.status == "pending" and now < e.start <= cut
-                   and e.tier in FILL_TIERS and (e.ev or 0) > 0 and e.win_prob >= FILL_MIN_WIN),
+                   and e.tier in FILL_TIERS
+                   and (((e.ev or 0) > 0 and e.win_prob >= FILL_MIN_WIN)
+                        or ((e.ev or 0) >= FILL_CARD_FLOOR_EV and e.win_prob >= FILL_CARD_MIN_WIN))),
                   key=lambda e: (-e.win_prob, -(e.score or 0)))
     out, games = [], set(taken)
     for e in pool:
