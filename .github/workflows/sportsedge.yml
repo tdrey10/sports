@@ -107,6 +107,13 @@ jobs:
         continue-on-error: true
         run: hambino forecast-study
 
+      # Price shopping: the best of 10-25 books vs the others' consensus, NFL and college football
+      # moneylines since 2020 (public archive), tuned through 2022, blind after.
+      - name: Price-shopping study
+        if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
+        continue-on-error: true
+        run: hambino shop-study --fetch
+
       # Tennis blind test on 2012+ ATP/WTA closing odds (public archive), with the other studies.
       - name: Tennis history test
         if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
@@ -140,7 +147,7 @@ jobs:
           git config user.email "sportsedge-bot@users.noreply.github.com"
           git add data/ledger.json data/brain.json
           # One path at a time: git add fails as a whole if any path is missing.
-          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/line_studies.json data/tennis_history.json data/forecast_study.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
+          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/line_studies.json data/tennis_history.json data/forecast_study.json data/shop_study.json data/study_log.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
             if [ -e "$p" ]; then git add "$p"; fi
           done
           git diff --cached --quiet || git commit -m "Update pick ledger"

@@ -680,6 +680,26 @@ def cmd_forecast_study(args) -> int:
     return 0
 
 
+def cmd_shop_study(args) -> int:
+    """Price shopping vs the consensus of other books, NFL and college football, blind."""
+    from . import shopstudy
+
+    data_dir = Path(args.data_dir)
+    src = data_dir / "_src" / "shop"
+    if args.fetch:
+        try:
+            shopstudy.fetch(src)
+        except Exception as exc:  # keep testing on what was saved
+            print(f"could not refresh the odds history: {exc}")
+    if not (src / "americanfootball_nfl.jsonl.gz").exists():
+        print("price-shopping study: no odds history yet")
+        return 0
+    res = shopstudy.run(src)
+    print(shopstudy.report(res))
+    (data_dir / "shop_study.json").write_text(json.dumps(res, indent=1, default=str))
+    return 0
+
+
 def cmd_tennis_history(args) -> int:
     from . import tennishist
 
@@ -891,6 +911,11 @@ def build_parser() -> argparse.ArgumentParser:
     fs.add_argument("--data-dir", default="data")
     fs.add_argument("--sports", nargs="+", default=["mlb", "nhl", "nba", "nfl", "ncaaf", "ncaab"])
     fs.set_defaults(func=cmd_forecast_study)
+
+    ss = sub.add_parser("shop-study", help="price shopping vs consensus, NFL and college football, blind")
+    ss.add_argument("--fetch", action="store_true", help="refresh the odds history and results first")
+    ss.add_argument("--data-dir", default="data")
+    ss.set_defaults(func=cmd_shop_study)
 
     th = sub.add_parser("tennis-history", help="tennis blind test on 2012+ closing odds (ATP and WTA)")
     th.add_argument("--fetch", action="store_true", help="refresh the odds history from the public archive first")
