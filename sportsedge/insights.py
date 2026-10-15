@@ -110,21 +110,21 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
     else:
         team = pick_team(pick, ctx) if ctx else None
         if pick.market == "h2h" and team and pick.ev <= 0:
-            headline = f"No edge at {odds}: {team} wins {our:.0%} of the time on our numbers, and the price needs {implied:.0%}."
+            headline = f"Nah at {odds}: {team} wins {our:.0%} by our numbers and the price needs {implied:.0%}. No juice here."
         elif pick.market == "h2h" and team:
             if pick.american > 0:
-                headline = f"{odds} undersells {team}: our numbers say they win {our:.0%} of the time, the price pays like {implied:.0%}."
+                headline = f"Books are sleeping on {team} at {odds}. We got em winning {our:.0%}, the price pays like {implied:.0%}."
             else:
-                headline = f"{team} wins {our:.0%} of the time on our numbers; {odds} only asks for {implied:.0%}."
+                headline = f"{team} wins this {our:.0%} of the time by our numbers. {odds} only needs {implied:.0%}. Free money vibes."
         elif pick.market == "h2h":
             headline = f"Draw comes in {our:.0%} on our numbers vs {implied:.0%} priced."
         elif pick.market == "spreads" and team and pred:
             margin = pred.exp_margin if pick.side == "home" else -pred.exp_margin
             outcome = f"to win by {margin:.1f}" if margin >= 0 else f"to lose by {-margin:.1f}"
             line = f"laying {-pick.point:g}" if pick.point < 0 else f"getting {pick.point:g}"
-            headline = f"We project {team} {outcome}; {line} at {odds} covers {our:.0%} of the time."
+            headline = f"We got {team} {outcome}, so {line} at {odds} cashes {our:.0%} of the time."
         elif pick.market == "totals" and pred:
-            headline = f"We project {pred.exp_total:.1f} total; {pick.selection} hits {our:.0%} of the time."
+            headline = f"We see {pred.exp_total:.1f} total. {pick.selection} hits {our:.0%} of the time."
         else:
             headline = f"Our number {our:.0%} vs {implied:.0%} implied by {odds}."
 
@@ -168,15 +168,15 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
         bullets.append(
             f"Model {pick.model_prob:.0%} · market (no-vig) {pick.market_prob:.0%} · blended {pick.win_prob:.0%} → fair {pick.fair_american:+.0f}."
         )
-    bullets.append(f"Best price {odds} at {pretty_book(pick.book)} ({pick.books} books compared).")
+    bullets.append(f"Best number: {odds} at {pretty_book(pick.book)} (checked {pick.books} books).")
     if ctx:
         for team, players in ctx.injuries.items():
             if players:
                 more = f" +{len(players) - 4} more" if len(players) > 4 else ""
                 bullets.append(f"{team} missing: {', '.join(players[:4])}{more}.")
         if not scan.sport.has_injury_feed:
-            bullets.append("No injury report is published for this league: the pick stands on form, scoring, "
-                           "head to head and the price.")
+            bullets.append("No injury report is published for this league, so this one rides on form, scoring, "
+                           "head to head and the number.")
     return headline, bullets
 
 

@@ -305,10 +305,10 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   <nav class="tabs" id="tabs" role="tablist" aria-label="Sections"></nav>
   <div class="filters" id="filters"><div class="seg" id="sports" aria-label="Sport"></div><div class="seg" id="markets" aria-label="Bet type"></div></div>
   <div id="view" class="grid"></div>
-  <div class="drops"><span aria-hidden="true">⚡</span> <b>Picks drop the moment we find an edge</b> — day or night. The engine watches every line around the clock, so check back anytime.</div>
+  <div class="drops"><span aria-hidden="true">⚡</span> <b>Picks drop the second we find an edge</b>, day or night. We're watching every line 24/7, so check back whenever.</div>
   <footer>
-    <span>Picks only; no bets are placed. Parlays: every leg has to win.</span>
-    <span>No model wins every bet. Judge it by the record and the closing-line value over many picks. Bet only what you can afford to lose.</span>
+    <span>We just call em, we don't place em. Parlays: every leg has to hit.</span>
+    <span>Nobody hits every bet. Judge us on the long run, not one night. Only bet what you can afford to lose.</span>
   </footer>
 </main>
 
@@ -489,10 +489,10 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const leans = items.filter((e) => e.tier === "lean");
     const topNote = best.length ? `${best.length} of 10 cleared the bar · ranked by edge score` : "Ranked by edge score";
     return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("Bet on it, the heat is coming."))
-      + (sharpBets.length ? panel("Sharp value", "A sportsbook paying more than Pinnacle's fair price", byGame(sharpBets)) : "")
+      + (sharpBets.length ? panel("Sharp value", "A book paying more than it should, straight up", byGame(sharpBets)) : "")
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
-      + panel("The board", "Every other game-line play today, by game", rest.length ? byGame(rest) : empty("No other game-line plays on today's board."))
-      + (leans.length ? panel("Leans", "No units — just a lean. A small edge, not enough to bet.", byGame(leans)) : "");
+      + panel("The board", "Everything else we like today", rest.length ? byGame(rest) : empty("Nothing else worth it today. We don't force it."))
+      + (leans.length ? panel("Leans", "Just a lean, no units. Small edge, not bet-the-house stuff.", byGame(leans)) : "");
   }
 
   // Parlays of the day: posted once, from the best bets, one leg per game.
@@ -551,7 +551,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const r6 = st["6"] || { won: 0, lost: 0, units: 0 };
     const recLine = `2-team ${r2.won}-${r2.lost} (${signed(r2.units, 1)}u) · 3-team ${r3.won}-${r3.lost} (${signed(r3.units, 1)}u) · 6-team ${r6.won}-${r6.lost} (${signed(r6.units, 1)}u)`;
     const how = `<p class="small muted">Only one kind of teaser leg has beaten the price in 20 NFL seasons: a dog of +1.5 to +2.5 teased 6 points to +7.5/+8.5, across 3 and 7, the most common margins (77% blind since 2018, 79% with a total of 49 or less). A 2-team teaser at −120 needs 73.9% a leg, a 3-team at +160 needs 72.7%. Favorites teased through 7 and 3 stopped working, so they're left out of the 2- and 3-team. The 6-team at +550 (needs 15.4%, about 73.2% a leg) leads with those dogs and fills with the next-best leg kinds by their 20-season record, and only posts when the legs together beat +550; units only if every leg is a proven one. Rechecked every morning. Prices vary by book.</p>`;
-    const body = how + (open.length ? `<div class="grid two">${open.map(card).join("")}</div>` : empty("No teaser today: it needs two or more NFL dogs at +1.5 to +2.5 on the board."))
+    const body = how + (open.length ? `<div class="grid two">${open.map(card).join("")}</div>` : empty("No teaser today. Need at least two NFL dogs at +1.5 to +2.5."))
       + (done.length ? `<h3 class="small">Recent</h3><div class="grid two">${done.map(card).join("")}</div>` : "");
     return panel("Best teasers", recLine, body);
   }
@@ -567,10 +567,10 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       ["dabble2", "Dabble 2-team"], ["dabble3", "Dabble 3-team"], ["dabble4", "Dabble 4-team"], ["dabble5", "Dabble 5-team"], ["dabble8", "Dabble 8-team"]]
       .map(([n, name]) => { const s = st[n] || { won: 0, lost: 0, units: 0 };
       return `<tr><td>${name}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 2)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("");
-    return teaserPanel() + panel("Parlays of the day", "The Heat when every leg is a unit play · Wanna Dabble? every day · most likely winners first",
+    return teaserPanel() + panel("Parlays of the day", "The Heat when every leg is legit · Wanna Dabble? for fun every day",
         (todays.length ? `<div class="grid two">${todays.map((p) => parlayCard(p, ids, p.id === topId)).join("")}</div>` : "") + note
         + `<p class="small muted"><b>🔥 The Heat</b>: every leg is a real unit play, so it's rare. Stakes stay small: ½u on a 2-team, ¼u on a 3- or 4-team, 0.1u on an 8-team. <b>Wanna Dabble?</b>: a 2-, 3-, 4-, 5- and 8-team every day when possible, no units, leans filling in where the unit plays run out. Best rated first: the grade is the parlay's edge on our numbers (A +10% or more, B +3%, C about even, D below −5%), and each leg shows its win chance against what its price needs. Every leg has to win, so parlays lose more often than straight bets.</p>`)
-      + panel("Parlay record", "Kept apart from the straight-bet record",
+      + panel("Parlay record", "Separate from the straight bets",
         `<div class="table-wrap"><table><thead><tr><th>Parlay</th><th>Record</th><th>Profit</th><th>ROI</th></tr></thead><tbody>${rows}</tbody></table></div>`)
       + (earlier.length ? panel("Earlier parlays", "Last 7 days", `<div class="grid two">${earlier.map((p) => parlayCard(p, ids)).join("")}</div>`) : "");
   }
@@ -583,7 +583,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function viewScores() {
     // Every sport on one page, no filter, in three blocks: live now on top, then coming up, then final.
     const sports = allSports().filter((sp) => (BOARD[sp.key] || []).length);
-    if (!sports.length) return panel("Live scores", "Today's games", empty("Loading today's scores from ESPN…"));
+    if (!sports.length) return panel("Live scores", "Today's games", empty("Pulling scores…"));
     const line = (g) => {
       const tail = g.state === "pre" ? fmt(g.when, { hour: "numeric", minute: "2-digit" }) : esc(g.detail);
       const sc = g.state === "pre" ? "" : ` <b>${esc(g.as ?? "")}-${esc(g.hs ?? "")}</b>`;
@@ -598,7 +598,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const byTime = (a, b) => new Date(a.when) - new Date(b.when);
     const live = block("in", byTime), next = block("pre", byTime), done = block("post", (a, b) => byTime(b, a));
     return panel("Live now", live.n ? `${live.n} game${live.n === 1 ? "" : "s"} on right now · updates every 30 seconds` : "Nothing live right now · updates every 30 seconds",
-        live.n ? live.html : empty("No games in progress. Coming up and finished games are below."))
+        live.n ? live.html : empty("Nothing live right now. Upcoming and finals below."))
       + (next.n ? panel("Coming up", `${next.n} still to play today`, next.html) : "")
       + (done.n ? panel("Final", `${done.n} finished · latest first`, done.html) : "");
   }
@@ -645,8 +645,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       ? `${o.right}-${o.wrong} picking winners (${pct(o.pct)}) · scores off by ${o.score_error == null ? "–" : o.score_error.toFixed(1)} a team`
       : "Graded after every final";
     const bySport = Object.values(rec.by_sport || {}).map((s) => `<span class="chip-rec">${esc(s.name)} ${s.right}-${s.wrong}</span>`).join("");
-    const intro = `<p class="small muted">Not picks: our read on every game still to play. It starts from the Vegas line and moves toward our team ratings (scoring, defense, home field, rest, injuries, starters) as far as they earned in the blind tests; the facts behind it are under each card. Each one locks at kickoff, comes off the board when the game ends, and is graded in the record above.</p>${bySport ? `<div class="chip-recs">${bySport}</div>` : ""}`;
-    return panel("Predictions", head, intro + (recent.length ? `<div class="grid two">${recent.map(card).join("")}</div>` : empty("No games left to predict right now: new ones show up as soon as lines post.")));
+    const intro = `<p class="small muted">Not bets, just how we see every game going. Starts from the Vegas line and leans toward our ratings as far as they've earned it in testing. Tap any card for the why. Locks at kickoff, drops off when it's over, and counts in the record up top.</p>${bySport ? `<div class="chip-recs">${bySport}</div>` : ""}`;
+    return panel("Predictions", head, intro + (recent.length ? `<div class="grid two">${recent.map(card).join("")}</div>` : empty("No games left to call right now. More drop as soon as lines post.")));
   }
 
   function viewLive() {
@@ -659,7 +659,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     // The one live bet we'd take right now: the open one with the best edge score.
     const open = items.filter((e) => !SETTLED[e.status]);
     const top = open.length ? open.reduce((a, b) => (score(b) > score(a) ? b : a)) : null;
-    const best = top ? panel("Best live bet", "The one we'd take right now · highest edge score", row(top, { matchup: true })) : "";
+    const best = top ? panel("Best live bet", "The one we'd hammer right now", row(top, { matchup: true })) : "";
     return best + panel("Live right now", items.length ? `${items.length} live bets today` : "",
         `<div class="grid two">${slot("live_win", "Most likely to win · 60%+", "")}${slot("live_plus", "Live plus money · +100 to +2000 · best edge & likely to win", "plus")}</div>`)
       + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "");
@@ -690,11 +690,11 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const labels = DATA.spot_labels || {};
     const spotRows = Object.entries(st.by_spot || {}).map(([k, s]) => `<tr><td>${esc(labels[k] || k)}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`).join("");
     const recent = DATA.entries.filter((e) => e.settled && e.status !== "void" && visible(e)).sort((a, b) => (b.graded_at || "").localeCompare(a.graded_at || "")).slice(0, 15);
-    return (sportRows ? panel("By sport", "Every graded pick (leans count as 1u) · and the real-money plays", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>All picks W-L</th><th>Win</th><th>Profit</th><th>Unit plays</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
+    return (sportRows ? panel("By sport", "Every pick we put out (leans count as 1u) · plus the money plays", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>All picks W-L</th><th>Win</th><th>Profit</th><th>Unit plays</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
       + panel("By early-bet spot", "Each spot keeps its own record · leans count as 1u", spotRows
           ? `<div class="table-wrap"><table><thead><tr><th>Spot</th><th>W-L</th><th>Units</th><th>CLV</th></tr></thead><tbody>${spotRows}</tbody></table></div>`
           : empty("No graded picks in a spot yet."))
-      + panel("Latest graded", "", recent.length ? recent.map((e) => row(e, { matchup: true })).join("") : empty("Results appear after games finish."));
+      + panel("Latest graded", "", recent.length ? recent.map((e) => row(e, { matchup: true })).join("") : empty("Results land here once games wrap."));
   }
 
   // Calibration chart: what the engine said (x) against how often it won (y), to scale, 0-100% both ways.
