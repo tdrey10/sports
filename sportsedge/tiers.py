@@ -49,6 +49,7 @@ DOG_MAX_ODDS = 220
 # The owner's rule: a Dog of the Day is a dog we think can actually win, not one we expect to
 # lose. Our number has to give it 45%+ (about a coin flip at plus money); otherwise no Dog today.
 DOG_MIN_WIN = 0.45
+DOG_FLOOR_WIN = 0.40  # the daily fallback: the most likely dog on the board, if it has 40%+
 PROP_ODDS_RANGE = (-200, 200)
 EARLY_HOURS = 24  # games further out than this are "early value"
 # The daily card (owner's rule: picks on the board every day). When fewer than DAILY_MIN picks
@@ -275,6 +276,7 @@ def build_cards(
     # does, the closest one is still posted as a lean: no units, tracked with the leans so
     # the betting record stays honest. A real one later in the day still posts.
     lean_ids: set[int] = set()
+    live_dog_ids: set[int] = set()
 
     def lean_pool(extra=lambda p: True, source: list[Pick] | None = None) -> list[Pick]:
         """Today's sides for a lean head pick: a positive edge if any game has one, otherwise
@@ -325,6 +327,18 @@ def build_cards(
                 dog = max(near, key=lambda p: p.ev)
                 chosen.append(("dog", dog))
                 lean_ids.add(id(dog))
+            else:
+                # The owner's call: a Dog every day. With no 45%+ dog, the most likely dog to win
+                # outright on today's board (40%+, a fair price on our number), as a no-unit lean.
+                live = [p for p in game
+                        if p.market == "h2h" and DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS
+                        and now < p.commence_time <= soon_cut and id(p) not in used_now and not p.warnings
+                        and p.win_prob >= DOG_FLOOR_WIN and p.ev >= DAILY_FLOOR_EV]
+                if live:
+                    dog = max(live, key=lambda p: (p.win_prob, p.ev))
+                    chosen.append(("dog", dog))
+                    lean_ids.add(id(dog))
+                    live_dog_ids.add(id(dog))
     used = {id(p) for _, p in chosen}
     chosen += [("value", p) for p in soon if id(p) not in used and p.win_prob >= LEGIT_MIN_WIN][:max_value]
     # Early: any game more than a day out where our number beats the price (a real edge, however
@@ -484,6 +498,10 @@ def build_cards(
             bullets.insert(0, f"Today's most likely winner ({pick.win_prob:.0%} on our numbers, the market "
                               f"{pick.market_prob:.0%})" if pick.market_prob is not None else
                               f"Today's most likely winner ({pick.win_prob:.0%} on our numbers)")
+        elif id(pick) in live_dog_ids:
+            bullets.insert(0, f"Best live dog on the board: we got em winning outright {pick.win_prob:.0%} of the time, "
+                              f"the most of any dog today, and {pick.american:+.0f} pays fair for that. No units, "
+                              "it's a shot, not a lock.")
         elif id(pick) in lean_ids:
             bullets.insert(0, f"Lean {TIER_LABELS[tier].split(' of ')[0]}: nothing cleared every check today, so this is "
                               "the closest one, posted with no units and tracked with the leans.")

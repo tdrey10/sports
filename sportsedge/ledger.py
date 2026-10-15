@@ -319,15 +319,15 @@ class Ledger:
         that isn't a realistic winner, or the same bet posted twice (two odds sources)."""
         from types import SimpleNamespace
 
-        from .tiers import DOG_MIN_WIN, LEGIT_MIN_WIN, backed, losing_kind
+        from .tiers import DOG_FLOOR_WIN, LEGIT_MIN_WIN, backed, losing_kind
 
         pulled = []
         seen: dict[tuple, Entry] = {}
         for e in sorted(self.entries.values(), key=lambda e: (not e.event_id.isdigit(), e.created_at)):
             if e.status != "pending" or e.start <= now or e.tier in LIVE_TIERS or e.tier == "sharp":
                 continue  # live and sharp-value bets have their own checks (and their own CLV record)
-            if e.tier == "dog" and e.win_prob < DOG_MIN_WIN:
-                # A Dog of the Day is a dog we think can win (45%+), not one we expect to lose.
+            if e.tier == "dog" and e.win_prob < DOG_FLOOR_WIN:
+                # A Dog of the Day is a dog with a real shot (40%+ on our number), not a long shot.
                 e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
                 e.reasons = [f"Pulled: we only had them winning {e.win_prob:.0%}. Dog of the Day is for dogs "
                              "we think can actually win."] + list(e.reasons)
