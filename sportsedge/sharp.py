@@ -192,7 +192,7 @@ def cards(cfg: SportConfig, events: list[dict], espn_games: list, now: datetime,
             f"Pinnacle (the sharpest book) has {selection} at {v['sharp_price']:+.0f}; without its margin that's "
             f"{v['fair']:.1%} to win.",
             f"{book} pays {v['price']:+.0f}: {v['ev']:+.1%} expected value per bet.",
-            "Bet it at this book and price or better; the edge is gone if the price moves.",
+            "Bet it at this book at this number or better. If the line moves, the edge is gone.",
         ]
         out.append(Card(tier="sharp", units=units, headline=headline, reasons=reasons, sport=cfg.key,
                         sport_name=cfg.name, pick=pick, home=game.home, away=game.away))
@@ -304,7 +304,7 @@ def tennis_cards(key: str, events: list[dict], now: datetime, proven: bool = Fal
             ("Units: our tennis value picks proved out on their own graded record." if proven else
              "No units yet: the 2012+ test of one big book (Bet365) against Pinnacle did not prove out, so tennis "
              "value picks stay leans until their own record does (60+ picks, profitable beyond luck)."),
-            "Bet it at this book and price or better; the edge is gone if the price moves. "
+            "Bet it at this book at this number or better. If the line moves, the edge is gone. "
             "The match must start for the bet to stand (retirement rules vary by book).",
         ]
         if rows:

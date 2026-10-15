@@ -458,7 +458,7 @@ def build_cards(
                 and not earns_units(pick, in_spots):
             # Money only on proven bet types: this one posts with no units until it proves out.
             bullets.insert(0, "No units: this sport and bet type hasn't beaten the closing line in a blind "
-                              "test yet, so it is tracked as a lean until it proves itself.")
+                              "test yet, so we're riding it as a lean until it proves itself.")
             if tier in ("lock", "dog"):
                 lean_ids.add(id(pick))  # still today's Lock/Dog, with no units
             elif tier == "early":
@@ -472,10 +472,10 @@ def build_cards(
             bullets.insert(0, f"No bet: no injury report for {', '.join(ctx.injuries_unknown)}, "
                               "so injuries are unknown. Tracked as a lean only.")
         if id(pick) in card_ids:
-            bullets.insert(0, f"Daily card: one of today's best prices on the board. Our number makes it "
+            bullets.insert(0, f"Daily card: one of the best numbers on the board today. We got it "
                               f"{pick.win_prob:.0%} to win, and at {pick.american:+.0f} the edge is {pick.ev:+.1%}: "
-                              + ("a small edge" if pick.ev > 0 else "priced about right, with the book's usual cut")
-                              + ". No units: tracked with the leans so the record shows if these earn.")
+                              + ("a little edge" if pick.ev > 0 else "priced about right, books still take their cut")
+                              + ". No units on it, just a play we're tracking.")
         elif id(pick) in lean_ids and tier == "lock":
             bullets.insert(0, f"Today's most likely winner ({pick.win_prob:.0%} on our numbers, the market "
                               f"{pick.market_prob:.0%})" if pick.market_prob is not None else
