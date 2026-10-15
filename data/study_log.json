@@ -98,5 +98,22 @@
   "blind": "n/a",
   "luck_control": "n/a",
   "verdict": "rule change; soccer picks carry no units until a soccer bet type proves out"
+ },
+ {
+  "date": "2026-10-16",
+  "idea": "Totals after hot or cold scoring: both teams' last game ran over/under its posted total (top/bottom 15%), and last 3 games' points vs the current total; bet over or under at the closing price",
+  "sports": [
+   "nfl",
+   "ncaaf",
+   "nba",
+   "ncaab",
+   "mlb",
+   "nhl"
+  ],
+  "data": "data/lines/espn/<sport> closing totals and prices 2018+",
+  "tuning": "2018-2021 set the 15% cut points and the tuning record",
+  "blind": "2022 on, 48 variants (6 sports x 8)",
+  "luck_control": "100 random tenths of all games betting over or under through the same bar: 0 of 100 passed",
+  "verdict": "none proven: the market already prices recent scoring. Best looks (under-streaks then over) were +4-6% blind with \u00b15-8% error and lost or barely made money in tuning (NFL -6.5%, NCAAF -6.9%). Dropped. Code: sportsedge/scoringstudy.py (rerunnable, not in the daily run)."
  }
 ]
