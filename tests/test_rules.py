@@ -118,9 +118,13 @@ def test_lock_and_dog_even_when_no_side_shows_an_edge():
     assert set(heads) == {"lock", "dog"} and all(c.units == 0 for c in heads.values())
     # By default nothing unbacked is posted: no maybes on the board.
     plain = Settings(min_ev=0.5)
-    assert not [c for c in build_cards(scans, plain, provider.now) if c.units == 0]  # no Lock without an edge
-    no_units = [c for c in build_cards(scans, Settings(min_ev=0.5, daily_lock=True), provider.now) if c.units == 0]
-    assert not no_units  # even the old daily Lock never posts a side that loses to its price
+    # No Lock without an edge. The one exception is the owner's daily Dog: the most likely dog at a
+    # fair price (40%+), posted with no units and labeled as the best live dog.
+    def unbacked(settings):
+        return [c for c in build_cards(scans, settings, provider.now)
+                if c.units == 0 and not (c.tier == "dog" and c.reasons[0].startswith("Best live dog"))]
+    assert not unbacked(plain)
+    assert not unbacked(Settings(min_ev=0.5, daily_lock=True))  # the daily Lock never posts a side that loses to its price
 
 
 def test_daily_lock_and_dog_leans_must_beat_break_even():
@@ -438,9 +442,13 @@ def test_dog_of_the_day_only_when_we_think_the_dog_can_win():
     provider = SampleProvider(seed=5)
     engine = Engine(provider, Settings(), now=provider.now)
     scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    from sportsedge.tiers import DOG_FLOOR_WIN
+
     for c in build_cards(scans, engine.settings, provider.now):
         if c.tier == "dog":
-            assert c.pick.win_prob >= DOG_MIN_WIN
+            assert c.pick.win_prob >= DOG_FLOOR_WIN
+            if c.pick.win_prob < DOG_MIN_WIN:
+                assert c.reasons[0].startswith("Best live dog on the board")
     led = Ledger()
     now = START - timedelta(hours=3)
     long = card(make_pick(event_id="d1", market="h2h", side="away", point=None, american=220, win_prob=0.32,
