@@ -47,12 +47,13 @@ def test_unknown_injuries_mean_no_bet():
     engine = Engine(provider, Settings(), now=provider.now)
     scans = [engine.scan(c) for c in resolve("nba,epl")]
     epl = next(s for s in scans if s.sport.key == "epl")
-    assert epl.contexts and all(ctx.injuries_unknown for ctx in epl.contexts.values())  # no soccer injury feed
+    # Soccer has no injury feed at all: judged on form and stats, not blocked (owner's call).
+    assert epl.contexts and not any(ctx.injuries_unknown for ctx in epl.contexts.values())
     nba = next(s for s in scans if s.sport.key == "nba")
     assert nba.contexts and not any(ctx.injuries_unknown for ctx in nba.contexts.values())
     cards = build_cards(scans, engine.settings, provider.now)
-    assert not [c for c in cards if c.sport == "epl"]  # injuries unknown: nothing posted, not even a lean
-    assert not [c for c in build_cards(scans, engine.settings, provider.now, posted_today=0) if c.sport == "epl"]
+    soccer = [c for c in cards if c.sport == "epl"]
+    assert all(any(r.startswith("No injury report is published") for r in c.reasons) for c in soccer)
     assert any(c.units > 0 for c in cards if c.sport == "nba")
 
 

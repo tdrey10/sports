@@ -172,7 +172,10 @@ class Engine:
             for team in (home, away):
                 key = injury_matcher.match(team) if injury_matcher else None
                 if key is None:
-                    ctx.injuries_unknown.append(team)
+                    # No report where the league publishes one: unknown, no bet. Leagues with no
+                    # injury feed at all (soccer) are judged on form and stats instead (owner's call).
+                    if cfg.has_injury_feed:
+                        ctx.injuries_unknown.append(team)
                     continue
                 out = [(p, pos) for p, status, pos in injuries[key] if is_out(status)]
                 ctx.injuries[team] = [p for p, _ in out]
