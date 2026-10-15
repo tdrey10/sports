@@ -426,3 +426,28 @@ def test_daily_card_fills_the_board_to_five_with_no_units():
     assert len({c.pick.event_id for c in card}) == len(card)  # one per game
     full = build_cards(scans, settings, provider.now, posted_today=DAILY_MIN)
     assert not any(c.reasons and c.reasons[0].startswith("Daily card") for c in full)
+
+
+def test_dog_of_the_day_only_when_we_think_the_dog_can_win():
+    from datetime import timedelta
+
+    from sportsedge.ledger import Ledger
+    from sportsedge.tiers import DOG_MIN_WIN
+    from tests.test_ledger import START, card, make_pick
+
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    for c in build_cards(scans, engine.settings, provider.now):
+        if c.tier == "dog":
+            assert c.pick.win_prob >= DOG_MIN_WIN
+    led = Ledger()
+    now = START - timedelta(hours=3)
+    long = card(make_pick(event_id="d1", market="h2h", side="away", point=None, american=220, win_prob=0.32,
+                          ev=0.01), tier="dog", units=0.0)
+    live = card(make_pick(event_id="d2", market="h2h", side="away", point=None, american=120, win_prob=0.48,
+                          ev=0.05), tier="dog", units=0.0)
+    gone, kept = led.publish([long, live], now)
+    led.withdraw(Settings(), now)
+    assert gone.status == "void" and gone.reasons[0].startswith("Pulled: we only had them winning 32%")
+    assert kept.status == "pending"

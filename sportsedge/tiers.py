@@ -46,6 +46,9 @@ LOCK_MAX_GAP = 0.06  # model and the no-vig market agree to within 6 points
 LOCK_MIN_GAMES = 8  # both teams have enough games this season to trust their ratings
 DOG_MIN_ODDS = 100  # the blueprint: dogs +100 to +220 only
 DOG_MAX_ODDS = 220
+# The owner's rule: a Dog of the Day is a dog we think can actually win, not one we expect to
+# lose. Our number has to give it 45%+ (about a coin flip at plus money); otherwise no Dog today.
+DOG_MIN_WIN = 0.45
 PROP_ODDS_RANGE = (-200, 200)
 EARLY_HOURS = 24  # games further out than this are "early value"
 # The daily card (owner's rule: picks on the board every day). When fewer than DAILY_MIN picks
@@ -311,12 +314,13 @@ def build_cards(
                 lean_ids.add(id(lock))
     if "dog" not in taken:
         used_now = {id(c) for _, c in chosen}
-        dogs = [p for p in soon if DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS and id(p) not in used_now]
+        dogs = [p for p in soon if DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS and id(p) not in used_now
+                and p.win_prob >= DOG_MIN_WIN]
         if dogs:
             chosen.append(("dog", max(dogs, key=lambda p: p.ev)))
         elif heads and "dog_lean" not in taken:
             near = lean_pool(lambda p: p.market == "h2h" and DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS
-                             and id(p) not in used_now)
+                             and id(p) not in used_now and p.win_prob >= DOG_MIN_WIN)
             if near:
                 dog = max(near, key=lambda p: p.ev)
                 chosen.append(("dog", dog))
