@@ -174,6 +174,9 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
             if players:
                 more = f" +{len(players) - 4} more" if len(players) > 4 else ""
                 bullets.append(f"{team} missing: {', '.join(players[:4])}{more}.")
+        if not scan.sport.has_injury_feed:
+            bullets.append("No injury report is published for this league: the pick stands on form, scoring, "
+                           "head to head and the price.")
     return headline, bullets
 
 

@@ -1,0 +1,250 @@
+{
+ "matches": 4827,
+ "priced": 1927,
+ "rows": [
+  {
+   "spot": "home on a 3+ win streak vs an away team winless in 3+",
+   "side": "home",
+   "in_sample": {
+    "bets": 5,
+    "roi": -0.19,
+    "se": 0.5011
+   },
+   "blind": {
+    "bets": 7,
+    "roi": -0.0166,
+    "se": 0.3483
+   },
+   "proven": false
+  },
+  {
+   "spot": "away on a 3+ win streak vs a home team winless in 3+",
+   "side": "away",
+   "in_sample": {
+    "bets": 9,
+    "roi": -0.1672,
+    "se": 0.3329
+   },
+   "blind": {
+    "bets": 18,
+    "roi": 0.2061,
+    "se": 0.3082
+   },
+   "proven": false
+  },
+  {
+   "spot": "fade a 4+ game win streak (bet the opponent at home)",
+   "side": "home",
+   "in_sample": {
+    "bets": 19,
+    "roi": 0.5157,
+    "se": 0.4259
+   },
+   "blind": {
+    "bets": 30,
+    "roi": -0.0167,
+    "se": 0.2777
+   },
+   "proven": false
+  },
+  {
+   "spot": "home form 6+ points better over the last 5",
+   "side": "home",
+   "in_sample": {
+    "bets": 33,
+    "roi": -0.0615,
+    "se": 0.1723
+   },
+   "blind": {
+    "bets": 67,
+    "roi": -0.0691,
+    "se": 0.1232
+   },
+   "proven": false
+  },
+  {
+   "spot": "away form 6+ points better over the last 5",
+   "side": "away",
+   "in_sample": {
+    "bets": 70,
+    "roi": -0.1704,
+    "se": 0.1339
+   },
+   "blind": {
+    "bets": 124,
+    "roi": -0.0557,
+    "se": 0.1136
+   },
+   "proven": false
+  },
+  {
+   "spot": "home unbeaten in 6+",
+   "side": "home",
+   "in_sample": {
+    "bets": 11,
+    "roi": 0.1289,
+    "se": 0.2725
+   },
+   "blind": {
+    "bets": 57,
+    "roi": -0.0104,
+    "se": 0.151
+   },
+   "proven": false
+  },
+  {
+   "spot": "away team unbeaten in 6+",
+   "side": "away",
+   "in_sample": {
+    "bets": 38,
+    "roi": -0.1303,
+    "se": 0.2353
+   },
+   "blind": {
+    "bets": 75,
+    "roi": 0.1004,
+    "se": 0.1491
+   },
+   "proven": false
+  },
+  {
+   "spot": "both attacking (3.2+ goals a game in their matches): over",
+   "side": "over",
+   "in_sample": {
+    "bets": 52,
+    "roi": -0.0604,
+    "se": 0.1385
+   },
+   "blind": {
+    "bets": 184,
+    "roi": -0.046,
+    "se": 0.0722
+   },
+   "proven": false
+  },
+  {
+   "spot": "both tight (2.2 or fewer goals a game): under",
+   "side": "under",
+   "in_sample": {
+    "bets": 19,
+    "roi": -0.0329,
+    "se": 0.2205
+   },
+   "blind": {
+    "bets": 22,
+    "roi": -0.4421,
+    "se": 0.2002
+   },
+   "proven": false
+  },
+  {
+   "spot": "both draw-heavy (35%+ of the last 10): draw",
+   "side": "draw",
+   "in_sample": {
+    "bets": 25,
+    "roi": -0.318,
+    "se": 0.2795
+   },
+   "blind": {
+    "bets": 43,
+    "roi": -0.0663,
+    "se": 0.2466
+   },
+   "proven": false
+  },
+  {
+   "spot": "home won the last 2+ meetings",
+   "side": "home",
+   "in_sample": {
+    "bets": 50,
+    "roi": -0.2432,
+    "se": 0.1405
+   },
+   "blind": {
+    "bets": 131,
+    "roi": -0.1403,
+    "se": 0.0946
+   },
+   "proven": false
+  },
+  {
+   "spot": "away won the last 2+ meetings",
+   "side": "away",
+   "in_sample": {
+    "bets": 76,
+    "roi": -0.024,
+    "se": 0.1541
+   },
+   "blind": {
+    "bets": 234,
+    "roi": -0.0611,
+    "se": 0.0867
+   },
+   "proven": false
+  },
+  {
+   "spot": "rested home (5+ days) vs away on 3 or fewer",
+   "side": "home",
+   "in_sample": {
+    "bets": 33,
+    "roi": 0.1654,
+    "se": 0.2726
+   },
+   "blind": {
+    "bets": 26,
+    "roi": 0.0065,
+    "se": 0.2668
+   },
+   "proven": false
+  },
+  {
+   "spot": "rested away (5+ days) vs home on 3 or fewer",
+   "side": "away",
+   "in_sample": {
+    "bets": 21,
+    "roi": -0.2821,
+    "se": 0.3133
+   },
+   "blind": {
+    "bets": 21,
+    "roi": 0.0976,
+    "se": 0.36
+   },
+   "proven": false
+  },
+  {
+   "spot": "strong home form (2.2+ points a home game)",
+   "side": "home",
+   "in_sample": {
+    "bets": 73,
+    "roi": 0.0582,
+    "se": 0.1365
+   },
+   "blind": {
+    "bets": 155,
+    "roi": -0.0214,
+    "se": 0.098
+   },
+   "proven": false
+  },
+  {
+   "spot": "weak road team (under 0.8 points an away game): home",
+   "side": "home",
+   "in_sample": {
+    "bets": 123,
+    "roi": -0.0334,
+    "se": 0.1
+   },
+   "blind": {
+    "bets": 215,
+    "roi": -0.1664,
+    "se": 0.0716
+   },
+   "proven": false
+  }
+ ],
+ "control": {
+  "random_spots": 200,
+  "passed": 0
+ }
+}

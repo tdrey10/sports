@@ -680,6 +680,17 @@ def cmd_forecast_study(args) -> int:
     return 0
 
 
+def cmd_soccer_study(args) -> int:
+    """Soccer spots (form, streaks, head to head, scoring style, draws, rest), blind."""
+    from . import soccerstudy
+
+    data_dir = Path(args.data_dir)
+    res = soccerstudy.run(data_dir / "games")
+    print(soccerstudy.report(res))
+    (data_dir / "soccer_study.json").write_text(json.dumps(res, indent=1, default=str))
+    return 0
+
+
 def cmd_shop_study(args) -> int:
     """Price shopping vs the consensus of other books, NFL and college football, blind."""
     from . import shopstudy
@@ -911,6 +922,10 @@ def build_parser() -> argparse.ArgumentParser:
     fs.add_argument("--data-dir", default="data")
     fs.add_argument("--sports", nargs="+", default=["mlb", "nhl", "nba", "nfl", "ncaaf", "ncaab"])
     fs.set_defaults(func=cmd_forecast_study)
+
+    sc = sub.add_parser("soccer-study", help="soccer form/streak/head-to-head/style spots, blind")
+    sc.add_argument("--data-dir", default="data")
+    sc.set_defaults(func=cmd_soccer_study)
 
     ss = sub.add_parser("shop-study", help="price shopping vs consensus, NFL and college football, blind")
     ss.add_argument("--fetch", action="store_true", help="refresh the odds history and results first")

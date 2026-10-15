@@ -78,5 +78,25 @@
   "blind": "live",
   "luck_control": "n/a",
   "verdict": "unit plays 5-1; no-unit leans ~16-25; injury-unknown soccer leans 3-5 -> those games now post nothing"
+ },
+ {
+  "date": "2026-10-15",
+  "idea": "Soccer spots: 3+ win streaks vs winless, fading 4+ streaks, 6+ point form gaps, 6+ unbeaten, attacking pairs over 2.5, tight pairs under, draw-heavy pairs, head to head (won last 2+), rest (5+ days vs 3 or fewer), strong home form, weak road teams",
+  "sports": "epl, laliga, seriea, bundesliga, ligue1, mls, ucl",
+  "data": "engine ESPN archive: 4,827 results since Oct 2024, 1,927 with closing 3-way and 2.5 prices (2025-26 on)",
+  "tuning": "Aug 2025 - Feb 2026",
+  "blind": "Mar 2026 on",
+  "luck_control": "0/200 random spots",
+  "verdict": "none proven; the market prices form, streaks and head to head (weak road team: home -16.6% blind on 215; home won last 2 meetings -14% on 131). Closest: away unbeaten 6+ +10% blind on 75 but lost in tuning. Reruns daily (soccerstudy). Weather and style-of-play stats (shots, possession) not in the archive yet."
+ },
+ {
+  "date": "2026-10-15",
+  "idea": "Owner's call: soccer has no injury feed, so unknown injuries no longer block soccer picks; US leagues keep the rule (a missing report there means a broken feed)",
+  "sports": "soccer",
+  "data": "n/a",
+  "tuning": "n/a",
+  "blind": "n/a",
+  "luck_control": "n/a",
+  "verdict": "rule change; soccer picks carry no units until a soccer bet type proves out"
  }
 ]
