@@ -472,3 +472,19 @@ def test_trusted_ev_shrinks_our_number_to_what_the_study_says_it_earned():
     assert trusted_ev(p, Settings(model_trust=full)) > 0
     # Our model 10 points off the market is the model missing something: never a lean.
     assert trusted_ev(replace(p, model_prob=0.63), Settings(model_trust=full)) < 0
+
+
+def test_value_early_and_best_bets_need_an_edge_the_data_backs():
+    from sportsedge.tiers import trusted_ev
+
+    provider = SampleProvider(seed=5)
+    loose = Settings(min_ev=0.0, show_leans=False, daily_lock=False, daily_heads=False)
+    engine = Engine(provider, loose, now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    trust = {f"{s}:{m}": 0.0 for s in ("nba", "nhl", "mlb") for m in ("h2h", "totals", "spreads")}
+    strict = Settings(min_ev=0.0, show_leans=False, daily_lock=False, daily_heads=False, model_trust=trust)
+    before = [c for c in build_cards(scans, loose, provider.now) if c.tier in ("value", "early")]
+    after = [c for c in build_cards(scans, strict, provider.now) if c.tier in ("value", "early")]
+    assert len(after) < len(before)
+    # No proven types or spots here: what's left beats its price with Vegas getting all the say.
+    assert all(trusted_ev(c.pick, strict) > 0 for c in after if not c.pick.is_prop)

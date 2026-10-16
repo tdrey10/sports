@@ -290,7 +290,27 @@ def build_cards(
     soon_cut = now + timedelta(hours=EARLY_HOURS)
     # Only legitimate edges: a market price, a kind of bet that isn't losing blind, a
     # calibrated edge. Value and early plays must also be realistic winners.
+    def spots_of(p: Pick) -> list[str]:
+        scan = by_event.get(p.event_id)
+        ctx = scan.contexts.get(p.event_id) if scan else None
+        if ctx and p.market == "h2h" and is_dog_price(p.american):
+            return list(ctx.spots.get(p.side, []))
+        if ctx and p.market == "totals" and p.side == "under":
+            return list(ctx.spots.get("under", []))
+        return []
+
+    def backed_edge(p: Pick) -> float:
+        """The edge the data backs (owner, Oct 16: value, early and best bets off studies and data).
+        A proven bet type or proven spot keeps its full edge: that edge beat the closing line blind.
+        Anything else counts our number only as much as the prediction study says it earned."""
+        if (settings.proven is not None and is_proven(p, settings)) \
+                or any(f"{p.sport}:{k}" in settings.spot_weights for k in spots_of(p)):
+            return p.ev
+        return trusted_ev(p, settings)
+
     candidates = [p for p in best_per_event(game, settings) if not not_legit(p, settings)]
+    if settings.model_trust:  # the prediction study is loaded (live board; demo and tests skip it)
+        candidates = [p for p in candidates if backed_edge(p) > 0]
     soon = [p for p in candidates if p.commence_time <= soon_cut]
     chosen: list[tuple[str, Pick]] = []
 
@@ -386,6 +406,7 @@ def build_cards(
         p for p in game
         if p.commence_time > soon_cut and p.ev > 0 and not p.warnings and p.american >= settings.max_favorite
         and p.win_prob >= LEGIT_MIN_WIN and not favorite_overreach(p) and not not_legit(p, settings)
+        and (not settings.model_trust or backed_edge(p) > 0)
     ]
     best_early: dict[str, Pick] = {}
     for p in sorted(early_pool, key=lambda p: p.ev, reverse=True):
@@ -461,6 +482,7 @@ def build_cards(
         p for tier, p in chosen
         if tier in UNIT_TIERS and id(p) not in lean_ids and p.commence_time <= soon_cut and not p.warnings
         and scores[id(p)][0] >= BEST_MIN_SCORE and scores[id(p)][2] > 0
+        and (not settings.model_trust or backed_edge(p) > 0)
         and not losing_kind(p, settings)  # the studies say this kind of bet loses: not a best bet
     ]
     ranked = sorted(contenders, key=lambda p: scores[id(p)][0], reverse=True)[:slots]
