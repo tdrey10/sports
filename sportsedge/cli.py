@@ -254,6 +254,11 @@ class Workspace:
                 },
             )
         if not self.demo:
+            from dataclasses import replace
+
+            from .tiers import model_trust
+
+            self.settings = replace(self.settings, model_trust=model_trust(self._forecast_study()))
             self.settings = self._with_nfl_wind(self.settings, data_dir)
             self.settings = self._with_history_spots(self.settings, data_dir)
 

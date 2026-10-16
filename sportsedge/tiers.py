@@ -58,7 +58,18 @@ EARLY_HOURS = 24  # games further out than this are "early value"
 # price is fair on our number (the edge no worse than DAILY_FLOOR_EV, a normal book's margin at
 # -110), and they carry no units: tracked as leans so the record shows whether they earn money.
 DAILY_MIN = 8
-DAILY_FLOOR_EV = -0.045
+# Owner's call (Oct 16): tighten up. The first 56 no-unit leans went 21-35 (-15.9u at 1u each),
+# nearly all of it near-even favorites and totals whose only edge was our ratings, which the
+# blind prediction study says add little or nothing to Vegas. So a lean or a daily-card pick
+# now has to beat its price with our number trusted only as much as it earned (trusted_ev),
+# and never at a negative edge. A short card beats a card of coin flips paying the juice.
+DAILY_FLOOR_EV = 0.0
+DOG_FALLBACK_FLOOR_EV = -0.045  # the daily Dog fallback (owner: a dog every day), no units
+DEFAULT_TRUST = 0.1  # sports and bet types with no prediction study (soccer, tennis, props)
+# A lean where our model sits this far from the market is the model missing something, not an
+# edge: the first 12 no-unit picks that cleared trusted_ev were NHL totals 8-11 points off the
+# market, and they went 2-10.
+LEAN_MAX_GAP = 0.06
 DAILY_MAX_DOG = 300
 MAX_UNITS = 3.0
 BEST_BETS = 10  # most daily top picks across spreads, totals, moneylines and props
@@ -188,6 +199,34 @@ def units_for(pick: Pick, settings: Settings | None = None) -> float:
 def overreach(p: Pick) -> bool:
     """A spread where our model sits 6+ points above the market: a proven loser blind."""
     return p.market == "spreads" and p.market_prob is not None and p.model_prob - p.market_prob > SPREAD_MAX_OVERREACH
+
+
+_STUDY_MARKET = {"h2h": "win", "totals": "total", "spreads": "margin"}
+
+
+def trusted_ev(p: Pick, settings: Settings | None) -> float:
+    """The edge with our number trusted only as much as the blind prediction study says it earned:
+    the consensus no-vig chance moved toward our model by that weight, against the price."""
+    if p.market_prob is None or p.is_prop:
+        return p.ev
+    if abs(p.model_prob - p.market_prob) > LEAN_MAX_GAP:
+        return -1.0  # too far from the market to trust
+    w = (settings.model_trust.get(f"{p.sport}:{p.market}", DEFAULT_TRUST)
+         if settings is not None and settings.model_trust else DEFAULT_TRUST)
+    q = p.market_prob + w * (p.model_prob - p.market_prob)
+    dec = 1 + p.american / 100 if p.american > 0 else 1 + 100 / -p.american
+    return q * dec - 1
+
+
+def model_trust(study: dict | None) -> dict[str, float]:
+    """forecast_study.json -> "sport:market" model weights for trusted_ev."""
+    out = {}
+    for sport, r in (study or {}).items():
+        for market, key in _STUDY_MARKET.items():
+            w = (r.get("weights") or {}).get(key)
+            if w is not None:
+                out[f"{sport}:{market}"] = float(w)
+    return out
 
 
 def favorite_overreach(p: Pick) -> bool:
@@ -333,7 +372,7 @@ def build_cards(
                 live = [p for p in game
                         if p.market == "h2h" and DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS
                         and now < p.commence_time <= soon_cut and id(p) not in used_now and not p.warnings
-                        and p.win_prob >= DOG_FLOOR_WIN and p.ev >= DAILY_FLOOR_EV]
+                        and p.win_prob >= DOG_FLOOR_WIN and p.ev >= DOG_FALLBACK_FLOOR_EV]
                 if live:
                     dog = max(live, key=lambda p: (p.win_prob, p.ev))
                     chosen.append(("dog", dog))
@@ -373,6 +412,7 @@ def build_cards(
         if not p.is_prop and p.ev > 0 and not p.warnings and p.american >= settings.max_favorite
         and p.win_prob >= LEGIT_MIN_WIN and not favorite_overreach(p)
     ]
+    leans = [p for p in leans if trusted_ev(p, settings) > 0]
     leans = [p for p in leans if p.commence_time <= soon_cut]  # today's slate only, not next week's
     best_lean: dict[str, Pick] = {}
     for p in sorted(leans, key=lambda p: p.ev, reverse=True):
@@ -390,7 +430,7 @@ def build_cards(
             if p.event_id not in covered and p.commence_time <= soon_cut and not p.warnings
             and settings.max_favorite <= p.american <= DAILY_MAX_DOG and p.win_prob >= LEGIT_MIN_WIN
             and p.ev >= DAILY_FLOOR_EV and p.market_prob is not None and not favorite_overreach(p)
-            and not losing_kind(p, settings)
+            and trusted_ev(p, settings) > DAILY_FLOOR_EV and not losing_kind(p, settings)
         ]
         best_fill: dict[str, Pick] = {}
         for p in sorted(fill, key=lambda p: (p.ev, p.win_prob), reverse=True):
@@ -407,6 +447,7 @@ def build_cards(
             why[(p.sport, "unknown injuries" if p.event_id in unknown else "warning" if p.warnings
                  else "odds" if not settings.max_favorite <= p.american <= DAILY_MAX_DOG
                  else "under 45%" if p.win_prob < LEGIT_MIN_WIN else "edge below floor" if p.ev < DAILY_FLOOR_EV
+                 else "no edge once Vegas is trusted" if trusted_ev(p, settings) <= DAILY_FLOOR_EV
                  else "no market" if p.market_prob is None else "favorite overreach" if favorite_overreach(p)
                  else "losing kind" if losing_kind(p, settings) else "not backed" if not backed(p, settings)
                  else "ok")] += 1
