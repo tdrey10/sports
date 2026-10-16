@@ -460,8 +460,6 @@ def test_dog_of_the_day_only_when_we_think_the_dog_can_win():
 
 
 def test_trusted_ev_shrinks_our_number_to_what_the_study_says_it_earned():
-    from dataclasses import replace
-
     from sportsedge.tiers import model_trust, trusted_ev
     from tests.test_ledger import make_pick
 
