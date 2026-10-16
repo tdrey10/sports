@@ -4,7 +4,7 @@
   "blind_seasons": "2022-2026",
   "games": {
    "tune": 7740,
-   "blind": 12340
+   "blind": 12342
   },
   "weights": {
    "total": 0.2,
@@ -40,10 +40,10 @@
    }
   },
   "postseason": {
-   "games": 356,
-   "actual": 8.04,
+   "games": 358,
+   "actual": 8.03,
    "vegas": 7.74,
-   "ratings": 8.91
+   "ratings": 8.9
   }
  },
  "nhl": {
@@ -51,7 +51,7 @@
   "blind_seasons": "2022-2026",
   "games": {
    "tune": 4621,
-   "blind": 5537
+   "blind": 5548
   },
   "weights": {
    "total": 0.30000000000000004,
@@ -77,9 +77,9 @@
     "blend": 0.595
    },
    "log_loss": {
-    "ratings": 0.6727,
-    "vegas": 0.663,
-    "blend": 0.663
+    "ratings": 0.6726,
+    "vegas": 0.6628,
+    "blend": 0.6628
    },
    "score_error": {
     "ratings": 1.39,
@@ -145,7 +145,7 @@
   "blind_seasons": "2022-2026",
   "games": {
    "tune": 1074,
-   "blind": 1217
+   "blind": 1218
   },
   "weights": {
    "total": 0.0,
@@ -166,14 +166,14 @@
     "blend": 9.56
    },
    "winners": {
-    "ratings": 0.641,
-    "vegas": 0.673,
-    "blend": 0.673
+    "ratings": 0.64,
+    "vegas": 0.672,
+    "blend": 0.672
    },
    "log_loss": {
-    "ratings": 0.6384,
-    "vegas": 0.6097,
-    "blend": 0.6097
+    "ratings": 0.6386,
+    "vegas": 0.6099,
+    "blend": 0.6099
    },
    "score_error": {
     "ratings": 7.41,
@@ -192,7 +192,7 @@
   "blind_seasons": "2022-2026",
   "games": {
    "tune": 2478,
-   "blind": 3260
+   "blind": 3263
   },
   "weights": {
    "total": 0.0,
@@ -209,12 +209,12 @@
    },
    "margin_error": {
     "ratings": 14.3,
-    "vegas": 12.03,
-    "blend": 12.03
+    "vegas": 12.04,
+    "blend": 12.04
    },
    "winners": {
     "ratings": 0.689,
-    "vegas": 0.748,
+    "vegas": 0.747,
     "blend": 0.746
    },
    "log_loss": {
