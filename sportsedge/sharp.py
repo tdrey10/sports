@@ -42,6 +42,10 @@ MARKETS = ("h2h",)  # moneylines only: one request per sport keeps the free plan
 SPORTS = ("nfl", "nba", "nhl", "mlb", "ncaaf")  # the biggest markets, where Pinnacle's line is sharpest
 MIN_EV = 0.02
 MAX_EV = 0.15  # bigger than this is almost always a stale or wrong price
+# Football: the price-shopping study (shopstudy, NFL + college football 2020+, pooled) is PROVEN
+# at a 2%+ edge over the other books' consensus, but the 4%+ slice lost in every tuning variant
+# (-20% to -36%): a price that far off is stale or wrong. So football takes 2% to 4% only.
+MAX_EV_BY_SPORT = {"nfl": 0.04, "ncaaf": 0.04}
 MAX_FAVORITE = -170
 MAX_UNITS = 1.0  # new method: small until its CLV record is in
 CORE_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific: always checked (credits allowing)
@@ -141,7 +145,7 @@ def find_value(cfg: SportConfig, ev: dict, now: datetime) -> list[dict]:
                 if q is None or price < MAX_FAVORITE:
                     continue
                 ev_ = q * american_to_decimal(price) - 1
-                if MIN_EV <= ev_ <= MAX_EV:
+                if MIN_EV <= ev_ <= MAX_EV_BY_SPORT.get(cfg.key, MAX_EV):
                     out.append({"market": market, "side": side, "point": point, "book": book, "price": price,
                                 "fair": q, "ev": ev_, "sharp_price": sides[side][0]})
     return out

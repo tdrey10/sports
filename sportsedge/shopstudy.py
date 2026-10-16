@@ -13,8 +13,10 @@ the best price on random games, the same number of bets, through the same bar.
 
 First run (Oct 2026): the best price 24h before kickoff at 2%+ over consensus made money blind
 in both sports (NFL +40% on 28 bets, college football +40% on 58), but no variant reached 60
-blind bets with a tuning profit too: promising, not proven. It reruns every morning as the
-archive grows; a variant that passes the proven bar is reported as PROVEN.
+blind bets with a tuning profit too. Pooled (Oct 16; same method, same market) the 2%+ edge
+is PROVEN at 1h, 6h and 24h before kickoff (24h: tuning 192 bets +5.2%, blind 86 bets +40%;
+luck control 0/96), while the 4%+ slice lost in tuning every time (stale prices), so sharp.py
+takes football edges of 2% to 4% only. It reruns every morning as the archive grows.
 """
 
 from __future__ import annotations
@@ -165,6 +167,7 @@ def proven(t: dict, b: dict) -> bool:
 
 def run(folder: Path, random_n: int = 100, seed: int = 5) -> dict:
     rows, control = [], {"spots": 0, "passed": 0}
+    pooled: dict[tuple, dict[str, list[float]]] = {}
     rng = random.Random(seed)
     for sport in SPORTS:
         for hours in HOURS:
@@ -176,6 +179,9 @@ def run(folder: Path, random_n: int = 100, seed: int = 5) -> dict:
                     if b:
                         won = g["home_won"] == b[1]
                         bets["tune" if g["season"] <= TUNE_LAST else "blind"].append(_dec(b[2]) - 1 if won else -1.0)
+                pool = pooled.setdefault((hours, edge), {"tune": [], "blind": []})
+                pool["tune"] += bets["tune"]
+                pool["blind"] += bets["blind"]
                 t, bl = _record(bets["tune"]), _record(bets["blind"])
                 rows.append({"sport": sport, "hours": hours, "edge": edge, "games": len(gs),
                              "in_sample": t, "blind": bl, "proven": proven(t, bl)})
@@ -198,6 +204,12 @@ def run(folder: Path, random_n: int = 100, seed: int = 5) -> dict:
                     rec[key] = _record(xs)
                 control["spots"] += 1
                 control["passed"] += proven(rec["t"], rec["b"])
+    # Same method, same market in both: NFL and college football together, so the blind seasons
+    # can reach the 60-bet bar one sport alone can't yet.
+    for (hours, edge), bets in pooled.items():
+        t, bl = _record(bets["tune"]), _record(bets["blind"])
+        rows.append({"sport": "football", "hours": hours, "edge": edge, "games": None,
+                     "in_sample": t, "blind": bl, "proven": proven(t, bl)})
     return {"rows": rows, "control": control, "source": RAW + "odds_history/"}
 
 
