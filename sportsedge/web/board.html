@@ -775,10 +775,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     $("updated").innerHTML = `<span class="dot"></span>Sports picks engine · updated ${esc(fmt(DATA.generated_at, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}`;
     $("demo").innerHTML = DATA.demo ? `<div class="demo">Demo data: made-up teams and odds so you can see how it works. Nothing here is a real bet.</div>` : "";
     const ap = st.all_picks || { won: 0, lost: 0, push: 0, units: 0 };
-    $("scoreboard").innerHTML = `<div class="all"><span>Every pick we put out</span><b>${rec(ap)}</b>
-        <small>${pct(ap.win_pct)} won · ${signed(ap.units, 1)}u at 1u each · leans included</small></div>
-      <div><span>Record</span><b>${rec(o)}</b><small>${pct(o.win_pct)} unit plays</small></div>
-      <div><span>Profit</span><b class="${cls(o.units)}">${signed(o.units, 1)}u</b><small>${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
+    $("scoreboard").innerHTML = `<div class="all"><span>Money plays (the picks with units)</span><b class="${cls(o.units)}">${signed(o.units, 1)}u</b>
+        <small>${rec(o)} · ${pct(o.win_pct)} won · ${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
+      <div><span>Free leans too</span><b>${rec(ap)}</b><small>every pick, 0u leans counted at 1u: ${signed(ap.units, 1)}u</small></div>
       <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b><small>from ${money(st.start_bankroll)}</small></div>
       <div><span>Beat the close</span><b>${pct(o.beat_close)}</b><small>avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</small></div>`;
     const counts = { today: bestToday().length, parlays: (DATA.parlays || []).filter((p) => p.day === today()).length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,

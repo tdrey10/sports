@@ -409,10 +409,8 @@ def test_unproven_early_value_stays_early_with_no_units_and_is_kept_on_the_board
     assert not L.withdraw(Settings(proven=set()), early_now)  # no-unit early value is not pulled
 
 
-def test_daily_card_fills_the_board_to_five_with_no_units():
-    from datetime import timedelta
-
-    from sportsedge.tiers import DAILY_FLOOR_EV, DAILY_MIN
+def test_daily_card_fills_only_with_sides_that_beat_the_price_once_vegas_is_trusted():
+    from sportsedge.tiers import DAILY_FLOOR_EV, DAILY_MIN, LEAN_MAX_GAP, trusted_ev
 
     provider = SampleProvider(seed=5)
     settings = Settings(min_ev=0.5, show_leans=False, daily_lock=False, daily_heads=False)  # an empty board
@@ -422,10 +420,10 @@ def test_daily_card_fills_the_board_to_five_with_no_units():
     filled = build_cards(scans, settings, provider.now, posted_today=0)
     card = [c for c in filled if c.reasons and c.reasons[0].startswith("Daily card")]
     assert card and len(filled) > len(base)
-    soon = [c for c in filled if c.pick.commence_time <= provider.now + timedelta(hours=24)]
-    assert len(soon) >= min(DAILY_MIN, len({p.event_id for s in scans for p in s.picks}))
+    assert len(card) <= DAILY_MIN  # a short card beats one padded with coin flips paying the juice
     for c in card:
         assert c.tier == "lean" and c.units == 0 and c.pick.ev >= DAILY_FLOOR_EV and c.pick.win_prob >= 0.45
+        assert trusted_ev(c.pick, settings) > 0 and abs(c.pick.model_prob - c.pick.market_prob) <= LEAN_MAX_GAP
         assert -170 <= c.pick.american <= 300
     assert len({c.pick.event_id for c in card}) == len(card)  # one per game
     full = build_cards(scans, settings, provider.now, posted_today=DAILY_MIN)
@@ -459,3 +457,20 @@ def test_dog_of_the_day_only_when_we_think_the_dog_can_win():
     led.withdraw(Settings(), now)
     assert gone.status == "void" and gone.reasons[0].startswith("Pulled: we only had them winning 32%")
     assert kept.status == "pending"
+
+
+def test_trusted_ev_shrinks_our_number_to_what_the_study_says_it_earned():
+    from dataclasses import replace
+
+    from sportsedge.tiers import model_trust, trusted_ev
+    from tests.test_ledger import make_pick
+
+    p = replace(make_pick(), market="totals", sport="nhl", american=-110, model_prob=0.56, market_prob=0.52)
+    trust = model_trust({"nhl": {"weights": {"total": 0.0, "margin": 0.0, "win": 0.0}}})
+    assert trust["nhl:totals"] == 0.0
+    # Vegas gets all the say: 52% at -110 loses to the juice, whatever our ratings think.
+    assert trusted_ev(p, Settings(model_trust=trust)) < 0
+    full = model_trust({"nhl": {"weights": {"total": 1.0}}})
+    assert trusted_ev(p, Settings(model_trust=full)) > 0
+    # Our model 10 points off the market is the model missing something: never a lean.
+    assert trusted_ev(replace(p, model_prob=0.63), Settings(model_trust=full)) < 0

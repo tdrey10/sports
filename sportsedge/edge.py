@@ -69,6 +69,10 @@ class Settings:
     # Adaptive trust from our own picks' closing line value: "sport:market" -> stake factor.
     # 0 = paused (keeps losing to the close), 0.5 = cut, 1.25 = picks keep beating the close.
     clv_trust: dict[str, float] = field(default_factory=dict)
+    # How much say our ratings earned against Vegas in the blind prediction study (forecast_study):
+    # "sport:market" -> weight 0..1. Leans and the daily card only post when the side still beats
+    # its price with our number shrunk to that weight (see tiers.trusted_ev).
+    model_trust: dict[str, float] = field(default_factory=dict)
 
     def min_ev_for(self, pick: "Pick") -> float:
         if pick.is_prop:
