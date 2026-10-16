@@ -33,3 +33,9 @@ def test_run_grades_snapshots_on_results(tmp_path):
     nfl = [r for r in res["rows"] if r["sport"] == "nfl" and r["hours"] == 1 and r["edge"] == 0.02][0]
     assert nfl["in_sample"]["bets"] == 40 and nfl["blind"]["bets"] == 40
     assert "luck control" in shopstudy.report(res)
+
+
+def test_football_sharp_value_skips_edges_over_four_percent():
+    from sportsedge.sharp import MAX_EV, MAX_EV_BY_SPORT
+
+    assert MAX_EV_BY_SPORT["nfl"] == MAX_EV_BY_SPORT["ncaaf"] == 0.04 < MAX_EV

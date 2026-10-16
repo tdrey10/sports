@@ -26,7 +26,7 @@ EVENT = {"id": "x", "commence_time": START.isoformat().replace("+00:00", "Z"),
 
 
 def test_us_book_beating_pinnacles_fair_price_is_value():
-    found = find_value(SPORTS["nfl"], EVENT, NOW)
+    found = find_value(SPORTS["nhl"], EVENT, NOW)
     best = max(found, key=lambda v: v["ev"])
     assert (best["book"], best["market"], best["side"], best["price"]) == ("fanduel", "h2h", "away", 130)
     assert 0.02 <= best["ev"] < 0.1 and 0.44 < best["fair"] < 0.47
@@ -35,11 +35,11 @@ def test_us_book_beating_pinnacles_fair_price_is_value():
 
 def test_sharp_cards_match_the_espn_game_and_pause_on_bad_clv():
     game = GameResult("401", START, "Dallas Cowboys", "Tampa Bay Buccaneers", None, None, state="pre")
-    (c,) = cards(SPORTS["nfl"], [EVENT], [game], NOW)
+    (c,) = cards(SPORTS["nhl"], [EVENT], [game], NOW)
     assert c.tier == "sharp" and c.pick.event_id == "401" and c.pick.book == "FanDuel" and 0.5 <= c.units <= 1
     assert "Pinnacle" in c.headline
-    assert cards(SPORTS["nfl"], [EVENT], [game], NOW, paused=True) == []
-    assert cards(SPORTS["nfl"], [EVENT], [], NOW) == []  # no matching ESPN game: not gradeable, not posted
+    assert cards(SPORTS["nhl"], [EVENT], [game], NOW, paused=True) == []
+    assert cards(SPORTS["nhl"], [EVENT], [], NOW) == []  # no matching ESPN game: not gradeable, not posted
 
 
 def test_checks_up_to_four_times_a_day():

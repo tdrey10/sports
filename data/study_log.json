@@ -132,5 +132,19 @@
   "blind": "2022 on, 24 variants (6 sports x 4)",
   "luck_control": "100 random tenths of all +100..+220 dogs through the same bar: 0 of 100 passed",
   "verdict": "none proven: all 24 variants either lost blind or had errors bigger than the gain. Best look: NCAAF better-form dog +13.1% blind on 323 bets (+/-6.7%) but -1.9% in tuning on 212; NFL dogs that looked good in tuning (+11% to +28%) lost blind (-4% to -12%). Dropped. Code: sportsedge/dogstudy.py (rerunnable, not in the daily run)."
+ },
+ {
+  "date": "2026-10-16",
+  "idea": "Price shopping pooled across NFL and college football: the best of 10-25 books beating the others' no-vig consensus by 2%+, 3%+, 4%+ at 1h, 6h, 24h before kickoff",
+  "sports": [
+   "nfl",
+   "ncaaf"
+  ],
+  "data": "D503therapper archive odds_history (multi-book moneylines 2020+) and games results",
+  "tuning": "2020-2022 seasons",
+  "blind": "2023 on",
+  "luck_control": "96 random-side spots at the best price: 0 passed",
+  "verdict": "PROVEN at a 2%+ edge at all three timings (24h: tuning 192 bets +5.2%, blind 86 bets +40.0% +/-18.3%); the 4%+ slice lost in tuning every time (-20% to -36%)",
+  "action": "sharp value caps football edges at 4% (2% to 4% only)"
  }
 ]
