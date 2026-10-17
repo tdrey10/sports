@@ -400,7 +400,7 @@ class Workspace:
         if not self.demo and os.environ.get("ODDS_API_KEY"):
             from . import sharp
 
-            if sharp.due(now) or getattr(self.args, "sharp_now", False):
+            if sharp.due(now) or sharp.is_core(now) or getattr(self.args, "sharp_now", False):
                 trust = {k: v["factor"] for k, v in self.ledger.clv_trust(now).items()}
                 from .insights import add_facts
 

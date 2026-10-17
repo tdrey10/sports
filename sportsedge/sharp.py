@@ -8,8 +8,8 @@ relying on our own model. It's the standard method of value-betting software.
 Odds come from The Odds API (free plan: 500 requests a month, key in
 ODDS_API_KEY). One check of one sport's moneylines across Pinnacle and up to nine US
 books costs 1 request, spent only on sports in season with a game in the next 36 hours.
-Checks run at about 8 AM, noon, 3 PM and 5 PM Pacific: noon and 5 PM (and Saturday 8 AM)
-always, the others only while the month's budget can carry every check to month end. Each pick is matched to its ESPN
+Checks are paced (see paced_checks): the month's requests are spread over the half-hourly
+daytime runs, each checking the sport with the most games about to start. Each pick is matched to its ESPN
 game so it is graded and its closing line value tracked like every other pick; the
 adaptive layer pauses sharp value in a sport whose picks keep losing to the close.
 """
@@ -48,36 +48,57 @@ MAX_EV = 0.15  # bigger than this is almost always a stale or wrong price
 MAX_EV_BY_SPORT = {"nfl": 0.04, "ncaaf": 0.04}
 MAX_FAVORITE = -170
 MAX_UNITS = 1.0  # new method: small until its CLV record is in
-CORE_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific: always checked (credits allowing)
-EXTRA_HOURS_UTC = (15, 22)  # about 8 AM and 3 PM Pacific: checked when the month's budget can carry them
+CORE_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific: tennis checks
 SATURDAY_HOUR_UTC = 15  # on Saturdays the 8 AM check is core: the early college football kickoffs
-CHECK_HOURS_UTC = CORE_HOURS_UTC + EXTRA_HOURS_UTC
 UPCOMING_HOURS = 36  # only spend a request on a sport with a game starting within this window
 CREDIT_FLOOR = 40
 CREDITS_PER_SPORT = 1  # one market, up to ten books
 
 
+# Paced checks (owner, Oct 17: "it should check every 30 mins"). The free plan's 500 requests a
+# month can't check every sport every half hour (that's 5,000+), so the month's requests are
+# spread evenly over the half-hourly daytime runs: each paced run checks the one sport with the
+# most games starting in the next PACE_HOURS, so the slate about to play gets checked about every
+# hour (more early in the month), right when its lines move. Tennis keeps its own small reserve.
+PACE_HOURS = 6
+DAY_RUNS = 24  # half-hourly runs, about 8 AM to 8 PM Pacific
+DAY_HOURS_UTC = tuple(range(15, 24)) + (0, 1, 2)
+TENNIS_PER_DAY = 3
+
+
 def due(now: datetime) -> bool:
-    """Up to four checks a day (8 AM, noon, 3 PM, 5 PM Pacific): the first run in each check hour."""
-    return now.hour in CHECK_HOURS_UTC and now.minute < 35
+    """Every daytime run may check (paced by the month's budget); overnight runs don't."""
+    return now.hour in DAY_HOURS_UTC
 
 
 def is_core(now: datetime) -> bool:
     return now.hour in CORE_HOURS_UTC or (now.weekday() == 5 and now.hour == SATURDAY_HOUR_UTC)
 
 
+def _days_left(now: datetime) -> int:
+    nxt = datetime(now.year + now.month // 12, now.month % 12 + 1, 1, tzinfo=now.tzinfo)
+    return max((nxt.date() - now.date()).days, 1)
+
+
+def paced_checks(remaining: float | None, now: datetime) -> int:
+    """How many sports this run may check: the requests left (above the floor and tennis's
+    reserve) spread evenly over the daytime runs left this month."""
+    if remaining is None:
+        return 0
+    days = _days_left(now)
+    spare = remaining - CREDIT_FLOOR - days * TENNIS_PER_DAY
+    if spare < CREDITS_PER_SPORT:
+        return 0
+    rate = spare / (days * DAY_RUNS)  # requests per run
+    slot = int(now.timestamp() // 1800)
+    return min(int((slot + 1) * rate) - int(slot * rate), len(SPORTS))
+
+
 def affordable(remaining: float | None, cost: int, now: datetime, core: bool) -> bool:
-    """Core checks run while credits last (above the floor). Extra checks run only when what is
-    left would still pay for every check, extras included, through the end of the month, so the
-    free plan never runs dry before it resets."""
+    """A forced check runs while credits last above the floor."""
     if remaining is None:
         return core
-    spare = remaining - CREDIT_FLOOR
-    if core:
-        return spare >= cost
-    nxt = datetime(now.year + now.month // 12, now.month % 12 + 1, 1, tzinfo=now.tzinfo)
-    days_left = max((nxt.date() - now.date()).days, 1)
-    return spare >= cost * days_left * len(CHECK_HOURS_UTC)
+    return remaining - CREDIT_FLOOR >= cost
 
 
 class SharpClient:
@@ -226,15 +247,25 @@ def run(sports: list[SportConfig], provider, now: datetime, clv_trust: dict | No
         except requests.RequestException as exc:
             log.warning("sharp value %s schedule failed: %s", cfg.key, exc)
             continue
-        if any(now < g.date <= now + timedelta(hours=UPCOMING_HOURS) for g in games):
-            todo.append((cfg, games))
-    core = force or is_core(now)
-    if not affordable(client.remaining, len(todo) * CREDITS_PER_SPORT, now, core):
+        soon = sum(1 for g in games if now < g.date <= now + timedelta(hours=PACE_HOURS))
+        if force and any(now < g.date <= now + timedelta(hours=UPCOMING_HOURS) for g in games):
+            todo.append((cfg, games, soon))
+        elif soon:
+            todo.append((cfg, games, soon))
+    if force:
+        if not affordable(client.remaining, len(todo) * CREDITS_PER_SPORT, now, True):
+            print("sharp value: forced check skipped, the month's requests are at the floor")
+            return []
+    else:
+        n = paced_checks(client.remaining, now)
         left = "unknown" if client.remaining is None else f"{client.remaining:.0f}"
-        print(f"sharp value: extra check skipped to save the month's requests ({left} left)")
-        return []
+        if not n or not todo:
+            print(f"sharp value: paced, no check this run ({len(todo)} sports with games in {PACE_HOURS}h, "
+                  f"{left} requests left)")
+            return []
+        todo = sorted(todo, key=lambda t: t[2], reverse=True)[:n]  # the slate about to play first
     out = []
-    for cfg, games in todo:
+    for cfg, games, _ in todo:
         if client.remaining is not None and client.remaining - CREDITS_PER_SPORT < CREDIT_FLOOR:
             print(f"sharp value: stopping, {client.remaining:.0f} Odds API requests left this month")
             break

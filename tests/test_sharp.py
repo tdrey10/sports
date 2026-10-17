@@ -42,37 +42,26 @@ def test_sharp_cards_match_the_espn_game_and_pause_on_bad_clv():
     assert cards(SPORTS["nhl"], [EVENT], [], NOW) == []  # no matching ESPN game: not gradeable, not posted
 
 
-def test_checks_up_to_four_times_a_day():
+def test_every_daytime_run_may_check():
     from datetime import datetime, timezone
 
-    day = datetime(2026, 10, 14, 0, 15, tzinfo=timezone.utc)  # a Wednesday
-    assert [h for h in range(24) if due(day.replace(hour=h))] == [0, 15, 19, 22]
-    assert not due(day.replace(minute=50))
+    day = datetime(2026, 10, 14, 0, 15, tzinfo=timezone.utc)
+    assert [h for h in range(24) if due(day.replace(hour=h))] == [0, 1, 2] + list(range(15, 24))
 
 
-def test_saturday_morning_check_is_core_for_early_college_kickoffs():
-    from datetime import datetime, timezone
+def test_paced_checks_spread_the_month_over_the_daytime_runs():
+    from datetime import datetime, timedelta, timezone
 
-    from sportsedge.sharp import is_core
+    from sportsedge.sharp import CREDIT_FLOOR, DAY_RUNS, TENNIS_PER_DAY, paced_checks
 
-    sat = datetime(2026, 10, 10, 15, 15, tzinfo=timezone.utc)  # a Saturday, 8:15 AM Pacific
-    assert due(sat) and is_core(sat)
-    assert due(sat.replace(day=9)) and not is_core(sat.replace(day=9))  # Friday 8 AM: an extra
-    assert is_core(sat.replace(hour=19)) and is_core(sat.replace(day=9, hour=0))
-
-
-def test_extra_checks_only_when_the_month_can_afford_them():
-    from datetime import datetime, timezone
-
-    from sportsedge.sharp import CREDIT_FLOOR, affordable
-
-    now = datetime(2026, 10, 20, 22, 0, tzinfo=timezone.utc)  # 12 days left in October
-    need = 4 * 12 * 4  # 4 sports x 12 days x 4 checks
-    assert affordable(CREDIT_FLOOR + need, 4, now, core=False)
-    assert not affordable(CREDIT_FLOOR + need - 1, 4, now, core=False)  # extras pause first
-    assert affordable(CREDIT_FLOOR + 4, 4, now, core=True)  # core checks run to the floor
-    assert not affordable(CREDIT_FLOOR + 3, 4, now, core=True)
-    assert not affordable(None, 4, now, core=False) and affordable(None, 4, now, core=True)
+    now = datetime(2026, 10, 20, 15, 15, tzinfo=timezone.utc)  # 12 days left in October
+    spare = 0.5 * 12 * DAY_RUNS  # half a request a run
+    left = CREDIT_FLOOR + 12 * TENNIS_PER_DAY + spare
+    day = [paced_checks(left, now + timedelta(minutes=30 * i)) for i in range(DAY_RUNS)]
+    assert DAY_RUNS // 2 <= sum(day) <= DAY_RUNS // 2 + 1 and max(day) == 1  # about one check an hour
+    assert paced_checks(CREDIT_FLOOR + 12 * TENNIS_PER_DAY, now) == 0  # nothing spare: no paced checks
+    assert paced_checks(None, now) == 0
+    assert paced_checks(CREDIT_FLOOR + 12 * TENNIS_PER_DAY + 4 * 12 * DAY_RUNS, now) == 4
 
 
 def test_run_spends_requests_only_on_sports_with_games_soon():
@@ -83,7 +72,7 @@ def test_run_spends_requests_only_on_sports_with_games_soon():
     now = datetime(2026, 10, 14, 19, 5, tzinfo=timezone.utc)
 
     class Client:
-        api_key, remaining, calls = "k", 400.0, []
+        api_key, remaining, calls = "k", 5000.0, []
 
         def active(self):
             return {SPORTS["nfl"].odds_key, SPORTS["nhl"].odds_key}
