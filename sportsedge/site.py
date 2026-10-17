@@ -45,6 +45,7 @@ def build_data(
     studies: dict | None = None,
     props: dict | None = None,
     ufc: dict | None = None,
+    rival: list[dict] | None = None,
 ) -> dict:
     cutoff = now - timedelta(days=KEEP_DAYS)
     entries = []
@@ -81,7 +82,18 @@ def build_data(
         "ufc": ufc or {},
         "clv_trust": ledger.clv_trust(now),
         "parlays": [v for v in ledger.parlay_views() if v["created_at"] >= cutoff.isoformat()],
+        # Head to head with the D503 engine: straight picks, same start date, graded the same way.
+        "rival": _rival(rival, ledger, now),
     }
+
+
+def _rival(picks, ledger, now):
+    if not picks:
+        return None
+    from .rival import head_to_head
+
+    today = now.astimezone(ledger.tz).date().isoformat()
+    return head_to_head(picks, [e.to_dict() for e in ledger.entries.values()], today)
 
 
 APP_HEAD = (

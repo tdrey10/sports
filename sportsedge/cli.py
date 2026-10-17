@@ -584,8 +584,11 @@ def cmd_page(args) -> int:
         brains, weights = {}, {}
     from .study import load as load_studies, load_props
 
+    from . import rival
+
     data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc), ufc=_ufc(data_dir),
-                      studies=load_studies(data_dir / "studies.json"), props=load_props(data_dir / "studies.json"))
+                      studies=load_studies(data_dir / "studies.json"), props=load_props(data_dir / "studies.json"),
+                      rival=rival.fetch(data_dir / "rival_picks.json"))
     Path(args.out).write_text(render_html(data, standalone=args.standalone))
     if args.app_dir:
         from .site import write_app
