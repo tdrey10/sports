@@ -163,5 +163,19 @@
   "blind": "2022 on",
   "luck_control": "300 random dog pools of 60-400 bets: 8 passed (2.7%) the same bar",
   "verdict": "none proven (63 variants): dogs lose about 3.7% blind overall (25,282 bets, +/-0.7%); road dogs -3.7%, home dogs -3.6%. Best looks were tiny samples (NCAAF road dog resting less +10.4% on 87, NBA home dog rested more +10.7% on 65, errors +/-13-15%). Dropped."
+ },
+ {
+  "date": "2026-10-17",
+  "idea": "Follow early steam: bet the side the multi-book consensus moved toward (1%, 2%, 3%+) between 48h->24h, 24h->6h, 12h->3h and 6h->1h before kickoff, at the best price at the later time",
+  "sports": [
+   "nfl",
+   "ncaaf"
+  ],
+  "data": "D503therapper archive odds_history (10-25 books, 2020+) and games results",
+  "tuning": "2020-2022 seasons",
+  "blind": "2023 on, 24 variants",
+  "luck_control": "random sides at the best price on the same games: 8/300 and 16/300 passed for the two NFL variants that passed",
+  "verdict": "none proven: college football nothing; NFL 24h->6h 1%+ (blind 96 bets +19%) and 12h->3h 1%+ (blind 107 bets +12%) pass the bar but at the rate luck alone would give across 24 variants",
+  "action": "none; rerun when the archive grows"
  }
 ]
