@@ -1,14 +1,14 @@
 {
- "ran_at": "2026-10-17T23:58:13.389619+00:00",
- "fights": 4324,
- "called": 3629,
- "accuracy": 0.5825296224855332,
- "log_loss": 0.680208830956518,
+ "ran_at": "2026-10-18T00:52:53.100044+00:00",
+ "fights": 4326,
+ "called": 3631,
+ "accuracy": 0.5824841641421096,
+ "log_loss": 0.6802458149063615,
  "calibration": [
   [
-   0.5315690396350665,
-   0.5644411836634874,
-   4089
+   0.5315784239389443,
+   0.5644096797848936,
+   4091
   ],
   [
    0.6214149860309529,
@@ -17,112 +17,16 @@
   ]
  ],
  "market": {
-  "bets": 9,
+  "bets": 10,
   "won": 3,
-  "lost": 6,
-  "units": 2.8,
-  "roi": 0.3111111111111111,
-  "se": 0.6562084789921833,
+  "lost": 7,
+  "units": 1.8,
+  "roi": 0.18,
+  "se": 0.6013965229179312,
   "proven": false
  },
  "lines_saved": 34,
  "upcoming": [
-  {
-   "fight_id": "401897388",
-   "card": "UFC Fight Night: Buckley vs. Malott",
-   "date": "2026-10-18T00:00Z",
-   "weight": "Welterweight",
-   "a": "Joaquin Buckley",
-   "a_record": "21-8-0",
-   "b": "Mike Malott",
-   "b_record": "14-2-1",
-   "model_a": 0.453,
-   "a_fights": 17,
-   "b_fights": 9,
-   "a_ml": 114.0,
-   "b_ml": -135.0,
-   "market_a": 0.449
-  },
-  {
-   "fight_id": "401897729",
-   "card": "UFC Fight Night: Buckley vs. Malott",
-   "date": "2026-10-18T00:00Z",
-   "weight": "W Flyweight",
-   "a": "Erin Blanchfield",
-   "a_record": "14-2-0",
-   "b": "Jasmine Jasudavicius",
-   "b_record": "15-4-0",
-   "model_a": 0.527,
-   "a_fights": 9,
-   "b_fights": 13,
-   "a_ml": -340.0,
-   "b_ml": 270.0,
-   "market_a": 0.741
-  },
-  {
-   "fight_id": "401905374",
-   "card": "UFC Fight Night: Buckley vs. Malott",
-   "date": "2026-10-18T00:00Z",
-   "weight": "Lightweight",
-   "a": "Mandel Nallo",
-   "a_record": "14-4-0",
-   "b": "Nate Landwehr",
-   "b_record": "18-8-0",
-   "model_a": 0.521,
-   "a_fights": 2,
-   "b_fights": 11,
-   "a_ml": -285.0,
-   "b_ml": 230.0,
-   "market_a": 0.71
-  },
-  {
-   "fight_id": "401908372",
-   "card": "UFC Fight Night: Buckley vs. Malott",
-   "date": "2026-10-18T00:00Z",
-   "weight": "Middleweight",
-   "a": "Marc-Andre Barriault",
-   "a_record": "17-11-0",
-   "b": "Kyle Daukaus",
-   "b_record": "17-5-0",
-   "model_a": 0.413,
-   "a_fights": 16,
-   "b_fights": 10,
-   "a_ml": 154.0,
-   "b_ml": -185.0,
-   "market_a": 0.378
-  },
-  {
-   "fight_id": "401909783",
-   "card": "UFC Fight Night: Buckley vs. Malott",
-   "date": "2026-10-18T00:00Z",
-   "weight": "Bantamweight",
-   "a": "Louis Jourdain",
-   "a_record": "9-3-0",
-   "b": "Timmy Cuamba",
-   "b_record": "10-4-0",
-   "model_a": 0.537,
-   "a_fights": 1,
-   "b_fights": 6,
-   "a_ml": -162.0,
-   "b_ml": 136.0,
-   "market_a": 0.593
-  },
-  {
-   "fight_id": "401923630",
-   "card": "UFC Fight Night: Buckley vs. Malott",
-   "date": "2026-10-18T00:00Z",
-   "weight": "Lightweight",
-   "a": "Kyle Nelson",
-   "a_record": "17-7-1",
-   "b": "Cristian P\u00e9rez",
-   "b_record": "15-2-0",
-   "model_a": 0.503,
-   "a_fights": 10,
-   "b_fights": 2,
-   "a_ml": 275.0,
-   "b_ml": -345.0,
-   "market_a": 0.256
-  },
   {
    "fight_id": "401928047",
    "card": "UFC 333: Volkanovski vs. Evloev",
@@ -209,9 +113,9 @@
    "model_a": 0.561,
    "a_fights": 14,
    "b_fights": 5,
-   "a_ml": -115.0,
-   "b_ml": -105.0,
-   "market_a": 0.511
+   "a_ml": -118.0,
+   "b_ml": -102.0,
+   "market_a": 0.517
   },
   {
    "fight_id": "401911632",
@@ -289,9 +193,9 @@
    "model_a": 0.501,
    "a_fights": 2,
    "b_fights": 2,
-   "a_ml": -105.0,
-   "b_ml": -115.0,
-   "market_a": 0.489
+   "a_ml": 102.0,
+   "b_ml": -122.0,
+   "market_a": 0.474
   },
   {
    "fight_id": "401914105",
