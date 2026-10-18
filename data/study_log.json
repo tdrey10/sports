@@ -177,5 +177,18 @@
   "luck_control": "random sides at the best price on the same games: 8/300 and 16/300 passed for the two NFL variants that passed",
   "verdict": "none proven: college football nothing; NFL 24h->6h 1%+ (blind 96 bets +19%) and 12h->3h 1%+ (blind 107 bets +12%) pass the bar but at the rate luck alone would give across 24 variants",
   "action": "none; rerun when the archive grows"
+ },
+ {
+  "date": "2026-10-18",
+  "idea": "Our own graded picks vs the market's closing fair odds, by tier and sport: is the model's win chance calibrated, and do leans/Locks beat the close?",
+  "sports": [
+   "all in ledger"
+  ],
+  "data": "data/ledger.json, 100 graded won/lost picks with a close_fair price (void picks dropped)",
+  "tuning": "none (no parameters fitted; a calibration check)",
+  "blind": "all picks are live, so every graded pick was unseen when posted",
+  "luck_control": "20,000 simulated seasons where each pick wins at the market's closing fair chance: leans (26 wins vs 32.8 expected) land that low or lower 5.7% of the time; Locks (2 of 7 vs 3.7) 17%; early picks (11 of 17 vs 8.5) high 17%",
+  "verdict": "nothing proven, nothing to wire. Leans run 41% wins with the model saying 59% (market 51%), -23% ROI on 64 no-unit picks; the model's Brier score (0.272) is worse than the close's (0.257), so it is overconfident on leans and not better than the market. Early picks 11-6 (+25%) and the 5 dogs 4-1 are too few to trust. Units are only on proven types and the Lock's 0.5u, so little money rides on this. Watch: if leans stay below the close past ~150 graded, shrink lean win chances toward the market.",
+  "action": "none; rerun weekly as the ledger grows"
  }
 ]
