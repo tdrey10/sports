@@ -494,7 +494,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + (sharpBets.length ? panel("Sharp value", "A book paying more than it should, straight up", byGame(sharpBets)) : "")
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
       + panel("The board", "Everything else we like today", rest.length ? byGame(rest) : empty("Nothing else worth it today. We don't force it."))
-      + panel("Leans", "No units, not tracked as bets. Who we got in today's other games and the fair price: only worth a sprinkle if your book pays more than that.",
+      + panel("Leans", "No units, not tracked as bets. Who we got in today's other games and the fair price (nothing past −300): only worth a sprinkle if your book pays more than that.",
           (leans.length ? byGame(leans) : "") + (reads().length ? `<ul class="reads">${reads().map(readRow).join("")}</ul>` : (leans.length ? "" : empty("No other games today."))));
   }
 
@@ -507,10 +507,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       .filter((f) => f.status === "pending" && pickedSport(f.sport) && !picked.has(f.event_id)
         && new Date(f.commence_time).getTime() > now && new Date(f.commence_time).getTime() <= soon)
       .map((f) => ({ f, p: f.winner === "home" ? f.p_home : f.winner === "away" ? f.p_away : f.p_draw }))
-      .filter((r) => r.p != null && r.p >= 0.5)
+      // Owner's call: nothing priced past -300 (a 75% favorite). That's too much to lay.
+      .filter((r) => r.p != null && r.p >= 0.5 && fairPrice(r.p) >= LEAN_MAX_FAV)
       .sort((a, b) => b.p - a.p)
       .slice(0, 20);
   }
+  const LEAN_MAX_FAV = -300;
   const fairPrice = (p) => (p >= 0.5 ? -Math.round(100 * p / (1 - p)) : Math.round(100 * (1 - p) / p));
   function readRow({ f, p }) {
     const team = f.winner === "home" ? f.home : f.winner === "away" ? f.away : "Draw";
