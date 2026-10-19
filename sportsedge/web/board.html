@@ -712,22 +712,22 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const st = DATA.stats;
     const sportRows = Object.entries(st.by_sport).map(([k, s]) => { const a = s.all || s;
       const money = s.won + s.lost + s.push ? `${rec(s)} <span class="${cls(s.units)}">${signed(s.units, 1)}u</span>` : "–";
-      return `<tr><td>${esc(s.name)}</td><td>${rec(a)}</td><td>${pct(a.win_pct)}</td><td class="${cls(a.units)}">${signed(a.units, 1)}u</td><td>${money}</td></tr>`; }).join("");
+      return `<tr><td>${esc(s.name)}</td><td>${money}</td><td>${rec(a)}</td><td>${pct(a.win_pct)}</td></tr>`; }).join("");
     const labels = DATA.spot_labels || {};
-    const spotRows = Object.entries(st.by_spot || {}).map(([k, s]) => `<tr><td>${esc(labels[k] || k)}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 1)}u</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`).join("");
+    const spotRows = Object.entries(st.by_spot || {}).map(([k, s]) => `<tr><td>${esc(labels[k] || k)}</td><td>${rec(s)}</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`).join("");
     const recent = DATA.entries.filter((e) => e.settled && e.status !== "void" && visible(e)).sort((a, b) => (b.graded_at || "").localeCompare(a.graded_at || "")).slice(0, 15);
     const rv = DATA.rival;
     const h2h = rv ? (() => {
-      const line = (name, r) => `<tr><td>${name}</td><td>${rec(r.money)}</td><td class="${cls(r.money.units)}">${signed(r.money.units, 1)}u</td><td>${r.money.staked ? signed(r.money.units / r.money.staked * 100, 0) + "%" : "–"}</td><td>${rec(r.leans)} <span class="${cls(r.leans.units)}">${signed(r.leans.units, 1)}u</span></td></tr>`;
+      const line = (name, r) => `<tr><td>${name}</td><td>${rec(r.money)}</td><td class="${cls(r.money.units)}">${signed(r.money.units, 1)}u</td><td>${r.money.staked ? signed(r.money.units / r.money.staked * 100, 0) + "%" : "–"}</td><td>${rec(r.leans)}</td></tr>`;
       const today = (rv.today || []).map((p) => { const l = (p.legs || [])[0] || {};
         return `<li>${esc((l.league || "").toUpperCase())} ${esc(l.team || "")} ${l.market === "ml" ? "ML" : esc(l.market || "")} ${odds(p.american)} · ${p.units > 0 ? p.units + "u" : "lean"}${l.edge == null ? "" : ` · his edge ${signed(l.edge * 100, 1)}%`}${p.status && p.status !== "open" ? ` · ${esc(p.status)}` : ""}</li>`; }).join("");
-      return panel("Head to head", `Us vs. the D503 engine since ${esc(rv.since)} · straight bets only, same grading · leans count as 1u`,
+      return panel("Head to head", `Us vs. the D503 engine since ${esc(rv.since)} · straight bets only, same grading · units are money plays only; leans are just a W-L, no units`,
         `<div class="table-wrap"><table><thead><tr><th></th><th>Money plays</th><th>Units</th><th>ROI</th><th>Leans</th></tr></thead><tbody>${line("Us", rv.ours)}${line("D503", rv.theirs)}</tbody></table></div>`
         + (today ? `<p class="small muted">D503's straight picks today:</p><ul class="small">${today}</ul>` : ""));
     })() : "";
-    return h2h + (sportRows ? panel("By sport", "Every pick we put out (leans count as 1u) · plus the money plays", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>All picks W-L</th><th>Win</th><th>Profit</th><th>Unit plays</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
-      + panel("By early-bet spot", "Each spot keeps its own record · leans count as 1u", spotRows
-          ? `<div class="table-wrap"><table><thead><tr><th>Spot</th><th>W-L</th><th>Units</th><th>CLV</th></tr></thead><tbody>${spotRows}</tbody></table></div>`
+    return h2h + (sportRows ? panel("By sport", "Units come from money plays only · leans are a W-L, no units", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Money plays</th><th>All picks W-L</th><th>Win</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
+      + panel("By early-bet spot", "Each spot keeps its own record (W-L and how often it beat the closing line)", spotRows
+          ? `<div class="table-wrap"><table><thead><tr><th>Spot</th><th>W-L</th><th>CLV</th></tr></thead><tbody>${spotRows}</tbody></table></div>`
           : empty("No graded picks in a spot yet."))
       + panel("Latest graded", "", recent.length ? recent.map((e) => row(e, { matchup: true })).join("") : empty("Results land here once games wrap."));
   }
@@ -810,9 +810,11 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     $("updated").innerHTML = `<span class="dot"></span>Sports picks engine · updated ${esc(fmt(DATA.generated_at, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}`;
     $("demo").innerHTML = DATA.demo ? `<div class="demo">Demo data: made-up teams and odds so you can see how it works. Nothing here is a real bet.</div>` : "";
     const ap = st.all_picks || { won: 0, lost: 0, push: 0, units: 0 };
+    // Leans carry no units, so they show as a W-L only (all picks minus the money plays).
+    const lean = { won: Math.max(ap.won - o.won, 0), lost: Math.max(ap.lost - o.lost, 0), push: Math.max((ap.push || 0) - (o.push || 0), 0) };
     $("scoreboard").innerHTML = `<div class="all"><span>Money plays (the picks with units)</span><b class="${cls(o.units)}">${signed(o.units, 1)}u</b>
         <small>${rec(o)} · ${pct(o.win_pct)} won · ${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
-      <div><span>Free leans too</span><b>${rec(ap)}</b><small>every pick, 0u leans counted at 1u: ${signed(ap.units, 1)}u</small></div>
+      <div><span>Leans</span><b>${rec(lean)}</b><small>${pct(lean.won + lean.lost ? lean.won / (lean.won + lean.lost) : null)} won · no units, not bets</small></div>
       <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b><small>from ${money(st.start_bankroll)}</small></div>
       <div><span>Beat the close</span><b>${pct(o.beat_close)}</b><small>avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</small></div>`;
     const counts = { today: bestToday().length, parlays: (DATA.parlays || []).filter((p) => p.day === today()).length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
