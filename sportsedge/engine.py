@@ -323,6 +323,10 @@ class Engine:
                 if key not in seen:
                     seen.add(key)
                     lines.append(pg)
+        # This season's games only (owner, Oct 20): last season's box scores carry players who
+        # have since moved and roles that changed, so a prop needs this year's games (4+, see
+        # project_prop) before it is priced. Early in a season that means fewer props, on purpose.
+        lines = this_season(lines, results)
         logs: dict[str, list[PlayerGame]] = {}
         player_team: dict[str, str] = {}
         for pg in lines:
@@ -419,3 +423,11 @@ def _scheduled_game(scheduled: list[GameResult], home: str, away: str, when: dat
         if g.home == home and g.away == away and abs((g.date - when).total_seconds()) < 36 * 3600:
             return g
     return None
+
+
+def this_season(lines: list[PlayerGame], results: list[GameResult]) -> list[PlayerGame]:
+    """Player box-score lines from the current season only (after the latest off-season gap)."""
+    from .models.ratings import _season_start
+
+    start = _season_start([g for g in results if g.completed])
+    return [pg for pg in lines if start is None or pg.date >= start]

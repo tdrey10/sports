@@ -488,3 +488,20 @@ def test_value_early_and_best_bets_need_an_edge_the_data_backs():
     assert len(after) < len(before)
     # No proven types or spots here: what's left beats its price with Vegas getting all the say.
     assert all(trusted_ev(c.pick, strict) > 0 for c in after if not c.pick.is_prop)
+
+
+def test_props_use_this_seasons_box_scores_only():
+    from datetime import datetime, timedelta, timezone
+
+    from sportsedge.engine import this_season
+    from sportsedge.models.props import PlayerGame
+    from sportsedge.models.ratings import GameResult
+
+    april = datetime(2026, 4, 10, tzinfo=timezone.utc)
+    october = datetime(2026, 10, 21, tzinfo=timezone.utc)
+    results = [GameResult(f"a{i}", april + timedelta(days=i), "A", "B", 100, 90) for i in range(5)]
+    results += [GameResult(f"o{i}", october + timedelta(days=i), "A", "B", 100, 90) for i in range(2)]
+    lines = [PlayerGame("a1", april + timedelta(days=1), "Old Guy", "A", {"points": 30}),
+             PlayerGame("o1", october + timedelta(days=1), "New Guy", "A", {"points": 20})]
+    assert [pg.player for pg in this_season(lines, results)] == ["New Guy"]
+    assert this_season(lines, results[:5]) == lines  # no off-season in sight: nothing dropped
