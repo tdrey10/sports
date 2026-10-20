@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-10-20T12:55:22.397243+00:00",
+ "ran_at": "2026-10-20T13:52:23.337154+00:00",
  "fights": 4331,
  "called": 3636,
  "accuracy": 0.581958195819582,
@@ -25,7 +25,7 @@
   "se": 0.5514730045500639,
   "proven": false
  },
- "lines_saved": 36,
+ "lines_saved": 39,
  "upcoming": [
   {
    "fight_id": "401928047",
@@ -70,7 +70,10 @@
    "b_record": "14-3-0",
    "model_a": 0.453,
    "a_fights": 6,
-   "b_fights": 6
+   "b_fights": 6,
+   "a_ml": 105.0,
+   "b_ml": -125.0,
+   "market_a": 0.468
   },
   {
    "fight_id": "401930916",
@@ -83,7 +86,10 @@
    "b_record": "10-2-0",
    "model_a": 0.498,
    "a_fights": 3,
-   "b_fights": 1
+   "b_fights": 1,
+   "a_ml": -155.0,
+   "b_ml": 130.0,
+   "market_a": 0.583
   },
   {
    "fight_id": "401930917",
@@ -96,7 +102,10 @@
    "b_record": "9-4-0",
    "model_a": 0.579,
    "a_fights": 7,
-   "b_fights": 4
+   "b_fights": 4,
+   "a_ml": -375.0,
+   "b_ml": 295.0,
+   "market_a": 0.757
   },
   {
    "fight_id": "401911637",
@@ -126,9 +135,9 @@
    "model_a": 0.478,
    "a_fights": 8,
    "b_fights": 5,
-   "a_ml": -122.0,
-   "b_ml": 102.0,
-   "market_a": 0.526
+   "a_ml": -120.0,
+   "b_ml": 100.0,
+   "market_a": 0.522
   },
   {
    "fight_id": "401911639",
@@ -142,9 +151,9 @@
    "model_a": 0.426,
    "a_fights": 12,
    "b_fights": 4,
-   "a_ml": 390.0,
-   "b_ml": -520.0,
-   "market_a": 0.196
+   "a_ml": 380.0,
+   "b_ml": -500.0,
+   "market_a": 0.2
   },
   {
    "fight_id": "401911640",
