@@ -208,5 +208,23 @@
   "luck_control": "100 random tenths of all +100..+220 dogs through the same bar: 0 of 100 passed; across 42 variants luck alone gives about 0.3 passes (1 in 150 each)",
   "verdict": "one variant passed the bar: NHL dog moved toward by 1%+ (tuning 223 bets +1.3%, blind 638 bets +8.5% +/-4.6%); 2% and 3%+ NHL dogs run +9% and +11% blind but lost in tuning (-5%, -15%) on 125 and 62 bets. Everything else lost or was flat: favorites that shortened lose in all six sports (MLB -7%, NCAAF -13% blind), dogs that drifted out lose, other sports' steam dogs flat. Not wired: the pass is one sport of 42, tuning is a single NHL season at +1.3%, and the live steam check uses first-seen price, not the true opener the study used.",
   "action": "none; keep watching NHL steam dogs. Code: sportsedge/movestudy.py (rerunnable, not in the daily run)"
+ },
+ {
+  "date": "2026-10-20",
+  "idea": "Lock-type moneyline favorites (-170 to -120 closing) by spot: home/road, off a loss, off a blowout win (letdown), vs a team off a blowout loss, win/losing streaks, rested vs back-to-back, 3rd game in 4 days, opponent backup starter",
+  "sports": [
+   "nfl",
+   "ncaaf",
+   "nba",
+   "ncaab",
+   "mlb",
+   "nhl"
+  ],
+  "data": "data/lines/espn/<sport> closing moneylines 2018+",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on, 68 variants (6 sports x 7-13 spots)",
+  "luck_control": "100 random tenths of all -170..-120 favorites through the same bar: 0 of 100 passed; across 68 variants luck alone gives about 0.5 passes by the 1-in-150 rule (more with this loose 1-SE bar on big variant counts)",
+  "verdict": "3 variants cleared the bar, all barely: NBA favorite off a blowout win (blind 150 bets +8.7% +/-6.7%, tuning +5.6%), NCAAF favorite vs a team on a 3+ losing streak (72 bets +11.2% +/-9.7%, tuning +3.2% +/-12.9%), NHL rested favorite vs a back-to-back (323 bets +6.1% +/-4.6%, tuning +1.4%). Each is under 1.5 SEs, one sport of six, and the same spot flips sign in neighbours (NBA rested vs back-to-back -4.6%, MLB -16.5%). Overall lock-price favorites lose in every sport (MLB -5.3%, NHL -5.3%, NCAAB -4.6%, NBA -3.1%, NCAAF -6.8%, NFL -0.7% blind): the price is already fair-to-shaded, so the Lock stays a 0.5u small stake. Not wired.",
+  "action": "none; watch NHL rested favorite vs back-to-back next to NHL steam dogs. Code: sportsedge/favstudy.py (rerunnable, not in the daily run)"
  }
 ]
