@@ -292,6 +292,11 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 .ticket .t-sport, .ticket .t-pay, .ticket .muted, .ticket .move-bad, .ticket small, .ticket .small { color: var(--ticket-ink); font-weight: 700; }
   .reads { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 10px; }
   .reads li { line-height: 1.35; }
+.sport-head { font-family: var(--display); font-size: 26px; letter-spacing: .03em; text-transform: uppercase; margin: 22px 0 10px;
+  padding: 6px 12px; border-left: 5px solid var(--accent); background: var(--surface-2); border-radius: 6px; }
+.sport-head small { font-size: 15px; color: var(--muted); margin-left: 6px; font-family: var(--body); }
+.sport-badge { font-family: var(--display); font-size: 20px; letter-spacing: .03em; text-transform: uppercase; color: var(--accent-2); margin-bottom: 4px; }
+.game-sport { font-weight: 800; color: var(--accent-2); font-size: 15px; }
 </style>
 
 <div class="photo-bg" aria-hidden="true" style="--mascot: url('__MASCOT__'); --thumb: url('__THUMB__')"></div>
@@ -369,7 +374,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const isOpen = (e) => e.status === "pending" && new Date(e.commence_time) > new Date();
   const visible = (e) => (state.sport === "all" || sportGroup(e.sport) === state.sport) && (state.market === "all" || groupOf(e) === state.market);
   const today = () => dayOf(DATA.generated_at);
-  const onBoard = (e) => visible(e) && e.status !== "void" && (!e.settled || e.day === today());
+  // Owner's call: today's picks stay up after they're graded (won/lost showing) until midnight,
+  // then clear. "Today" is the viewer's clock in the board's time zone, so it clears at midnight
+  // even between engine runs.
+  const nowDay = () => dayOf(new Date().toISOString());
+  const onBoard = (e) => visible(e) && e.status !== "void"
+    && (!e.settled || dayOf(e.commence_time) === nowDay() || e.day === nowDay());
   const cls = (x) => (x == null ? "" : x >= 0 ? "pos" : "neg");
   const rec = (s) => `${s.won}-${s.lost}${s.push ? "-" + s.push : ""}`;
   const units = (e) => (e.units > 0 ? `${e.units === 0.5 ? "½" : e.units}u` : "lean");
@@ -432,6 +442,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const kind = e.player ? "Prop" : LABEL[e.market] || e.market_label;
     return `<article class="bet">${stamp(e)}
       <div class="rk" aria-label="Rank ${e.rank}">${e.rank}</div>
+      <div class="sport-badge">${esc(sportHead(e.sport))}</div>
       <div class="sel"><strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${TIER[e.tier]}</span>` : ""}</div>
       <div class="price"><b>${odds(e.odds)}</b><small>${units(e)} · ${signed(e.ev * 100, 1)}% EV</small></div>
       <div class="sub">${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}</div>
@@ -448,9 +459,21 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     list.forEach((e) => { if (!games.has(e.event_id)) games.set(e.event_id, []); games.get(e.event_id).push(e); });
     return [...games.values()].sort((a, b) => new Date(a[0].commence_time) - new Date(b[0].commence_time)).map((g) => {
       const e = g[0];
-      return `<div class="game"><div class="game-head"><span><b>${esc(e.matchup)}</b> · ${esc(e.sport_name)}</span><span>${timeOf(e)}</span></div>
+      return `<div class="game"><div class="game-head"><span><b>${esc(e.matchup)}</b> · <span class="game-sport">${esc(e.sport_name)}</span></span><span>${timeOf(e)}</span></div>
         ${g.sort((a, b) => b.ev - a.ev).map((x) => row(x)).join("")}</div>`;
     }).join("");
+  }
+
+  const SPORT_HEAD = { nfl: "🏈 NFL", ncaaf: "🏈 College Football", nba: "🏀 NBA", ncaab: "🏀 College Basketball",
+    mlb: "⚾ MLB", nhl: "🏒 NHL", soccer: "⚽ Soccer", tennis: "🎾 Tennis", ufc: "🥊 UFC" };
+  const sportHead = (k) => SPORT_HEAD[sportGroup(k)] || String(k).toUpperCase();
+  // On "All", picks are split by sport under a big header (sports in order of their first game).
+  function bySport(list, render = byGame) {
+    if (state.sport !== "all") return render(list);
+    const groups = new Map();
+    [...list].sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time))
+      .forEach((e) => { const k = sportGroup(e.sport); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(e); });
+    return [...groups.entries()].map(([k, g]) => `<h3 class="sport-head">${esc(sportHead(k))} <small>${g.length}</small></h3>${render(g)}`).join("");
   }
 
   // Picks join the top bets across the day's scans; show them ordered by edge score, numbered by that order.
@@ -491,11 +514,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const leans = items.filter((e) => e.tier === "lean");
     const topNote = best.length ? `${best.length} of 10 cleared the bar · ranked by edge score` : "Ranked by edge score";
     return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("Bet on it, the heat is coming."))
-      + (sharpBets.length ? panel("Sharp value", "A book paying more than it should, straight up", byGame(sharpBets)) : "")
+      + (sharpBets.length ? panel("Sharp value", "A book paying more than it should, straight up", bySport(sharpBets)) : "")
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
-      + panel("The board", "Everything else we like today", rest.length ? byGame(rest) : empty("Nothing else worth it today. We don't force it."))
+      + panel("The board", "Everything else we like today", rest.length ? bySport(rest) : empty("Nothing else worth it today. We don't force it."))
       + panel("Leans", "No units, not tracked as bets. Who we got in today's other games and the fair price (nothing past −300): only worth a sprinkle if your book pays more than that.",
-          (leans.length ? byGame(leans) : "") + (reads().length ? `<ul class="reads">${reads().map(readRow).join("")}</ul>` : (leans.length ? "" : empty("No other games today."))));
+          (leans.length ? bySport(leans) : "") + (reads().length ? bySport(reads().map((r) => Object.assign({}, r, { sport: r.f.sport, commence_time: r.f.commence_time })),
+            (g) => `<ul class="reads">${g.map(readRow).join("")}</ul>`) : (leans.length ? "" : empty("No other games today."))));
   }
 
   // Our read on today's games with no pick (from the predictions): the side we have, its win
