@@ -319,7 +319,7 @@ class Ledger:
         that isn't a realistic winner, or the same bet posted twice (two odds sources)."""
         from types import SimpleNamespace
 
-        from .tiers import DOG_FLOOR_WIN, LEGIT_MIN_WIN, backed, losing_kind
+        from .tiers import DOG_FALLBACK_FLOOR_EV, DOG_FLOOR_WIN, LEGIT_MIN_WIN, backed, losing_kind
 
         pulled = []
         seen: dict[tuple, Entry] = {}
@@ -344,6 +344,11 @@ class Ledger:
                 # The daily Lock/Dog lean stays only while it still beats its price's break-even.
                 daily_lock = daily_lock or (e.tier in ("lock", "dog") and getattr(settings, "daily_heads", False)
                                             and e.win_prob > break_even(e.odds))
+                # The owner's daily Dog: the fallback "best live dog" (40%+ to win, a fair-ish price) is posted
+                # on purpose when no dog beats its price, so it isn't pulled for missing break-even.
+                daily_lock = daily_lock or (e.tier == "dog" and getattr(settings, "daily_heads", False)
+                                            and e.win_prob >= DOG_FLOOR_WIN
+                                            and e.ev >= DOG_FALLBACK_FLOOR_EV)
                 lean = e.tier == "lean" and getattr(settings, "show_leans", True) and e.win_prob >= LEGIT_MIN_WIN
                 # No-unit early value stays while it is a realistic winner that still beats its break-even.
                 lean = lean or (e.tier == "early" and e.win_prob >= LEGIT_MIN_WIN and e.win_prob > break_even(e.odds))
