@@ -505,3 +505,21 @@ def test_props_use_this_seasons_box_scores_only():
              PlayerGame("o1", october + timedelta(days=1), "New Guy", "A", {"points": 20})]
     assert [pg.player for pg in this_season(lines, results)] == ["New Guy"]
     assert this_season(lines, results[:5]) == lines  # no off-season in sight: nothing dropped
+
+
+def test_daily_fallback_dog_is_not_pulled_for_missing_break_even():
+    from dataclasses import replace
+    from datetime import timedelta
+
+    from sportsedge.ledger import Ledger
+    from tests.test_ledger import START, card, make_pick
+
+    pick = make_pick(market="h2h", side="away", point=None, american=105, ev=-0.043, win_prob=0.467,
+                     market_prob=0.465)
+    L = Ledger()
+    L.publish([replace(card(pick), tier="dog", units=0.0)], START - timedelta(hours=10))
+    assert not L.withdraw(Settings(proven=set(), daily_heads=True), START - timedelta(hours=9))
+    weak = make_pick(market="h2h", side="away", point=None, american=180, ev=-0.10, win_prob=0.32,
+                     event_id="ev2", market_prob=0.33)
+    L.publish([replace(card(weak), tier="dog", units=0.0)], START - timedelta(hours=10))
+    assert [e.event_id for e in L.withdraw(Settings(proven=set(), daily_heads=True), START - timedelta(hours=9))] == ["ev2"]
