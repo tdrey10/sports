@@ -24,3 +24,20 @@ def test_head_to_head_grades_both_engines_the_same_way():
     assert (o["money"]["lost"], o["money"]["units"], o["leans"]["won"]) == (1, -0.5, 1)
     assert [p["legs"][0]["team"] for p in r["today"]] == ["Rice"]
     assert head_to_head([], ours, "2026-10-03") is None
+
+
+def test_his_record_comes_from_his_own_dashboard():
+    from sportsedge.rival import head_to_head, reported
+
+    html = ('<div class="ovr-t">💰 UNIT PLAYS RECORD</div><div class="ovr-r">39-35</div>'
+            '<div class="ovr-p up">+23.0 UNITS · ROI +35%</div>'
+            '<div class="ovr-t">🟡 LEANS RECORD</div><div class="ovr-r">34-30</div>')
+    r = reported(html)
+    assert (r["money"]["won"], r["money"]["lost"], r["money"]["units"]) == (39, 35, 23.0)
+    assert round(r["money"]["units"] / r["money"]["staked"], 2) == 0.35
+    assert (r["leans"]["won"], r["leans"]["lost"]) == (34, 30)
+    assert reported("<html>nothing</html>") is None
+    picks = [{"date": "2026-10-01", "kind": "lock", "units": 1.0, "dec": 2.0, "status": "won", "legs": [{}]}]
+    h = head_to_head(picks, [], "2026-10-02", r)
+    assert h["theirs"]["reported"] and h["theirs"]["money"]["units"] == 23.0
+    assert head_to_head(picks, [], "2026-10-02")["theirs"]["money"]["units"] == 1.0  # fallback: our count
