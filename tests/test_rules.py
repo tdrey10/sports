@@ -118,11 +118,9 @@ def test_lock_and_dog_even_when_no_side_shows_an_edge():
     assert set(heads) == {"lock", "dog"} and all(c.units == 0 for c in heads.values())
     # By default nothing unbacked is posted: no maybes on the board.
     plain = Settings(min_ev=0.5)
-    # No Lock without an edge. The one exception is the owner's daily Dog: the most likely dog at a
-    # fair price (40%+), posted with no units and labeled as the best live dog.
+    # No Lock or Dog without an edge: a day with nothing that beats its price posts nothing.
     def unbacked(settings):
-        return [c for c in build_cards(scans, settings, provider.now)
-                if c.units == 0 and not (c.tier == "dog" and c.reasons[0].startswith("Best live dog"))]
+        return [c for c in build_cards(scans, settings, provider.now) if c.units == 0]
     assert not unbacked(plain)
     assert not unbacked(Settings(min_ev=0.5, daily_lock=True))  # the daily Lock never posts a side that loses to its price
 
@@ -443,10 +441,8 @@ def test_dog_of_the_day_only_when_we_think_the_dog_can_win():
     from sportsedge.tiers import DOG_FLOOR_WIN
 
     for c in build_cards(scans, engine.settings, provider.now):
-        if c.tier == "dog":
-            assert c.pick.win_prob >= DOG_FLOOR_WIN
-            if c.pick.win_prob < DOG_MIN_WIN:
-                assert c.reasons[0].startswith("Best live dog on the board")
+        if c.tier == "dog":  # only a dog we think can win, at a price it beats
+            assert c.pick.win_prob >= max(DOG_FLOOR_WIN, DOG_MIN_WIN) and c.pick.ev > 0
     led = Ledger()
     now = START - timedelta(hours=3)
     long = card(make_pick(event_id="d1", market="h2h", side="away", point=None, american=220, win_prob=0.32,
@@ -506,20 +502,3 @@ def test_props_use_this_seasons_box_scores_only():
     assert [pg.player for pg in this_season(lines, results)] == ["New Guy"]
     assert this_season(lines, results[:5]) == lines  # no off-season in sight: nothing dropped
 
-
-def test_daily_fallback_dog_is_not_pulled_for_missing_break_even():
-    from dataclasses import replace
-    from datetime import timedelta
-
-    from sportsedge.ledger import Ledger
-    from tests.test_ledger import START, card, make_pick
-
-    pick = make_pick(market="h2h", side="away", point=None, american=105, ev=-0.043, win_prob=0.467,
-                     market_prob=0.465)
-    L = Ledger()
-    L.publish([replace(card(pick), tier="dog", units=0.0)], START - timedelta(hours=10))
-    assert not L.withdraw(Settings(proven=set(), daily_heads=True), START - timedelta(hours=9))
-    weak = make_pick(market="h2h", side="away", point=None, american=180, ev=-0.10, win_prob=0.32,
-                     event_id="ev2", market_prob=0.33)
-    L.publish([replace(card(weak), tier="dog", units=0.0)], START - timedelta(hours=10))
-    assert [e.event_id for e in L.withdraw(Settings(proven=set(), daily_heads=True), START - timedelta(hours=9))] == ["ev2"]

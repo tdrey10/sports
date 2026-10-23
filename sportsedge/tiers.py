@@ -386,18 +386,8 @@ def build_cards(
                 dog = max(near, key=lambda p: p.ev)
                 chosen.append(("dog", dog))
                 lean_ids.add(id(dog))
-            else:
-                # The owner's call: a Dog every day. With no 45%+ dog, the most likely dog to win
-                # outright on today's board (40%+, a fair price on our number), as a no-unit lean.
-                live = [p for p in game
-                        if p.market == "h2h" and DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS
-                        and now < p.commence_time <= soon_cut and id(p) not in used_now and not p.warnings
-                        and p.win_prob >= DOG_FLOOR_WIN and p.ev >= DOG_FALLBACK_FLOOR_EV]
-                if live:
-                    dog = max(live, key=lambda p: (p.win_prob, p.ev))
-                    chosen.append(("dog", dog))
-                    lean_ids.add(id(dog))
-                    live_dog_ids.add(id(dog))
+            # No fallback Dog (owner, Oct 23: "Why would we put a dog bet out and then say no juice
+            # here?"). The Dog of the Day posts only when a 45%+ dog beats its price; otherwise none.
     used = {id(p) for _, p in chosen}
     chosen += [("value", p) for p in soon if id(p) not in used and p.win_prob >= LEGIT_MIN_WIN][:max_value]
     # Early: any game more than a day out where our number beats the price (a real edge, however
