@@ -102,6 +102,7 @@ LONGSHOT_MAX_UNITS = 0.5
 
 
 UNPROVEN_MAX_UNITS = 0.5
+HEAD_MAX_UNITS = 1.0  # the daily Lock/Dog: ½u on a thin real edge, up to 1u on a strong one (unproven types)
 STUDY_MARKET = {"h2h": "moneyline", "spreads": "spreads", "totals": "over/under"}
 
 
@@ -179,21 +180,38 @@ def track_line(pick: Pick, settings: Settings | None) -> str | None:
     return "Blind study, bets like this in " + pick.sport.upper() + ": " + ", ".join(parts) + "." if parts else None
 
 
-def units_for(pick: Pick, settings: Settings | None = None) -> float:
+def verified(p: Pick) -> bool:
+    """A real market price to check our number against (see build_cards)."""
+    if p.is_prop:
+        from .data.espn_odds import ESTIMATED_BOOK
+
+        return p.book != ESTIMATED_BOOK
+    return p.market_prob is not None
+
+
+def units_for(pick: Pick, settings: Settings | None = None, cap: float | None = None) -> float:
     """Quarter-Kelly stake as units (1 unit = 1% of bankroll), rounded to half units.
+
+    Owner, Oct 23: "The more the units are the better the bet is. If the bet isn't worth the money
+    then don't add units." So the stake grows with the edge, and an edge too thin to reach half a
+    unit gets none (0.0): it can still post, but with no money on it.
 
     Long shots (+400 and up) are capped at half a unit: their win probability
     is the hardest number to get right, and Kelly sizes them off it. So is any
-    sport and bet type that hasn't been proven in a blind test.
+    sport and bet type that hasn't been proven in a blind test (``cap`` overrides that).
     """
     units = round(pick.kelly * 100 * 2) / 2
-    cap = LONGSHOT_MAX_UNITS if pick.american >= LONGSHOT_ODDS else MAX_UNITS
-    if not is_proven(pick, settings):
-        cap = min(cap, UNPROVEN_MAX_UNITS)
+    top = LONGSHOT_MAX_UNITS if pick.american >= LONGSHOT_ODDS else MAX_UNITS
+    if cap is not None:
+        top = min(top, cap)
+    elif not is_proven(pick, settings):
+        top = min(top, UNPROVEN_MAX_UNITS)
     if settings is not None:
         units *= settings.clv_trust.get(market_key(pick), 1.0)  # adaptive: our CLV record
         units = round(units * 2) / 2
-    return min(max(units, 0.5), cap)
+    if units < 0.5:
+        return 0.0  # not worth the money
+    return min(units, top)
 
 
 def overreach(p: Pick) -> bool:
@@ -285,6 +303,11 @@ def build_cards(
     every = [p for p in every if p.event_id not in unknown]
     blocked = []
     game = [p for p in game if p.event_id not in unknown]
+    # Owner, Oct 23: "No pick should ever not be verified." Every pick needs a real market price to
+    # check our number against: game lines a consensus price, props a real book price (never the
+    # assumed -115 put on lines ESPN publishes without a price).
+    game = [p for p in game if verified(p)]
+    props = [p for p in props if verified(p)]
     props = [p for p in props if p.event_id not in unknown]
 
     soon_cut = now + timedelta(hours=EARLY_HOURS)
@@ -514,7 +537,10 @@ def build_cards(
                                "by more than luck.")
         # The owner's rule: the Lock is never a lean. Unproven, it carries a small stake, but only
         # if it passes every bet rule; otherwise it stays a no-unit lean as before.
-        head_units = settings.lock_units if tier == "lock" else settings.dog_units if tier == "dog" else 0.0
+        # The Lock's and Dog's stake grows with the edge (½u thin, 1u strong), capped at
+        # HEAD_MAX_UNITS while the bet type is unproven; an edge too thin for ½u gets no units.
+        head_cap = settings.lock_units if tier == "lock" else settings.dog_units if tier == "dog" else 0.0
+        head_units = units_for(pick, settings, cap=max(head_cap, HEAD_MAX_UNITS)) if head_cap > 0 else 0.0
         small_lock = (head_units > 0 and not earns_units(pick, in_spots)
                       and pick.ev > 0 and pick.american >= LOCK_MIN_ODDS and not pick.warnings
                       and pick.market_prob is not None  # a real edge needs a market price to check against
@@ -524,9 +550,9 @@ def build_cards(
             fallback = id(pick) in lean_ids
             lean_ids.discard(id(pick))
             best_rank.pop(id(pick), None)  # unproven: not a Top bet
-            bullets.insert(0, f"Small stake ({head_units:g}u): today's {'Lock' if tier == 'lock' else 'Dog'} gets one "
-                              "when it beats its price. This bet type hasn't beaten the closing line in a blind test "
-                              "yet, so it stays small.")
+            bullets.insert(0, f"{head_units:g}u: today's {'Lock' if tier == 'lock' else 'Dog'} beats its price by "
+                              f"{pick.ev:+.1%}, sized to that edge (½u thin, 1u strong). This bet type hasn't beaten "
+                              "the closing line in a blind test yet, so it stays at 1u or less.")
             if fallback:
                 bullets.insert(0, f"Today's best Lock: the strongest side on the board ({pick.win_prob:.0%} on our "
                                   f"numbers, {pick.ev:+.1%} edge), -170 or better, injuries known.")
@@ -570,12 +596,17 @@ def build_cards(
                               f"{cash:.0%} after calibration with a real edge (score {sc:.0f}), injuries are "
                               f"known, -170 or better, and both teams have {LOCK_MIN_GAMES}+ games this season.")
         ctx = scan.contexts.get(pick.event_id) if scan else None
+        stake = (head_units if small_lock
+                 else units_for(pick, settings)
+                 if tier in UNIT_TIERS and id(pick) not in lean_ids and id(pick) not in no_units else 0.0)
+        if (not small_lock and stake == 0 and tier in UNIT_TIERS and id(pick) not in lean_ids
+                and id(pick) not in no_units):
+            bullets.insert(0, f"No units: a {pick.ev:+.1%} edge is too thin to be worth money. "
+                              "The bigger the edge, the more units; this one doesn't reach ½u.")
         cards.append(
             Card(
                 tier=tier,
-                units=(head_units if small_lock
-                       else units_for(pick, settings)
-                       if tier in UNIT_TIERS and id(pick) not in lean_ids and id(pick) not in no_units else 0.0),
+                units=stake,
                 headline=headline,
                 reasons=bullets,
                 sport=pick.sport,
