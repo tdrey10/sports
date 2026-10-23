@@ -502,3 +502,17 @@ def test_props_use_this_seasons_box_scores_only():
     assert [pg.player for pg in this_season(lines, results)] == ["New Guy"]
     assert this_season(lines, results[:5]) == lines  # no off-season in sight: nothing dropped
 
+
+
+def test_dog_of_the_day_gets_half_a_unit_when_it_beats_its_price():
+    provider = SampleProvider(seed=5)
+    settings = Settings(proven=set())
+    engine = Engine(provider, settings, now=provider.now)
+    scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
+    for c in build_cards(scans, settings, provider.now):
+        if c.tier in ("lock", "dog"):
+            assert c.pick.market_prob is not None  # always checked against a market price
+            if c.tier == "dog" and c.units > 0:
+                assert c.units == settings.dog_units == 0.5 and c.pick.ev > 0 and c.pick.american > 0
+    none = Settings(proven=set(), dog_units=0.0)
+    assert all(c.units == 0 for c in build_cards(scans, none, provider.now) if c.tier == "dog")

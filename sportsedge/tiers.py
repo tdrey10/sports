@@ -345,6 +345,7 @@ def build_cards(
         pool = source if source is not None else game + [b for b in blocked if not b.is_prop]
         base = [p for p in pool
                 if now < p.commence_time <= soon_cut and not p.warnings and p.american >= settings.max_favorite
+                and p.market_prob is not None  # no market price, no way to check the edge: never a Lock/Dog
                 and extra(p)]
         tiers = [[p for p in base if p.ev > 0 and p.event_id not in unknown], [p for p in base if p.ev > 0]]
         if settings.fill:
@@ -513,15 +514,19 @@ def build_cards(
                                "by more than luck.")
         # The owner's rule: the Lock is never a lean. Unproven, it carries a small stake, but only
         # if it passes every bet rule; otherwise it stays a no-unit lean as before.
-        small_lock = (tier == "lock" and settings.lock_units > 0 and not earns_units(pick, in_spots)
+        head_units = settings.lock_units if tier == "lock" else settings.dog_units if tier == "dog" else 0.0
+        small_lock = (head_units > 0 and not earns_units(pick, in_spots)
                       and pick.ev > 0 and pick.american >= LOCK_MIN_ODDS and not pick.warnings
+                      and pick.market_prob is not None  # a real edge needs a market price to check against
+                      and (tier == "lock" or (pick.american > 0 and pick.win_prob >= DOG_MIN_WIN))
                       and not (ctx and ctx.injuries_unknown))
         if small_lock:
             fallback = id(pick) in lean_ids
             lean_ids.discard(id(pick))
             best_rank.pop(id(pick), None)  # unproven: not a Top bet
-            bullets.insert(0, f"Small stake ({settings.lock_units:g}u): today's Lock always gets one. This bet type "
-                              "hasn't beaten the closing line in a blind test yet, so it stays small.")
+            bullets.insert(0, f"Small stake ({head_units:g}u): today's {'Lock' if tier == 'lock' else 'Dog'} gets one "
+                              "when it beats its price. This bet type hasn't beaten the closing line in a blind test "
+                              "yet, so it stays small.")
             if fallback:
                 bullets.insert(0, f"Today's best Lock: the strongest side on the board ({pick.win_prob:.0%} on our "
                                   f"numbers, {pick.ev:+.1%} edge), -170 or better, injuries known.")
@@ -568,7 +573,7 @@ def build_cards(
         cards.append(
             Card(
                 tier=tier,
-                units=(settings.lock_units if small_lock
+                units=(head_units if small_lock
                        else units_for(pick, settings)
                        if tier in UNIT_TIERS and id(pick) not in lean_ids and id(pick) not in no_units else 0.0),
                 headline=headline,

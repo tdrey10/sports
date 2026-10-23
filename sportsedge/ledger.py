@@ -362,9 +362,10 @@ class Ledger:
                 why = "no market price to check our number against"
             elif e.tier in ("value", "early") and e.win_prob < LEGIT_MIN_WIN:
                 why = f"wins only {e.win_prob:.0%} of the time on our numbers"
-            elif e.tier == "lock" and getattr(settings, "lock_units", 0) > 0:
-                # The daily Lock's small stake is the owner's rule, not a proven bet type: it stays
-                # while it still beats its price's break-even.
+            elif (e.tier == "lock" and getattr(settings, "lock_units", 0) > 0) \
+                    or (e.tier == "dog" and getattr(settings, "dog_units", 0) > 0):
+                # The daily Lock's and Dog's small stake is the owner's rule, not a proven bet type:
+                # it stays while it still beats its price's break-even.
                 if e.win_prob <= break_even(e.odds):
                     why = f"no longer beats the break-even at {e.odds:+.0f}"
             else:

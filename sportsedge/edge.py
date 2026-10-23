@@ -55,6 +55,10 @@ class Settings:
     # still carries this small stake, as long as it passes every bet rule (-170 or better, a
     # positive edge that beats the price's break-even, injuries known). 0 turns it off.
     lock_units: float = 0.5
+    # Owner, Oct 23: "There needs to be units when there's a dog bet." The Dog of the Day gets the
+    # same small stake as the Lock, under the same rules: it beats its price (a real edge against a
+    # market price), 45%+ to win, plus money, injuries known. 0 turns it off.
+    dog_units: float = 0.5
     # Optional hold: before this local hour, runs watch the lines but post no picks. Off (None)
     # by default: a pick posts the moment an edge is found, day or night.
     board_hour: int | None = None
