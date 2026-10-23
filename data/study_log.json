@@ -262,5 +262,16 @@
   "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 of 100 passed; 144 variants at 1 in 150 each give about 1 pass from luck alone",
   "verdict": "none proven: 0 of 144 variants cleared the bar, so the market prices early-season and late-season games fine. Dropped.",
   "action": "none. Code: sportsedge/seasonstudy.py (rerunnable, not in the daily run)"
+ },
+ {
+  "date": "2026-10-23",
+  "idea": "Road trips and homestands: dogs (+100 to +220 closing) and lock-price favorites (-170 to -120) by how many games in a row the bet side has played at its venue kind (road trip, homestand, first game back), and the same for the opponent being on a long trip or homestand",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing lines 2018+ (sportsedge/tripstudy.py)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong",
+  "verdict": "none proven: 0 of 72 variants cleared the bar (luck alone gave 0 of 100). Best blind looks were tiny or lost in tuning: NCAAB dog homestand 3+ (+20% on 71, tuning -19%), NBA lock favorite on a road trip 3+ (tuning +13%, blind -14%). Long road-trip dogs lose in NBA (-17.5% blind on 228) and NHL; the market prices travel fine. Dropped.",
+  "action": "logged; no change to bet rules"
  }
 ]
