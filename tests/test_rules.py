@@ -330,8 +330,9 @@ def test_money_only_on_proven_bet_types():
 
 
 def test_the_lock_is_never_a_lean_when_it_passes_every_rule():
-    """Owner's rule: an unproven Lock still carries a small stake (never a lean), but only if it
-    passes every bet rule; it is kept out of the Top bets, and lock_units=0 restores the lean."""
+    """Owner's rule: an unproven Lock carries a stake sized to its edge (½u thin, 1u strong) if it
+    passes every bet rule; an edge too thin for ½u gets none. It stays out of the Top bets, and
+    lock_units=0 turns the stake off."""
     from sportsedge.ledger import break_even
 
     provider = SampleProvider(seed=5)
@@ -339,10 +340,14 @@ def test_the_lock_is_never_a_lean_when_it_passes_every_rule():
     scans = [engine.scan(c) for c in resolve("nba,nhl,mlb")]
     nothing_proven = Settings(proven=set())
     (lock,) = [c for c in build_cards(scans, nothing_proven, provider.now) if c.tier == "lock"]
-    assert lock.units == 0.5 and lock.best_rank is None
+    from sportsedge.tiers import HEAD_MAX_UNITS, units_for
+
+    assert lock.units == units_for(lock.pick, nothing_proven, cap=HEAD_MAX_UNITS) and lock.best_rank is None
+    assert lock.units in (0.0, 0.5, 1.0)  # sized to the edge; this sample's thin edge gets none
     assert lock.pick.ev > 0 and lock.pick.american >= -170
     assert lock.pick.win_prob > break_even(lock.pick.american)
-    assert lock.reasons[0].startswith(("Small stake", "Today's best Lock"))
+    strong = make_pick(market="h2h", american=-130, win_prob=0.62, kelly=0.03)
+    assert units_for(strong, nothing_proven, cap=HEAD_MAX_UNITS) == 1.0  # a strong edge gets more
     (off,) = [c for c in build_cards(scans, Settings(proven=set(), lock_units=0), provider.now) if c.tier == "lock"]
     assert off.units == 0
 
@@ -504,7 +509,7 @@ def test_props_use_this_seasons_box_scores_only():
 
 
 
-def test_dog_of_the_day_gets_half_a_unit_when_it_beats_its_price():
+def test_dog_of_the_day_gets_units_sized_to_its_edge():
     provider = SampleProvider(seed=5)
     settings = Settings(proven=set())
     engine = Engine(provider, settings, now=provider.now)
@@ -513,6 +518,22 @@ def test_dog_of_the_day_gets_half_a_unit_when_it_beats_its_price():
         if c.tier in ("lock", "dog"):
             assert c.pick.market_prob is not None  # always checked against a market price
             if c.tier == "dog" and c.units > 0:
-                assert c.units == settings.dog_units == 0.5 and c.pick.ev > 0 and c.pick.american > 0
+                assert c.units in (0.5, 1.0) and c.pick.ev > 0 and c.pick.american > 0  # sized to the edge
     none = Settings(proven=set(), dog_units=0.0)
     assert all(c.units == 0 for c in build_cards(scans, none, provider.now) if c.tier == "dog")
+
+
+def test_no_pick_is_ever_unverified():
+    from dataclasses import replace
+
+    from sportsedge.data.espn_odds import ESTIMATED_BOOK
+    from sportsedge.tiers import verified
+
+    p = make_pick(market="h2h", american=120, market_prob=0.45)
+    assert verified(p) and not verified(replace(p, market_prob=None))
+    prop = replace(p, player="Somebody", market="player_points")
+    assert verified(replace(prop, book="draftkings")) and not verified(replace(prop, book=ESTIMATED_BOOK))
+    provider = SampleProvider(seed=5)
+    engine = Engine(provider, Settings(), now=provider.now)
+    scans = [engine.scan(c, props=True) for c in resolve("nba,nhl,mlb")]
+    assert all(verified(c.pick) for c in build_cards(scans, engine.settings, provider.now))

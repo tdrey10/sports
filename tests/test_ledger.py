@@ -128,7 +128,7 @@ def test_learn_weights_prefers_the_better_source():
 
 def test_units_from_kelly():
     assert units_for(make_pick(kelly=0.012)) == 1.0
-    assert units_for(make_pick(kelly=0.001)) == 0.5
+    assert units_for(make_pick(kelly=0.001)) == 0.0  # owner: not worth the money, no units
     assert units_for(make_pick(kelly=0.2)) == 3.0
 
 
