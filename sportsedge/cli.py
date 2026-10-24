@@ -180,6 +180,7 @@ def _settings(args) -> Settings:
         kelly_multiplier=args.kelly,
         max_stake=args.max_stake,
         hide_flagged=not args.show_flagged,
+        engine="legacy" if getattr(args, "demo", False) else "d503",  # demo teams have no history
     )
 
 
@@ -386,6 +387,7 @@ class Workspace:
             first_seen=self._first_seen(sports),
             teaser_study=None if self.demo else self._nfl_history(),
             forecast_study=None if self.demo else self._forecast_study(),
+            d5_models_path=str(self.data_dir / "d5_models.json"), d5_root=str(self.data_dir),
         )
         self.brains.update(res.brains)
         self.weights = res.weights
@@ -689,6 +691,25 @@ def cmd_forecast_study(args) -> int:
     return 0
 
 
+def cmd_d5_fit(args) -> int:
+    """Refit the D503 engine: Elo K / home edge, the own-read model and the market blend per sport."""
+    from .d5 import model
+
+    data_dir = Path(args.data_dir)
+    models = {}
+    for sport in ("nfl", "ncaaf", "nba", "mlb", "nhl", "ncaab"):
+        try:
+            m = models[sport] = model.fit(sport, root=data_dir)
+        except Exception as exc:  # a sport with no history keeps its last saved model
+            print(f"D503 {sport}: refit failed ({exc})")
+            continue
+        print(f"D503 {sport}: K {m.k:g} HFA {m.hfa:g}, {m.games} games, accuracy {m.accuracy}, "
+              f"blend {[round(x, 3) for x in m.blend]}, bias {m.bias:+.4f}")
+    old = model.load_models(data_dir / "d5_models.json")
+    model.save({**old, **models}, data_dir / "d5_models.json")
+    return 0
+
+
 def cmd_soccer_study(args) -> int:
     """Soccer spots (form, streaks, head to head, scoring style, draws, rest), blind."""
     from . import soccerstudy
@@ -931,6 +952,9 @@ def build_parser() -> argparse.ArgumentParser:
     fs.add_argument("--data-dir", default="data")
     fs.add_argument("--sports", nargs="+", default=["mlb", "nhl", "nba", "nfl", "ncaaf", "ncaab"])
     fs.set_defaults(func=cmd_forecast_study)
+    d5 = sub.add_parser("d5-fit", help="refit the D503 engine (ratings, own read, market blend) per sport")
+    d5.add_argument("--data-dir", default="data")
+    d5.set_defaults(func=cmd_d5_fit)
 
     sc = sub.add_parser("soccer-study", help="soccer form/streak/head-to-head/style spots, blind")
     sc.add_argument("--data-dir", default="data")

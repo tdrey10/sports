@@ -13,10 +13,10 @@ from sportsedge.tiers import build_cards
 from tests.test_ledger import make_pick
 
 
-def test_never_bet_worse_than_minus_170():
-    s = Settings(min_ev=0.0)
-    ok = make_pick(american=-170, ev=0.03)
-    too_short = make_pick(american=-171, ev=0.03, event_id="ev2")
+def test_never_bet_worse_than_minus_150():
+    s = Settings(min_ev=0.0)  # owner, Oct 24: -150, the D503 rule
+    ok = make_pick(american=-150, ev=0.03)
+    too_short = make_pick(american=-151, ev=0.03, event_id="ev2")
     assert qualifying([ok, too_short], s) == [ok]
 
 

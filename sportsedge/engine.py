@@ -40,6 +40,9 @@ class EventContext:
     home_goalie_sv: tuple[float, float] | None = None  # NHL: (career save %, shots) of the probable goalie
     away_goalie_sv: tuple[float, float] | None = None
     away_pitcher_decisions: int = 0
+    injured: dict[str, list[tuple[str, str]]] = field(default_factory=dict)  # team -> (player, position) out
+    questionable: dict[str, list[tuple[str, str]]] = field(default_factory=dict)  # team -> (player, position)
+    open_prices: dict[str, float] = field(default_factory=dict)  # side -> first moneyline we saw (the open)
 
     @property
     def home_b2b(self) -> bool:
@@ -179,6 +182,10 @@ class Engine:
                     continue
                 out = [(p, pos) for p, status, pos in injuries[key] if is_out(status)]
                 ctx.injuries[team] = [p for p, _ in out]
+                ctx.injured[team] = out
+                ctx.questionable[team] = [(p, pos) for p, status, pos in injuries[key]
+                                          if "question" in str(status).lower() or "day-to-day" in str(status).lower()
+                                          or "game-time" in str(status).lower()]
                 for p, pos in out:
                     hit = injury_weights.get(pos.upper(), 0.0)
                     if hit:
@@ -186,6 +193,7 @@ class Engine:
                         ctx.injury_notes.append(f"{team} without {p} ({pos}): -{hit:.0%} win chance")
             ctx.spots = team_spots(cfg.key, home, away, event.commence_time, results, neutral)
             first = self.first_seen.get(cfg.key, {}).get(event.id, {})
+            ctx.open_prices = {k: v for k, v in first.items() if k in ("home", "away") and v is not None}
             for side in ("home", "away"):
                 prices = [q.american for q in event.quotes if q.market == "h2h" and q.side == side]
                 if "steam_dog" in SPOTS and cfg.key in SPOTS["steam_dog"].sports and prices \
