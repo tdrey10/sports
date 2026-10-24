@@ -481,7 +481,7 @@ def choose(sides: list[Side], now: datetime, taken: set[str] | frozenset = froze
             out.append(("value", 0.5, s, "Value play"))
             used.add(s.eid)
     gaps = [s for s in pool if s.sport == "ncaaf" and s.eid not in used and DOG_MIN <= s.odds <= DOG_MAX
-            and s.elo_pts >= 0 and s.raw_own - s.p_market >= 0.10]
+            and s.elo_pts >= 0 and s.raw_own - s.p_market >= 0.10 and s.beats_price()]
     for s in sorted(gaps, key=lambda s: s.raw_own - s.p_market, reverse=True):
         if s.eid not in used:
             s.notes.insert(0, f"🔍 Gap play: our ratings have {s.team} at {s.raw_own:.0%}, the books {s.p_market:.0%}.")
