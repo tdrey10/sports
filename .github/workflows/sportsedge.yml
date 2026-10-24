@@ -107,6 +107,13 @@ jobs:
         continue-on-error: true
         run: hambino forecast-study
 
+      # The D503 engine (the owner's call, Oct 24): refit Elo, the own-read model and the market
+      # blend per sport every morning; the board reads data/d5_models.json each run.
+      - name: D503 refit
+        if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
+        continue-on-error: true
+        run: hambino d5-fit
+
       # Soccer spots: form, streaks, head to head, scoring style, draws and rest, on the
       # engine's own 2024+ results and 2025+ closing prices (seven leagues).
       - name: Soccer study
@@ -154,7 +161,7 @@ jobs:
           git config user.email "sportsedge-bot@users.noreply.github.com"
           git add data/ledger.json data/brain.json
           # One path at a time: git add fails as a whole if any path is missing.
-          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/line_studies.json data/tennis_history.json data/forecast_study.json data/shop_study.json data/soccer_study.json data/study_log.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
+          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/line_studies.json data/tennis_history.json data/forecast_study.json data/d5_models.json data/shop_study.json data/soccer_study.json data/study_log.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
             if [ -e "$p" ]; then git add "$p"; fi
           done
           git diff --cached --quiet || git commit -m "Update pick ledger"

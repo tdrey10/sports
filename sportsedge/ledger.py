@@ -38,6 +38,9 @@ CLV_PRIOR = 30  # picks of "no edge" the CLV average is shrunk toward
 GRADE_AFTER = timedelta(hours=2)  # earliest a game can be final
 
 
+D503_MARK = "Engine: D503 formula."
+
+
 @dataclass
 class Entry:
     id: str
@@ -326,6 +329,8 @@ class Ledger:
         for e in sorted(self.entries.values(), key=lambda e: (not e.event_id.isdigit(), e.created_at)):
             if e.status != "pending" or e.start <= now or e.tier in LIVE_TIERS or e.tier == "sharp":
                 continue  # live and sharp-value bets have their own checks (and their own CLV record)
+            if D503_MARK in (e.reasons or []):
+                continue  # the D503 formula: a posted pick never changes
             if e.tier == "dog" and e.win_prob < DOG_FLOOR_WIN:
                 # A Dog of the Day is a dog with a real shot (40%+ on our number), not a long shot.
                 e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()

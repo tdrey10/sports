@@ -55,6 +55,9 @@ def run_cycle(
     first_seen=None,
     teaser_study: dict | None = None,
     forecast_study: dict | None = None,
+    d5_models: dict | None = None,
+    d5_models_path: str = "data/d5_models.json",
+    d5_root: str = "data",
 ) -> CycleResult:
     """``props_sports`` limits player props to those sport keys (None = every sport)."""
     out = CycleResult()
@@ -83,8 +86,23 @@ def run_cycle(
             out.brains[cfg.key] = scan.brain
     _funnel(out.scans, settings)
     held = settings.board_hour is not None and now.astimezone(ledger.tz).hour < settings.board_hour
-    cards = [] if held else build_cards(
-        out.scans, settings, now, taken_today=ledger.taken_today(now), best_taken=ledger.best_taken(now),
+    # Owner, Oct 24: the D503 formula runs the board for its six sports; the old board keeps the rest
+    # (soccer, UFC). The D503 Lock / Dog go first, so the old board never posts a second one.
+    d503 = settings.engine == "d503"
+    d5_cards: list = []
+    legacy_scans = out.scans
+    if d503:
+        from .d5 import board as d5board
+        from .d5.model import load_models
+
+        legacy_scans = [s for s in out.scans if s.sport.key not in d5board.D5_SPORTS]
+        if not held:
+            models = d5_models if d5_models is not None else load_models(d5_models_path)
+            d5_cards = d5board.build(out.scans, now, models, taken=set(ledger.taken_today(now)),
+                                     posted_events=set(ledger.open_events(now)), root=d5_root)
+    taken = set(ledger.taken_today(now)) | {c.tier for c in d5_cards if c.tier in ("lock", "dog")}
+    cards = [] if held else d5_cards + build_cards(
+        legacy_scans, settings, now, taken_today=taken, best_taken=ledger.best_taken(now),
         posted_today=ledger.posted_today(now), posted_events=ledger.open_events(now),
     )
     out.published = len(ledger.publish(cards, now))

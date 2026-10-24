@@ -174,8 +174,9 @@ def test_simulated_history_and_dashboard(tmp_path):
     provider = SampleProvider(seed=11)
     L = Ledger()
     sports = resolve("nba,nhl")
-    brains = simulate_history(provider, sports, L, Settings(), days=4, props=False)
-    res = run_cycle(provider, sports, L, Settings(), provider.now)
+    legacy = Settings(engine="legacy")  # made-up teams: the old board's mechanics (D503 needs real history)
+    brains = simulate_history(provider, sports, L, legacy, days=4, props=False)
+    res = run_cycle(provider, sports, L, legacy, provider.now)
     assert any(e.settled for e in L.entries.values())
     stats = L.stats(provider.now)
     assert stats["overall"]["won"] + stats["overall"]["lost"] > 0
@@ -370,9 +371,9 @@ def test_board_drops_at_8am_local():
 
     provider = SampleProvider(seed=5)
     hour = provider.now.astimezone(Ledger().tz).hour
-    held = run_cycle(provider, resolve("nba,nhl"), Ledger(), Settings(board_hour=hour + 1), provider.now)
+    held = run_cycle(provider, resolve("nba,nhl"), Ledger(), Settings(board_hour=hour + 1, engine="legacy"), provider.now)
     assert held.published == 0  # before the board drops: lines watched, nothing posted
-    open_ = run_cycle(provider, resolve("nba,nhl"), Ledger(), Settings(board_hour=hour), provider.now)
+    open_ = run_cycle(provider, resolve("nba,nhl"), Ledger(), Settings(board_hour=hour, engine="legacy"), provider.now)
     assert open_.published > 0
 
 
