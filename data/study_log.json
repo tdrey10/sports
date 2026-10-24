@@ -273,5 +273,16 @@
   "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong",
   "verdict": "none proven: 0 of 72 variants cleared the bar (luck alone gave 0 of 100). Best blind looks were tiny or lost in tuning: NCAAB dog homestand 3+ (+20% on 71, tuning -19%), NBA lock favorite on a road trip 3+ (tuning +13%, blind -14%). Long road-trip dogs lose in NBA (-17.5% blind on 228) and NHL; the market prices travel fine. Dropped.",
   "action": "logged; no change to bet rules"
+ },
+ {
+  "date": "2026-10-24",
+  "idea": "Teams beating or missing their prices: each team's average (result minus no-vig win chance) over its earlier games this season; dogs (+100 to +220 closing) and lock-price favorites (-170 to -120) when the bet side or the opponent is hot/cold against the price, and when the gap between them is 2x the cutoff",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing lines 2018+ (sportsedge/beatstudy.py)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong",
+  "verdict": "none wired: 2 of 72 variants cleared the bar, neither STRONG, about what luck gives across 72 tries (~0.5 expected at 1 in 150 per try, though the 100-spot control gave 0). NFL dog facing a team missing its prices (blind +17.3% on 110, tuning +4.9%) is contradicted by NFL dog that is itself missing its prices losing blind (-9.9% on 173). NCAAF dog missing its prices (blind +10.0% on 206, tuning +7.7%) is the one to watch but is not STRONG and has no mirror support (NCAAF lock favorites missing prices lose -21%). Dropped; recheck when more seasons are in.",
+  "action": "logged; no change to bet rules"
  }
 ]
