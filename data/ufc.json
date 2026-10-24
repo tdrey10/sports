@@ -1,14 +1,14 @@
 {
- "ran_at": "2026-10-24T15:40:42.915251+00:00",
- "fights": 4335,
- "called": 3640,
- "accuracy": 0.5818681318681319,
- "log_loss": 0.6802964535703566,
+ "ran_at": "2026-10-24T16:08:07.785949+00:00",
+ "fights": 4336,
+ "called": 3641,
+ "accuracy": 0.5819829717110684,
+ "log_loss": 0.6802877428940551,
  "calibration": [
   [
-   0.5316006622879244,
-   0.5639024390243902,
-   4100
+   0.5315992872565664,
+   0.5640087783467447,
+   4101
   ],
   [
    0.6214149860309529,
@@ -17,80 +17,16 @@
   ]
  ],
  "market": {
-  "bets": 14,
-  "won": 4,
+  "bets": 15,
+  "won": 5,
   "lost": 10,
-  "units": 1.5,
-  "roi": 0.10714285714285714,
-  "se": 0.4860939046567309,
+  "units": 6.2,
+  "roi": 0.41333333333333333,
+  "se": 0.546383492278931,
   "proven": false
  },
  "lines_saved": 48,
  "upcoming": [
-  {
-   "fight_id": "401911637",
-   "card": "UFC 333: Volkanovski vs. Evloev",
-   "date": "2026-10-24T16:00Z",
-   "weight": "Light Heavyweight",
-   "a": "Azamat Murzakanov",
-   "a_record": "16-1-0",
-   "b": "Dominick Reyes",
-   "b_record": "16-5-0",
-   "model_a": 0.584,
-   "a_fights": 8,
-   "b_fights": 11,
-   "a_ml": -192.0,
-   "b_ml": 160.0,
-   "market_a": 0.631
-  },
-  {
-   "fight_id": "401911638",
-   "card": "UFC 333: Volkanovski vs. Evloev",
-   "date": "2026-10-24T16:00Z",
-   "weight": "Middleweight",
-   "a": "Abus Magomedov",
-   "a_record": "29-7-1",
-   "b": "Cam Rowston",
-   "b_record": "15-3-0",
-   "model_a": 0.478,
-   "a_fights": 8,
-   "b_fights": 5,
-   "a_ml": -122.0,
-   "b_ml": 102.0,
-   "market_a": 0.526
-  },
-  {
-   "fight_id": "401911639",
-   "card": "UFC 333: Volkanovski vs. Evloev",
-   "date": "2026-10-24T16:00Z",
-   "weight": "Light Heavyweight",
-   "a": "Nikita Krylov",
-   "a_record": "31-12-0",
-   "b": "Abdul-Rakhman Yakhyaev",
-   "b_record": "10-0-0",
-   "model_a": 0.426,
-   "a_fights": 12,
-   "b_fights": 4,
-   "a_ml": 400.0,
-   "b_ml": -535.0,
-   "market_a": 0.192
-  },
-  {
-   "fight_id": "401911640",
-   "card": "UFC 333: Volkanovski vs. Evloev",
-   "date": "2026-10-24T16:00Z",
-   "weight": "Lightweight",
-   "a": "Grant Dawson",
-   "a_record": "24-3-1",
-   "b": "Nurullo Aliev",
-   "b_record": "12-0-0",
-   "model_a": 0.561,
-   "a_fights": 14,
-   "b_fights": 5,
-   "a_ml": -112.0,
-   "b_ml": -108.0,
-   "market_a": 0.504
-  },
   {
    "fight_id": "401911632",
    "card": "UFC 333: Volkanovski vs. Evloev",
@@ -167,9 +103,9 @@
    "model_a": 0.501,
    "a_fights": 2,
    "b_fights": 2,
-   "a_ml": -142.0,
-   "b_ml": 120.0,
-   "market_a": 0.563
+   "a_ml": -148.0,
+   "b_ml": 124.0,
+   "market_a": 0.572
   },
   {
    "fight_id": "401914105",
