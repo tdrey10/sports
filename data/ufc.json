@@ -1,14 +1,14 @@
 {
- "ran_at": "2026-10-24T13:41:24.752024+00:00",
- "fights": 4331,
- "called": 3636,
- "accuracy": 0.581958195819582,
- "log_loss": 0.6803162164565256,
+ "ran_at": "2026-10-24T14:41:28.260307+00:00",
+ "fights": 4333,
+ "called": 3638,
+ "accuracy": 0.5819131390874107,
+ "log_loss": 0.6802892754424907,
  "calibration": [
   [
-   0.5315892143520325,
-   0.56396484375,
-   4096
+   0.5315937248669541,
+   0.563933626159102,
+   4098
   ],
   [
    0.6214149860309529,
@@ -17,96 +17,16 @@
   ]
  ],
  "market": {
-  "bets": 12,
+  "bets": 13,
   "won": 4,
-  "lost": 8,
-  "units": 3.5,
-  "roi": 0.2916666666666667,
-  "se": 0.5514730045500639,
+  "lost": 9,
+  "units": 2.5,
+  "roi": 0.19230769230769232,
+  "se": 0.5169203105847835,
   "proven": false
  },
- "lines_saved": 47,
+ "lines_saved": 48,
  "upcoming": [
-  {
-   "fight_id": "401928047",
-   "card": "UFC 333: Volkanovski vs. Evloev",
-   "date": "2026-10-24T14:00Z",
-   "weight": "Bantamweight",
-   "a": "Colby Thicknesse",
-   "a_record": "9-1-0",
-   "b": "Asaf Chopurov",
-   "b_record": "11-0-0",
-   "model_a": 0.526,
-   "a_fights": 3,
-   "b_fights": 0,
-   "a_ml": 470.0,
-   "b_ml": -650.0,
-   "market_a": 0.168
-  },
-  {
-   "fight_id": "401930357",
-   "card": "UFC 333: Volkanovski vs. Evloev",
-   "date": "2026-10-24T14:00Z",
-   "weight": "Middleweight",
-   "a": "Abubakar Vagaev",
-   "a_record": "25-4-0",
-   "b": "Jacob Malkoun",
-   "b_record": "10-3-0",
-   "model_a": 0.455,
-   "a_fights": 1,
-   "b_fights": 9,
-   "a_ml": -155.0,
-   "b_ml": 130.0,
-   "market_a": 0.583
-  },
-  {
-   "fight_id": "401930915",
-   "card": "UFC 333: Volkanovski vs. Evloev",
-   "date": "2026-10-24T14:00Z",
-   "weight": "Featherweight",
-   "a": "Bolaji Oki",
-   "a_record": "10-4-0",
-   "b": "Daniel Santos",
-   "b_record": "14-3-0",
-   "model_a": 0.453,
-   "a_fights": 6,
-   "b_fights": 6,
-   "a_ml": -110.0,
-   "b_ml": -110.0,
-   "market_a": 0.5
-  },
-  {
-   "fight_id": "401930916",
-   "card": "UFC 333: Volkanovski vs. Evloev",
-   "date": "2026-10-24T14:00Z",
-   "weight": "Lightweight",
-   "a": "Kody Steele",
-   "a_record": "8-1-0",
-   "b": "Noah Gugnon",
-   "b_record": "10-2-0",
-   "model_a": 0.498,
-   "a_fights": 3,
-   "b_fights": 1,
-   "a_ml": -155.0,
-   "b_ml": 130.0,
-   "market_a": 0.583
-  },
-  {
-   "fight_id": "401930917",
-   "card": "UFC 333: Volkanovski vs. Evloev",
-   "date": "2026-10-24T14:00Z",
-   "weight": "W Strawweight",
-   "a": "Iasmin Lucindo",
-   "a_record": "18-6-0",
-   "b": "Nicolle Caliari",
-   "b_record": "9-4-0",
-   "model_a": 0.579,
-   "a_fights": 7,
-   "b_fights": 4,
-   "a_ml": -440.0,
-   "b_ml": 340.0,
-   "market_a": 0.782
-  },
   {
    "fight_id": "401911637",
    "card": "UFC 333: Volkanovski vs. Evloev",
@@ -151,9 +71,9 @@
    "model_a": 0.426,
    "a_fights": 12,
    "b_fights": 4,
-   "a_ml": 410.0,
-   "b_ml": -550.0,
-   "market_a": 0.188
+   "a_ml": 400.0,
+   "b_ml": -535.0,
+   "market_a": 0.192
   },
   {
    "fight_id": "401911640",
@@ -167,9 +87,9 @@
    "model_a": 0.561,
    "a_fights": 14,
    "b_fights": 5,
-   "a_ml": -115.0,
-   "b_ml": -105.0,
-   "market_a": 0.511
+   "a_ml": -112.0,
+   "b_ml": -108.0,
+   "market_a": 0.504
   },
   {
    "fight_id": "401911632",
@@ -342,6 +262,19 @@
    "market_a": 0.355
   },
   {
+   "fight_id": "401931617",
+   "card": "UFC Fight Night: Moicano vs. Nolan",
+   "date": "2026-10-31T21:00Z",
+   "weight": "Middleweight",
+   "a": "Zach Reese",
+   "a_record": "10-4-0",
+   "b": "Mickey Gall",
+   "b_record": "7-7-0",
+   "model_a": 0.598,
+   "a_fights": 9,
+   "b_fights": 8
+  },
+  {
    "fight_id": "401921310",
    "card": "UFC Fight Night: Moicano vs. Nolan",
    "date": "2026-11-01T00:00Z",
@@ -404,6 +337,35 @@
    "a_ml": -125.0,
    "b_ml": 105.0,
    "market_a": 0.532
+  },
+  {
+   "fight_id": "401931615",
+   "card": "UFC Fight Night: Moicano vs. Nolan",
+   "date": "2026-11-01T00:00Z",
+   "weight": "Featherweight",
+   "a": "Francis Marshall",
+   "a_record": "10-3-0",
+   "b": "Dakota Hope",
+   "b_record": "11-2-0",
+   "model_a": 0.569,
+   "a_fights": 8,
+   "b_fights": 1,
+   "a_ml": -258.0,
+   "b_ml": 210.0,
+   "market_a": 0.691
+  },
+  {
+   "fight_id": "401931616",
+   "card": "UFC Fight Night: Moicano vs. Nolan",
+   "date": "2026-11-01T00:00Z",
+   "weight": "Welterweight",
+   "a": "Randy Brown",
+   "a_record": "20-8-0",
+   "b": "Jacobe Smith",
+   "b_record": "13-0-0",
+   "model_a": 0.478,
+   "a_fights": 15,
+   "b_fights": 5
   },
   {
    "fight_id": "401911642",
