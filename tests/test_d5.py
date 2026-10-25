@@ -124,3 +124,31 @@ def test_dog_score_bye_and_ice_cold_fire():
     assert "ice cold" in notes
     assert round(dog.dog_score, 2) == round(5.4 - 1, 2)  # his Illinois: +5.4 base, +2 bye, -3 ice cold = 4.4
     assert dog.dog_p is not None  # past the college gate of 4
+
+
+def test_audit_names_why_we_missed_his_pick(tmp_path):
+    from sportsedge.d5 import audit
+
+    his = [{"date": "2026-10-24", "kind": "dog", "units": 2.0, "american": 310,
+            "legs": [{"game_id": "ncaaf:g9", "home": True, "team": "Illinois", "market": "ml", "p": 0.288,
+                      "dog_score": 4.39, "reasons": ["better QB play lately"]}]},
+           {"date": "2026-10-24", "kind": "dog", "units": 2.0, "american": 180,
+            "legs": [{"game_id": "ncaaf:g8", "home": True, "team": "Wyoming", "market": "ml"}]},
+           {"date": "2026-10-24", "kind": "lean", "units": 0, "legs": [{"game_id": "ncaaf:g7", "market": "ml"}]}]
+    ours = side(310, 0.288, 0.288, p_market=0.234, sport="ncaaf", eid="g9", reasons=())
+    ours.dog_score = 1.6
+    caught = side(180, 0.40, 0.40, p_market=0.34, sport="ncaaf", eid="g8")
+    rows = audit.run(his, [ours, caught], {("g8", "home"): "dog"}, NOW, tmp_path / "a.json", days=("2026-10-24",))
+    assert [r["status"] for r in rows] == ["missed", "caught"]  # leans are not money picks
+    assert any("under the NCAAF gate of 4" in w for w in rows[0]["why"])
+    assert any("no reason" in w for w in rows[0]["why"])
+    assert len(audit.json.loads((tmp_path / "a.json").read_text())) == 2
+
+
+def test_a_gated_dog_needs_no_other_reason():
+    from sportsedge.d5.board import good
+
+    dog = side(180, 0.40, 0.40, p_market=0.34, sport="ncaaf", reasons=())
+    assert not good(dog)
+    dog.dog_score, dog.dog_p = 7.1, 0.41  # past the college gate: his Wyoming +180
+    assert good(dog)

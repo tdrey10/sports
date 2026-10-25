@@ -161,7 +161,7 @@ jobs:
           git config user.email "sportsedge-bot@users.noreply.github.com"
           git add data/ledger.json data/brain.json
           # One path at a time: git add fails as a whole if any path is missing.
-          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/line_studies.json data/tennis_history.json data/forecast_study.json data/d5_models.json data/qb data/shop_study.json data/soccer_study.json data/study_log.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
+          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/line_studies.json data/tennis_history.json data/forecast_study.json data/d5_models.json data/d5_audit.json data/qb data/shop_study.json data/soccer_study.json data/study_log.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
             if [ -e "$p" ]; then git add "$p"; fi
           done
           git diff --cached --quiet || git commit -m "Update pick ledger"
