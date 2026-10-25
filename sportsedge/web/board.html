@@ -288,6 +288,11 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; display:
 .stat small { font-size: 13px; color: var(--muted); }
 .chart { width: 100%; height: 110px; display: block; }
 .table-wrap { overflow-x: auto; }
+.nba td, .nba th { white-space: normal; vertical-align: top; }
+.nba td:first-child, .nba th:first-child { text-align: left; }
+.nba td small { white-space: nowrap; }
+.nba-game { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; display: grid; gap: 4px; }
+.nba-game strong { font: 700 17px/1.3 var(--body); }
 table { width: 100%; border-collapse: collapse; font-size: 15px; }
 th, td { padding: 8px 8px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--line); }
 th:first-child, td:first-child { text-align: left; }
@@ -366,7 +371,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"], ["tennis", "Tennis"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
-  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["scores", "Live Scores"], ["predict", "Predictions"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
+  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["scores", "Live Scores"], ["predict", "Predictions"], ["nba", "NBA"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
   const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
     live: "Live", live_win: "Live · likely winner", live_plus: "Live · plus money", sharp: "Sharp value" };
   const state = { tab: "today", sport: "all", market: "all" };
@@ -682,6 +687,55 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
 
   // Predictions: every game, not just the picks. Projected score and who we think wins.
+  // Owner, Oct 25: the NBA player report. Who's hurt, who's cold or hot, the starters at every
+  // position, which teams are due, and the blind study. Research only: nothing here carries units.
+  function viewNba() {
+    const R = DATA.nba;
+    if (!R) return panel("NBA report", "", empty("The NBA report builds on the next engine run."));
+    const POS = ["PG", "SG", "SF", "PF", "C"];
+    const tsTxt = (x) => (x == null ? "–" : (x * 100).toFixed(1) + "%");
+    const short = (t) => String(t || "").split(" ").slice(-1)[0];
+    const games = (R.matchups || []).map((m) => {
+      const ml = (x) => (x == null ? "" : ` ${odds(x)}`);
+      const angle = m.angle ? `<p class="small"><span class="tag value">Proven angle</span> ${esc(m.angle)} against the spread: an unlucky team vs a lucky one (+12% blind on 137 games since 2022; research, not strong enough for units yet).</p>` : "";
+      return `<article class="nba-game"><strong>${esc(m.away)}${ml(m.away_ml)} @ ${esc(m.home)}${ml(m.home_ml)}</strong>
+        <div class="muted small">${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}${m.spread != null ? ` · ${esc(short(m.home))} ${m.spread > 0 ? "+" : ""}${m.spread}` : ""}</div>
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both teams healthy, nothing cold, hot or due.</p>`}${angle}</article>`;
+    }).join("");
+    const teams = Object.entries(R.teams || {});
+    const hurt = teams.filter(([, t]) => t.hurt.length).sort((a, b) => b[1].minutes_out - a[1].minutes_out).map(([name, t]) =>
+      `<tr><td>${esc(name)}</td><td>${t.hurt.map((h) => `${esc(h.name)} <small>${esc(h.pos)}${h.starter ? " · starter" : ""} · ${h.status}${h.mpg ? ` · ${h.mpg} min, ${h.ppg} pts` : ""}</small>`).join("<br>")}</td><td>${pct(t.minutes_out)}</td><td>${pct(t.points_out)}</td></tr>`).join("");
+    const form = (tag) => (R.players || []).filter((p) => p.form && p.form.tag === tag)
+      .sort((a, b) => (tag === "hot" ? b.form.d_ts - a.form.d_ts : a.form.d_ts - b.form.d_ts)).slice(0, 15)
+      .map((p) => `<tr><td>${esc(p.name)} <small>${esc(p.pos)} · ${esc(short(p.team))}</small></td><td>${p.form.ppg} pts</td><td>${tsTxt(p.form.ts)} <small>(${signed(p.form.d_ts * 100, 1)} vs ${esc(p.form.vs)})</small></td><td>${p.form.mpg} min</td><td>${signed(p.form.pm, 1)}</td></tr>`).join("");
+    const formTable = (rows, none) => rows ? `<div class="table-wrap"><table><thead><tr><th>Player</th><th>Scoring</th><th>True shooting</th><th>Minutes</th><th>+/-</th></tr></thead><tbody>${rows}</tbody></table></div>` : empty(none);
+    const lineups = teams.filter(([, t]) => Object.keys(t.lineup).length).map(([name, t]) => {
+      const out = new Set(t.hurt.map((h) => h.name));
+      const cell = (pos) => { const n = t.lineup[pos]; if (!n) return "<td>–</td>";
+        const h = t.hurt.find((x) => x.name === n);
+        return `<td>${esc(n.split(" ").slice(-1)[0])}${h ? ` <small class="${h.status === "out" ? "neg" : ""}">${h.status}</small>` : ""}${t.cold.includes(n) ? " 🥶" : t.hot.includes(n) ? " 🔥" : ""}</td>`; };
+      return `<tr><td>${esc(short(name))}</td>${POS.map(cell).join("")}</tr>`;
+    }).join("");
+    const due = teams.filter(([, t]) => t.due).sort((a, b) => ((a[1].due.luck ?? 0) - (b[1].due.luck ?? 0)) || ((a[1].due.last5 ?? 0) - (b[1].due.last5 ?? 0)))
+      .map(([name, t]) => { const d = t.due;
+        return `<tr><td>${esc(name)}</td><td>${d.w}-${d.l}</td><td>${signed(d.diff, 1)}</td><td>${d.luck == null ? "–" : signed(d.luck * 100, 0)}</td><td>${d.close > 0 ? "+" : ""}${d.close}</td><td>${d.last5 == null ? "–" : signed(d.last5, 1)}</td><td class="small">${esc((d.notes || []).join("; "))}</td></tr>`; }).join("");
+    const st = R.study;
+    const studyRows = st ? st.rows.filter((r) => r.blind.bets >= 60).sort((a, b) => (b.blind.flat_roi ?? -1) - (a.blind.flat_roi ?? -1)).slice(0, 8)
+      .map((r) => `<tr><td>${esc(r.variant)} <small>${esc(r.market)}</small></td><td>${r.in_sample.bets} · ${signed((r.in_sample.flat_roi || 0) * 100, 1)}%</td><td class="${cls(r.blind.flat_roi)}">${r.blind.bets} · ${signed((r.blind.flat_roi || 0) * 100, 1)}%</td><td>${esc(r.verdict || "–")}</td></tr>`).join("") : "";
+    return `<div class="nba">` + panel("Tonight's NBA games", "Injuries, positions, form and luck, game by game · research, no units", games ? `<div class="grid">${games}</div>` : empty("No NBA games on the board right now."))
+      + panel("Who's hurt", "Today's injury report · share of the team's minutes and scoring that's out",
+          hurt ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Out / questionable</th><th>Minutes out</th><th>Scoring out</th></tr></thead><tbody>${hurt}</tbody></table></div>` : empty("Nobody listed."))
+      + panel("Who's shitting the bed 🥶", "Last 5 games vs his baseline: shooting 6+ pts worse and scoring 15%+ down (regulars, 15+ min)", formTable(form("cold"), "Nobody's cold right now."))
+      + panel("Who's hot 🔥", "Last 5 games: shooting 6+ pts better and scoring 15%+ up", formTable(form("hot"), "Nobody's hot right now."))
+      + panel("Starters by position", "Each team's usual starters over its last 5 games · 🥶 cold · 🔥 hot",
+          lineups ? `<div class="table-wrap"><table><thead><tr><th>Team</th>${POS.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody>${lineups}</tbody></table></div>` : empty("Player box scores are still loading."))
+      + panel("Who's due", "Luck = win % minus what the point differential says (reads start at 10 games) · close = net wins in 5-point games · last 5 = average margin",
+          due ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Record</th><th>Diff</th><th>Luck</th><th>Close</th><th>Last 5</th><th>Notes</th></tr></thead><tbody>${due}</tbody></table></div>` : empty("No games yet."))
+      + (st ? panel("Does it beat the price?", `Blind test on 10 seasons at the closing price (tune 2018-21, blind 2022 on) · luck control: ${st.control.proven} of ${st.control.spots} random sets passed`,
+          `<div class="table-wrap"><table><thead><tr><th>Angle</th><th>Tuning</th><th>Blind</th><th>Verdict</th></tr></thead><tbody>${studyRows}</tbody></table></div>
+           <p class="small muted">Only STRONG angles carry units. The popular "due" ideas (close-game losers, fading the hot team) lose at the real price; the books already price them.</p>`) : "") + `</div>`;
+  }
+
   function viewPredict() {
     const all = (DATA.forecasts || []).filter((f) => pickedSport(f.sport));
     const now = Date.now();
@@ -892,7 +946,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${usd(st.bankroll)}</b><small>from ${usd(st.start_bankroll)} · 1 unit = ${usd(U())}</small></div>`;
     const counts = { today: bestToday().length, parlays: (DATA.parlays || []).filter((p) => p.day === today()).length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
       early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length, scores: liveGames(),
-      predict: (DATA.forecasts || []).filter((f) => f.status === "pending" && pickedSport(f.sport)).length };
+      predict: (DATA.forecasts || []).filter((f) => f.status === "pending" && pickedSport(f.sport)).length,
+      nba: ((DATA.nba || {}).matchups || []).length };
     $("tabs").innerHTML = TABS.map(([k, n]) => `<button role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${n}${counts[k] ? `<span class="count">${counts[k]}</span>` : ""}</button>`).join("");
     $("sports").innerHTML = SPORTS.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${state.sport === k}">${n}</button>`).join("");
     $("filters").hidden = state.tab === "scores";  // live scores: every sport at once, no filter chips
@@ -903,7 +958,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     renderTop();
     renderHero();
     const views = {
-      today: viewToday, parlays: viewParlays, live: viewLive, scores: viewScores, predict: viewPredict, results: viewResults,
+      today: viewToday, parlays: viewParlays, nba: viewNba, live: viewLive, scores: viewScores, predict: viewPredict, results: viewResults,
       props: () => viewList((e) => e.player, "Player props", "Best edge first · priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
       early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves · no units until early bets prove out", "Nothing early yet: an early pick needs a real edge on a realistic winner (45%+ to cash)."),
     };

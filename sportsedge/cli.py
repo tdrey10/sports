@@ -399,6 +399,8 @@ class Workspace:
         for w in dict.fromkeys(res.warnings):
             print("warning:", w)
         print(f"published {res.published} new picks, graded {res.graded}")
+        if not self.demo:
+            _nba_report(self.data_dir, res.scans, now)
         if not self.demo and os.environ.get("ODDS_API_KEY"):
             from . import sharp
 
@@ -466,7 +468,8 @@ class Workspace:
 
         data = build_data(self.ledger, self.brains, self.weights, self.sports, now, demo=self.demo,
                           studies=self.studies, ufc=_ufc(self.data_dir, self.demo),
-                          props=load_props(self.data_dir / ("demo-studies.json" if self.demo else "studies.json")))
+                          props=load_props(self.data_dir / ("demo-studies.json" if self.demo else "studies.json")),
+                          nba=None if self.demo else _load_json(self.data_dir / "nba_report.json"))
         path = write_site(self.site_dir, data)
         o = data["stats"]["overall"]
         print(f"dashboard: {path}  (record {o['won']}-{o['lost']}, {o['units']:+.1f}u, bankroll ${data['stats']['bankroll']:,.2f})")
@@ -590,7 +593,7 @@ def cmd_page(args) -> int:
 
     data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc), ufc=_ufc(data_dir),
                       studies=load_studies(data_dir / "studies.json"), props=load_props(data_dir / "studies.json"),
-                      rival=rival.fetch(data_dir / "rival_picks.json"),
+                      rival=rival.fetch(data_dir / "rival_picks.json"), nba=_load_json(data_dir / "nba_report.json"),
                       rival_reported=rival.fetch_reported(data_dir / "rival_dashboard.html"))
     Path(args.out).write_text(render_html(data, standalone=args.standalone))
     if args.app_dir:
@@ -600,6 +603,67 @@ def cmd_page(args) -> int:
     # Same picks and results -> same fingerprint, so a refresh job can skip republishing an unchanged page.
     fingerprint = hashlib.sha1(json.dumps(data["entries"], sort_keys=True, default=str).encode()).hexdigest()[:12]
     print(f"wrote {args.out} ({len(data['entries'])} picks, fingerprint {fingerprint})")
+    return 0
+
+
+def _nba_report(data_dir: Path, scans, now: datetime, budget: int = 40) -> None:
+    """Owner, Oct 25: the NBA player report. New box scores, today's injuries and games -> data/nba_report.json."""
+    import json
+
+    from . import nbaplayers
+    from .data.espn import EspnClient
+
+    scan = next((s for s in scans if s.sport.key == "nba"), None)
+    try:
+        added = nbaplayers.collect(EspnClient(), now, data_dir, budget=budget)
+        injuries, games = {}, []
+        if scan is not None:
+            prices: dict[str, dict] = {}
+            for p in scan.picks:
+                if p.market == "h2h" and p.side in ("home", "away"):
+                    prices.setdefault(p.event_id, {})[p.side] = p.american
+                elif p.market == "spreads" and p.side == "home":
+                    prices.setdefault(p.event_id, {})["spread"] = p.point
+            for eid, ctx in scan.contexts.items():
+                for team in (ctx.home, ctx.away):
+                    injuries[team] = {"out": ctx.injured.get(team, []), "questionable": ctx.questionable.get(team, [])}
+                if ctx.event.commence_time.astimezone(now.tzinfo).date() == now.date() or ctx.event.commence_time > now:
+                    pr = prices.get(eid, {})
+                    games.append({"home": ctx.home, "away": ctx.away, "start": ctx.event.commence_time.isoformat(),
+                                  "home_ml": pr.get("home"), "away_ml": pr.get("away"), "spread": pr.get("spread")})
+        try:
+            study = json.loads((data_dir / "nba_study.json").read_text())
+        except (OSError, ValueError):
+            study = None
+        rep = nbaplayers.build(now, data_dir, injuries, sorted(games, key=lambda g: g["start"])[:15], study)
+        (data_dir / "nba_report.json").write_text(json.dumps(rep, separators=(",", ":")))
+        print(f"NBA report: {added} new box scores, {len(rep['players'])} players, {len(rep['matchups'])} games")
+    except Exception as exc:  # the report never stops a run
+        print(f"NBA report failed: {exc}")
+
+
+def _load_json(path: Path) -> dict | None:
+    import json
+
+    try:
+        return json.loads(Path(path).read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def cmd_nba_study(args) -> int:
+    """Backfill NBA player box scores (this season and last) and run the blind "who's due" study."""
+    import json
+
+    from . import nbaplayers, nbastudy
+    from .data.espn import EspnClient
+
+    data_dir = Path(args.data_dir)
+    added = nbaplayers.collect(EspnClient(), datetime.now(timezone.utc), data_dir, budget=args.budget)
+    print(f"NBA players: {added} box scores saved")
+    res = nbastudy.run(data_dir / "lines" / "espn")
+    (data_dir / "nba_study.json").write_text(json.dumps(res, indent=1))
+    print(nbastudy.report(res))
     return 0
 
 
@@ -960,6 +1024,11 @@ def build_parser() -> argparse.ArgumentParser:
     fs.add_argument("--data-dir", default="data")
     fs.add_argument("--sports", nargs="+", default=["mlb", "nhl", "nba", "nfl", "ncaaf", "ncaab"])
     fs.set_defaults(func=cmd_forecast_study)
+    ns = sub.add_parser("nba-study", help="NBA player box scores (backfill) + the blind 'who's due' study")
+    ns.add_argument("--data-dir", default="data")
+    ns.add_argument("--budget", type=int, default=1200, help="most box scores to download this run")
+    ns.set_defaults(func=cmd_nba_study)
+
     d5 = sub.add_parser("d5-fit", help="refit the D503 engine (ratings, own read, market blend) per sport")
     d5.add_argument("--data-dir", default="data")
     d5.set_defaults(func=cmd_d5_fit)

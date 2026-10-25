@@ -47,6 +47,7 @@ def build_data(
     ufc: dict | None = None,
     rival: list[dict] | None = None,
     rival_reported: dict | None = None,
+    nba: dict | None = None,
 ) -> dict:
     cutoff = now - timedelta(days=KEEP_DAYS)
     entries = []
@@ -85,6 +86,8 @@ def build_data(
         "parlays": [v for v in ledger.parlay_views() if v["created_at"] >= cutoff.isoformat()],
         # Head to head with the D503 engine: straight picks, same start date, graded the same way.
         "rival": _rival(rival, ledger, now, rival_reported),
+        # The NBA player report (nbaplayers.py): research, no units.
+        "nba": nba,
     }
 
 
