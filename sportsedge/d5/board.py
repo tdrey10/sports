@@ -49,6 +49,10 @@ TIER_PTS = {"Key": 0.04, "Starter": 0.02, "Rotation": 0.005}  # NFL; college is 
 # Our read this far over the market on a Lock usually means the market knows something we don't
 # (the 49ers: 71% vs 57%): it's still posted, at 1u, until a blind test says the gap pays.
 GAP_CAP = 0.08
+# Owner's standing rule: nothing gets big units until it beats the closing line in a blind test with a
+# luck control. His formula hasn't been through one, yet his ladder posted the 49ers at 3u (Oct 25,
+# a loss). Until it passes, a D503 Lock or Dog is posted at no more than 1u.
+UNPROVEN_MAX = 1.0
 
 _cache: dict[str, tuple[list[Game], Replay]] = {}
 _tiers: dict[str, dict] = {}
@@ -499,6 +503,12 @@ def dog_units(sd: Side) -> float:
     return 2.0 if sd.edge_own > 0 else 1.0
 
 
+def _capped(units: float, sd: Side) -> float:
+    if units > UNPROVEN_MAX:
+        sd.notes.insert(0, f"His ladder says {units:g}u; capped at {UNPROVEN_MAX:g}u until his formula passes a blind test.")
+    return min(units, UNPROVEN_MAX)
+
+
 def _pt_day(d: datetime) -> str:
     return d.astimezone(PT).date().isoformat()
 
@@ -520,7 +530,7 @@ def choose(sides: list[Side], now: datetime, taken: set[str] | frozenset = froze
                      and s.own >= 0.56 and s.edge_own > 0 and s.real_value()]
         if locks:
             lk = max(locks, key=lambda s: (round(s.p, 3), s.read_of * s.dec - 1))
-            out.append(("lock", lock_units(lk), lk, "Lock of the Day"))
+            out.append(("lock", _capped(lock_units(lk), lk), lk, "Lock of the Day"))
             used.add(lk.eid)
     if "dog" not in taken:
         dogs = [s for s in pool if s.eid not in used and good(s) and DOG_MIN <= s.odds <= DOG_MAX and s.beats_price()
@@ -536,7 +546,7 @@ def choose(sides: list[Side], now: datetime, taken: set[str] | frozenset = froze
                    and (s.p_market + s.dog_score / 100) * s.dec - 1 >= 0.01]
             pick = max(nhl, key=lambda s: s.dog_score) if nhl else None
         if pick:
-            out.append(("dog", dog_units(pick), pick, "Dog of the Day"))
+            out.append(("dog", _capped(dog_units(pick), pick), pick, "Dog of the Day"))
             used.add(pick.eid)
     plays = [s for s in pool if s.eid not in used and good(s) and MAX_FAV <= s.odds <= -101 and lock_ok(s)
              and s.own_agrees() and s.real_value() and s.own_beats() and not s.hurt and not s.waiting]
