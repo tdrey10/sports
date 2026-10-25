@@ -11,7 +11,7 @@ from .edge import Settings
 from .engine import Engine, SportScan
 from .ledger import Ledger
 from .sports import SPORTS, SportConfig
-from .tiers import build_cards
+from .tiers import BEST_BETS, build_cards
 
 log = logging.getLogger(__name__)
 
@@ -101,8 +101,16 @@ def run_cycle(
             d5_cards = d5board.build(out.scans, now, models, taken=set(ledger.taken_today(now)),
                                      posted_events=set(ledger.open_events(now)), root=d5_root)
     taken = set(ledger.taken_today(now)) | {c.tier for c in d5_cards if c.tier in ("lock", "dog")}
+    # Owner, Oct 25: the D503 money plays are the day's Top bets, biggest stake first; the old
+    # board fills whatever slots are left.
+    best_taken = ledger.best_taken(now)
+    if d503:
+        money = sorted((c for c in d5_cards if c.units > 0), key=lambda c: (c.units, c.pick.ev), reverse=True)
+        for c in money[:max(BEST_BETS - best_taken, 0)]:
+            best_taken += 1
+            c.best_rank = best_taken
     cards = [] if held else d5_cards + build_cards(
-        legacy_scans, settings, now, taken_today=taken, best_taken=ledger.best_taken(now),
+        legacy_scans, settings, now, taken_today=taken, best_taken=best_taken,
         posted_today=ledger.posted_today(now), posted_events=ledger.open_events(now),
     )
     out.published = len(ledger.publish(cards, now))
