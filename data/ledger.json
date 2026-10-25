@@ -13312,7 +13312,7 @@
    "live": {
     "home": 0.0,
     "away": 0.0,
-    "detail": "25'"
+    "detail": "HT"
    },
    "final": null,
    "result_value": null,
@@ -13388,8 +13388,12 @@
    ],
    "close_odds": -155.0,
    "close_fair": 0.5883234780346962,
-   "status": "pending",
-   "live": null,
+   "status": "live",
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "10:44 - 1st"
+   },
    "final": null,
    "result_value": null,
    "profit": null,
@@ -13454,8 +13458,12 @@
    ],
    "close_odds": -130.0,
    "close_fair": 0.545402735448801,
-   "status": "pending",
-   "live": null,
+   "status": "live",
+   "live": {
+    "home": 7.0,
+    "away": 0.0,
+    "detail": "12:57 - 1st"
+   },
    "final": null,
    "result_value": null,
    "profit": null,
@@ -13559,7 +13567,7 @@
    "best_rank": null,
    "score": null,
    "spots": [],
-   "current_odds": -112.0,
+   "current_odds": -108.0,
    "current_point": null,
    "current_book": "draftkings",
    "history": [
@@ -13587,10 +13595,15 @@
      "2026-10-25T16:08:04.152919+00:00",
      -112.0,
      null
+    ],
+    [
+     "2026-10-25T17:09:22.436634+00:00",
+     -108.0,
+     null
     ]
    ],
-   "close_odds": -112.0,
-   "close_fair": 0.5046406578888563,
+   "close_odds": -108.0,
+   "close_fair": 0.4953593421111437,
    "status": "pending",
    "live": null,
    "final": null,
@@ -14109,206 +14122,6 @@
   }
  ],
  "forecasts": [
-  {
-   "id": "nfl:401872982",
-   "sport": "nfl",
-   "sport_name": "NFL",
-   "event_id": "401872982",
-   "commence_time": "2026-10-11T17:00:00+00:00",
-   "home": "Miami Dolphins",
-   "away": "Cincinnati Bengals",
-   "home_score": 17.7,
-   "away_score": 24.1,
-   "p_home": 0.3161,
-   "p_away": 0.6839,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.3161,
-   "market_home": 0.2356,
-   "facts": [],
-   "updated_at": "2026-10-11T16:56:17.261694+00:00",
-   "status": "final",
-   "final_home": 24.0,
-   "final_away": 31.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-10-11T20:27:58.936708+00:00"
-  },
-  {
-   "id": "nfl:401872983",
-   "sport": "nfl",
-   "sport_name": "NFL",
-   "event_id": "401872983",
-   "commence_time": "2026-10-11T17:00:00+00:00",
-   "home": "New York Jets",
-   "away": "Cleveland Browns",
-   "home_score": 17.9,
-   "away_score": 17.2,
-   "p_home": 0.5216,
-   "p_away": 0.4784,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.5216,
-   "market_home": 0.5674,
-   "facts": [],
-   "updated_at": "2026-10-11T16:56:17.261694+00:00",
-   "status": "final",
-   "final_home": 17.0,
-   "final_away": 12.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-10-11T20:27:58.936708+00:00"
-  },
-  {
-   "id": "nfl:401872984",
-   "sport": "nfl",
-   "sport_name": "NFL",
-   "event_id": "401872984",
-   "commence_time": "2026-10-11T17:00:00+00:00",
-   "home": "Tennessee Titans",
-   "away": "Houston Texans",
-   "home_score": 15.6,
-   "away_score": 21.1,
-   "p_home": 0.3387,
-   "p_away": 0.6613,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.3387,
-   "market_home": 0.2512,
-   "facts": [],
-   "updated_at": "2026-10-11T16:56:17.261694+00:00",
-   "status": "final",
-   "final_home": 3.0,
-   "final_away": 26.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-10-11T20:27:58.936708+00:00"
-  },
-  {
-   "id": "nfl:401872985",
-   "sport": "nfl",
-   "sport_name": "NFL",
-   "event_id": "401872985",
-   "commence_time": "2026-10-11T17:00:00+00:00",
-   "home": "Pittsburgh Steelers",
-   "away": "Indianapolis Colts",
-   "home_score": 19.6,
-   "away_score": 20.5,
-   "p_home": 0.4742,
-   "p_away": 0.5258,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.4742,
-   "market_home": 0.5993,
-   "facts": [],
-   "updated_at": "2026-10-11T16:56:17.261694+00:00",
-   "status": "final",
-   "final_home": 34.0,
-   "final_away": 22.0,
-   "live": null,
-   "correct": false,
-   "graded_at": "2026-10-11T20:27:58.936708+00:00"
-  },
-  {
-   "id": "nfl:401872986",
-   "sport": "nfl",
-   "sport_name": "NFL",
-   "event_id": "401872986",
-   "commence_time": "2026-10-11T17:00:00+00:00",
-   "home": "New England Patriots",
-   "away": "Las Vegas Raiders",
-   "home_score": 19.2,
-   "away_score": 15.1,
-   "p_home": 0.6217,
-   "p_away": 0.3783,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.6217,
-   "market_home": 0.624,
-   "facts": [],
-   "updated_at": "2026-10-11T16:56:17.261694+00:00",
-   "status": "final",
-   "final_home": 45.0,
-   "final_away": 17.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-10-11T20:27:58.936708+00:00"
-  },
-  {
-   "id": "nfl:401872987",
-   "sport": "nfl",
-   "sport_name": "NFL",
-   "event_id": "401872987",
-   "commence_time": "2026-10-11T17:00:00+00:00",
-   "home": "New Orleans Saints",
-   "away": "Minnesota Vikings",
-   "home_score": 15.8,
-   "away_score": 20.1,
-   "p_home": 0.3721,
-   "p_away": 0.6279,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.3721,
-   "market_home": 0.4326,
-   "facts": [],
-   "updated_at": "2026-10-11T16:56:17.261694+00:00",
-   "status": "final",
-   "final_home": 13.0,
-   "final_away": 23.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-10-11T19:54:30.442498+00:00"
-  },
-  {
-   "id": "nfl:401872988",
-   "sport": "nfl",
-   "sport_name": "NFL",
-   "event_id": "401872988",
-   "commence_time": "2026-10-11T17:00:00+00:00",
-   "home": "Washington Commanders",
-   "away": "New York Giants",
-   "home_score": 17.8,
-   "away_score": 20.2,
-   "p_home": 0.4286,
-   "p_away": 0.5714,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.4286,
-   "market_home": 0.624,
-   "facts": [],
-   "updated_at": "2026-10-11T16:56:17.261694+00:00",
-   "status": "final",
-   "final_home": 27.0,
-   "final_away": 27.0,
-   "live": null,
-   "correct": false,
-   "graded_at": "2026-10-11T20:55:29.936735+00:00"
-  },
-  {
-   "id": "nfl:401872990",
-   "sport": "nfl",
-   "sport_name": "NFL",
-   "event_id": "401872990",
-   "commence_time": "2026-10-11T17:00:00+00:00",
-   "home": "Green Bay Packers",
-   "away": "Chicago Bears",
-   "home_score": 18.1,
-   "away_score": 23.3,
-   "p_home": 0.3501,
-   "p_away": 0.6499,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.3501,
-   "market_home": 0.4654,
-   "facts": [],
-   "updated_at": "2026-10-11T16:56:17.261694+00:00",
-   "status": "final",
-   "final_home": 31.0,
-   "final_away": 7.0,
-   "live": null,
-   "correct": false,
-   "graded_at": "2026-10-11T20:27:58.936708+00:00"
-  },
   {
    "id": "ligue1:401876440",
    "sport": "ligue1",
@@ -34233,31 +34046,14 @@
    "winner": "home",
    "model_home": 0.4333,
    "market_home": 0.3626,
-   "facts": [
-    "Vegas: Celta Vigo -0.5 \u00b7 O/U 2.5 (our ratings agree).",
-    "Market win chance: Real Betis 35% \u00b7 Celta Vigo 36% \u00b7 draw 29%.",
-    "Our ratings alone: Real Betis 1.2 @ Celta Vigo 1.5, Celta Vigo 43% to win. The prediction gives them 11% of the say on the total and 4% on the winner, the weight they earned in testing.",
-    "No history test for this league yet: it uses the average weights of the tested sports.",
-    "Real Betis (6-2-1) @ Celta Vigo (2-2-5).",
-    "Celta Vigo fresh off a 2-1 win over Alav\u00e9s (Sun 10/18).",
-    "Season goals per game: Real Betis 1.8 scored / 1.6 allowed; Celta Vigo 1.1 scored / 0.8 allowed.",
-    "Last 5: Real Betis 3-1-1 (avg margin +0.4); Celta Vigo 2-0-3 (avg margin +1.2).",
-    "Splits: Celta Vigo 2-2-1 at home; Real Betis 2-1-1 on the road.",
-    "Power rank: Real Betis #5 vs Celta Vigo #6 (of 23).",
-    "Upset risk: 29% chance Real Betis wins outright.",
-    "Track record: teams we gave a 46% chance to win outright won 48% of the time (27 recent games tested)."
-   ],
+   "facts": [],
    "updated_at": "2026-10-25T15:06:50.971700+00:00",
-   "status": "live",
-   "final_home": null,
-   "final_away": null,
-   "live": {
-    "home": 0.0,
-    "away": 0.0,
-    "detail": "68'"
-   },
-   "correct": null,
-   "graded_at": null
+   "status": "final",
+   "final_home": 0.0,
+   "final_away": 0.0,
+   "live": null,
+   "correct": false,
+   "graded_at": "2026-10-25T17:09:21.959190+00:00"
   },
   {
    "id": "tennis_atp:jan lennard struff|tallon griekspoor|2026-10-25",
@@ -34326,7 +34122,7 @@
    "live": {
     "home": 0.0,
     "away": 0.0,
-    "detail": "25'"
+    "detail": "HT"
    },
    "correct": null,
    "graded_at": null
@@ -34366,9 +34162,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 0.0,
+    "home": 2.0,
     "away": 0.0,
-    "detail": "26'"
+    "detail": "HT"
    },
    "correct": null,
    "graded_at": null
@@ -34408,9 +34204,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 1.0,
+    "home": 2.0,
     "away": 0.0,
-    "detail": "26'"
+    "detail": "HT"
    },
    "correct": null,
    "graded_at": null
@@ -34452,7 +34248,7 @@
    "live": {
     "home": 0.0,
     "away": 0.0,
-    "detail": "26'"
+    "detail": "HT"
    },
    "correct": null,
    "graded_at": null
@@ -34494,7 +34290,7 @@
    "live": {
     "home": 0.0,
     "away": 0.0,
-    "detail": "26'"
+    "detail": "HT"
    },
    "correct": null,
    "graded_at": null
@@ -34535,8 +34331,8 @@
    "final_away": null,
    "live": {
     "home": 0.0,
-    "away": 0.0,
-    "detail": "11'"
+    "away": 1.0,
+    "detail": "39'"
    },
    "correct": null,
    "graded_at": null
@@ -34578,7 +34374,7 @@
    "live": {
     "home": 0.0,
     "away": 0.0,
-    "detail": "10'"
+    "detail": "39'"
    },
    "correct": null,
    "graded_at": null
@@ -34614,10 +34410,14 @@
     "Power rank: Cincinnati Bengals #15 vs Baltimore Ravens #14 (of 32)."
    ],
    "updated_at": "2026-10-25T16:40:48.125298+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 7.0,
+    "away": 0.0,
+    "detail": "13:36 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -34652,10 +34452,14 @@
     "Upset risk: 42% chance Tennessee Titans wins outright."
    ],
    "updated_at": "2026-10-25T16:40:48.125298+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 7.0,
+    "away": 0.0,
+    "detail": "12:57 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -34690,10 +34494,14 @@
     "Upset risk: 31% chance Indianapolis Colts wins outright."
    ],
    "updated_at": "2026-10-25T16:40:48.125298+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "11:17 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -34728,10 +34536,14 @@
     "Power rank: Miami Dolphins #31 vs New York Jets #26 (of 32)."
    ],
    "updated_at": "2026-10-25T16:40:48.125298+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 0.0,
+    "away": 6.0,
+    "detail": "10:53 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -34766,10 +34578,14 @@
     "Track record: teams we gave a 65% chance to win outright won 55% of the time (22 recent games tested)."
    ],
    "updated_at": "2026-10-25T16:40:48.125298+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "11:48 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -34804,10 +34620,14 @@
     "Track record: teams we gave a 55% chance to win outright won 45% of the time (22 recent games tested)."
    ],
    "updated_at": "2026-10-25T16:40:48.125298+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "10:44 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -34842,10 +34662,14 @@
     "Upset risk: 45% chance Tampa Bay Buccaneers wins outright."
    ],
    "updated_at": "2026-10-25T16:40:48.125298+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "11:21 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -34880,10 +34704,14 @@
     "Track record: teams we gave a 65% chance to win outright won 70% of the time (20 recent games tested)."
    ],
    "updated_at": "2026-10-25T16:40:48.125298+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "4'"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -34897,11 +34725,11 @@
    "away": "Levante",
    "home_score": 2.5,
    "away_score": 1.0,
-   "p_home": 0.625,
+   "p_home": 0.6251,
    "p_away": 0.1777,
    "p_draw": 0.1973,
    "winner": "home",
-   "model_home": 0.542,
+   "model_home": 0.5429,
    "market_home": 0.6285,
    "facts": [
     "Vegas: Real Sociedad -1.5 \u00b7 O/U 3.5 (our ratings agree).",
@@ -34917,7 +34745,7 @@
     "Power rank: Levante #13 vs Real Sociedad #7 (of 23).",
     "Upset risk: 24% chance Levante wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -34955,7 +34783,7 @@
     "Power rank: Florida Panthers #21 vs Chicago Blackhawks #31 (of 32).",
     "Upset risk: 45% chance Chicago Blackhawks wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -34973,15 +34801,15 @@
    "away": "AC Milan",
    "home_score": 1.0,
    "away_score": 1.5,
-   "p_home": 0.2026,
-   "p_away": 0.536,
-   "p_draw": 0.2614,
+   "p_home": 0.2021,
+   "p_away": 0.5447,
+   "p_draw": 0.2532,
    "winner": "away",
    "model_home": 0.2547,
-   "market_home": 0.2005,
+   "market_home": 0.1999,
    "facts": [
     "Vegas: AC Milan -0.5 \u00b7 O/U 2.5 (our ratings agree).",
-    "Market win chance: AC Milan 54% \u00b7 Udinese 20% \u00b7 draw 26%.",
+    "Market win chance: AC Milan 55% \u00b7 Udinese 20% \u00b7 draw 25%.",
     "Our ratings alone: AC Milan 1.6 @ Udinese 1.1, Udinese 25% to win. The prediction gives them 11% of the say on the total and 4% on the winner, the weight they earned in testing.",
     "No history test for this league yet: it uses the average weights of the tested sports.",
     "AC Milan (4-0-3) @ Udinese (1-5-1).",
@@ -34993,7 +34821,7 @@
     "Upset risk: 25% chance Udinese wins outright.",
     "Track record: teams we gave a 65% chance to win outright won 70% of the time (20 recent games tested)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35011,16 +34839,16 @@
    "away": "Real Madrid",
    "home_score": 3.0,
    "away_score": 1.5,
-   "p_home": 0.6191,
+   "p_home": 0.6192,
    "p_away": 0.2227,
-   "p_draw": 0.1582,
+   "p_draw": 0.1581,
    "winner": "home",
-   "model_home": 0.6147,
+   "model_home": 0.6156,
    "market_home": 0.6193,
    "facts": [
     "Vegas: Barcelona -1.5 \u00b7 O/U 4.5 (our ratings agree).",
     "Market win chance: Real Madrid 22% \u00b7 Barcelona 62% \u00b7 draw 16%.",
-    "Our ratings alone: Real Madrid 1.3 @ Barcelona 2.5, Barcelona 61% to win. The prediction gives them 11% of the say on the total and 4% on the winner, the weight they earned in testing.",
+    "Our ratings alone: Real Madrid 1.3 @ Barcelona 2.5, Barcelona 62% to win. The prediction gives them 11% of the say on the total and 4% on the winner, the weight they earned in testing.",
     "No history test for this league yet: it uses the average weights of the tested sports.",
     "Real Madrid (7-2) @ Barcelona (9-0).",
     "Barcelona fresh off a 5-2 blowout of Real Betis (Sat 10/17).",
@@ -35029,9 +34857,9 @@
     "Splits: Barcelona 4-0 at home; Real Madrid 2-2 on the road.",
     "Power rank: Real Madrid #2 vs Barcelona #1 (of 23).",
     "Upset risk: 19% chance Real Madrid wins outright.",
-    "Track record: teams we gave a 54% chance to win outright won 33% of the time (15 recent games tested)."
+    "Track record: teams we gave a 54% chance to win outright won 38% of the time (16 recent games tested)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35069,7 +34897,7 @@
     "Upset risk: 32% chance Arizona Cardinals wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 45% of the time (22 recent games tested)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35107,7 +34935,7 @@
     "Power rank: Green Bay Packers #17 vs Detroit Lions #9 (of 32).",
     "Upset risk: 47% chance Green Bay Packers wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35125,15 +34953,15 @@
    "away": "Los Angeles Rams",
    "home_score": 22.5,
    "away_score": 26.0,
-   "p_home": 0.3696,
-   "p_away": 0.6304,
+   "p_home": 0.376,
+   "p_away": 0.624,
    "p_draw": 0.0,
    "winner": "away",
    "model_home": 0.3929,
-   "market_home": 0.3696,
+   "market_home": 0.376,
    "facts": [
     "Vegas: Los Angeles Rams -3.5 \u00b7 O/U 48.5 (our ratings agree).",
-    "Market win chance: Los Angeles Rams 63% \u00b7 Las Vegas Raiders 37%.",
+    "Market win chance: Los Angeles Rams 62% \u00b7 Las Vegas Raiders 38%.",
     "Our ratings alone: Los Angeles Rams 25.9 @ Las Vegas Raiders 22.4, Las Vegas Raiders 39% to win. The prediction gives them 0% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 1,232 blind-tested games (2022-2026): this method picked 67.1% of winners (Vegas alone 67.1%, our ratings alone 63.8%) and missed the total by 10.2 points on average (ratings alone 10.63).",
     "Los Angeles Rams (2-4) @ Las Vegas Raiders (3-3).",
@@ -35145,7 +34973,7 @@
     "Upset risk: 39% chance Las Vegas Raiders wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 45% of the time (22 recent games tested)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35183,7 +35011,7 @@
     "Utah Jazz missing: Trey Alexander, Jusuf Nurkic.",
     "Los Angeles Lakers missing: Adou Thiero, Cameron Carr."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35221,7 +35049,7 @@
     "Best number: -278 at DraftKings (checked 1 books).",
     "Brooklyn Nets missing: Tyler Bilodeau, Mikel Brown Jr.."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35259,7 +35087,7 @@
     "Power rank: New York Islanders #19 vs Dallas Stars #4 (of 32).",
     "Upset risk: 44% chance New York Islanders wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35277,15 +35105,15 @@
    "away": "Orlando Magic",
    "home_score": 116.0,
    "away_score": 108.5,
-   "p_home": 0.7318,
-   "p_away": 0.2682,
+   "p_home": 0.7234,
+   "p_away": 0.2766,
    "p_draw": 0.0,
    "winner": "home",
    "model_home": 0.7227,
-   "market_home": 0.7323,
+   "market_home": 0.7234,
    "facts": [
     "Vegas: New York Knicks -7.5 \u00b7 O/U 224.5 (our ratings have 4.5 fewer points than the total).",
-    "Market win chance: Orlando Magic 27% \u00b7 New York Knicks 73%.",
+    "Market win chance: Orlando Magic 28% \u00b7 New York Knicks 72%.",
     "Our ratings alone: Orlando Magic 106.1 @ New York Knicks 113.9, New York Knicks 72% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
     "Backed by 5,321 blind-tested games (2022-2026): this method picked 68.0% of winners (Vegas alone 68.1%, our ratings alone 65.4%) and missed the total by 14.18 points on average (ratings alone 15.01).",
     "Orlando Magic (0-2) @ New York Knicks (0-2).",
@@ -35293,10 +35121,10 @@
     "Season points per game: Orlando Magic 109.0 scored / 123.5 allowed; New York Knicks 101.5 scored / 106.5 allowed.",
     "Power rank: Orlando Magic #18 vs New York Knicks #3 (of 30).",
     "Upset risk: 28% chance Orlando Magic wins outright.",
-    "Best number: -298 at DraftKings (checked 1 books).",
+    "Best number: -285 at DraftKings (checked 1 books).",
     "Orlando Magic missing: Jonathan Isaac, Paolo Banchero, Noah Penda, Izaiyah Nelson."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35334,7 +35162,7 @@
     "Minnesota Timberwolves missing: Donte DiVincenzo.",
     "Toronto Raptors missing: Nate Bittle."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35350,8 +35178,8 @@
    "commence_time": "2026-10-25T23:00:00+00:00",
    "home": "Oklahoma City Thunder",
    "away": "LA Clippers",
-   "home_score": 120.2,
-   "away_score": 104.3,
+   "home_score": 119.7,
+   "away_score": 104.8,
    "p_home": 0.9074,
    "p_away": 0.0926,
    "p_draw": 0.0,
@@ -35359,7 +35187,7 @@
    "model_home": 0.6519,
    "market_home": 0.9208,
    "facts": [
-    "Vegas: Oklahoma City Thunder -16.5 \u00b7 O/U 224.5 (our ratings have LA Clippers 11.3 better than the spread; our ratings have 2.4 fewer points than the total).",
+    "Vegas: Oklahoma City Thunder -15.5 \u00b7 O/U 224.5 (our ratings have LA Clippers 10.3 better than the spread; our ratings have 2.4 fewer points than the total).",
     "Market win chance: LA Clippers 8% \u00b7 Oklahoma City Thunder 92%.",
     "Our ratings alone: LA Clippers 108.4 @ Oklahoma City Thunder 113.6, Oklahoma City Thunder 65% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
     "Backed by 5,321 blind-tested games (2022-2026): this method picked 68.0% of winners (Vegas alone 68.1%, our ratings alone 65.4%) and missed the total by 14.18 points on average (ratings alone 15.01).",
@@ -35372,7 +35200,7 @@
     "Oklahoma City Thunder missing: Otega Oweh, Nikola Topic, Thomas Sorber.",
     "LA Clippers missing: Bradley Beal, Max Strus, Yanic Konan Niederhauser, Brandon Ingram +1 more."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35410,7 +35238,7 @@
     "Power rank: Montreal Canadiens #13 vs Winnipeg Jets #22 (of 32).",
     "Upset risk: 49% chance Winnipeg Jets wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35428,12 +35256,12 @@
    "away": "Detroit Pistons",
    "home_score": 112.9,
    "away_score": 114.6,
-   "p_home": 0.4983,
-   "p_away": 0.5017,
+   "p_home": 0.4895,
+   "p_away": 0.5105,
    "p_draw": 0.0,
    "winner": "away",
    "model_home": 0.3779,
-   "market_home": 0.5046,
+   "market_home": 0.4954,
    "facts": [
     "Vegas: Detroit Pistons -1.5 \u00b7 O/U 227.5 (our ratings have Detroit Pistons 2.6 better than the spread).",
     "Market win chance: Detroit Pistons 50% \u00b7 Philadelphia 76ers 50%.",
@@ -35446,9 +35274,9 @@
     "Last 5: Philadelphia 76ers 3-0 (avg margin +8.3).",
     "Power rank: Detroit Pistons #6 vs Philadelphia 76ers #14 (of 30).",
     "Upset risk: 38% chance Philadelphia 76ers wins outright.",
-    "Best number: -108 at DraftKings (checked 1 books)."
+    "Best number: -112 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35486,7 +35314,7 @@
     "Splits: Nashville Predators 2-3 at home; Colorado Avalanche 2-3 on the road.",
     "Power rank: Colorado Avalanche #2 vs Nashville Predators #25 (of 32)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35524,7 +35352,7 @@
     "Power rank: Kansas City Chiefs #5 vs Seattle Seahawks #3 (of 32).",
     "Upset risk: 42% chance Kansas City Chiefs wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35562,7 +35390,7 @@
     "Power rank: LA Galaxy #24 vs LAFC #4 (of 30).",
     "Upset risk: 17% chance LA Galaxy wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35584,7 +35412,7 @@
    "p_away": 0.6029,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.451,
+   "model_home": 0.4511,
    "market_home": 0.3943,
    "facts": [
     "Vegas: Memphis Grizzlies -3.5 \u00b7 O/U 234.5 (our ratings have Sacramento Kings 1.9 better than the spread; our ratings have 3.7 fewer points than the total).",
@@ -35600,7 +35428,7 @@
     "Sacramento Kings missing: Ben Simmons, Dylan Cardwell, Maxime Raynaud.",
     "Memphis Grizzlies missing: Zach Edey."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35631,7 +35459,7 @@
     "Toray Pan Pacific Open Tennis \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35662,7 +35490,7 @@
     "Toray Pan Pacific Open Tennis \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35693,7 +35521,7 @@
     "Toray Pan Pacific Open Tennis \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35724,7 +35552,7 @@
     "Toray Pan Pacific Open Tennis \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35755,7 +35583,7 @@
     "Toray Pan Pacific Open Tennis \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35786,7 +35614,7 @@
     "Toray Pan Pacific Open Tennis \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35824,7 +35652,7 @@
     "Splits: Vancouver Canucks 1-4 at home; Minnesota Wild 3-5 on the road.",
     "Power rank: Minnesota Wild #5 vs Vancouver Canucks #32 (of 32)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35854,7 +35682,7 @@
     "Hard-court Elo: Alejandro Davidovich Fokina 1817 (351 matches) \u00b7 Zizou Bergs 1678 (194 matches).",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35885,7 +35713,7 @@
     "Swiss Indoors Basel \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35916,7 +35744,7 @@
     "Swiss Indoors Basel \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35946,7 +35774,7 @@
     "Too few matches on one player to rate them: the market's read stands in.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -35977,7 +35805,7 @@
     "Swiss Indoors Basel \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36007,7 +35835,7 @@
     "Hard-court Elo: Hubert Hurkacz 1800 (387 matches) \u00b7 Arthur Fils 1869 (191 matches).",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36038,7 +35866,7 @@
     "Swiss Indoors Basel \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36069,7 +35897,7 @@
     "Swiss Indoors Basel \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36100,7 +35928,7 @@
     "Swiss Indoors Basel \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36131,7 +35959,7 @@
     "Swiss Indoors Basel \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36162,7 +35990,7 @@
     "Swiss Indoors Basel \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36193,7 +36021,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36224,7 +36052,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36254,7 +36082,7 @@
     "Too few matches on one player to rate them: the market's read stands in.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36285,7 +36113,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36315,7 +36143,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36346,7 +36174,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36376,7 +36204,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36407,7 +36235,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36438,7 +36266,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36469,7 +36297,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36499,7 +36327,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36530,7 +36358,7 @@
     "Erste Bank Open \u00b7 Round 1 \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-10-25T16:41:05.313663+00:00",
+   "updated_at": "2026-10-25T17:09:38.987269+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36552,7 +36380,7 @@
    "p_away": 0.1323,
    "p_draw": 0.1692,
    "winner": "home",
-   "model_home": 0.5265,
+   "model_home": 0.5263,
    "market_home": 0.7056,
    "facts": [
     "Vegas: Paris Saint-Germain -1.5 \u00b7 O/U 3.5 (our ratings agree).",
@@ -36568,7 +36396,7 @@
     "Upset risk: 22% chance Lyon wins outright.",
     "Track record: teams we gave a 43% chance to win outright won 50% of the time (22 recent games tested)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36586,16 +36414,16 @@
    "away": "Osasuna",
    "home_score": 1.5,
    "away_score": 1.0,
-   "p_home": 0.5069,
+   "p_home": 0.507,
    "p_away": 0.2218,
    "p_draw": 0.2713,
    "winner": "home",
-   "model_home": 0.5111,
+   "model_home": 0.5121,
    "market_home": 0.5067,
    "facts": [
     "Vegas: Sevilla -0.5 \u00b7 O/U 2.5 (our ratings agree).",
     "Market win chance: Osasuna 22% \u00b7 Sevilla 51% \u00b7 draw 27%.",
-    "Our ratings alone: Osasuna 1.1 @ Sevilla 1.7, Sevilla 51% to win. The prediction gives them 11% of the say on the total and 4% on the winner, the weight they earned in testing.",
+    "Our ratings alone: Osasuna 1.1 @ Sevilla 1.8, Sevilla 51% to win. The prediction gives them 11% of the say on the total and 4% on the winner, the weight they earned in testing.",
     "No history test for this league yet: it uses the average weights of the tested sports.",
     "Osasuna (3-4-2) @ Sevilla (4-3-2).",
     "Sevilla coming off a 1-4 loss to Real Madrid (Sun 10/18).",
@@ -36603,10 +36431,10 @@
     "Last 5: Osasuna 1-3-1 (avg margin -1.4); Sevilla 2-2-1 (avg margin -0.6).",
     "Splits: Sevilla 2-2 at home; Osasuna 1-3 on the road.",
     "Power rank: Osasuna #19 vs Sevilla #14 (of 23).",
-    "Upset risk: 24% chance Osasuna wins outright.",
-    "Track record: teams we gave a 54% chance to win outright won 33% of the time (15 recent games tested)."
+    "Upset risk: 23% chance Osasuna wins outright.",
+    "Track record: teams we gave a 54% chance to win outright won 38% of the time (16 recent games tested)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36628,23 +36456,23 @@
    "p_away": 0.4453,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.5725,
+   "model_home": 0.5644,
    "market_home": 0.5547,
    "facts": [
     "Vegas: New York Rangers -1.5 \u00b7 O/U 5.5 (our ratings have Los Angeles Kings 1.1 better than the spread).",
     "Market win chance: Los Angeles Kings 45% \u00b7 New York Rangers 55%.",
-    "Our ratings alone: Los Angeles Kings 2.5 @ New York Rangers 3.0, New York Rangers 57% to win. The prediction gives them 30% of the say on the total and 0% on the winner, the weight they earned in testing.",
+    "Our ratings alone: Los Angeles Kings 2.6 @ New York Rangers 3.0, New York Rangers 56% to win. The prediction gives them 30% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 5,609 blind-tested games (2022-2026): this method picked 59.5% of winners (Vegas alone 59.5%, our ratings alone 57.9%) and missed the total by 1.84 goals on average (ratings alone 1.85).",
     "Los Angeles Kings (2-7) @ New York Rangers (7-6).",
     "New York Rangers coming off a 4-7 loss to Ottawa Senators (Sat 10/24).",
-    "Starting goalies: Darcy Kuemper (0.912 career save %, 13,773 shots) vs Dylan Garand (0.926 career save %, 285 shots).",
+    "Starting goalies: Darcy Kuemper (0.912 career save %, 13,773 shots) vs Dylan Garand (0.915 career save %, 307 shots).",
     "Season goals per game: Los Angeles Kings 2.3 scored / 3.6 allowed; New York Rangers 3.2 scored / 2.8 allowed.",
     "Last 5: Los Angeles Kings 2-3 (avg margin -0.8); New York Rangers 1-4 (avg margin -1.6).",
     "Splits: New York Rangers 6-0 at home; Los Angeles Kings 2-4 on the road.",
     "Power rank: Los Angeles Kings #29 vs New York Rangers #12 (of 32).",
-    "Upset risk: 43% chance Los Angeles Kings wins outright."
+    "Upset risk: 44% chance Los Angeles Kings wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36682,7 +36510,7 @@
     "Head to head this season: Tampa Bay Rays 1-4 (last: Tampa Bay Rays 4 - Milwaukee Brewers 5, 10/25).",
     "Power rank: Milwaukee Brewers #1 vs Tampa Bay Rays #5 (of 30)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36720,7 +36548,7 @@
     "Power rank: Dallas Cowboys #21 vs Philadelphia Eagles #23 (of 32).",
     "Upset risk: 43% chance Philadelphia Eagles wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36758,7 +36586,7 @@
     "Power rank: Toronto Maple Leafs #14 vs Calgary Flames #30 (of 32).",
     "Upset risk: 36% chance Calgary Flames wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36796,7 +36624,7 @@
     "Power rank: Detroit Red Wings #28 vs Edmonton Oilers #9 (of 32).",
     "Upset risk: 41% chance Detroit Red Wings wins outright."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36834,7 +36662,7 @@
     "Upset risk: 28% chance Sassuolo wins outright.",
     "Track record: teams we gave a 65% chance to win outright won 70% of the time (20 recent games tested)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36872,7 +36700,7 @@
     "Upset risk: 13% chance Cagliari wins outright.",
     "Track record: teams we gave a 45% chance to win outright won 69% of the time (16 recent games tested)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36910,7 +36738,7 @@
     "Upset risk: 20% chance Torino wins outright.",
     "Track record: teams we gave a 65% chance to win outright won 70% of the time (20 recent games tested)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36926,17 +36754,17 @@
    "commence_time": "2026-10-27T23:00:00+00:00",
    "home": "Western Kentucky Hilltoppers",
    "away": "Delaware Blue Hens",
-   "home_score": 28.5,
-   "away_score": 30.0,
-   "p_home": 0.4866,
-   "p_away": 0.5134,
+   "home_score": 28.0,
+   "away_score": 29.5,
+   "p_home": 0.4759,
+   "p_away": 0.5241,
    "p_draw": 0.0,
    "winner": "away",
    "model_home": 0.6743,
-   "market_home": 0.4768,
+   "market_home": 0.4654,
    "facts": [
-    "Vegas: Delaware Blue Hens -1.5 \u00b7 O/U 58.5 (our ratings have Western Kentucky Hilltoppers 10.9 better than the spread; our ratings have 2.4 fewer points than the total).",
-    "Market win chance: Delaware Blue Hens 52% \u00b7 Western Kentucky Hilltoppers 48%.",
+    "Vegas: Delaware Blue Hens -1.5 \u00b7 O/U 57.5 (our ratings have Western Kentucky Hilltoppers 10.9 better than the spread; our ratings have 1.4 fewer points than the total).",
+    "Market win chance: Delaware Blue Hens 53% \u00b7 Western Kentucky Hilltoppers 47%.",
     "Our ratings alone: Delaware Blue Hens 23.4 @ Western Kentucky Hilltoppers 32.7, Western Kentucky Hilltoppers 67% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
     "Backed by 3,360 blind-tested games (2022-2026): this method picked 74.4% of winners (Vegas alone 74.5%, our ratings alone 68.8%) and missed the total by 12.41 points on average (ratings alone 12.8).",
     "Delaware Blue Hens (3-4) @ Western Kentucky Hilltoppers (3-4).",
@@ -36948,7 +36776,7 @@
     "Power rank: Delaware Blue Hens #102 vs Western Kentucky Hilltoppers #99 (of 138).",
     "Upset chance: Delaware Blue Hens wins outright 33% of the time on our numbers."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -36964,8 +36792,8 @@
    "commence_time": "2026-10-28T00:00:00+00:00",
    "home": "Missouri State Bears",
    "away": "Sam Houston Bearkats",
-   "home_score": 28.2,
-   "away_score": 22.2,
+   "home_score": 28.5,
+   "away_score": 23.0,
    "p_home": 0.6747,
    "p_away": 0.3253,
    "p_draw": 0.0,
@@ -36973,7 +36801,7 @@
    "model_home": 0.6801,
    "market_home": 0.6744,
    "facts": [
-    "Vegas: Missouri State Bears -6 \u00b7 O/U 50.5 (our ratings have Missouri State Bears 3.7 better than the spread; our ratings have 4.4 more points than the total).",
+    "Vegas: Missouri State Bears -5.5 \u00b7 O/U 51.5 (our ratings have Missouri State Bears 4.2 better than the spread; our ratings have 3.4 more points than the total).",
     "Market win chance: Sam Houston Bearkats 33% \u00b7 Missouri State Bears 67%.",
     "Our ratings alone: Sam Houston Bearkats 22.6 @ Missouri State Bears 32.3, Missouri State Bears 68% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
     "Backed by 3,360 blind-tested games (2022-2026): this method picked 74.4% of winners (Vegas alone 74.5%, our ratings alone 68.8%) and missed the total by 12.41 points on average (ratings alone 12.8).",
@@ -36986,7 +36814,7 @@
     "Upset risk: 32% chance Sam Houston Bearkats wins outright.",
     "Track record: teams we gave a 66% chance to win outright won 54% of the time (94 recent games tested)."
    ],
-   "updated_at": "2026-10-25T16:40:48.125298+00:00",
+   "updated_at": "2026-10-25T17:09:22.436634+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -37438,7 +37266,7 @@
      "rate": 0.7677165354330708,
      "proven": true,
      "model_cover": 0.714,
-     "status": "pending",
+     "status": "live",
      "final": null
     },
     {
@@ -37456,7 +37284,7 @@
      "rate": 0.7677165354330708,
      "proven": true,
      "model_cover": 0.6593,
-     "status": "pending",
+     "status": "live",
      "final": null
     }
    ],
@@ -37464,7 +37292,7 @@
    "leg_rate": 0.7717948717948718,
    "proven": true,
    "hit": 0.5956673241288627,
-   "status": "pending",
+   "status": "live",
    "profit": null,
    "graded_at": null
   },
@@ -37490,7 +37318,7 @@
      "rate": 0.7677165354330708,
      "proven": true,
      "model_cover": 0.714,
-     "status": "pending",
+     "status": "live",
      "final": null
     },
     {
@@ -37508,7 +37336,7 @@
      "rate": 0.7677165354330708,
      "proven": true,
      "model_cover": 0.6593,
-     "status": "pending",
+     "status": "live",
      "final": null
     },
     {
@@ -37526,7 +37354,7 @@
      "rate": 0.7636986301369864,
      "proven": true,
      "model_cover": 0.6658,
-     "status": "pending",
+     "status": "live",
      "final": null
     }
    ],
@@ -37534,7 +37362,7 @@
    "leg_rate": 0.7717948717948718,
    "proven": true,
    "hit": 0.4597329860584299,
-   "status": "pending",
+   "status": "live",
    "profit": null,
    "graded_at": null
   },
@@ -37560,7 +37388,7 @@
      "rate": 0.7677165354330708,
      "proven": true,
      "model_cover": 0.7523,
-     "status": "pending",
+     "status": "live",
      "final": null
     },
     {
@@ -37586,7 +37414,7 @@
    "leg_rate": 0.7717948717948718,
    "proven": true,
    "hit": 0.5956673241288627,
-   "status": "pending",
+   "status": "live",
    "profit": null,
    "graded_at": null
   }
