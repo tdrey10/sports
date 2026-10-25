@@ -48,6 +48,7 @@ def build_data(
     rival: list[dict] | None = None,
     rival_reported: dict | None = None,
     nba: dict | None = None,
+    reports: dict | None = None,
 ) -> dict:
     cutoff = now - timedelta(days=KEEP_DAYS)
     entries = []
@@ -88,6 +89,8 @@ def build_data(
         "rival": _rival(rival, ledger, now, rival_reported),
         # The NBA player report (nbaplayers.py): research, no units.
         "nba": nba,
+        # The football reports (fbplayers.py): {"nfl": ..., "ncaaf": ...}. Research, no units.
+        "reports": reports or {},
     }
 
 

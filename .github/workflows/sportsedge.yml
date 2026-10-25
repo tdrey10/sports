@@ -114,9 +114,11 @@ jobs:
         continue-on-error: true
         run: hambino d5-fit
 
-      # NBA players (owner, Oct 25): box scores by position for this season and last (backfilled a
-      # bit each morning), and the blind "who's due" study on 10 seasons of closing lines.
-      - name: NBA players and study
+      # Player reports (owner, Oct 25): NBA box scores by position (this season and last) and NFL /
+      # college football passing, rushing and receiving (this season), backfilled a bit each morning,
+      # and the blind "who's due" study in every sport with closing lines (NBA, NFL, college
+      # football, college hoops, MLB).
+      - name: Player reports and due study
         if: github.event.schedule == '47 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.study)
         continue-on-error: true
         timeout-minutes: 25
@@ -169,7 +171,7 @@ jobs:
           git config user.email "sportsedge-bot@users.noreply.github.com"
           git add data/ledger.json data/brain.json
           # One path at a time: git add fails as a whole if any path is missing.
-          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/line_studies.json data/tennis_history.json data/forecast_study.json data/d5_models.json data/d5_audit.json data/qb data/players data/nba_report.json data/nba_study.json data/shop_study.json data/soccer_study.json data/study_log.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
+          for p in data/studies.json data/ufc.json data/nfl_history.json data/ncaaf_history.json data/espn_history.json data/line_studies.json data/tennis_history.json data/forecast_study.json data/d5_models.json data/d5_audit.json data/qb data/players data/nba_report.json data/nba_study.json data/nfl_report.json data/ncaaf_report.json data/due_study.json data/shop_study.json data/soccer_study.json data/study_log.json data/lines data/boxscores data/history data/games data/odds data/props data/props_graded; do
             if [ -e "$p" ]; then git add "$p"; fi
           done
           git diff --cached --quiet || git commit -m "Update pick ledger"
