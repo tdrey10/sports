@@ -26,7 +26,7 @@ from .models.ratings import GameResult
 from .odds import american_to_decimal
 from .sports import SPORTS
 from .parlays import DABBLE_SIZES, SIZES as PARLAY_SIZES, Parlay, build as build_parlays, settle
-from .tiers import BEST_BETS, LIVE_TIERS, Card
+from .tiers import BEST_BETS, LIVE_TIERS, Card, gate
 
 DAY_TIERS = ("lock", "dog", "prop")
 
@@ -233,6 +233,7 @@ class Ledger:
     def publish(self, cards: list[Card], now: datetime) -> list[Entry]:
         """Add new cards. A pick already in the ledger keeps its original price,
         and each game gets at most one game-line unit play."""
+        cards = [gate(c) for c in cards]
         added = []
         unit_events = {
             e.event_id for e in self.entries.values() if e.is_unit_play and e.player is None and e.tier not in LIVE_TIERS

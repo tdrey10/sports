@@ -46,6 +46,9 @@ MAX_EV = 0.15  # bigger than this is almost always a stale or wrong price
 # at a 2%+ edge over the other books' consensus, but the 4%+ slice lost in every tuning variant
 # (-20% to -36%): a price that far off is stale or wrong. So football takes 2% to 4% only.
 MAX_EV_BY_SPORT = {"nfl": 0.04, "ncaaf": 0.04}
+# Only football's price shopping has passed the blind test (shopstudy: 2%+ over the other books,
+# 75-86 blind bets, +20% to +40%); the other sports' value bets post at 0u until theirs does.
+SHOP_PROVEN = {k: "Football price shopping (2%+ over the other books): PROVEN blind" for k in ("nfl", "ncaaf")}
 MAX_FAVORITE = -170
 MAX_UNITS = 1.0  # new method: small until its CLV record is in
 CORE_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific: tennis checks
@@ -220,7 +223,8 @@ def cards(cfg: SportConfig, events: list[dict], espn_games: list, now: datetime,
             "Bet it at this book at this number or better. If the line moves, the edge is gone.",
         ]
         out.append(Card(tier="sharp", units=units, headline=headline, reasons=reasons, sport=cfg.key,
-                        sport_name=cfg.name, pick=pick, home=game.home, away=game.away))
+                        sport_name=cfg.name, pick=pick, home=game.home, away=game.away,
+                        proven=SHOP_PROVEN.get(cfg.key, "")))
     return out
 
 
@@ -349,7 +353,8 @@ def tennis_cards(key: str, events: list[dict], now: datetime, proven: bool = Fal
             facts = match_facts(rows, away, home, start, tour)
             reasons = reasons[:3] + facts[:max(MAX_FACTS - len(reasons), 8)] + reasons[3:]
         out.append(Card(tier="sharp", units=units, headline=headline, reasons=reasons, sport=cfg.key,
-                        sport_name=f"Tennis · {tour.upper()}", pick=pick, home=home, away=away))
+                        sport_name=f"Tennis · {tour.upper()}", pick=pick, home=home, away=away,
+                        proven="Tennis value: its own graded record" if proven else ""))
     return out
 
 
