@@ -119,7 +119,7 @@ def build(rows: list[dict], now: datetime) -> dict:
             if x["load3"] >= 3:
                 notes.append(f"{x['name']}: {x['load3']} matches in the last 3 days ({x['sets7']} sets this week)")
             if x["form"]:
-                notes.append(f"{x['name']} is " + {"cold": "ice cold 🥶", "hot": "cookin' 🔥"}.get(x["form"], x["form"]) + f": {x['last10']} the last 10, {x['season']} on the year")
+                notes.append(f"{x['name']} is " + {"cold": "playing like a bum 🥶", "hot": "cookin' 🔥"}.get(x["form"], x["form"]) + f": {x['last10']} the last 10, {x['season']} on the year")
         if pa["load7"] - pb["load7"] >= 3 or pb["load7"] - pa["load7"] >= 3:
             tired, fresh = (pa, pb) if pa["load7"] > pb["load7"] else (pb, pa)
             notes.append(f"Legs check: {tired['name']} has played {tired['load7']} matches this week, {fresh['name']} only {fresh['load7']}")

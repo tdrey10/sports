@@ -52,7 +52,7 @@ def test_build_names_the_qb_flags_cold_and_key_injuries(tmp_path):
     assert a["qb"]["name"] == "Joe Starter" and a["qb"]["tag"] == "cold" and a["qb"]["starts"] == 6
     assert {h["name"]: h["key"] for h in a["hurt"]} == {"Lead Back": "RB1", "Big Target": "top target"}
     notes = " ".join(rep["matchups"][0]["notes"])
-    assert "RB1 Lead Back out" in notes and "Joe Starter (Team A) is ice cold" in notes
+    assert "RB1 Lead Back out" in notes and "Joe Starter (Team A) is playing like a bum" in notes
 
 
 def test_due_study_runs_for_football_with_its_own_numbers():
