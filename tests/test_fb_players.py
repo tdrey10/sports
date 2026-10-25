@@ -62,3 +62,29 @@ def test_due_study_runs_for_football_with_its_own_numbers():
         t.add(pf, pa, False)
     assert t.close == 2 and t.luck() >= p.luck  # .500 record, about .25 by point differential
     assert any("one-score" not in k and "close-game" in k for k in nbastudy.rules(p))
+
+
+def test_games_saved_before_defense_are_read_again_once(tmp_path):
+    """Owner, Oct 25: Nick Bosa wasn't on the 49ers roster because games were saved before defense was kept."""
+    g = tmp_path / "games" / "nfl"
+    g.mkdir(parents=True)
+    (g / "2026-10.csv").write_text("event_id,date,home,away,home_score,away_score\n"
+                                   f"e1,{(NOW - timedelta(days=3)).isoformat()},Home,Away,24,17\n")
+    _store(tmp_path, {"e1": {"date": "x", "home": "Home", "away": "Away", "rows": [["Home", "Starter QB", "passing", 1, 1, 1, 0, 0]]}})
+    calls = []
+
+    class Client:
+        def summary(self, cfg, eid):
+            calls.append(eid)
+            return summary()
+
+    assert fbplayers.collect(Client(), "nfl", NOW, tmp_path) == 1
+    assert fbplayers.collect(Client(), "nfl", NOW, tmp_path) == 0 and calls == ["e1"]  # once, then kept
+    rows = json.loads((tmp_path / "players" / "nfl" / "2026.json").read_text())["e1"]["rows"]
+    assert any(r[1] == "Linebacker" and r[2] == "defensive" for r in rows)
+
+
+def test_a_qb_whose_picks_sink_him_stays_on_offense():
+    mine = {("T", "Mac Jones", "passing"): [(None, [3, 10, 20, 0, 2])]}
+    roster = fbplayers._roster("T", mine, 1, None, {}, set(), set())
+    assert roster[0]["unit"] == "offense"

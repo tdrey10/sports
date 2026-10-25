@@ -9,9 +9,11 @@ changes, public splits. Those dog-score items are simply not added (they are cap
 
 from __future__ import annotations
 
+import json
 import logging
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from ..edge import Pick
@@ -39,8 +41,17 @@ INJURY_PTS = {  # owner-spec injury penalties on the own read, win-chance points
     "ncaaf": {"QB": 0.03, "one": 0.0, "two": 0.05},
 }
 SKILL = {"QB": "QB", "RB": "RB", "WR": "WR", "TE": "WR"}
+# Owner, Oct 25 (49ers 3u Lock): the table above counts position groups, not players, so the
+# Falcons' backup RB and WR cost them 10 points while Nick Bosa and two starting 49ers receivers
+# cost 3. Each player out now costs what he means to his team (his tier in the roster report,
+# offense and defense), capped at the table's "two"; his team's starting QB still costs "QB".
+TIER_PTS = {"Key": 0.04, "Starter": 0.02, "Rotation": 0.005}  # NFL; college is scaled by its cap
+# Our read this far over the market on a Lock usually means the market knows something we don't
+# (the 49ers: 71% vs 57%): it's still posted, at 1u, until a blind test says the gap pays.
+GAP_CAP = 0.08
 
 _cache: dict[str, tuple[list[Game], Replay]] = {}
+_tiers: dict[str, dict] = {}
 LAST_SIDES: list = []  # every side the last build() read (the miss audit looks his picks up here)
 
 
@@ -138,11 +149,32 @@ def _state(sport: str, model: SportModel, games: list[Game]) -> Replay:
     return r
 
 
-def _injury_pen(sport: str, out: list[tuple[str, str]]) -> tuple[float, bool]:
-    """(penalty in win-chance points, QB out) from the owner's injury table."""
+def roster_tiers(sport: str, root="data") -> dict[str, dict]:
+    """team -> {"tiers": {player: tier}, "qb": starting QB} from the saved roster report."""
+    key = f"tiers:{sport}:{root}"
+    if key not in _tiers:
+        try:
+            teams = json.loads((Path(root) / f"{sport}_report.json").read_text()).get("teams") or {}
+        except (OSError, ValueError):
+            teams = {}
+        _tiers[key] = {t: {"tiers": {p["name"]: p["tier"] for p in v.get("roster") or []},
+                           "qb": (v.get("qb") or {}).get("name")} for t, v in teams.items()}
+    return _tiers[key]
+
+
+def _injury_pen(sport: str, out: list[tuple[str, str]], team: dict | None = None) -> tuple[float, bool]:
+    """(penalty in win-chance points, QB out). With the team's roster tiers, each player costs his
+    tier's points; without them, the owner's position table."""
     table = INJURY_PTS.get(sport)
     if not table:
         return 0.0, False
+    if team and team.get("tiers"):
+        scale = table["two"] / INJURY_PTS["nfl"]["two"]
+        qb = (any(n == team["qb"] for n, _ in out) if team.get("qb")
+              else any((pos or "").upper() == "QB" for _, pos in out))
+        pen = table["QB"] if qb else 0.0
+        pen += sum(TIER_PTS.get(team["tiers"].get(n), 0.0) * scale for n, _ in out if n != team.get("qb"))
+        return min(pen, max(table["two"], table["QB"] if qb else 0.0)), qb
     kinds = {SKILL[pos.upper()] for _, pos in out if pos and pos.upper() in SKILL}
     qb = "QB" in kinds
     if len(kinds) >= 2:
@@ -189,8 +221,9 @@ def build_sides(scan, model: SportModel, now: datetime, root="data") -> list[Sid
         f = info["f"]
         p_model = model.own(f)
         home_dog = m < 0.5 and not ctx.neutral
-        pen_h, qb_h = _injury_pen(sport, inj_h)
-        pen_a, qb_a = _injury_pen(sport, inj_a)
+        rt = roster_tiers(sport, root) if sport in INJURY_PTS else {}
+        pen_h, qb_h = _injury_pen(sport, inj_h, rt.get(ctx.home))
+        pen_a, qb_a = _injury_pen(sport, inj_a, rt.get(ctx.away))
         key_out = qb_h or qb_a or (sport == "nhl" and any(pos.upper() == "G" for _, pos in inj_h + inj_a))
         if key_out:
             ph = sigmoid(logit(m) + model.blend[1] * move) if sport != "nhl" else m
@@ -453,6 +486,8 @@ def nhl_pricey(sd: Side) -> bool:
 def lock_units(sd: Side) -> float:
     if sd.thin():
         return 0.5
+    if sd.read_of - sd.p_market > GAP_CAP:
+        return 1.0
     if sd.w_p is not None and sd.w_p * sd.dec > 1:
         return 3.0 if sd.edge_own > 0 else 2.0
     return 1.0
