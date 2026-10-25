@@ -159,7 +159,7 @@ def _team_due(root, sport: str, season: int, now: datetime) -> dict[str, dict]:
             elif t.close >= p.close_n:
                 notes.append(f"won {t.close} more one-score games than they lost")
             if d["slump"] <= -p.slump:
-                notes.append(f"slumping: {abs(d['slump']):.0f} pts a game worse the last {p.recent} than their season")
+                notes.append(f"playin' like bums: {abs(d['slump']):.0f} pts a game worse the last {p.recent} than their season")
             elif d["slump"] >= p.slump:
                 notes.append(f"rollin': {d['slump']:.0f} pts a game better the last {p.recent} than their season")
         else:
@@ -325,7 +325,7 @@ def build(sport: str, now: datetime, root="data", injuries: dict | None = None,
                 notes.append(f"{name}: QB {q['name']} only has {q['starts']} starts this year, new guy under center")
             for who in ([q] if q else []) + ([t["rb"]] if t.get("rb") else []) + t.get("wr", []):
                 if who and who.get("tag"):
-                    notes.append(f"{who['name']} ({name}) is " + {"cold": "ice cold 🥶", "hot": "cookin' 🔥"}.get(who["tag"], who["tag"]))
+                    notes.append(f"{who['name']} ({name}) is " + {"cold": "playing like a bum 🥶", "hot": "cookin' 🔥"}.get(who["tag"], who["tag"]))
             for n in ((t.get("due") or {}).get("notes") or [])[:2]:
                 if "games in" not in n:
                     notes.append(f"{name}: {n}")

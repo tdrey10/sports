@@ -384,6 +384,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     live: "Live", live_win: "Live · likely winner", live_plus: "Live · plus money", sharp: "Sharp value" };
   const state = { tab: "today", sport: "all", market: "all", rep: "nba" };
   try { Object.assign(state, JSON.parse(localStorage.getItem("fb-state") || "{}")); } catch (e) {}
+  // A tab that's been taken off (Predictions, Live Scores) never comes back from a saved visit.
+  if (!TABS.some(([k]) => k === state.tab)) state.tab = "today";
   if (!TABS.some(([k]) => k === state.tab)) state.tab = "today";  // e.g. a saved tab that no longer exists
   const save = () => { try { localStorage.setItem("fb-state", JSON.stringify(state)); } catch (e) {} };
 
@@ -675,30 +677,6 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     || (state.sport === "tennis" && String(key).startsWith("tennis"));
   const liveGames = () => allSports()
     .reduce((n, sp) => n + (BOARD[sp.key] || []).filter((g) => g.state === "in").length, 0);
-  function viewScores() {
-    // Every sport on one page, no filter, in three blocks: live now on top, then coming up, then final.
-    const sports = allSports().filter((sp) => (BOARD[sp.key] || []).length);
-    if (!sports.length) return panel("Live scores", "Today's games", empty("Pulling scores…"));
-    const line = (g) => {
-      const tail = g.state === "pre" ? fmt(g.when, { hour: "numeric", minute: "2-digit" }) : esc(g.detail);
-      const sc = g.state === "pre" ? "" : ` <b>${esc(g.as ?? "")}-${esc(g.hs ?? "")}</b>`;
-      return `<li class="${g.state === "in" ? "live-dot" : ""}">${esc(g.away)} ${g.vs ? "vs" : "@"} ${esc(g.home)}${sc} <span class="muted">· ${tail}</span></li>`;
-    };
-    const block = (state, sort) => {
-      const groups = sports.map((sp) => [sp, BOARD[sp.key].filter((g) => (g.state === "in" || g.state === "post" ? g.state : "pre") === state).sort(sort)])
-        .filter(([, games]) => games.length).sort((a, b) => b[1].length - a[1].length);
-      return { n: groups.reduce((n, [, g]) => n + g.length, 0),
-        html: `<div class="grid two">${groups.map(([sp, games]) => `<div><span class="kind">${esc(sp.name)}</span><ul class="scores">${games.map(line).join("")}</ul></div>`).join("")}</div>` };
-    };
-    const byTime = (a, b) => new Date(a.when) - new Date(b.when);
-    const live = block("in", byTime), next = block("pre", byTime), done = block("post", (a, b) => byTime(b, a));
-    return panel("Live now", live.n ? `${live.n} game${live.n === 1 ? "" : "s"} on right now · updates every 30 seconds` : "Nothing live right now · updates every 30 seconds",
-        live.n ? live.html : empty("Nothing live right now. Upcoming and finals below."))
-      + (next.n ? panel("Coming up", `${next.n} still to play today`, next.html) : "")
-      + (done.n ? panel("Final", `${done.n} finished · latest first`, done.html) : "");
-  }
-
-  // Predictions: every game, not just the picks. Projected score and who we think wins.
   // Owner, Oct 25: the NBA player report. Who's hurt, who's cold or hot, the starters at every
   // position, which teams are due, and the blind study. Research only: nothing here carries units.
   function viewNba() {
@@ -712,7 +690,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const angle = m.angle ? `<p class="small"><span class="tag value">Proven angle</span> ${esc(m.angle)} against the spread: an unlucky team vs a lucky one (+12% blind on 137 games since 2022). Still just the scoop, not strong enough for units yet.</p>` : "";
       return `<article class="nba-game"><strong>${esc(m.away)}${ml(m.away_ml)} @ ${esc(m.home)}${ml(m.home_ml)}</strong>
         <div class="muted small">${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}${m.spread != null ? ` · ${esc(short(m.home))} ${m.spread > 0 ? "+" : ""}${m.spread}` : ""}</div>
-        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both squads healthy, nobody cookin' or ice cold, nobody due. Clean game.</p>`}${angle}${liveInj("nba", m.away)}${liveInj("nba", m.home)}</article>`;
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both squads healthy, no bums, nobody cookin', nobody due. Clean game.</p>`}${angle}${liveInj("nba", m.away)}${liveInj("nba", m.home)}</article>`;
     }).join("");
     const teams = Object.entries(R.teams || {});
     const hurt = teams.filter(([, t]) => t.hurt.length).sort((a, b) => b[1].minutes_out - a[1].minutes_out).map(([name, t]) =>
@@ -737,9 +715,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     return `<div class="nba">` + panel("Tonight's NBA games", "Who's hurt, who starts where, who's cookin' and who's been lucky, game by game · just the scoop, no units", games ? `<div class="grid">${games}</div>` : empty("No NBA games on the board right now."))
       + panel("Who's hurt", "Today's injury report · how much of each team's minutes and buckets are sitting",
           hurt ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Out / questionable</th><th>Minutes out</th><th>Scoring out</th></tr></thead><tbody>${hurt}</tbody></table></div>` : empty("Everybody's good to go."))
-      + panel("Who's shitting the bed 🥶", "His last 5 vs his usual: shooting 6+ pts worse and scoring 15%+ less (guys playing 15+ min). Ice cold.", formTable(form("cold"), "Nobody's cold right now."))
+      + panel("Who's shitting the bed 🥶", "His last 5 vs his usual: shooting 6+ pts worse and scoring 15%+ less (guys playing 15+ min). Straight bums right now.", formTable(form("cold"), "No bums right now. Everybody's holding it down."))
       + panel("Who's hot 🔥", "His last 5: shooting 6+ pts better and scoring 15%+ more. He's cookin'.", formTable(form("hot"), "Nobody's hot right now."))
-      + panel("Starters by position", "Who's been starting at each spot the last 5 games · 🥶 ice cold · 🔥 cookin'",
+      + panel("Starters by position", "Who's been starting at each spot the last 5 games · 🥶 playing like a bum · 🔥 cookin'",
           lineups ? `<div class="table-wrap"><table><thead><tr><th>Team</th>${POS.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody>${lineups}</tbody></table></div>` : empty("Still pulling the box scores, hang tight."))
       + panel("Who's due", "Luck = their record minus what their point differential says it should be (kicks in at 10 games) · close = net wins in 5-point games · last 5 = average margin. Unlucky teams are due.",
           due ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Record</th><th>Diff</th><th>Luck</th><th>Close</th><th>Last 5</th><th>Notes</th></tr></thead><tbody>${due}</tbody></table></div>` : empty("Not enough games yet, give it a minute."))
@@ -775,7 +753,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         cards ? `<div class="grid">${cards}</div>` : empty("No matches in the next 36 hours, homie."))
       + panel("Health flags", `Retired from a match or handed out a walkover in the last 60 days, or rusty after 30+ days off`, hurt ? `<ul class="reads">${hurt}</ul>` : empty("Nobody's banged up."))
       + panel("Who's hot 🔥", "Last 10 matches 20+ pts better than their season (15+ matches). Cookin'.", list(R.hot || [], "Nobody's hot right now."))
-      + panel("Who's shitting the bed 🥶", "Last 10 matches 20+ pts worse than their season. Ice cold.", list(R.cold || [], "Nobody's cold right now.")) + `</div>`;
+      + panel("Who's shitting the bed 🥶", "Last 10 matches 20+ pts worse than their season. Straight bums right now.", list(R.cold || [], "No bums right now. Everybody's holding it down.")) + `</div>`;
   }
 
   // Owner, Oct 25: "look at the entire roster... who's important and impactful and who's not?"
@@ -850,7 +828,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const ml = (x) => (x == null ? "" : ` ${odds(x)}`);
       return `<article class="nba-game"><strong>${esc(m.away)}${ml(m.away_ml)} @ ${esc(m.home)}${ml(m.home_ml)}</strong>
         <div class="muted small">${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}${m.spread != null ? ` · ${esc(short(m.home))} ${m.spread > 0 ? "+" : ""}${m.spread}` : ""}</div>
-        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Starters healthy, nobody cookin' or ice cold, nobody due. Clean game.</p>`}${liveInj(R.sport, m.away)}${liveInj(R.sport, m.home)}</article>`;
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Starters healthy, no bums, nobody cookin', nobody due. Clean game.</p>`}${liveInj(R.sport, m.away)}${liveInj(R.sport, m.home)}</article>`;
     }).join("");
     const hurt = teams.filter(([, t]) => t.hurt.some((h) => h.key || h.pos === "QB")).map(([n, t]) =>
       `<tr><td>${esc(n)}</td><td>${t.hurt.filter((h) => h.key || h.pos === "QB").map((h) => `${esc(h.name)} <small>${esc(h.key || h.pos)} · ${h.status}</small>`).join("<br>")}</td></tr>`).join("");
@@ -871,58 +849,13 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
           hurt ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Out / questionable</th></tr></thead><tbody>${hurt}</tbody></table></div>` : empty("No key guys banged up."))
       + panel("Quarterbacks", `Each team's latest starter · yards per throw with TDs and picks baked in ((yds + 20 TD − 45 INT) / att), season and last 3${R.sport === "nfl" ? "" : " · teams playing on this slate"}`,
           qbs ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>QB</th><th>Adj YPA</th><th>Last 3</th><th>TD-INT</th></tr></thead><tbody>${qbs}</tbody></table></div>` : empty("Still pulling the box scores, hang tight."))
-      + panel("Who's shitting the bed 🥶", "Last 3 games: QB 1.5+ yds a throw under his season, RB 1.2+ yds a carry under, receiver at 60% of his usual yards or less. Ice cold.", formTable(formRows("cold"), "Nobody's cold right now."))
+      + panel("Who's shitting the bed 🥶", "Last 3 games: QB 1.5+ yds a throw under his season, RB 1.2+ yds a carry under, receiver at 60% of his usual yards or less. Straight bums right now.", formTable(formRows("cold"), "No bums right now. Everybody's holding it down."))
       + panel("Who's hot 🔥", "Same thing the other way. Cookin'.", formTable(formRows("hot"), "Nobody's hot right now."))
       + panel("Who's due", "Luck = their record minus what their point differential says it should be (kicks in at 4 games) · close = net one-score wins (7 pts or less). Unlucky teams are due.",
           due ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Record</th><th>Diff</th><th>Luck</th><th>Close</th><th>Notes</th></tr></thead><tbody>${due}</tbody></table></div>` : empty("Not enough games yet, give it a minute."))
       + (st ? panel("Does it beat the price?", `Blind test at the closing price (tune 2018-21, blind 2022 on) · luck control: ${st.control.proven} of ${st.control.spots} random sets passed`,
           `<div class="table-wrap"><table><thead><tr><th>Angle</th><th>Tuning</th><th>Blind</th><th>Verdict</th></tr></thead><tbody>${studyRows}</tbody></table></div>
            <p class="small muted">Only STRONG angles get units.</p>`) : "") + `</div>`;
-  }
-
-  function viewPredict() {
-    const all = (DATA.forecasts || []).filter((f) => pickedSport(f.sport));
-    const now = Date.now();
-    // Only games still to play or under way: a finished game comes off (its result counts in the record above).
-    const recent = all.filter((f) => (f.status === "pending" || f.status === "live") && !(scoreFor(f) || {}).final
-      && now - new Date(f.commence_time).getTime() < 12 * 3600e3);
-    const order = { live: 0, pending: 1, final: 2 };
-    recent.sort((a, b) => (order[a.status] ?? 1) - (order[b.status] ?? 1) || new Date(a.commence_time) - new Date(b.commence_time));
-    const name = (f, side) => (side === "home" ? f.home : side === "away" ? f.away : "Draw");
-    const card = (f) => {
-      const [hs, as] = f.score || [Math.round(f.home_score), Math.round(f.away_score)];
-      const prob = f.winner === "home" ? f.p_home : f.winner === "away" ? f.p_away : f.p_draw;
-      const team = (side, sc) => `<div class="fc-row${f.winner === side ? " pick" : ""}"><span>${side === "home" ? (f.sport.startsWith("tennis") ? "vs " : "@ ") : ""}${esc(name(f, side))}</span><b>${sc}</b></div>`;
-      let status = `<span class="muted">${timeOf(f)}</span>`;
-      if (f.status === "live" && f.live) status = `<span class="live-dot">Live ${esc(f.live.away ?? "")}-${esc(f.live.home ?? "")} · ${esc(f.live.detail || "")}</span>`;
-      const sc = scoreFor(f);
-      if (f.status === "pending" && sc && !sc.final) status = `<span class="live-dot">Live ${esc(sc.away)}-${esc(sc.home)} · ${esc(sc.detail)}</span>`;
-      if (f.status === "pending" && sc && sc.final) status = `<span class="muted">Final ${esc(sc.away)}-${esc(sc.home)} · ${esc(String(sc.detail).replace(/ · Final$/, ""))} · grading soon</span>`;
-      let result = "";
-      if (f.status === "final") {
-        const mark = f.correct ? `<span class="mark win">✓</span>` : `<span class="mark loss">✗</span>`;
-        result = `<p class="fc-final">${mark}Final: ${esc(f.away)} ${f.final_away} – ${esc(f.home)} ${f.final_home}</p>`;
-      }
-      const draw = f.p_draw > 0 ? ` · draw ${pct(f.p_draw)}` : "";
-      const bar = `<div class="fc-bar" title="${esc(f.away)} ${pct(f.p_away)} · ${esc(f.home)} ${pct(f.p_home)}"><i style="width:${(f.p_away * 100).toFixed(1)}%"></i>${f.p_draw > 0 ? `<i class="d" style="width:${(f.p_draw * 100).toFixed(1)}%"></i>` : ""}</div>`;
-      const vegas = (f.facts || []).find((x) => x.startsWith("Vegas:"));
-      const rest = (f.facts || []).filter((x) => x !== vegas);
-      const facts = rest.length ? `<details><summary>Why · stats &amp; facts</summary><ul>${rest.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></details>` : "";
-      const mkt = f.market_home != null ? ` · market ${pct(f.winner === "away" ? 1 - f.market_home - (f.p_draw ? f.p_draw : 0) : f.market_home)}` : "";
-      return `<article class="fc ${f.status === "final" ? (f.correct ? "ok" : "miss") : ""}">
-        <div class="fc-head"><span class="kind">${esc(f.sport_name)}</span>${status}</div>
-        ${team("away", as)}${team("home", hs)}${bar}
-        <p class="fc-pick">We say <b>${esc(name(f, f.winner))}</b> ${f.winner === "draw" ? "" : "win"} ${pct(prob)}${draw}</p>
-        ${vegas ? `<p class="fc-vegas small muted">${esc(vegas)}</p>` : ""}${result}${facts}</article>`;
-    };
-    const rec = DATA.forecast_record || {};
-    const o = rec.overall || {};
-    const head = o.right + o.wrong
-      ? `${o.right}-${o.wrong} picking winners (${pct(o.pct)}) · scores off by ${o.score_error == null ? "–" : o.score_error.toFixed(1)} a team`
-      : "Graded after every final";
-    const bySport = Object.values(rec.by_sport || {}).map((s) => `<span class="chip-rec">${esc(s.name)} ${s.right}-${s.wrong}</span>`).join("");
-    const intro = `<p class="small muted">Not bets, just how we see every game going. Starts from the Vegas line and leans toward our ratings as far as they've earned it in testing. Tap any card for the why. Locks at kickoff, drops off when it's over, and counts in the record up top.</p>${bySport ? `<div class="chip-recs">${bySport}</div>` : ""}`;
-    return panel("Predictions", head, intro + (recent.length ? `<div class="grid two">${recent.map(card).join("")}</div>` : empty("Nothin' to call live right now. More drop as soon as lines post.")));
   }
 
   function viewLive() {
@@ -1090,7 +1023,6 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${usd(st.bankroll)}</b><small>from ${usd(st.start_bankroll)} · 1 unit = ${usd(U())}</small></div>`;
     const counts = { today: bestToday().length, parlays: (DATA.parlays || []).filter((p) => p.day === today()).length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
       early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length, scores: liveGames(),
-      predict: (DATA.forecasts || []).filter((f) => f.status === "pending" && pickedSport(f.sport)).length,
       nba: [DATA.nba, ...Object.values(DATA.reports || {})].reduce((n, r) => n + ((r || {}).matchups || []).length, 0) };
     $("tabs").innerHTML = TABS.map(([k, n]) => `<button role="tab" data-tab="${k}" aria-selected="${state.tab === k}">${n}${counts[k] ? `<span class="count">${counts[k]}</span>` : ""}</button>`).join("");
     $("sports").innerHTML = SPORTS.map(([k, n]) => `<button data-sport="${k}" aria-pressed="${state.sport === k}">${n}</button>`).join("");
@@ -1102,7 +1034,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     renderTop();
     renderHero();
     const views = {
-      today: viewToday, parlays: viewParlays, nba: viewReports, live: viewLive, scores: viewScores, predict: viewPredict, results: viewResults,
+      today: viewToday, parlays: viewParlays, nba: viewReports, live: viewLive, results: viewResults,
       props: () => viewList((e) => e.player, "Player props", "Best edge first · priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
       early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves · no units until early bets prove out", "Nothing early yet: an early pick needs a real edge on a realistic winner (45%+ to cash)."),
     };

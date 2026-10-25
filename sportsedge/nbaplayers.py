@@ -197,7 +197,7 @@ def _team_due(root: Path | str, season: int, now: datetime) -> dict[str, dict]:
             elif t.close >= 3:
                 notes.append(f"won {t.close} more close ones than they lost")
             if d["slump"] <= -8:
-                notes.append(f"slumping: {abs(d['slump']):.0f} pts a game worse the last 5 than their season")
+                notes.append(f"playin' like bums: {abs(d['slump']):.0f} pts a game worse the last 5 than their season")
             elif d["slump"] >= 8:
                 notes.append(f"rollin': {d['slump']:.0f} pts a game better the last 5 than their season")
             d["notes"] = notes
@@ -404,7 +404,7 @@ def build(now: datetime, root: Path | str = "data", injuries: dict | None = None
                     notes.append(f"{short}: {hole['starter']} ({hole['slot']}) is questionable{with_him(hole['starter'])}"
                                  + (f"; {hole['next']} starts if he sits." if hole["next"] else "."))
             for n in t.get("cold", [])[:2]:
-                notes.append(f"{n} ({short}) is ice cold right now 🥶")
+                notes.append(f"{n} ({short}) is playing like a bum right now 🥶")
             for n in t.get("hot", [])[:2]:
                 notes.append(f"{n} ({short}) is cookin' 🔥")
             for n in ((t.get("due") or {}).get("notes") or [])[:2]:

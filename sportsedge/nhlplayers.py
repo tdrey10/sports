@@ -251,7 +251,7 @@ def build(now: datetime, root="data", injuries: dict | None = None, games_today:
                 if g1.get("status"):
                     notes.append(f"{name}: #1 goalie {g1['name']} {g1['status']}" + (f", {gl[1]['name']} likely gets the net" if len(gl) > 1 else ""))
                 elif g1.get("form"):
-                    notes.append(f"{name}: #1 goalie {g1['name']} is " + {"cold": "ice cold 🥶", "hot": "cookin' 🔥"}.get(g1["form"], g1["form"]) + f" (saving {g1['last5']:.3f} his last 5 vs {g1['sv']:.3f} on the year)")
+                    notes.append(f"{name}: #1 goalie {g1['name']} is " + {"cold": "playing like a bum 🥶", "hot": "cookin' 🔥"}.get(g1["form"], g1["form"]) + f" (saving {g1['last5']:.3f} his last 5 vs {g1['sv']:.3f} on the year)")
             out = [p for p in t.get("roster", []) if p["status"] == "out" and p["tier"] != "Bench"]
             if out and t.get("production_out", 0) >= 0.05:
                 notes.append(f"{name.split()[-1]} without {', '.join(p['name'] + ' (' + p['line'].split(' · ')[0] + ', ' + p['line'].split(' · ')[1] + ')' for p in out)}: "
@@ -260,7 +260,7 @@ def build(now: datetime, root="data", injuries: dict | None = None, games_today:
                 if p["status"] and p["tier"] in ("Key", "Starter"):
                     notes.append(f"{name}: {p['tier'].lower()} {p['name']} {p['status']}" + (f" ({p['impact']})" if p["impact"] else ""))
                 elif p["form"] and p["tier"] in ("Key", "Starter"):
-                    notes.append(f"{p['name']} ({name}) is " + {"cold": "ice cold 🥶", "hot": "cookin' 🔥"}.get(p["form"], p["form"]))
+                    notes.append(f"{p['name']} ({name}) is " + {"cold": "playing like a bum 🥶", "hot": "cookin' 🔥"}.get(p["form"], p["form"]))
             for n in ((t.get("due") or {}).get("notes") or [])[:2]:
                 if "games in" not in n:
                     notes.append(f"{name}: {n}")
