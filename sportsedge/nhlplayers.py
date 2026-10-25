@@ -252,8 +252,10 @@ def build(now: datetime, root="data", injuries: dict | None = None, games_today:
                     notes.append(f"{name}: #1 goalie {g1['name']} {g1['status']}" + (f", {gl[1]['name']} next" if len(gl) > 1 else ""))
                 elif g1.get("form"):
                     notes.append(f"{name}: #1 goalie {g1['name']} is {g1['form']} (last 5 {g1['last5']:.3f} vs {g1['sv']:.3f})")
-            if t.get("production_out", 0) >= 0.08:
-                notes.append(f"{name} missing {t['production_out']:.0%} of its production")
+            out = [p for p in t.get("roster", []) if p["status"] == "out" and p["tier"] != "Bench"]
+            if out and t.get("production_out", 0) >= 0.05:
+                notes.append(f"{name.split()[-1]} without {', '.join(p['name'] + ' (' + p['line'].split(' · ')[0] + ', ' + p['line'].split(' · ')[1] + ')' for p in out)}: "
+                             f"{t['production_out']:.0%} of their ice time and points sit.")
             for p in t.get("roster", []):
                 if p["status"] and p["tier"] in ("Key", "Starter"):
                     notes.append(f"{name}: {p['tier'].lower()} {p['name']} {p['status']}" + (f" ({p['impact']})" if p["impact"] else ""))

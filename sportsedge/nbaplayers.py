@@ -380,11 +380,29 @@ def build(now: datetime, root: Path | str = "data", injuries: dict | None = None
         h, a = teams.get(g["home"], {}), teams.get(g["away"], {})
         notes = []
         for side, t, name in (("home", h, g["home"]), ("away", a, g["away"])):
-            if t.get("minutes_out", 0) >= 0.10:
-                notes.append(f"{name} missing {t['minutes_out']:.0%} of its minutes ({t['points_out']:.0%} of its scoring)")
+            # Owner, Oct 25: say who is out and what he means to the team, not just a percent.
+            short = name.split()[-1]
+            ww = {r["name"]: r["ww"] for r in t.get("roster", []) if r.get("ww") and r["ww"].get("diff") is not None}
+
+            def with_him(n: str) -> str:
+                d = ww.get(n)
+                if not d:
+                    return ""
+                return (f"; the {short} have been {abs(d['diff']):.1f} pts a game {'better' if d['diff'] >= 0 else 'worse'} "
+                        f"with him ({d['n_without']} games without)")
+
+            out = [x for x in t.get("hurt", []) if x["status"] == "out" and x.get("mpg")]
+            if out and t.get("minutes_out", 0) >= 0.05:
+                who = ", ".join(f"{x['name']} ({x['mpg']:.0f} min, {x['ppg']:.1f} pts a game)" for x in out)
+                top = max(out, key=lambda x: x["ppg"] or 0)["name"]
+                notes.append(f"{short} without {who}: {t['points_out']:.0%} of their scoring and {t['minutes_out']:.0%} "
+                             f"of their minutes sit{with_him(top)}.")
             for hole in t.get("holes", []):
-                notes.append(f"{name} {hole['slot']} {hole['starter']} {hole['status']}"
-                             + (f", {hole['next']} next up" if hole["next"] else ""))
+                if hole["status"] == "out":
+                    notes.append(f"{short}: {hole['next'] or 'a backup'} likely starts at {hole['slot']} for {hole['starter']}.")
+                else:
+                    notes.append(f"{short}: {hole['starter']} ({hole['slot']}) is questionable{with_him(hole['starter'])}"
+                                 + (f"; {hole['next']} starts if he sits." if hole["next"] else "."))
             for n in t.get("cold", [])[:2]:
                 notes.append(f"{n} ({name}) is cold")
             for n in t.get("hot", [])[:2]:
