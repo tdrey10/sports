@@ -119,13 +119,13 @@ def build(rows: list[dict], now: datetime) -> dict:
             if x["load3"] >= 3:
                 notes.append(f"{x['name']}: {x['load3']} matches in the last 3 days ({x['sets7']} sets this week)")
             if x["form"]:
-                notes.append(f"{x['name']} is {x['form']}: {x['last10']} in the last 10, {x['season']} this season")
+                notes.append(f"{x['name']} is " + {"cold": "ice cold 🥶", "hot": "cookin' 🔥"}.get(x["form"], x["form"]) + f": {x['last10']} the last 10, {x['season']} on the year")
         if pa["load7"] - pb["load7"] >= 3 or pb["load7"] - pa["load7"] >= 3:
             tired, fresh = (pa, pb) if pa["load7"] > pb["load7"] else (pb, pa)
-            notes.append(f"Fatigue gap: {tired['name']} has played {tired['load7']} matches this week, {fresh['name']} {fresh['load7']}")
+            notes.append(f"Legs check: {tired['name']} has played {tired['load7']} matches this week, {fresh['name']} only {fresh['load7']}")
         gap = pa["rating"] - pb["rating"]
         if abs(gap) >= 150:
-            notes.append(f"{surface}-court rating gap: {(pa if gap > 0 else pb)['name']} by {abs(gap)} points")
+            notes.append(f"{(pa if gap > 0 else pb)['name']} has the edge on {surface.lower()}: {abs(gap)} rating points better")
         h2h = [m for m in by_player.get(na, []) if _done(m) and nb in (norm(m["p1_name"]), norm(m["p2_name"]))
                and _t(m["start"]) < now]
         hw = sum(_won(m, na) for m in h2h)

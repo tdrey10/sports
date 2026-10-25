@@ -137,15 +137,15 @@ def _team_due(root, season: int, now: datetime) -> dict[str, dict]:
         if t.games >= p.min_games:
             d["luck"], d["slump"] = round(t.luck(), 3), round(t.slump(), 2)
             if d["luck"] <= -p.luck:
-                notes.append(f"due: record {abs(d['luck']) * 100:.0f} pts under what its goal differential says")
+                notes.append(f"due: their record's {abs(d['luck']) * 100:.0f} pts worse than their goal differential says, they've been unlucky")
             elif d["luck"] >= p.luck:
-                notes.append(f"lucky: record {d['luck'] * 100:.0f} pts over its goal differential")
+                notes.append(f"lucky: their record's {d['luck'] * 100:.0f} pts better than their goal differential says, the bill's coming")
             if t.close <= -p.close_n:
-                notes.append(f"{-t.close} more one-goal losses than wins")
+                notes.append(f"lost {-t.close} more one-goal games than they won")
             elif t.close >= p.close_n:
-                notes.append(f"{t.close} more one-goal wins than losses")
+                notes.append(f"won {t.close} more one-goal games than they lost")
         else:
-            notes.append(f"{t.games} games in: luck reads start at {p.min_games}")
+            notes.append(f"only {t.games} games in, luck reads kick in at {p.min_games}")
         d["notes"] = notes
         out[name] = d
     return out
@@ -249,9 +249,9 @@ def build(now: datetime, root="data", injuries: dict | None = None, games_today:
             if gl:
                 g1 = gl[0]
                 if g1.get("status"):
-                    notes.append(f"{name}: #1 goalie {g1['name']} {g1['status']}" + (f", {gl[1]['name']} next" if len(gl) > 1 else ""))
+                    notes.append(f"{name}: #1 goalie {g1['name']} {g1['status']}" + (f", {gl[1]['name']} likely gets the net" if len(gl) > 1 else ""))
                 elif g1.get("form"):
-                    notes.append(f"{name}: #1 goalie {g1['name']} is {g1['form']} (last 5 {g1['last5']:.3f} vs {g1['sv']:.3f})")
+                    notes.append(f"{name}: #1 goalie {g1['name']} is " + {"cold": "ice cold 🥶", "hot": "cookin' 🔥"}.get(g1["form"], g1["form"]) + f" (saving {g1['last5']:.3f} his last 5 vs {g1['sv']:.3f} on the year)")
             out = [p for p in t.get("roster", []) if p["status"] == "out" and p["tier"] != "Bench"]
             if out and t.get("production_out", 0) >= 0.05:
                 notes.append(f"{name.split()[-1]} without {', '.join(p['name'] + ' (' + p['line'].split(' · ')[0] + ', ' + p['line'].split(' · ')[1] + ')' for p in out)}: "
@@ -260,7 +260,7 @@ def build(now: datetime, root="data", injuries: dict | None = None, games_today:
                 if p["status"] and p["tier"] in ("Key", "Starter"):
                     notes.append(f"{name}: {p['tier'].lower()} {p['name']} {p['status']}" + (f" ({p['impact']})" if p["impact"] else ""))
                 elif p["form"] and p["tier"] in ("Key", "Starter"):
-                    notes.append(f"{p['name']} ({name}) is {p['form']}")
+                    notes.append(f"{p['name']} ({name}) is " + {"cold": "ice cold 🥶", "hot": "cookin' 🔥"}.get(p["form"], p["form"]))
             for n in ((t.get("due") or {}).get("notes") or [])[:2]:
                 if "games in" not in n:
                     notes.append(f"{name}: {n}")

@@ -151,19 +151,19 @@ def _team_due(root, sport: str, season: int, now: datetime) -> dict[str, dict]:
         if t.games >= p.min_games:
             d["luck"], d["slump"] = round(t.luck(), 3), round(t.slump(), 1)
             if d["luck"] <= -p.luck:
-                notes.append(f"due: record {abs(d['luck']) * 100:.0f} pts under what its point differential says")
+                notes.append(f"due: their record's {abs(d['luck']) * 100:.0f} pts worse than their point differential says, they've been unlucky")
             elif d["luck"] >= p.luck:
-                notes.append(f"lucky: record {d['luck'] * 100:.0f} pts over its point differential")
+                notes.append(f"lucky: their record's {d['luck'] * 100:.0f} pts better than their point differential says, the bill's coming")
             if t.close <= -p.close_n:
-                notes.append(f"{-t.close} more one-score losses than wins")
+                notes.append(f"lost {-t.close} more one-score games than they won")
             elif t.close >= p.close_n:
-                notes.append(f"{t.close} more one-score wins than losses")
+                notes.append(f"won {t.close} more one-score games than they lost")
             if d["slump"] <= -p.slump:
-                notes.append(f"slumping: last {p.recent} games {abs(d['slump']):.0f} pts a game under its season")
+                notes.append(f"slumping: {abs(d['slump']):.0f} pts a game worse the last {p.recent} than their season")
             elif d["slump"] >= p.slump:
-                notes.append(f"hot: last {p.recent} games {d['slump']:.0f} pts a game over its season")
+                notes.append(f"rollin': {d['slump']:.0f} pts a game better the last {p.recent} than their season")
         else:
-            notes.append(f"{t.games} games in: luck reads start at {p.min_games}")
+            notes.append(f"only {t.games} games in, luck reads kick in at {p.min_games}")
         d["notes"] = notes
         out[name] = d
     return out
@@ -322,10 +322,10 @@ def build(sport: str, now: datetime, root="data", injuries: dict | None = None,
                     notes.append(f"{name}: {h['key'] or h['pos']} {h['name']} {h['status']}")
             q = t.get("qb")
             if q and q.get("new"):
-                notes.append(f"{name}: QB {q['name']} has only {q['starts']} starts this season")
+                notes.append(f"{name}: QB {q['name']} only has {q['starts']} starts this year, new guy under center")
             for who in ([q] if q else []) + ([t["rb"]] if t.get("rb") else []) + t.get("wr", []):
                 if who and who.get("tag"):
-                    notes.append(f"{who['name']} ({name}) is {who['tag']}")
+                    notes.append(f"{who['name']} ({name}) is " + {"cold": "ice cold 🥶", "hot": "cookin' 🔥"}.get(who["tag"], who["tag"]))
             for n in ((t.get("due") or {}).get("notes") or [])[:2]:
                 if "games in" not in n:
                     notes.append(f"{name}: {n}")
