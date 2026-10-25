@@ -114,6 +114,8 @@ def run_cycle(
         posted_today=ledger.posted_today(now), posted_events=ledger.open_events(now),
     )
     out.published = len(ledger.publish(cards, now))
+    if d503 and not held:
+        _audit(ledger, now, d5_root)
     ledger.withdraw(settings, now)
     if not held:
         ledger.post_parlays(now)
@@ -130,6 +132,27 @@ def run_cycle(
                           if t.status in ("pending", "live") or datetime.fromisoformat(t.created_at) >= keep_after]
     out.graded = refresh_scores(provider, ledger, now)
     return out
+
+
+def _audit(ledger: Ledger, now: datetime, root: str) -> None:
+    """Owner, Oct 25: every money pick the D503 engine posts today, caught or not, and why not."""
+    from pathlib import Path
+
+    from . import rival
+    from .d5 import audit
+    from .d5.board import LAST_SIDES
+    from .ledger import D503_MARK
+
+    try:
+        picks = rival.fetch(Path(root) / "rival_picks.json")
+        today = ledger.day_of(now)
+        posted = {(e.event_id, e.side): e.tier for e in ledger.entries.values()
+                  if e.units > 0 and e.status != "void" and any(D503_MARK in r for r in e.reasons)}
+        rows = audit.run(picks, LAST_SIDES, posted, now, Path(root) / "d5_audit.json", days=(today,))
+        if rows:
+            print(f"D503 audit: {sum(r['status'] == 'caught' for r in rows)} of {len(rows)} of his money picks today caught")
+    except Exception as exc:  # the audit never stops a run
+        log.warning("D503 audit failed: %s", exc)
 
 
 def simulate_history(

@@ -41,6 +41,7 @@ INJURY_PTS = {  # owner-spec injury penalties on the own read, win-chance points
 SKILL = {"QB": "QB", "RB": "RB", "WR": "WR", "TE": "WR"}
 
 _cache: dict[str, tuple[list[Game], Replay]] = {}
+LAST_SIDES: list = []  # every side the last build() read (the miss audit looks his picks up here)
 
 
 @dataclass
@@ -427,7 +428,10 @@ def _weighed_favorites(sides: list[Side], r: Replay) -> None:
 
 
 def good(sd: Side) -> bool:
-    if not sd.reasons or sd.fighting:
+    # A dog past its league's dog-score gate needs no other reason: his live board posts those
+    # (Wyoming +180, Oct 23, a 2u Dog with no model reason; owner, Oct 25: catch every one).
+    gated_dog = sd.odds >= 100 and sd.dog_p is not None
+    if (not sd.reasons and not gated_dog) or sd.fighting:
         return False
     if sd.sport == "nhl" and sd.odds < 0 and sd.w_p is not None and sd.w_p * sd.dec <= 1:
         return False
@@ -668,6 +672,7 @@ def build(scans, now: datetime, models: dict[str, SportModel], taken: set[str] |
             sides += build_sides(scan, model, now, root)
         except Exception as exc:
             log.warning("D503 board for %s failed: %s", sport, exc, exc_info=True)
+    LAST_SIDES[:] = sides
     chosen = choose(sides, now, taken, posted_events)
     chosen += night_picks(sides, now, chosen, posted_events)
     chosen += choose_early(sides, now, posted_events)
