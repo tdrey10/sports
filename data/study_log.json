@@ -284,5 +284,16 @@
   "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong",
   "verdict": "none wired: 2 of 72 variants cleared the bar, neither STRONG, about what luck gives across 72 tries (~0.5 expected at 1 in 150 per try, though the 100-spot control gave 0). NFL dog facing a team missing its prices (blind +17.3% on 110, tuning +4.9%) is contradicted by NFL dog that is itself missing its prices losing blind (-9.9% on 173). NCAAF dog missing its prices (blind +10.0% on 206, tuning +7.7%) is the one to watch but is not STRONG and has no mirror support (NCAAF lock favorites missing prices lose -21%). Dropped; recheck when more seasons are in.",
   "action": "logged; no change to bet rules"
+ },
+ {
+  "date": "2026-10-25",
+  "idea": "Divisional games (NFL): dogs (+100 to +220) and lock-price favorites (-170 to -120) on the moneyline, favorite/dog/short-favorite/big-dog spread sides, and overs/unders, divisional vs non-divisional as a mirror (16 variants)",
+  "sports": "nfl",
+  "data": "data/lines/nfl 2006-2025 regular season (sportsedge/divstudy.py; ESPN archive has no division flag)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of the same bets through the same bar: 0 passed, 0 strong",
+  "verdict": "none wired: 1 of 16 variants cleared the bar (about what luck gives, ~0.1 expected at 1 in 150), and it is not STRONG. Divisional dog spread: blind +4.7% on 412, tuning only +0.9% on 1,536, and it is just the flip side of divisional favorites on the spread losing (-12.5% blind). Divisional dog moneyline lost blind (-5.4% on 250), divisional overs lose in both arms (-6%) but a bet that loses at -110 is not a signal to take the under (under -1.9% blind). Dropped; recheck when more seasons are in.",
+  "action": "logged; no change to bet rules"
  }
 ]
