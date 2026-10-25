@@ -122,9 +122,15 @@ button, select { font: inherit; color: inherit; }
 .board .all { grid-column: 1 / -1; border-left: 0; border-bottom: 1px solid var(--line);
   display: flex; align-items: baseline; gap: 6px 14px; flex-wrap: wrap; }
 .board .all b { font-size: 28px; }
+.board .day { grid-column: 1 / -1; border-left: 0; border-bottom: 1px solid var(--line); text-align: center; padding: 16px 14px; }
+.board .day span { font-size: 13px; }
+.board .day > b { font-size: 44px; }
+.board .day small { font-size: 15px; }
+.board .day .yest b { font: 700 15px/1.2 var(--mono); }
+.board .day + .all { border-left: 0; }
 .board .all + div { border-left: 0; }
 @media (max-width: 560px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .board div:nth-child(4) { border-left: 0; } .board div:nth-child(n+4) { border-top: 1px solid var(--line); } }
+  .board > div:nth-child(5) { border-left: 0; } .board > div:nth-child(n+5) { border-top: 1px solid var(--line); } }
 
 /* ---------- tabs + filters ---------- */
 .tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; padding-block: 4px;
@@ -836,7 +842,24 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const ap = st.all_picks || { won: 0, lost: 0, push: 0, units: 0 };
     // Leans carry no units, so they show as a W-L only (all picks minus the money plays).
     const lean = { won: Math.max(ap.won - o.won, 0), lost: Math.max(ap.lost - o.lost, 0), push: Math.max((ap.push || 0) - (o.push || 0), 0) };
-    $("scoreboard").innerHTML = `<div class="all"><span>Money plays (the picks with units)</span><b class="${cls(o.units)}">${signed(o.units, 1)}u</b>
+    // Owner, Oct 25: units won today, at the very top, plain. Money plays only (the picks with
+    // units), by the day the game is played; yesterday's next to it.
+    const dayUnits = (d) => {
+      const es = DATA.entries.filter((e) => e.units > 0 && e.status !== "void" && dayOf(e.commence_time) === d);
+      const done = es.filter((e) => e.settled);
+      const r = { won: 0, lost: 0, push: 0 };
+      done.forEach((e) => { const k = e.status.endsWith("won") ? "won" : e.status.endsWith("lost") ? "lost" : "push"; r[k]++; });
+      return { units: done.reduce((t, e) => t + (e.profit || 0), 0), rec: r, graded: done.length,
+               open: es.length - done.length, risk: es.filter((e) => !e.settled).reduce((t, e) => t + e.units, 0) };
+    };
+    const yest = new Date(); yest.setDate(yest.getDate() - 1);
+    const td = dayUnits(nowDay()), yd = dayUnits(dayOf(yest.toISOString()));
+    const tdLine = td.graded ? `${rec(td.rec)} today` : "No picks graded yet today";
+    const openLine = td.open ? ` · ${td.open} still to play (${signed(td.risk, 1).replace("+", "")}u riding)` : "";
+    const todayBox = `<div class="day"><span>Today's units</span><b class="${td.graded ? cls(td.units) : ""}">${td.graded ? signed(td.units, 2) + "u" : "0u"}</b>
+        <small>${tdLine}${openLine}</small>
+        <small class="yest">Yesterday: <b class="${yd.graded ? cls(yd.units) : ""}">${yd.graded ? signed(yd.units, 2) + "u" : "no money plays"}</b>${yd.graded ? ` (${rec(yd.rec)})` : ""}</small></div>`;
+    $("scoreboard").innerHTML = todayBox + `<div class="all"><span>Season · money plays (the picks with units)</span><b class="${cls(o.units)}">${signed(o.units, 1)}u</b>
         <small>${rec(o)} · ${pct(o.win_pct)} won · ${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
       <div><span>Leans</span><b>${rec(lean)}</b><small>${pct(lean.won + lean.lost ? lean.won / (lean.won + lean.lost) : null)} won · no units, not bets</small></div>
       <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${money(st.bankroll)}</b><small>from ${money(st.start_bankroll)}</small></div>
