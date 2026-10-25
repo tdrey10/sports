@@ -40,6 +40,14 @@ GRADE_AFTER = timedelta(hours=2)  # earliest a game can be final
 
 D503_MARK = "Engine: D503 formula."
 
+# Owner, Oct 25 (his sizing, the D503 spec): a $100,000 bankroll, 1 unit = $1,000, +$500 for every
+# full $50,000 the bankroll grows ($150k -> $1,500 a unit), set each morning from that bankroll.
+BANKROLL_START = 100_000.0
+
+
+def unit_dollars(bankroll: float) -> float:
+    return max(1000.0, 0.01 * (bankroll // 50_000) * 50_000)
+
 
 @dataclass
 class Entry:
@@ -117,7 +125,7 @@ def entry_id(pick: Pick, live: bool = False) -> str:
 
 
 class Ledger:
-    def __init__(self, entries: Iterable[Entry] = (), tz: str = "America/Los_Angeles", start_bankroll: float = 1000.0):
+    def __init__(self, entries: Iterable[Entry] = (), tz: str = "America/Los_Angeles", start_bankroll: float = BANKROLL_START):
         self.entries: dict[str, Entry] = {e.id: e for e in entries}
         self.parlays: list[Parlay] = []
         self.forecasts: dict = {}  # id -> forecasts.Forecast: a prediction for every game (not picks)
@@ -134,7 +142,8 @@ class Ledger:
         data = json.loads(path.read_text())
         names = {f.name for f in fields(Entry)}
         entries = [Entry(**{k: v for k, v in e.items() if k in names}) for e in data.get("entries", [])]
-        kw.setdefault("start_bankroll", data.get("start_bankroll", 1000.0))
+        # Ledgers saved before the D503 sizing started from $1,000 (1u = $10): they move to $100,000.
+        kw.setdefault("start_bankroll", max(data.get("start_bankroll", BANKROLL_START), BANKROLL_START))
         ledger = cls(entries, **kw)
         pnames = {f.name for f in fields(Parlay)}
         ledger.parlays = [Parlay(**{k: v for k, v in p.items() if k in pnames}) for p in data.get("parlays", [])]
@@ -540,10 +549,20 @@ class Ledger:
 
     # ---------------------------------------------------------------- stats
     def stats(self, now: datetime) -> dict:
-        unit = self.start_bankroll / 100.0
         settled = [e for e in self.entries.values() if e.settled and e.status != "void"]
         plays = [e for e in settled if e.is_unit_play]
         leans = [e for e in settled if not e.is_unit_play]
+        # Bankroll in dollars: every graded unit pick in date order at that day's unit size.
+        usd: dict[str, float] = {}
+        curve, bank, day, unit = [], self.start_bankroll, None, unit_dollars(self.start_bankroll)
+        for e in sorted(plays, key=lambda e: e.graded_at or ""):
+            d = (e.graded_at or "")[:10]
+            if d != day:
+                day, unit = d, unit_dollars(bank)
+            usd[e.id] = (e.profit or 0) * unit
+            bank += usd[e.id]
+            curve.append([e.graded_at, round(bank, 2)])
+        unit = unit_dollars(bank)  # today's unit, from this morning's bankroll
 
         def summary(items: list[Entry]) -> dict:
             won = sum(1 for e in items if e.status in ("won", "half_won"))
@@ -558,7 +577,7 @@ class Ledger:
                 "units": round(profit, 2),
                 "risked": round(risked, 2),
                 "roi": profit / risked if risked else None,
-                "dollars": round(profit * unit, 2),
+                "dollars": round(sum(usd.get(e.id, 0.0) for e in items), 2),
                 "clv": sum(clvs) / len(clvs) if clvs else None,
                 "beat_close": sum(1 for c in clvs if c > 0) / len(clvs) if clvs else None,
             }
@@ -573,17 +592,12 @@ class Ledger:
             by_sport[sport] = {"name": SPORTS[sport].name if sport in SPORTS else sport,
                                **summary([e for e in mine if e.is_unit_play]), "all": summary(mine)}
 
-        curve, bank = [], self.start_bankroll
-        for e in sorted(plays, key=lambda e: e.graded_at or ""):
-            bank += (e.profit or 0) * unit
-            curve.append([e.graded_at, round(bank, 2)])
-
         lean_won = sum(1 for e in leans if e.status in ("won", "half_won"))
         lean_lost = sum(1 for e in leans if e.status in ("lost", "half_lost"))
         return {
             "unit_value": unit,
             "start_bankroll": self.start_bankroll,
-            "bankroll": round(self.start_bankroll + sum(e.profit or 0 for e in plays) * unit, 2),
+            "bankroll": round(bank, 2),
             "overall": summary(plays),
             # Every graded pick we put out, bet or not (leans count as 1 unit). Parlays stay separate.
             "all_picks": summary(settled),
