@@ -229,6 +229,37 @@ def _lineup(team: str, starts: list, this: dict, pos_of) -> dict[str, str]:
     return dict(zip(POSITIONS, sorted(five, key=size)))
 
 
+def game_score(line: "Line") -> float:
+    """Per game: Hollinger's game score from what the box score keeps (no steals, blocks, turnovers):
+    PTS + 0.4 FGM - 0.7 FGA - 0.4 (FTA - FTM) + 0.5 REB + 0.7 AST."""
+    t, g = line.t, line.g or 1
+    return (t["pts"] + 0.4 * t["fgm"] - 0.7 * t["fga"] - 0.4 * (t["fta"] - t["ftm"]) + 0.5 * t["reb"] + 0.7 * t["ast"]) / g
+
+
+def _roster(team: str, this: dict, pos_of, ww: dict, by_name: dict, out_names: set, q_names: set,
+            starters: set) -> list[dict]:
+    """Every player who has played for the team this season: role, production, share of the team's
+    production, tier, the team's margin with and without him, form and today's status."""
+    from .roster import impact_line, tiers
+
+    mine = {n: line for (t, n), line in this.items() if t == team}
+    played = max((line.g for line in mine.values()), default=1)
+    value = {n: max(game_score(line), 0.0) * line.g / played for n, line in mine.items()}
+    tier = tiers(value, 0.17, 0.10, 0.04)
+    total = sum(value.values()) or 1.0
+    out = []
+    for n, line in sorted(mine.items(), key=lambda kv: -value[kv[0]]):
+        p = by_name.get((team, n)) or {}
+        out.append({"name": n, "pos": pos_of(n), "gp": line.g, "tier": tier[n], "share": round(value[n] / total, 3),
+                    "starter": n in starters,
+                    "line": f"{line.per_game('pts'):.1f} pts · {line.per_game('reb'):.1f} reb · {line.per_game('ast'):.1f} ast · "
+                            f"{line.mpg:.0f} min" + (f" · {line.ts:.0%} TS" if line.ts else ""),
+                    "gmsc": round(game_score(line), 1), "ww": ww.get(n), "impact": impact_line(ww.get(n)),
+                    "form": (p.get("form") or {}).get("tag"),
+                    "status": "out" if n in out_names else "questionable" if n in q_names else None})
+    return out
+
+
 def build(now: datetime, root: Path | str = "data", injuries: dict | None = None,
           games_today: list[dict] | None = None, study: dict | None = None) -> dict:
     """The report the NBA tab shows. ``injuries``: team -> {"out": [(player, pos)], "questionable": [...]};
@@ -297,6 +328,13 @@ def build(now: datetime, root: Path | str = "data", injuries: dict | None = None
         players.append(p)
     by_name = {(p["team"], p["name"]): p for p in players}
 
+    # With/without for every player: this season and last, his team's margin with him and without.
+    from .roster import margins, team_index, with_without
+
+    margin = margins(root, "nba")
+    appear, dates = team_index({**prev, **cur}, lambda r: r[0], lambda r: r[1])
+    ww_by_team: dict[str, dict] = {}
+
     # Usual starters by position (last 5 starts each team), and today's health.
     teams: dict[str, dict] = {}
     due = _team_due(root, season, now)
@@ -328,7 +366,10 @@ def build(now: datetime, root: Path | str = "data", injuries: dict | None = None
                                and p["name"] not in lineup.values() and p["name"] not in out_names), key=lambda p: -p["mpg"])
                 holes.append({"slot": slot, "starter": n, "status": "out" if n in out_names else "questionable",
                               "next": subs[0]["name"] if subs else None})
-        teams[team] = {"lineup": lineup, "hurt": hurt, "holes": holes,
+        roster = _roster(team, this, pos_of, ww_by_team.setdefault(team, with_without(appear, dates, margin, team)),
+                         by_name, out_names, q_names, set(lineup.values()))
+        lost = sum(p["share"] for p in roster if p["status"] == "out")
+        teams[team] = {"lineup": lineup, "hurt": hurt, "holes": holes, "roster": roster, "production_out": round(lost, 3),
                        "minutes_out": round(mins_out / tot_min, 3), "points_out": round(pts_out / tot_pts, 3),
                        "cold": [p["name"] for p in players if p["team"] == team and (p["form"] or {}).get("tag") == "cold"],
                        "hot": [p["name"] for p in players if p["team"] == team and (p["form"] or {}).get("tag") == "hot"],

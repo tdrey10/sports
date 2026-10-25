@@ -638,6 +638,17 @@ def _nba_report(data_dir: Path, scans, now: datetime, budget: int = 40) -> None:
             print(f"{sport.upper()} report: {added} new box scores, {len(rep['teams'])} teams, {len(rep['matchups'])} games")
         except Exception as exc:
             print(f"{sport.upper()} report failed: {exc}")
+    # And hockey (owner, Oct 25).
+    from . import nhlplayers
+
+    try:
+        added = nhlplayers.collect(client, now, data_dir, budget=budget)
+        injuries, games = _slate(scans, "nhl", now)
+        rep = nhlplayers.build(now, data_dir, injuries, games[:20], due.get("nhl"))
+        (data_dir / "nhl_report.json").write_text(json.dumps(rep, separators=(",", ":")))
+        print(f"NHL report: {added} new box scores, {len(rep['teams'])} teams, {len(rep['matchups'])} games")
+    except Exception as exc:
+        print(f"NHL report failed: {exc}")
 
 
 def _slate(scans, sport: str, now: datetime) -> tuple[dict, list[dict]]:
@@ -664,7 +675,7 @@ def _slate(scans, sport: str, now: datetime) -> tuple[dict, list[dict]]:
 
 def _reports(data_dir: Path) -> dict:
     """The football reports the site shows, by sport."""
-    return {s: r for s in ("nfl", "ncaaf") if (r := _load_json(Path(data_dir) / f"{s}_report.json"))}
+    return {s: r for s in ("nfl", "ncaaf", "nhl", "tennis") if (r := _load_json(Path(data_dir) / f"{s}_report.json"))}
 
 
 def _load_json(path: Path) -> dict | None:
@@ -692,12 +703,32 @@ def cmd_nba_study(args) -> int:
     print(f"NBA players: {added} box scores saved")
     for sport in fbplayers.FB_SPORTS:
         print(f"{sport.upper()} players: {fbplayers.collect(client, sport, now, data_dir, budget=args.budget)} box scores saved")
+    from . import nhlplayers
+
+    print(f"NHL players: {nhlplayers.collect(client, now, data_dir, budget=args.budget)} box scores saved")
     # The "who's due" study in every sport with closing lines (owner, Oct 25).
     res = nbastudy.run_all(data_dir / "lines" / "espn")
     (data_dir / "nba_study.json").write_text(json.dumps(res["nba"], indent=1))
     (data_dir / "due_study.json").write_text(json.dumps(res, indent=1))
     for r in res.values():
         print(nbastudy.report(r))
+    # Owner, Oct 25: every team and player studied. When the players who matter sit, does the
+    # closing line already price it? (NBA and NHL: the sports with enough player box scores.)
+    from . import absencestudy
+
+    absent = {}
+    for sport in ("nba", "nhl"):
+        try:
+            absent[sport] = r = absencestudy.run(data_dir, sport)
+        except Exception as exc:
+            print(f"{sport.upper()} absence study failed: {exc}")
+            continue
+        print(f"{sport.upper()} absences: {r['games']} games (tune {r['tune_games']}), luck control {r['control']}")
+        for row in r["rows"]:
+            t, b = row["in_sample"], row["blind"]
+            fmt = lambda x: "  -  " if x["flat_roi"] is None else f"{x['flat_roi']:+.1%}"  # noqa: E731
+            print(f"  {row['market']:<19} {row['variant']:<58} tune {t['bets']:>4} {fmt(t)}  blind {b['bets']:>4} {fmt(b)} {row['verdict']}")
+    (data_dir / "absence_study.json").write_text(json.dumps(absent, indent=1))
     return 0
 
 
@@ -904,6 +935,15 @@ def cmd_tennis(args) -> int:
     posted, graded = tennis.run(ledger, src, study)
     ledger.save(path)
     print(f"tennis: {posted} match predictions, {graded} graded")
+    # Owner, Oct 25: the player report for tennis too (form, surface, fatigue, health, head to head).
+    try:
+        from . import tennisreport
+
+        rep = tennisreport.build(tennis.read_matches(src / "matches.csv"), datetime.now(timezone.utc))
+        (data_dir / "tennis_report.json").write_text(json.dumps(rep, separators=(",", ":")))
+        print(f"tennis report: {len(rep['matches'])} matches, {len(rep['hurt'])} health flags")
+    except Exception as exc:  # the report never stops a run
+        print(f"tennis report failed: {exc}")
     return 0
 
 

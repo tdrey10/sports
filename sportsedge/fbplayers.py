@@ -23,7 +23,8 @@ from pathlib import Path
 log = logging.getLogger(__name__)
 
 FB_SPORTS = ("nfl", "ncaaf")
-GROUPS = {"passing": ("C/ATT", "YDS", "TD", "INT"), "rushing": ("CAR", "YDS", "TD"), "receiving": ("REC", "YDS", "TD", "TGTS")}
+GROUPS = {"passing": ("C/ATT", "YDS", "TD", "INT"), "rushing": ("CAR", "YDS", "TD"), "receiving": ("REC", "YDS", "TD", "TGTS"),
+          "defensive": ("TOT", "SACKS", "TFL", "PD", "QB HTS"), "interceptions": ("INT", "YDS", "TD")}
 RECENT = 3
 QB_SWING = 1.5  # adjusted yards/attempt this far off his season = hot / cold
 RB_SWING = 1.2  # yards per carry
@@ -63,6 +64,11 @@ def parse(summary: dict) -> list[list]:
                         continue
                 elif gname == "rushing":
                     row = [_num(stats.get("CAR")), _num(stats.get("YDS")), _num(stats.get("TD")), 0.0, 0.0]
+                elif gname == "defensive":
+                    row = [_num(stats.get("TOT")), _num(stats.get("SACKS")), _num(stats.get("TFL")), _num(stats.get("PD")),
+                           _num(stats.get("QB HTS"))]
+                elif gname == "interceptions":
+                    row = [_num(stats.get("INT")), _num(stats.get("YDS")), _num(stats.get("TD")), 0.0, 0.0]
                 else:
                     row = [_num(stats.get("REC")), _num(stats.get("YDS")), _num(stats.get("TD")), _num(stats.get("TGTS")), 0.0]
                 out.append([team, name, gname] + row)
@@ -163,6 +169,50 @@ def _team_due(root, sport: str, season: int, now: datetime) -> dict[str, dict]:
     return out
 
 
+def _roster(team: str, mine: dict, games: int, qb: str | None, ww: dict, out_names: set, q_names: set) -> list[dict]:
+    """Every player in the team's box scores this season, offense and defense: production, share of
+    his unit's production, tier, the team's margin with and without him, status."""
+    from .roster import impact_line, tiers
+
+    people: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(list))
+    for (_, n, grp), rows in mine.items():
+        people[n][grp] = [r for _, r in rows]
+    s = lambda rows, i: sum(r[i] for r in rows)  # noqa: E731
+    off, dfn, info = {}, {}, {}
+    for n, g in people.items():
+        p, ru, re, de, it = (g.get(k, []) for k in ("passing", "rushing", "receiving", "defensive", "interceptions"))
+        o = 0.5 * (s(p, 2) + 20 * s(p, 3) - 45 * s(p, 4)) + s(ru, 1) + 20 * s(ru, 2) + s(re, 1) + 20 * s(re, 2)
+        d = s(de, 0) + 4 * s(de, 1) + 2 * s(de, 2) + 2 * s(de, 3) + 2 * s(de, 4) + 6 * s(it, 0)
+        gp = max(len(x) for x in (p, ru, re, de, it))
+        if o >= d:
+            off[n] = max(o, 0.0)
+            role = "QB" if p and s(p, 1) >= 10 else "RB" if s(ru, 0) > s(re, 0) else "WR/TE"
+            bits = []
+            if p and s(p, 1):
+                bits.append(f"{s(p, 2) / len(p):.0f} pass yds/g, {s(p, 3):.0f} TD-{s(p, 4):.0f} INT")
+            if ru and s(ru, 0) >= 5:
+                bits.append(f"{s(ru, 1) / len(ru):.0f} rush yds/g ({s(ru, 1) / s(ru, 0):.1f} a carry), {s(ru, 2):.0f} TD")
+            if re and s(re, 0):
+                bits.append(f"{s(re, 0) / len(re):.1f} rec, {s(re, 1) / len(re):.0f} yds/g, {s(re, 2):.0f} TD")
+            info[n] = ("offense", role, "; ".join(bits), gp)
+        else:
+            dfn[n] = d
+            info[n] = ("defense", "DEF", f"{s(de, 0):.0f} tkl, {s(de, 1):g} sacks, {s(de, 2):g} TFL, {s(de, 3):g} PD, "
+                                         f"{s(it, 0):.0f} INT", gp)
+    tier = {**tiers(off, 0.20, 0.08, 0.03), **tiers(dfn, 0.10, 0.06, 0.03)}
+    if qb in tier:
+        tier[qb] = "Key"
+    tot = {"offense": sum(off.values()) or 1.0, "defense": sum(dfn.values()) or 1.0}
+    out = []
+    for n, (unit, role, line, gp) in info.items():
+        v = off.get(n, dfn.get(n, 0.0))
+        out.append({"name": n, "pos": role, "unit": unit, "gp": gp, "tier": tier[n], "share": round(v / tot[unit], 3),
+                    "line": line, "ww": ww.get(n), "impact": impact_line(ww.get(n)), "form": None,
+                    "status": "out" if n in out_names else "questionable" if n in q_names else None})
+    rank = {"Key": 0, "Starter": 1, "Rotation": 2, "Bench": 3}
+    return sorted(out, key=lambda p: (p["unit"] != "offense", rank[p["tier"]], -p["share"]))
+
+
 def build(sport: str, now: datetime, root="data", injuries: dict | None = None,
           games_today: list[dict] | None = None, study: dict | None = None) -> dict:
     """``injuries``: team -> {"out": [(player, pos)], "questionable": [...]}; ``games_today``:
@@ -179,6 +229,11 @@ def build(sport: str, now: datetime, root="data", injuries: dict | None = None,
         for t in {r[0] for r in g["rows"]}:
             team_games[t].append(g["date"])
 
+    from .roster import margins, team_index, with_without
+
+    margin = margins(root, sport)
+    appear, gdates = team_index(store, lambda r: r[0], lambda r: r[1])
+    ww_by_team: dict[str, dict] = {}
     teams: dict[str, dict] = {}
     due = _team_due(root, sport, season, now)
     inj = injuries or {}
@@ -243,10 +298,19 @@ def build(sport: str, now: datetime, root="data", injuries: dict | None = None,
                         "rec_g": round(sum(r[0] for _, r in rows) / g_all, 1), "td": int(sum(r[2] for _, r in rows)), "tag": tag})
         key = {x["name"]: role for x, role in ((qb_line, "QB1"), (rb, "RB1")) if x} | {w["name"]: "top target" for w in wrs}
         t_inj = inj.get(team, {})
+        out_names = {n for n, _ in t_inj.get("out", [])}
+        q_names = {n for n, _ in t_inj.get("questionable", [])}
+        roster = _roster(team, mine, len(dates), qb, ww_by_team.setdefault(team, with_without(appear, gdates, margin, team)),
+                         out_names, q_names)
+        for p in roster:  # the whole roster's Key players count as key on the injury list too
+            if p["tier"] == "Key":
+                key.setdefault(p["name"], f"key {p['unit']}")
         hurt = [{"name": n, "pos": pos, "status": st, "key": key.get(n)}
                 for st, lst in (("out", t_inj.get("out", [])), ("questionable", t_inj.get("questionable", [])))
                 for n, pos in lst]
-        teams[team] = {"qb": qb_line, "rb": rb, "wr": wrs, "hurt": hurt, "due": due.get(team)}
+        lost = {u: round(sum(p["share"] for p in roster if p["unit"] == u and p["status"] == "out"), 3) for u in ("offense", "defense")}
+        teams[team] = {"qb": qb_line, "rb": rb, "wr": wrs, "hurt": hurt, "roster": roster, "production_out": lost,
+                       "due": due.get(team)}
 
     matchups = []
     for g in games_today or []:
