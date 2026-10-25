@@ -40,11 +40,13 @@ def test_lock_never_past_minus_150_and_never_forced():
     assert all(s.odds >= -150 for _, _, s, _ in board)
 
 
-def test_dog_needs_the_gate_and_gets_two_units():
+def test_dog_needs_the_gate_and_is_held_to_one_unit_until_proven():
     dog = side(140, 0.46, 0.46, p_market=0.40, sport="nfl", eid="d", side="away")
     dog.dog_score, dog.dog_p = 9.0, 0.49  # past the NFL gate of 8
+    assert dog_units(dog) == 2.0  # his ladder
     board = choose([dog], NOW)
-    assert [(t, u) for t, u, *_ in board] == [("dog", 2.0)]
+    assert [(t, u) for t, u, *_ in board] == [("dog", 1.0)]  # owner's rule: no blind test, no big units
+    assert dog.notes[0].startswith("His ladder says 2u; capped at 1u")
     assert dog_units(side(120, 0.5, 0.5, sport="nba")) == 0.5  # NBA dogs are ½u
     ungated = side(140, 0.46, 0.46, p_market=0.40, sport="nfl", eid="e", side="away")
     assert not [t for t, *_ in choose([ungated], NOW) if t == "dog"]
