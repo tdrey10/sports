@@ -288,6 +288,7 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; display:
 .stat small { font-size: 13px; color: var(--muted); }
 .chart { width: 100%; height: 110px; display: block; }
 .table-wrap { overflow-x: auto; }
+.inj { margin: 4px 0 0; }
 .rep-seg { margin: 0 0 12px; display: flex; flex-wrap: wrap; gap: 6px; }
 .roster { list-style: none; margin: 8px 0 0; padding: 0; }
 .roster .ro { padding: 10px 0; border-top: 1px solid var(--line); display: grid; gap: 3px; }
@@ -478,7 +479,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div class="odds"><b>${odds(e.odds)}</b><small>${needs(e)}</small>${stake(e)}</div>
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${opts.matchup ? `<span class="muted">${esc(e.matchup)} · ${timeOf(e)}</span>` : ""}${moveText(e)}${statusText(e)}${addBtn(e)}</div>
-      ${more(e)}</div>`;
+      ${pickInj(e)}${more(e)}</div>`;
   }
   function bet(e) {
     const kind = e.player ? "Prop" : LABEL[e.market] || e.market_label;
@@ -491,7 +492,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div class="gauge">${meter(e)}<span class="small muted">${needs(e)}</span></div>
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${moveText(e)}${statusText(e)}${addBtn(e)}</div>
-      ${more(e)}</article>`;
+      ${pickInj(e)}${more(e)}</article>`;
   }
   const empty = (msg) => `<p class="empty">${msg}</p>`;
   const panel = (title, aside, body) => `<section class="panel"><div class="panel-head"><h2>${title}</h2><span class="muted">${aside || ""}</span></div>${body}</section>`;
@@ -711,7 +712,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const angle = m.angle ? `<p class="small"><span class="tag value">Proven angle</span> ${esc(m.angle)} against the spread: an unlucky team vs a lucky one (+12% blind on 137 games since 2022; research, not strong enough for units yet).</p>` : "";
       return `<article class="nba-game"><strong>${esc(m.away)}${ml(m.away_ml)} @ ${esc(m.home)}${ml(m.home_ml)}</strong>
         <div class="muted small">${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}${m.spread != null ? ` · ${esc(short(m.home))} ${m.spread > 0 ? "+" : ""}${m.spread}` : ""}</div>
-        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both teams healthy, nothing cold, hot or due.</p>`}${angle}</article>`;
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both teams healthy, nothing cold, hot or due.</p>`}${angle}${liveInj("nba", m.away)}${liveInj("nba", m.home)}</article>`;
     }).join("");
     const teams = Object.entries(R.teams || {});
     const hurt = teams.filter(([, t]) => t.hurt.length).sort((a, b) => b[1].minutes_out - a[1].minutes_out).map(([name, t]) =>
@@ -790,8 +791,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const t = teams[pick];
     const opts = names.map((n) => `<option value="${esc(n)}"${n === pick ? " selected" : ""}>${esc(n)}${slate.includes(n) ? " · plays today" : ""}</option>`).join("");
     const badge = (tier) => `<span class="tag tier-${tier.toLowerCase()}">${tier}</span>`;
-    const status = (p) => (p.status ? ` <small class="${p.status === "out" ? "neg" : ""}">${p.status}</small>` : "") + (p.form === "cold" ? " 🥶" : p.form === "hot" ? " 🔥" : "");
-    const rows = (t.roster || []).map((p) => `<li class="ro"><div>${esc(p.name)} <small>${esc(p.pos || "")}${p.unit ? " · " + p.unit : ""} · ${p.gp} g</small>${status(p)}</div>
+    const status = (p) => { const st = liveStatus(sport, pick, p.name) ?? p.status;
+      return (st ? ` <small class="${st === "out" ? "neg" : ""}">${st}</small>` : ""); }
+    const rows = (t.roster || []).map((p) => `<li class="ro"><div>${esc(p.name)} <small>${esc(p.pos || "")}${p.unit ? " · " + p.unit : ""} · ${p.gp} g</small>${status(p)}${p.form === "cold" ? " 🥶" : p.form === "hot" ? " 🔥" : ""}</div>
       <div class="small muted">${esc(p.line)}</div>
       <div class="small">${badge(p.tier)} ${pct(p.share)} of the team's ${p.unit || "production"}${p.ww && p.ww.diff != null
         ? ` · with/without <b class="${cls(p.ww.diff)}">${signed(p.ww.diff, 1)}</b> (${p.ww.n_without} games without)` : p.ww && p.ww.n_with > 3 ? " · hasn't missed a game" : ""}</div></li>`).join("");
@@ -812,7 +814,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const ml = (x) => (x == null ? "" : ` ${odds(x)}`);
       return `<article class="nba-game"><strong>${esc(m.away)}${ml(m.away_ml)} @ ${esc(m.home)}${ml(m.home_ml)}</strong>
         <div class="muted small">${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}</div>
-        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both #1 goalies set, key players healthy, nobody due.</p>`}</article>`;
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both #1 goalies set, key players healthy, nobody due.</p>`}${liveInj("nhl", m.away)}${liveInj("nhl", m.home)}</article>`;
     }).join("");
     const teams = Object.entries(R.teams || {});
     const goalies = teams.filter(([, t]) => (t.goalies || []).length).map(([n, t]) => { const g = t.goalies[0];
@@ -848,7 +850,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const ml = (x) => (x == null ? "" : ` ${odds(x)}`);
       return `<article class="nba-game"><strong>${esc(m.away)}${ml(m.away_ml)} @ ${esc(m.home)}${ml(m.home_ml)}</strong>
         <div class="muted small">${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}${m.spread != null ? ` · ${esc(short(m.home))} ${m.spread > 0 ? "+" : ""}${m.spread}` : ""}</div>
-        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Starters healthy, nobody hot or cold, nobody due.</p>`}</article>`;
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Starters healthy, nobody hot or cold, nobody due.</p>`}${liveInj(R.sport, m.away)}${liveInj(R.sport, m.home)}</article>`;
     }).join("");
     const hurt = teams.filter(([, t]) => t.hurt.some((h) => h.key || h.pos === "QB")).map(([n, t]) =>
       `<tr><td>${esc(n)}</td><td>${t.hurt.filter((h) => h.key || h.pos === "QB").map((h) => `${esc(h.name)} <small>${esc(h.key || h.pos)} · ${h.status}</small>`).join("<br>")}</td></tr>`).join("");
@@ -1115,6 +1117,60 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     else if (t.dataset.market) { state.market = t.dataset.market; save(); render(); }
     else if (t.dataset.rep) { state.rep = t.dataset.rep; save(); render(); }
   });
+  // Owner / Devon, Oct 25: "check the injury reports every minute and keep the live updates accurate
+  // if someone is ruled from questionable to active." While the page is open it pulls ESPN's NBA,
+  // NFL and NHL injury reports every 60 seconds and reads each written update the way the engine
+  // does (the call named last wins: probable = playing).
+  const INJ = {};
+  let INJ_AT = null;
+  const CALLS = [["probable", ["probable", "expected to play", "will play", "plans to play", "is available", "upgraded to available",
+      "cleared to play", "good to go", "will suit up", "in the lineup"]],
+    ["out", ["ruled out", "will not play", "won't play", "will miss", "is out for", "is out against", "will sit", "sidelined for"]],
+    ["doubtful", ["doubtful"]], ["questionable", ["questionable", "game-time decision", "uncertain"]]];
+  function refineStatus(status, comment) {
+    const s = String(status || "").trim().toLowerCase();
+    if (!["day-to-day", "questionable", ""].includes(s)) return s.startsWith("out") || s.startsWith("injured") || s.startsWith("suspend") ? "out" : s;
+    const c = String(comment || "").toLowerCase();
+    let best = null, at = -1;
+    for (const [call, words] of CALLS) for (const w of words) { const i = c.lastIndexOf(w); if (i > at) { best = call; at = i; } }
+    return best || (s === "day-to-day" ? "questionable" : s || null);
+  }
+  async function pollInjuries() {
+    let changed = false;
+    await Promise.all(["nba", "nfl", "nhl"].filter((k) => (DATA.espn || {})[k]).map(async (k) => {
+      try {
+        const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${DATA.espn[k].path}/injuries`, { cache: "no-store" });
+        if (!r.ok) return;
+        const out = {};
+        for (const b of (await r.json()).injuries || []) {
+          const team = b.displayName || (b.team || {}).displayName;
+          if (!team) continue;
+          out[team] = (b.injuries || []).map((i) => ({ name: (i.athlete || {}).displayName,
+            status: refineStatus(i.status || (i.type || {}).description, i.shortComment || i.longComment) })).filter((x) => x.name && x.status);
+        }
+        if (JSON.stringify(out) !== JSON.stringify(INJ[k])) { INJ[k] = out; changed = true; }
+      } catch (e) {}
+    }));
+    INJ_AT = new Date();
+    if (changed) render();
+  }
+  const injSport = (k) => (k === "ncaaf" ? null : k);
+  function liveStatus(sport, team, name) {
+    const list = (INJ[injSport(sport)] || {})[team];
+    if (!list) return undefined;
+    const hit = list.find((x) => x.name === name);
+    return hit ? (["out", "doubtful"].includes(hit.status) ? "out" : hit.status === "probable" ? "probable" : "questionable") : null;
+  }
+  function liveInj(sport, team) {
+    const list = (INJ[injSport(sport)] || {})[team];
+    if (!list) return "";
+    const by = (want) => list.filter((x) => want.includes(x.status)).map((x) => esc(x.name)).join(", ");
+    const parts = [["Out", by(["out", "doubtful"])], ["Questionable", by(["questionable"])], ["Probable", by(["probable"])]].filter(([, v]) => v);
+    return `<p class="small inj">🚑 <b>${esc(String(team).split(" ").slice(-1)[0])}</b>: ${parts.length ? parts.map(([k, v]) => `${k}: ${v}`).join(" · ") : "nobody listed"}
+      <span class="muted">· live, ${INJ_AT ? INJ_AT.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" }) : ""}</span></p>`;
+  }
+  const pickInj = (e) => (["nba", "nfl", "nhl"].includes(e.sport) && !e.settled && !e.player ? liveInj(e.sport, e.away) + liveInj(e.sport, e.home) : "");
+
   document.addEventListener("change", (ev) => {
     const s = ev.target.closest("select[data-team-sport]");
     if (!s) return;
@@ -1220,6 +1276,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     if (JSON.stringify(SCORES) + JSON.stringify(BOARD) !== before) render();
   }
   pollScores();
+  pollInjuries();
+  setInterval(pollInjuries, 60000);
   setInterval(pollScores, 30000);
 })();
 </script>
