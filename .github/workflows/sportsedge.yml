@@ -2,15 +2,15 @@ name: SportsEdge
 
 # Everything runs on free ESPN data (stats plus DraftKings lines). No API key or paid plan needed.
 # GitHub's free plan gives private repos 2,000 Actions minutes a month. Each refresh takes about a
-# minute (26 a day) and the daily study up to 21, about 1,400 minutes a month in all.
+# minute (about 30 a day) and the daily study up to 21, about 1,400 minutes a month in all.
 on:
   schedule:
     # Each refresh: live-bet check, fresh odds and injuries, new picks, line tracking, scores, grading.
-    # Every 30 minutes from 8 AM to 8 PM Pacific, when lines move and games start.
-    - cron: "15,45 0-2,15-23 * * *"
-    # Hourly the rest of the day and all night: the engine watches lines and injury news overnight;
-    # the day's picks are held until the board drops at 8 AM Pacific.
-    - cron: "15 3-14 * * *"
+    # Every 30 minutes from 6 AM to 8 PM Pacific (5 AM in winter), when lines move and games start.
+    # Owner, Oct 25: the board is up by 7 AM, so the 6:15 and 6:45 runs post the day's picks.
+    - cron: "15,45 0-2,13-23 * * *"
+    # Hourly the rest of the night: the engine watches lines and injury news, posting any edge it finds.
+    - cron: "15 3-12 * * *"
     - cron: "47 15 * * *"      # daily studies + NFL and NBA player props (8:47 AM Pacific)
   workflow_dispatch:
     inputs:
