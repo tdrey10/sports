@@ -186,6 +186,13 @@ button, select { font: inherit; color: inherit; }
 .bet .sub { font-size: 14px; color: var(--muted); }
 .bet .gauge { grid-column: 2 / -1; display: flex; gap: 8px 16px; align-items: center; flex-wrap: wrap; }
 .bet .why, .bet .meta, .bet details.more { grid-column: 2 / -1; }
+/* Every part of a top-bet card gets its own place: badge on top, pick and price side by side, the
+   injury list across the card (it was squeezed into the narrow middle column, a word per line). */
+.bet .sport-badge { grid-column: 2 / -1; }
+.bet .sel { grid-column: 2; }
+.bet .price { grid-column: 3; grid-row: auto; }
+.bet .sub { grid-column: 2 / -1; }
+.bet .inj { grid-column: 2 / -1; }
 @media (max-width: 520px) { .bet { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 4px 10px; } .bet .rk { font-size: 32px; } }
 
 /* ---------- picks of the day ---------- */
@@ -523,7 +530,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 
   // Picks join the top bets across the day's scans; show them ordered by edge score, numbered by that order.
   const bestToday = () => DATA.entries.filter((e) => e.best_rank && e.day === today() && visible(e))
-    .sort((a, b) => b.units - a.units || score(b) - score(a) || a.best_rank - b.best_rank)  // biggest stake first.map((e, i) => Object.assign({}, e, { rank: i + 1 }));
+    .sort((a, b) => b.units - a.units || score(b) - score(a) || a.best_rank - b.best_rank)  // biggest stake first
+    .map((e, i) => Object.assign({}, e, { rank: i + 1 }));
 
   function renderHero() {
     const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && x.units > 0 && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
