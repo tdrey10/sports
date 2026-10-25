@@ -143,6 +143,8 @@ def _audit(ledger: Ledger, now: datetime, root: str) -> None:
     from .d5.board import LAST_SIDES
     from .ledger import D503_MARK
 
+    if not LAST_SIDES:  # the board read no D503 games: nothing to compare (and no fetch)
+        return
     try:
         picks = rival.fetch(Path(root) / "rival_picks.json")
         today = ledger.day_of(now)
