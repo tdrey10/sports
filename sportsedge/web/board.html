@@ -707,7 +707,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       `<tr><td>${esc(name)}</td><td>${t.hurt.map((h) => `${esc(h.name)} <small>${esc(h.pos)}${h.starter ? " · starter" : ""} · ${h.status}${h.mpg ? ` · ${h.mpg} min, ${h.ppg} pts` : ""}</small>`).join("<br>")}</td><td>${pct(t.minutes_out)}</td><td>${pct(t.points_out)}</td></tr>`).join("");
     const form = (tag) => (R.players || []).filter((p) => p.form && p.form.tag === tag)
       .sort((a, b) => (tag === "hot" ? b.form.d_ts - a.form.d_ts : a.form.d_ts - b.form.d_ts)).slice(0, 15)
-      .map((p) => `<tr><td>${esc(p.name)} <small>${esc(p.pos)} · ${esc(short(p.team))}</small></td><td>${p.form.ppg} pts</td><td>${tsTxt(p.form.ts)} <small>(${signed(p.form.d_ts * 100, 1)} vs ${esc(p.form.vs)})</small></td><td>${p.form.mpg} min</td><td>${signed(p.form.pm, 1)}</td></tr>`).join("");
+      .map((p) => `<tr><td>${esc(p.name)} <small>${esc(p.pos)} · ${esc(short(p.team))} · last ${p.form.games}</small></td><td>${p.form.ppg} pts</td><td>${tsTxt(p.form.ts)} <small>(${signed(p.form.d_ts * 100, 1)} vs ${esc(p.form.vs)})</small></td><td>${p.form.mpg} min</td><td>${signed(p.form.pm, 1)}</td></tr>`).join("");
     const formTable = (rows, none) => rows ? `<div class="table-wrap"><table><thead><tr><th>Player</th><th>Scoring</th><th>True shooting</th><th>Minutes</th><th>+/-</th></tr></thead><tbody>${rows}</tbody></table></div>` : empty(none);
     const lineups = teams.filter(([, t]) => Object.keys(t.lineup).length).map(([name, t]) => {
       const out = new Set(t.hurt.map((h) => h.name));
