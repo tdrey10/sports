@@ -141,6 +141,15 @@ class EspnClient:
             return None
         return parse_injuries(data) or None
 
+    def illness(self, cfg: SportConfig) -> dict[str, list[str]]:
+        """team -> sick players, from the same (cached) injury report."""
+        if not cfg.has_injury_feed or cfg.key == "ncaaf":
+            return {}
+        try:
+            return parse_illness(self._get(f"{BASE}/{cfg.espn_path}/injuries", {}, ttl=1800))
+        except requests.RequestException:
+            return {}
+
     def goalie_stats(self, athlete_id: str) -> tuple[float, float] | None:
         """(career save %, career shots faced) of an NHL goalie, or None."""
         if not athlete_id:
@@ -279,6 +288,23 @@ def parse_injuries(data: dict) -> dict[str, list[tuple[str, str, str]]]:
             position = (athlete.get("position") or {}).get("abbreviation") or ""
             if name:
                 players.append((name, refine_status(status, item.get("shortComment") or item.get("longComment") or ""), position))
+    return out
+
+
+SICK = ("illness", "sick", "flu", "virus", "stomach", "non-covid")
+
+
+def parse_illness(data: dict) -> dict[str, list[str]]:
+    """team -> players on the report because they're sick (owner, Oct 25: 'if they been sick')."""
+    out: dict[str, list[str]] = {}
+    for block in data.get("injuries", []) or []:
+        team = block.get("displayName") or (block.get("team") or {}).get("displayName")
+        for item in block.get("injuries", []) or []:
+            name = (item.get("athlete") or {}).get("displayName")
+            what = " ".join(str(x) for x in ((item.get("details") or {}).get("type"), item.get("shortComment"),
+                                             item.get("longComment")) if x).lower()
+            if team and name and any(w in what for w in SICK):
+                out.setdefault(team, []).append(name)
     return out
 
 

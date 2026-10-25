@@ -649,6 +649,43 @@ def _nba_report(data_dir: Path, scans, now: datetime, budget: int = 40) -> None:
         print(f"NHL report: {added} new box scores, {len(rep['teams'])} teams, {len(rep['matchups'])} games")
     except Exception as exc:
         print(f"NHL report failed: {exc}")
+    _game_studies(client, data_dir, now)
+
+
+def _game_studies(client, data_dir: Path, now: datetime) -> None:
+    """Owner, Oct 25: 'a study on every game played in every sport.' Each report's games get every
+    situation each team is in and what the factor study (data/factor_study.json) says about it, plus
+    who's out sick."""
+    import json
+
+    from . import factorstudy
+    from .sports import SPORTS
+
+    results = factorstudy.load_results(data_dir / "factor_study.json")
+    for sport in ("nba", "nfl", "ncaaf", "nhl"):
+        path = data_dir / f"{sport}_report.json"
+        rep = _load_json(path)
+        if not rep or not rep.get("matchups"):
+            continue
+        try:
+            studies = factorstudy.game_study(sport, rep["matchups"], data_dir, results=results, now=now)
+            sick = client.illness(SPORTS[sport])
+        except Exception as exc:  # the study never stops a run
+            print(f"{sport.upper()} game study failed: {exc}")
+            continue
+        n = 0
+        for m in rep["matchups"]:
+            rows = studies.get(f"{m['away']} @ {m['home']}")
+            if rows is not None:
+                m["study"] = rows
+                m["study_notes"] = factorstudy.notes(rows)
+                n += 1
+            ill = [f"🤒 {p} ({t}) is on the report sick" for t in (m["away"], m["home"]) for p in sick.get(t, [])]
+            if ill:
+                m["study_notes"] = ill + m.get("study_notes", [])
+        path.write_text(json.dumps(rep, separators=(",", ":")))
+        print(f"{sport.upper()} game study: {n} of {len(rep['matchups'])} games, "
+              f"{sum(len(m.get('study', [])) for m in rep['matchups'])} factors in play")
 
 
 def _slate(scans, sport: str, now: datetime) -> tuple[dict, list[dict]]:
@@ -729,6 +766,13 @@ def cmd_nba_study(args) -> int:
             fmt = lambda x: "  -  " if x["flat_roi"] is None else f"{x['flat_roi']:+.1%}"  # noqa: E731
             print(f"  {row['market']:<19} {row['variant']:<58} tune {t['bets']:>4} {fmt(t)}  blind {b['bets']:>4} {fmt(b)} {row['verdict']}")
     (data_dir / "absence_study.json").write_text(json.dumps(absent, indent=1))
+    # Owner, Oct 25: every situation that can swing a game, every sport, tested blind.
+    from . import factorstudy
+
+    fs = factorstudy.run_all(data_dir / "lines" / "espn")
+    for r in fs.values():
+        print(factorstudy.report(r))
+    (data_dir / "factor_study.json").write_text(json.dumps(fs, separators=(",", ":")))
     return 0
 
 

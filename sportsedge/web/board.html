@@ -503,6 +503,17 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div class="meta">${moveText(e)}${statusText(e)}${addBtn(e)}</div>
       ${pickInj(e)}${more(e)}</article>`;
   }
+  // Owner, Oct 25: "a study on every game." Every situation each team is in, tested blind on years of
+  // closing lines: the ones that showed an edge (and anyone out sick) up top, the rest folded away.
+  function gameStudy(m) {
+    const all = m.study_notes || [];
+    if (!all.length) return "";
+    const top = all.filter((n) => n.startsWith("🤒") || !n.endsWith("no edge either way"));
+    const rest = all.filter((n) => !top.includes(n));
+    const li = (n) => `<li>${esc(n)}</li>`;
+    return `${top.length ? `<ul class="reads">${top.map(li).join("")}</ul>` : ""}`
+      + (rest.length ? `<details class="more"><summary>Game study · ${rest.length} more spot${rest.length > 1 ? "s" : ""} checked, no edge</summary><ul>${rest.map(li).join("")}</ul></details>` : "");
+  }
   const empty = (msg) => `<p class="empty">${msg}</p>`;
   const panel = (title, aside, body) => `<section class="panel"><div class="panel-head"><h2>${title}</h2><span class="muted">${aside || ""}</span></div>${body}</section>`;
 
@@ -698,7 +709,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const angle = m.angle ? `<p class="small"><span class="tag value">Proven angle</span> ${esc(m.angle)} against the spread: an unlucky team vs a lucky one (+12% blind on 137 games since 2022). Still just the scoop, not strong enough for units yet.</p>` : "";
       return `<article class="nba-game"><strong>${esc(m.away)}${ml(m.away_ml)} @ ${esc(m.home)}${ml(m.home_ml)}</strong>
         <div class="muted small">${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}${m.spread != null ? ` · ${esc(short(m.home))} ${m.spread > 0 ? "+" : ""}${m.spread}` : ""}</div>
-        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both squads healthy, no bums, nobody cookin', nobody due. Clean game.</p>`}${angle}${liveInj("nba", m.away)}${liveInj("nba", m.home)}</article>`;
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both squads healthy, no bums, nobody cookin', nobody due. Clean game.</p>`}${gameStudy(m)}${angle}${liveInj("nba", m.away)}${liveInj("nba", m.home)}</article>`;
     }).join("");
     const teams = Object.entries(R.teams || {});
     const hurt = teams.filter(([, t]) => t.hurt.length).sort((a, b) => b[1].minutes_out - a[1].minutes_out).map(([name, t]) =>
@@ -800,7 +811,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const ml = (x) => (x == null ? "" : ` ${odds(x)}`);
       return `<article class="nba-game"><strong>${esc(m.away)}${ml(m.away_ml)} @ ${esc(m.home)}${ml(m.home_ml)}</strong>
         <div class="muted small">${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}</div>
-        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both #1 goalies set, key guys healthy, nobody due. Clean game.</p>`}${liveInj("nhl", m.away)}${liveInj("nhl", m.home)}</article>`;
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both #1 goalies set, key guys healthy, nobody due. Clean game.</p>`}${gameStudy(m)}${liveInj("nhl", m.away)}${liveInj("nhl", m.home)}</article>`;
     }).join("");
     const teams = Object.entries(R.teams || {});
     const goalies = teams.filter(([, t]) => (t.goalies || []).length).map(([n, t]) => { const g = t.goalies[0];
@@ -836,7 +847,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const ml = (x) => (x == null ? "" : ` ${odds(x)}`);
       return `<article class="nba-game"><strong>${esc(m.away)}${ml(m.away_ml)} @ ${esc(m.home)}${ml(m.home_ml)}</strong>
         <div class="muted small">${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}${m.spread != null ? ` · ${esc(short(m.home))} ${m.spread > 0 ? "+" : ""}${m.spread}` : ""}</div>
-        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Starters healthy, no bums, nobody cookin', nobody due. Clean game.</p>`}${liveInj(R.sport, m.away)}${liveInj(R.sport, m.home)}</article>`;
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Starters healthy, no bums, nobody cookin', nobody due. Clean game.</p>`}${gameStudy(m)}${liveInj(R.sport, m.away)}${liveInj(R.sport, m.home)}</article>`;
     }).join("");
     const hurt = teams.filter(([, t]) => t.hurt.some((h) => h.key || h.pos === "QB")).map(([n, t]) =>
       `<tr><td>${esc(n)}</td><td>${t.hurt.filter((h) => h.key || h.pos === "QB").map((h) => `${esc(h.name)} <small>${esc(h.key || h.pos)} · ${h.status}</small>`).join("<br>")}</td></tr>`).join("");
