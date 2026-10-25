@@ -22,10 +22,10 @@
 * { box-sizing: border-box; }
 html { background: var(--bg); }
 body { margin: 0; background: transparent; color: var(--fg); font: 16px/1.45 var(--body); }
-/* The background photo (Yosemite Sam and Elmer, guns drawn, Space Jam) sits behind the whole
-   engine, tinted black so the picks stay readable, and fades into the black page below it.
-   It is landscape, so it is sized by height (--mh) and centered: on a phone the two of them stay
-   in frame between the guns. A fixed layer (not background-attachment) so it stays put on phones. */
+/* The background photo (owner, Oct 25: Lillard's series-winning three over OKC) sits behind the
+   whole engine, tinted black so the picks stay readable, and fades into the black page below it.
+   It is portrait, so it is sized by height (--mh) and centered, with its edges faded on wide
+   screens. A fixed layer (not background-attachment) so it stays put on phones. */
 .photo-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; --mh: max(62vh, 460px);
   --my: 0px;
   background: linear-gradient(180deg, rgba(var(--tint), .25) 0%, rgba(var(--tint), .15) 20%, rgba(var(--tint), .62) 40%, rgba(var(--tint), .9) 70%, rgba(var(--tint), .96) 100%),
@@ -35,7 +35,7 @@ body { margin: 0; background: transparent; color: var(--fg); font: 16px/1.45 var
 @media (min-width: 761px) {
   .photo-bg { --mh: max(100vh, 680px);
     background: linear-gradient(180deg, rgba(var(--tint), .25) 0%, rgba(var(--tint), .2) 35%, rgba(var(--tint), .7) 70%, rgba(var(--tint), .95) 90%),
-      linear-gradient(90deg, var(--bg), transparent 15%, transparent 85%, var(--bg)) 50% 0 / calc(var(--mh) * 1.62) var(--mh) no-repeat,
+      linear-gradient(90deg, var(--bg), transparent 15%, transparent 85%, var(--bg)) 50% 0 / calc(var(--mh) * 0.8) var(--mh) no-repeat,
       linear-gradient(180deg, transparent 55%, var(--bg)) 50% 0 / 100% var(--mh) no-repeat,
       var(--mascot) 50% 0 / auto var(--mh) no-repeat, var(--bg); }
   /* The cover is just the name over the photo; the day's picks start below it. */
