@@ -49,6 +49,34 @@ def norm(name: str) -> str:
     return " ".join(s.lower().replace("-", " ").replace(".", " ").split())
 
 
+_SUFFIX = {"jr", "sr", "ii", "iii", "iv"}
+
+
+def pkey(name: str) -> str:
+    """A player key for matching across sources: name parts in any order, suffixes dropped.
+    The odds feed says 'Shuai Zhang', ESPN 'Zhang Shuai'; one says 'Martin Damm Jr', the other
+    'Martin Damm'. Before this, those matches were never graded."""
+    return " ".join(sorted(t for t in norm(name).split() if t not in _SUFFIX))
+
+
+def _same(a: str, b: str) -> bool:
+    """Loose match for spellings that differ by a letter ('Yulia' / 'Yuliia'): they share a name
+    part of 4+ letters (usually the surname)."""
+    ta = {t for t in norm(a).split() if len(t) >= 4 and t not in _SUFFIX}
+    tb = {t for t in norm(b).split() if len(t) >= 4 and t not in _SUFFIX}
+    return bool(ta & tb)
+
+
+def _find(rows: list[dict], by_pair: dict, key: tuple, a: str, b: str, start: datetime) -> list[dict]:
+    """ESPN rows for a match: by exact name keys within 3 days, else (spellings differ) both
+    players loosely matching within a day on that tour."""
+    near = [r for r in by_pair.get(key, []) if r.get("start") and abs((_t(r["start"]) - start).total_seconds()) < 3 * 86400]
+    if near:
+        return near
+    return [r for r in rows if r.get("start") and abs((_t(r["start"]) - start).total_seconds()) < 86400
+            and ((_same(r["p1_name"], a) and _same(r["p2_name"], b)) or (_same(r["p1_name"], b) and _same(r["p2_name"], a)))]
+
+
 def _t(s: str) -> datetime:
     return datetime.fromisoformat(s.replace("Z", "+00:00"))
 
@@ -272,16 +300,15 @@ def grade(stored: dict, rows: list[dict], now: datetime) -> int:
     """Grade tennis forecasts on ESPN results (a retirement or walkover voids the prediction)."""
     by_pair: dict[tuple, list[dict]] = {}
     for r in rows:
-        key = (r["tour"], *sorted((norm(r["p1_name"]), norm(r["p2_name"]))))
+        key = (r["tour"], *sorted((pkey(r["p1_name"]), pkey(r["p2_name"]))))
         by_pair.setdefault(key, []).append(r)
     graded = 0
     for f in stored.values():
         if not f.sport.startswith("tennis_") or f.status not in ("pending", "live") or f.start > now:
             continue
         tour = f.sport.split("_", 1)[1]
-        na, nb = norm(f.away), norm(f.home)
-        near = [r for r in by_pair.get((tour, *sorted((na, nb))), [])
-                if r.get("start") and abs((_t(r["start"]) - f.start).total_seconds()) < 3 * 86400]
+        na, nb = pkey(f.away), pkey(f.home)
+        near = [r for r in _find(rows, by_pair, (tour, *sorted((na, nb))), f.away, f.home, f.start) if r["tour"] == tour]
         if not near:
             if now - f.start > timedelta(days=4):
                 f.status, f.graded_at = "void", now.isoformat()
@@ -291,7 +318,7 @@ def grade(stored: dict, rows: list[dict], now: datetime) -> int:
             f.status, f.graded_at, f.facts = "void", now.isoformat(), []
             continue
         if r.get("status") == "STATUS_FINAL" and r.get("winner") in ("1", "2"):
-            p1_is_away = norm(r["p1_name"]) == na
+            p1_is_away = pkey(r["p1_name"]) == na or (pkey(r["p1_name"]) != nb and _same(r["p1_name"], f.away))
             s1 = [int(x) for x in (r.get("sets1") or "").split() if x.isdigit()]
             s2 = [int(x) for x in (r.get("sets2") or "").split() if x.isdigit()]
             sets1 = sum(1 for x, y in zip(s1, s2) if x > y)
@@ -314,14 +341,13 @@ def grade_entries(ledger, rows: list[dict], now: datetime) -> int:
 
     by_pair: dict[tuple, list[dict]] = {}
     for r in rows:
-        by_pair.setdefault(tuple(sorted((norm(r["p1_name"]), norm(r["p2_name"])))), []).append(r)
+        by_pair.setdefault(tuple(sorted((pkey(r["p1_name"]), pkey(r["p2_name"])))), []).append(r)
     graded = 0
     for e in ledger.entries.values():
         if not e.sport.startswith("tennis_") or e.settled or e.start > now:
             continue
-        home, away = norm(e.home), norm(e.away)
-        near = [r for r in by_pair.get(tuple(sorted((home, away))), [])
-                if r.get("start") and abs((_t(r["start"]) - e.start).total_seconds()) < 3 * 86400]
+        home, away = pkey(e.home), pkey(e.away)
+        near = _find(rows, by_pair, tuple(sorted((home, away))), e.away, e.home, e.start)
         if not near:
             if now - e.start > timedelta(days=4):
                 e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
@@ -331,7 +357,7 @@ def grade_entries(ledger, rows: list[dict], now: datetime) -> int:
             e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
             continue
         if r.get("status") == "STATUS_FINAL" and r.get("winner") in ("1", "2"):
-            p1_home = norm(r["p1_name"]) == home
+            p1_home = pkey(r["p1_name"]) == home or (pkey(r["p1_name"]) != away and _same(r["p1_name"], e.home))
             home_won = (r["winner"] == "1") == p1_home
             game = GameResult(r.get("id", ""), e.start, e.home, e.away, 1.0 if home_won else 0.0,
                               0.0 if home_won else 1.0, state="post")

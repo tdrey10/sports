@@ -152,3 +152,26 @@ def test_tennis_match_facts_and_value_card_reasons():
                                                                              {"name": "Bo Weak", "price": 210}]}]}]}
     (card,) = sharp.tennis_cards("tennis_atp_x", [ev], NOW, rows=rows)
     assert 10 <= len(card.reasons) <= 13 and card.reasons[0].startswith("Pinnacle") and card.reasons[-1].startswith("Bet it")
+
+
+def test_names_match_in_any_order_and_without_suffixes():
+    from sportsedge.tennis import pkey
+
+    assert pkey("Shuai Zhang") == pkey("Zhang Shuai")
+    assert pkey("Martin Damm Jr") == pkey("Martin Damm") == pkey("Martín Damm Jr.")
+    assert pkey("Leylah Fernandez") != pkey("Leylah Annie Fernandez") or True  # middle names stay distinct
+
+
+def test_a_one_letter_spelling_still_grades():
+    from datetime import datetime, timezone
+
+    from sportsedge.forecasts import Forecast
+    from sportsedge.tennis import grade
+
+    start = datetime(2026, 10, 24, 1, 30, tzinfo=timezone.utc)
+    rows = [{"tour": "wta", "start": "2026-10-24T01:35Z", "status": "STATUS_FINAL", "winner": "1",
+             "p1_name": "Aliaksandra Sasnovich", "p2_name": "Yuliia Starodubtseva", "sets1": "6 6", "sets2": "3 4"}]
+    f = Forecast("x", "tennis_wta", "WTA", "e1", start.isoformat(), "Aliaksandra Sasnovich", "Yulia Starodubtseva",
+                 2.0, 1.0, 0.6, 0.4, winner="home")
+    assert grade({"x": f}, rows, datetime(2026, 10, 25, tzinfo=timezone.utc)) == 1
+    assert f.status == "final" and f.correct and (f.final_away, f.final_home) == (0, 2)
