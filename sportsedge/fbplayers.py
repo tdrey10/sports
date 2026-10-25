@@ -1,0 +1,273 @@
+"""Football player report, NFL and college (owner, Oct 25: "do we have this for nfl, college
+football...?"): the NBA report's football twin.
+
+Box scores come from ESPN (only the pipeline can reach it): ``collect`` saves each finished game's
+passing, rushing and receiving lines to data/players/<sport>/<season>.json as
+    gid -> {"date", "home", "away", "rows": [[team, name, group, a, b, c, d, e], ...]}
+    passing [cmp, att, yds, td, int] · rushing [car, yds, td, 0, 0] · receiving [rec, yds, td, tgts, 0]
+``build`` turns that, this season's results and today's injury report into data/<sport>_report.json:
+each team's QB (and whether he's new), lead back and top receivers with their last 3 games against
+their season, who's hurt (flagged when it's one of those), team luck, and notes for each game.
+Research only: nothing here posts a pick or carries units.
+"""
+
+from __future__ import annotations
+
+import csv
+import json
+import logging
+from collections import Counter, defaultdict
+from datetime import datetime
+from pathlib import Path
+
+log = logging.getLogger(__name__)
+
+FB_SPORTS = ("nfl", "ncaaf")
+GROUPS = {"passing": ("C/ATT", "YDS", "TD", "INT"), "rushing": ("CAR", "YDS", "TD"), "receiving": ("REC", "YDS", "TD", "TGTS")}
+RECENT = 3
+QB_SWING = 1.5  # adjusted yards/attempt this far off his season = hot / cold
+RB_SWING = 1.2  # yards per carry
+WR_SHARE = 0.6  # receiving yards at 60% of his season pace or less = cold (140%+ = hot)
+
+
+def season_of(when: datetime) -> int:
+    return when.year if when.month >= 7 else when.year - 1
+
+
+def _num(raw) -> float:
+    try:
+        return float(str(raw).replace(",", ""))
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def parse(summary: dict) -> list[list]:
+    """[team, name, group, a, b, c, d, e] rows from an ESPN football summary."""
+    out = []
+    for block in (summary.get("boxscore") or {}).get("players") or []:
+        team = (block.get("team") or {}).get("displayName", "")
+        for group in block.get("statistics") or []:
+            gname = (group.get("name") or "").lower()
+            if gname not in GROUPS:
+                continue
+            labels = [str(x).upper() for x in (group.get("labels") or [])]
+            for ath in group.get("athletes") or []:
+                name = (ath.get("athlete") or {}).get("displayName")
+                stats = dict(zip(labels, ath.get("stats") or []))
+                if not name or not stats:
+                    continue
+                if gname == "passing":
+                    c, _, a = str(stats.get("C/ATT", "0/0")).partition("/")
+                    row = [_num(c), _num(a), _num(stats.get("YDS")), _num(stats.get("TD")), _num(stats.get("INT"))]
+                    if not row[1]:
+                        continue
+                elif gname == "rushing":
+                    row = [_num(stats.get("CAR")), _num(stats.get("YDS")), _num(stats.get("TD")), 0.0, 0.0]
+                else:
+                    row = [_num(stats.get("REC")), _num(stats.get("YDS")), _num(stats.get("TD")), _num(stats.get("TGTS")), 0.0]
+                out.append([team, name, gname] + row)
+    return out
+
+
+def _path(root, sport: str, season: int) -> Path:
+    return Path(root) / "players" / sport / f"{season}.json"
+
+
+def load_season(root, sport: str, season: int) -> dict:
+    try:
+        return json.loads(_path(root, sport, season).read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def _finished(root, sport: str, season: int, now: datetime) -> list[tuple[datetime, dict]]:
+    out = []
+    for f in sorted((Path(root) / "games" / sport).glob("*.csv")):
+        with f.open() as fh:
+            for r in csv.DictReader(fh):
+                try:
+                    when = datetime.fromisoformat(r["date"])
+                except (KeyError, ValueError):
+                    continue
+                if r.get("home_score") and when < now and season_of(when) == season:
+                    out.append((when, r))
+    return sorted(out, key=lambda x: x[0])
+
+
+def collect(client, sport: str, now: datetime, root="data", budget: int = 60) -> int:
+    """Save this season's finished games not yet saved, newest first. Returns games added."""
+    from .sports import SPORTS
+
+    season = season_of(now)
+    store = load_season(root, sport, season)
+    added = 0
+    for when, r in reversed(_finished(root, sport, season, now)):
+        if added >= budget:
+            break
+        if r["event_id"] in store:
+            continue
+        try:
+            rows = parse(client.summary(SPORTS[sport], r["event_id"]))
+        except Exception as exc:  # one bad box score never stops the rest
+            log.info("%s box score %s failed: %s", sport, r["event_id"], exc)
+            continue
+        if rows:
+            store[r["event_id"]] = {"date": when.isoformat(), "home": r["home"], "away": r["away"], "rows": rows}
+            added += 1
+    if added:
+        p = _path(root, sport, season)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps(store, separators=(",", ":"), sort_keys=True))
+    return added
+
+
+def _adj_ypa(lines: list[list]) -> float | None:
+    att = sum(r[1] for r in lines)
+    if not att:
+        return None
+    return (sum(r[2] for r in lines) + 20 * sum(r[3] for r in lines) - 45 * sum(r[4] for r in lines)) / att
+
+
+def _team_due(root, sport: str, season: int, now: datetime) -> dict[str, dict]:
+    from .nbastudy import PARAMS, Team
+
+    p = PARAMS[sport]
+    teams: dict[str, Team] = defaultdict(lambda: Team(p))
+    for _, r in _finished(root, sport, season, now):
+        hs, as_ = float(r["home_score"]), float(r["away_score"])
+        teams[r["home"]].add(hs, as_, False)
+        teams[r["away"]].add(as_, hs, False)
+    out = {}
+    for name, t in teams.items():
+        d = {"w": t.w, "l": t.l, "diff": round((t.pf - t.pa) / t.games, 1) if t.games else 0.0, "close": t.close,
+             "last5": round(sum(t.last5) / len(t.last5), 1) if t.last5 else None}
+        notes = []
+        if t.games >= p.min_games:
+            d["luck"], d["slump"] = round(t.luck(), 3), round(t.slump(), 1)
+            if d["luck"] <= -p.luck:
+                notes.append(f"due: record {abs(d['luck']) * 100:.0f} pts under what its point differential says")
+            elif d["luck"] >= p.luck:
+                notes.append(f"lucky: record {d['luck'] * 100:.0f} pts over its point differential")
+            if t.close <= -p.close_n:
+                notes.append(f"{-t.close} more one-score losses than wins")
+            elif t.close >= p.close_n:
+                notes.append(f"{t.close} more one-score wins than losses")
+            if d["slump"] <= -p.slump:
+                notes.append(f"slumping: last {p.recent} games {abs(d['slump']):.0f} pts a game under its season")
+            elif d["slump"] >= p.slump:
+                notes.append(f"hot: last {p.recent} games {d['slump']:.0f} pts a game over its season")
+        else:
+            notes.append(f"{t.games} games in: luck reads start at {p.min_games}")
+        d["notes"] = notes
+        out[name] = d
+    return out
+
+
+def build(sport: str, now: datetime, root="data", injuries: dict | None = None,
+          games_today: list[dict] | None = None, study: dict | None = None) -> dict:
+    """``injuries``: team -> {"out": [(player, pos)], "questionable": [...]}; ``games_today``:
+    [{"home", "away", "start", "home_ml", "away_ml", "spread"}]."""
+    season = season_of(now)
+    store = load_season(root, sport, season)
+    games = sorted(store.values(), key=lambda g: g["date"])
+    by: dict[tuple[str, str, str], list[tuple[str, list]]] = defaultdict(list)  # (team, name, group) -> [(date, row)]
+    for g in games:
+        for r in g["rows"]:
+            by[(r[0], r[1], r[2])].append((g["date"], r[3:]))
+    team_games: dict[str, list[str]] = defaultdict(list)
+    for g in games:
+        for t in {r[0] for r in g["rows"]}:
+            team_games[t].append(g["date"])
+
+    teams: dict[str, dict] = {}
+    due = _team_due(root, sport, season, now)
+    inj = injuries or {}
+    names = sorted(set(team_games) | set(inj) | set(due))
+    for team in names:
+        dates = team_games.get(team, [])
+        recent = set(dates[-RECENT:])
+        mine = {k: v for k, v in by.items() if k[0] == team}
+        # The starter each game: the most pass attempts. The QB now: the latest game's starter.
+        starter_by_day: dict[str, tuple[float, str]] = {}
+        for k, v in mine.items():
+            if k[2] != "passing":
+                continue
+            for d, r in v:
+                if d not in starter_by_day or r[1] > starter_by_day[d][0]:
+                    starter_by_day[d] = (r[1], k[1])
+        starts = Counter(n for _, n in starter_by_day.values())
+        last = dates[-1] if dates else None
+        qb = starter_by_day[last][1] if last in starter_by_day else None
+        qb_line = None
+        if qb:
+            rows = [r for _, r in mine[(team, qb, "passing")]]
+            season_ypa, last3 = _adj_ypa(rows), _adj_ypa([r for d, r in mine[(team, qb, "passing")] if d in recent])
+            tag = None
+            if len(rows) >= RECENT + 1 and season_ypa is not None and last3 is not None:
+                tag = "hot" if last3 - season_ypa >= QB_SWING else "cold" if season_ypa - last3 >= QB_SWING else None
+            qb_line = {"name": qb, "starts": starts.get(qb, 0), "games": len(dates), "new": starts.get(qb, 0) <= 2 < len(dates),
+                       "ypa": season_ypa and round(season_ypa, 1), "last3": last3 and round(last3, 1), "tag": tag,
+                       "yds_g": round(sum(r[2] for r in rows) / len(rows), 1), "td": int(sum(r[3] for r in rows)),
+                       "int": int(sum(r[4] for r in rows))}
+        # Lead back: most carries over the last 3 games.
+        rb = None
+        backs = sorted(((sum(r[0] for d, r in v if d in recent), k[1]) for k, v in mine.items() if k[2] == "rushing"
+                        and k[1] != qb), reverse=True)
+        if backs and backs[0][0]:
+            n = backs[0][1]
+            rows = mine[(team, n, "rushing")]
+            car, yds = sum(r[0] for _, r in rows), sum(r[1] for _, r in rows)
+            rc, ry = sum(r[0] for d, r in rows if d in recent), sum(r[1] for d, r in rows if d in recent)
+            ypc, rypc = (yds / car if car else None), (ry / rc if rc else None)
+            tag = None
+            if len(rows) >= RECENT + 1 and ypc is not None and rypc is not None and rc >= 20:
+                tag = "hot" if rypc - ypc >= RB_SWING else "cold" if ypc - rypc >= RB_SWING else None
+            rb = {"name": n, "car_g": round(car / len(rows), 1), "ypc": ypc and round(ypc, 1),
+                  "last3_ypc": rypc and round(rypc, 1), "yds_g": round(yds / len(rows), 1), "tag": tag}
+        # Top 3 receivers: targets (or catches) over the last 3 games.
+        catchers = sorted(((sum((r[3] or r[0]) for d, r in v if d in recent), k[1]) for k, v in mine.items()
+                           if k[2] == "receiving"), reverse=True)[:3]
+        wrs = []
+        for vol, n in catchers:
+            if not vol:
+                continue
+            rows = mine[(team, n, "receiving")]
+            g_all = len(rows)
+            per = sum(r[1] for _, r in rows) / g_all
+            rec3 = [r for d, r in rows if d in recent]
+            per3 = sum(r[1] for r in rec3) / len(rec3) if rec3 else None
+            tag = None
+            if g_all >= RECENT + 1 and per3 is not None and per >= 30:
+                tag = "hot" if per3 >= per * (2 - WR_SHARE) else "cold" if per3 <= per * WR_SHARE else None
+            wrs.append({"name": n, "yds_g": round(per, 1), "last3_yds": per3 and round(per3, 1),
+                        "rec_g": round(sum(r[0] for _, r in rows) / g_all, 1), "td": int(sum(r[2] for _, r in rows)), "tag": tag})
+        key = {x["name"]: role for x, role in ((qb_line, "QB1"), (rb, "RB1")) if x} | {w["name"]: "top target" for w in wrs}
+        t_inj = inj.get(team, {})
+        hurt = [{"name": n, "pos": pos, "status": st, "key": key.get(n)}
+                for st, lst in (("out", t_inj.get("out", [])), ("questionable", t_inj.get("questionable", [])))
+                for n, pos in lst]
+        teams[team] = {"qb": qb_line, "rb": rb, "wr": wrs, "hurt": hurt, "due": due.get(team)}
+
+    matchups = []
+    for g in games_today or []:
+        notes = []
+        for name in (g["away"], g["home"]):
+            t = teams.get(name, {})
+            for h in t.get("hurt", []):
+                if h["key"] or (h["status"] == "out" and h["pos"] in ("QB",)):
+                    notes.append(f"{name}: {h['key'] or h['pos']} {h['name']} {h['status']}")
+            q = t.get("qb")
+            if q and q.get("new"):
+                notes.append(f"{name}: QB {q['name']} has only {q['starts']} starts this season")
+            for who in ([q] if q else []) + ([t["rb"]] if t.get("rb") else []) + t.get("wr", []):
+                if who and who.get("tag"):
+                    notes.append(f"{who['name']} ({name}) is {who['tag']}")
+            for n in ((t.get("due") or {}).get("notes") or [])[:2]:
+                if "games in" not in n:
+                    notes.append(f"{name}: {n}")
+        matchups.append({**g, "notes": notes})
+    return {"sport": sport, "generated_at": now.isoformat(), "season": season, "games_saved": len(store),
+            "teams": teams, "matchups": matchups, "study": study}
+
+
+__all__ = ["FB_SPORTS", "collect", "build", "parse", "season_of"]
