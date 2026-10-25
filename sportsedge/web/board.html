@@ -182,7 +182,7 @@ button, select { font: inherit; color: inherit; }
 .bet .sel strong { font-size: 18px; font-weight: 700; overflow-wrap: anywhere; }
 .bet .price { text-align: right; grid-row: span 2; }
 .bet .price b { font: 700 20px/1.1 var(--mono); display: block; }
-.bet .price small { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.bet .price small { color: var(--muted); font-size: 13px; white-space: nowrap; display: block; }
 .bet .sub { font-size: 14px; color: var(--muted); }
 .bet .gauge { grid-column: 2 / -1; display: flex; gap: 8px 16px; align-items: center; flex-wrap: wrap; }
 .bet .why, .bet .meta, .bet details.more { grid-column: 2 / -1; }
@@ -251,7 +251,7 @@ button, select { font: inherit; color: inherit; }
 .row .sel strong { font-size: 17px; overflow-wrap: anywhere; }
 .row .odds { text-align: right; }
 .row .odds b { font: 700 18px/1.2 var(--mono); display: block; }
-.row .odds small { color: var(--muted); font-size: 13px; }
+.row .odds small { color: var(--muted); font-size: 13px; display: block; }
 .row .why, .row .meta, .row details.more { grid-column: 1 / -1; }
 .why { font-size: 14px; color: var(--muted); margin: 0; max-width: 70ch; }
 .meta { display: flex; gap: 6px 14px; flex-wrap: wrap; align-items: center; font-size: 14px; }
@@ -466,7 +466,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function row(e, opts = {}) {
     return `<div class="row">${stamp(e)}
       <div class="sel"><span class="tag ${e.tier}">${TIER[e.tier] || e.tier}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
-      <div class="odds"><b>${odds(e.odds)}</b>${stake(e)}<small>${needs(e)}</small></div>
+      <div class="odds"><b>${odds(e.odds)}</b><small>${needs(e)}</small>${stake(e)}</div>
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${opts.matchup ? `<span class="muted">${esc(e.matchup)} · ${timeOf(e)}</span>` : ""}${moveText(e)}${statusText(e)}${addBtn(e)}</div>
       ${more(e)}</div>`;
@@ -477,7 +477,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div class="rk" aria-label="Rank ${e.rank}">${e.rank}</div>
       <div class="sport-badge">${esc(sportHead(e.sport))}</div>
       <div class="sel"><strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${TIER[e.tier]}</span>` : ""}</div>
-      <div class="price"><b>${odds(e.odds)}</b>${stake(e)}<small>${signed(e.ev * 100, 1)}% EV</small></div>
+      <div class="price"><b>${odds(e.odds)}</b><small>${signed(e.ev * 100, 1)}% EV</small>${stake(e)}</div>
       <div class="sub">${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}</div>
       <div class="gauge">${meter(e)}<span class="small muted">${needs(e)}</span></div>
       <p class="why">${esc(e.headline)}</p>
@@ -523,7 +523,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     $("hero").innerHTML = `<div class="ticket">${stamp(e)}
       <div class="t-head"><span class="t-kind">${kind}</span><span class="t-sport">${esc(e.sport_name)} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)} · ${timeOf(e)}</span></div>
       <h2>${esc(e.selection)}</h2>
-      <div class="t-row"><span class="t-odds">${odds(e.odds)}</span><span class="t-pay">${stake(e)}<br>${wins(e)}<br><b>wins ${pct(e.win_prob)}</b> on our numbers · needs ${pct(implied(e.odds))}</span></div>
+      <div class="t-row"><span class="t-odds">${odds(e.odds)}</span><span class="t-pay">${wins(e)}<br><b>wins ${pct(e.win_prob)}</b> on our numbers · needs ${pct(implied(e.odds))}<br>${stake(e)}</span></div>
       <p>${esc(e.headline)}</p>
       <div class="t-stub">${meter(e)}<span class="small muted">${esc(e.matchup)}</span><span>${statusText(e)} ${moveText(e)}</span>${addBtn(e)}</div>
     </div>`;
@@ -538,7 +538,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
       if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">Bet on it, the heat is coming</p></div>`;
       return `<div class="potd">${stamp(e)}<span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
-        <div class="price"><b>${odds(e.odds)}</b>${stake(e)}<span class="muted">${wins(e)}</span></div><p class="small">${needs(e)}</p>
+        <div class="price"><b>${odds(e.odds)}</b><span class="muted">${wins(e)}</span></div><p class="small">${needs(e)}</p>${stake(e)}
         <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${more(e)}</div>`;
     }).join("");
     const best = bestToday();
