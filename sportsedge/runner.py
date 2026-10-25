@@ -132,6 +132,12 @@ def run_cycle(
             legacy_scans, settings, now, taken_today=taken, best_taken=best_taken,
             posted_today=ledger.posted_today(now), posted_events=ledger.open_events(now),
         )]
+    if not held:
+        # Owner, Oct 25: shop every new money moneyline across the US books before it posts.
+        from . import shop
+        from .ledger import entry_id
+
+        shop.shop(cards, is_new=lambda c: entry_id(c.pick) not in ledger.entries)
     # Owner, Oct 23/25: a Lock or Dog always carries units; one the old board would post at 0u
     # ("Lean Dog", "best live dog... no units") is not posted at all. Leans stay leans.
     cards = [c for c in cards if not (c.tier in ("lock", "dog") and c.units <= 0)]

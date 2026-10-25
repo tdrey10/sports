@@ -911,6 +911,22 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <path d="${d}L${x(pts.length - 1)},${H}L${x(0)},${H}Z" fill="${col}" opacity=".12"/>
       <path d="${d}" fill="none" stroke="${col}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
   }
+  // Owner, Oct 25: judge picks on the price, not just W-L. A bet at a better number than the line
+  // closed at was a good bet even when it lost; over time that's what wins.
+  function priceCheck() {
+    const line = (list) => {
+      const done = list.filter((e) => e.settled && e.status !== "void" && e.close_odds != null && e.odds != null);
+      if (!done.length) return null;
+      const edge = done.map((e) => dec(e.odds) / dec(e.close_odds) - 1);
+      return { n: done.length, beat: edge.filter((x) => x > 1e-9).length, avg: edge.reduce((a, b) => a + b, 0) / done.length };
+    };
+    const money = line(DATA.entries.filter((e) => e.units > 0)), all = line(DATA.entries);
+    if (!all) return "";
+    const say = (r) => `got a better price than the closing line on <b>${r.beat} of ${r.n}</b> · average <span class="${cls(r.avg)}">${signed(r.avg * 100, 1)}%</span> on the price`;
+    return panel("Price check", "Did we get a better number than the line closed at? That's how you know the bets were good, win or lose",
+      `<ul class="reads">${money ? `<li>Money plays: ${say(money)}</li>` : ""}<li>Every pick: ${say(all)}</li></ul>`);
+  }
+
   function viewResults() {
     const st = DATA.stats;
     const sportRows = Object.entries(st.by_sport).map(([k, s]) => { const a = s.all || s;
@@ -928,7 +944,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         `<div class="table-wrap"><table><thead><tr><th></th><th>Money plays</th><th>Units</th><th>ROI</th><th>Leans</th></tr></thead><tbody>${line("Us", rv.ours)}${line(rv.theirs.reported ? "D503 <small>(his count)</small>" : "D503", rv.theirs)}</tbody></table></div>`
         + (today ? `<p class="small muted">D503's straight picks today:</p><ul class="small">${today}</ul>` : ""));
     })() : "";
-    return h2h + (sportRows ? panel("By sport", "Units come from money plays only · leans are a W-L, no units", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Money plays</th><th>All picks W-L</th><th>Win</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
+    return priceCheck() + h2h + (sportRows ? panel("By sport", "Units come from money plays only · leans are a W-L, no units", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Money plays</th><th>All picks W-L</th><th>Win</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
       + panel("By early-bet spot", "Each spot keeps its own record (W-L and how often it beat the closing line)", spotRows
           ? `<div class="table-wrap"><table><thead><tr><th>Spot</th><th>W-L</th><th>CLV</th></tr></thead><tbody>${spotRows}</tbody></table></div>`
           : empty("No graded picks in a spot yet."))
