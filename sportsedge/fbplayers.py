@@ -31,6 +31,9 @@ RB_SWING = 1.2  # yards per carry
 WR_SHARE = 0.6  # receiving yards at 60% of his season pace or less = cold (140%+ = hot)
 
 
+STORE_V = 2  # 2: defensive and interception rows kept
+
+
 def season_of(when: datetime) -> int:
     return when.year if when.month >= 7 else when.year - 1
 
@@ -110,7 +113,8 @@ def collect(client, sport: str, now: datetime, root="data", budget: int = 60) ->
     for when, r in reversed(_finished(root, sport, season, now)):
         if added >= budget:
             break
-        if r["event_id"] in store:
+        # Games saved before defense was kept (no "v") are read again so tackles, sacks and picks count.
+        if store.get(r["event_id"], {}).get("v", 0) >= STORE_V:
             continue
         try:
             rows = parse(client.summary(SPORTS[sport], r["event_id"]))
@@ -118,7 +122,8 @@ def collect(client, sport: str, now: datetime, root="data", budget: int = 60) ->
             log.info("%s box score %s failed: %s", sport, r["event_id"], exc)
             continue
         if rows:
-            store[r["event_id"]] = {"date": when.isoformat(), "home": r["home"], "away": r["away"], "rows": rows}
+            store[r["event_id"]] = {"date": when.isoformat(), "home": r["home"], "away": r["away"], "rows": rows,
+                                    "v": STORE_V}
             added += 1
     if added:
         p = _path(root, sport, season)
@@ -184,7 +189,7 @@ def _roster(team: str, mine: dict, games: int, qb: str | None, ww: dict, out_nam
         o = 0.5 * (s(p, 2) + 20 * s(p, 3) - 45 * s(p, 4)) + s(ru, 1) + 20 * s(ru, 2) + s(re, 1) + 20 * s(re, 2)
         d = s(de, 0) + 4 * s(de, 1) + 2 * s(de, 2) + 2 * s(de, 3) + 2 * s(de, 4) + 6 * s(it, 0)
         gp = max(len(x) for x in (p, ru, re, de, it))
-        if o >= d:
+        if o >= d or not (de or it):  # no defensive line at all = offense (a QB whose picks sink him below 0)
             off[n] = max(o, 0.0)
             role = "QB" if p and s(p, 1) >= 10 else "RB" if s(ru, 0) > s(re, 0) else "WR/TE"
             bits = []

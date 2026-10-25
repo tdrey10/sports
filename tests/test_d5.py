@@ -152,3 +152,33 @@ def test_a_gated_dog_needs_no_other_reason():
     assert not good(dog)
     dog.dog_score, dog.dog_p = 7.1, 0.41  # past the college gate: his Wyoming +180
     assert good(dog)
+
+
+def test_injuries_cost_what_the_player_means_not_his_position_group():
+    """Owner, Oct 25: the 49ers were a 3u Lock with Bosa and two starting receivers out, because the
+    Falcons' backup RB and WR (two position groups) cost Atlanta more than all of it."""
+    from sportsedge.d5.board import _injury_pen
+
+    niners = {"qb": "Brock Purdy", "tiers": {"Nick Bosa": "Key", "Mike Evans": "Starter", "Deebo Samuel Sr.": "Starter",
+                                             "Garret Wallow": "Rotation", "Brock Purdy": "Key"}}
+    falcons = {"qb": "Michael Penix Jr.", "tiers": {"Brian Robinson Jr.": "Starter", "Beaux Collins": "Bench",
+                                                    "Michael Penix Jr.": "Key"}}
+    sf_out = [("Nick Bosa", "DE"), ("Mike Evans", "WR"), ("Deebo Samuel Sr.", "WR"), ("Garret Wallow", "LB")]
+    atl_out = [("Brian Robinson Jr.", "RB"), ("Beaux Collins", "WR"), ("Billy Bowman Jr.", "S")]
+    assert _injury_pen("nfl", atl_out) == (0.10, False)  # the old position table: two groups
+    sf, _ = _injury_pen("nfl", sf_out, niners)
+    atl, _ = _injury_pen("nfl", atl_out, falcons)
+    assert round(sf, 3) == 0.085 and round(atl, 3) == 0.02  # Bosa matters; a backup doesn't
+    assert _injury_pen("nfl", [("Brock Purdy", "QB")], niners) == (0.08, True)
+    assert _injury_pen("nfl", [("Mac Jones", "QB")], niners) == (0.0, False)  # the backup QB out
+    assert _injury_pen("nfl", sf_out + [("Brock Purdy", "QB")], niners)[0] == 0.10  # capped
+    assert round(_injury_pen("ncaaf", sf_out, niners)[0], 4) == 0.0425  # college: half the points
+
+
+def test_a_lock_far_over_the_market_is_one_unit():
+    far = side(-142, 0.71, 0.68, p_market=0.567, sport="nfl")
+    far.w_p = 0.71
+    assert lock_units(far) == 1.0  # 14 points over the market: we're missing something
+    near = side(-142, 0.64, 0.64, p_market=0.58, sport="nfl")
+    near.w_p = 0.64
+    assert lock_units(near) == 3.0
