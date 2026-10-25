@@ -112,7 +112,7 @@ def run(picks: list[dict], sides: list[Side], posted: dict[tuple[str, str], str]
         if row["status"] != "caught":
             print(f"D503 miss: {h['league']} {h['team']} {h['american']:+} {h['kind']} {h['units']}u "
                   f"(his read {h['p'] or 0:.1%}, dog score {h['dog_score']}) - " + "; ".join(row["why"]))
-    if path is not None:
+    if path is not None and rows:
         p = Path(path)
         try:
             old = json.loads(p.read_text())
