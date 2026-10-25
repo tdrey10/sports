@@ -64,6 +64,7 @@ def shop(cards, is_new=lambda c: True, client: SharpClient | None = None) -> int
                 old_book, old = c.pick.book, c.pick.american
                 c.pick = replace(c.pick, american=price, book=name,
                                  ev=c.pick.win_prob * american_to_decimal(price) - 1)
+                c.headline = c.headline.replace(f"{old:+.0f}", f"{price:+.0f}")  # it was written at the board's price
                 c.reasons.insert(1, f"💸 Best price: {name} {price:+.0f} (the board had {old_book} {old:+.0f}). "
                                     f"Checked {n} books. Bet it there.")
                 better += 1
