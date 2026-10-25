@@ -3697,5 +3697,536 @@
    "proven": 0,
    "strong": 0
   }
+ },
+ "nhl": {
+  "rows": [
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "due vs lucky: unlucky team vs a lucky one (6+ pts each way)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 43,
+     "won": 20,
+     "lost": 23,
+     "push": 0,
+     "units": 5.42,
+     "roi": 0.12604651162790698,
+     "flat_roi": 0.12604651162790698,
+     "se": 0.18876122938878004,
+     "proven": false
+    },
+    "blind": {
+     "bets": 47,
+     "won": 20,
+     "lost": 27,
+     "push": 0,
+     "units": 2.61,
+     "roi": 0.055531914893617015,
+     "flat_roi": 0.055531914893617,
+     "se": 0.18410063624429426,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "due: 3+ net one-goal-game losses",
+    "verdict": "",
+    "in_sample": {
+     "bets": 1291,
+     "won": 478,
+     "lost": 813,
+     "push": 0,
+     "units": -87.96,
+     "roi": -0.06813323005422155,
+     "flat_roi": -0.06813323005422153,
+     "se": 0.034577472890603034,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1282,
+     "won": 490,
+     "lost": 792,
+     "push": 0,
+     "units": -72.44,
+     "roi": -0.05650546021840869,
+     "flat_roi": -0.05650546021840874,
+     "se": 0.034199006581662444,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "due: record 6+ pts under its point differential",
+    "verdict": "",
+    "in_sample": {
+     "bets": 289,
+     "won": 126,
+     "lost": 163,
+     "push": 0,
+     "units": 22.73,
+     "roi": 0.07865051903114187,
+     "flat_roi": 0.07865051903114186,
+     "se": 0.07427428056624638,
+     "proven": true
+    },
+    "blind": {
+     "bets": 381,
+     "won": 151,
+     "lost": 230,
+     "push": 0,
+     "units": -10.71,
+     "roi": -0.028110236220472432,
+     "flat_roi": -0.028110236220472453,
+     "se": 0.06260626492501166,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "due: slumping (last 10 games 1+ goals under its season)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 242,
+     "won": 99,
+     "lost": 143,
+     "push": 0,
+     "units": 1.45,
+     "roi": 0.005991735537190073,
+     "flat_roi": 0.005991735537190073,
+     "se": 0.07957835844588952,
+     "proven": false
+    },
+    "blind": {
+     "bets": 329,
+     "won": 133,
+     "lost": 196,
+     "push": 0,
+     "units": -3.65,
+     "roi": -0.011094224924012172,
+     "flat_roi": -0.011094224924012158,
+     "se": 0.06779732159291935,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "fade: 3+ net one-goal-game wins",
+    "verdict": "",
+    "in_sample": {
+     "bets": 1445,
+     "won": 535,
+     "lost": 910,
+     "push": 0,
+     "units": -127.45,
+     "roi": -0.08820069204152242,
+     "flat_roi": -0.08820069204152249,
+     "se": 0.031928642031894154,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1494,
+     "won": 597,
+     "lost": 897,
+     "push": 0,
+     "units": -41.77,
+     "roi": -0.02795850066934404,
+     "flat_roi": -0.02795850066934405,
+     "se": 0.031480800108682726,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "fade: hot team (last 10 games 1+ goals over its season)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 264,
+     "won": 100,
+     "lost": 164,
+     "push": 0,
+     "units": -15.08,
+     "roi": -0.05712121212121212,
+     "flat_roi": -0.05712121212121212,
+     "se": 0.07604512544045909,
+     "proven": false
+    },
+    "blind": {
+     "bets": 341,
+     "won": 137,
+     "lost": 204,
+     "push": 0,
+     "units": -8.05,
+     "roi": -0.023607038123167123,
+     "flat_roi": -0.023607038123167154,
+     "se": 0.06576787734961426,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "fade: record 6+ pts over its point differential",
+    "verdict": "",
+    "in_sample": {
+     "bets": 333,
+     "won": 127,
+     "lost": 206,
+     "push": 0,
+     "units": -24.2,
+     "roi": -0.07267267267267268,
+     "flat_roi": -0.07267267267267268,
+     "se": 0.06594936762445763,
+     "proven": false
+    },
+    "blind": {
+     "bets": 371,
+     "won": 164,
+     "lost": 207,
+     "push": 0,
+     "units": 18.75,
+     "roi": 0.0505390835579515,
+     "flat_roi": 0.05053908355795148,
+     "se": 0.062420780547240984,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "fade: slumping team (last 10 games 1+ goals under its season)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 196,
+     "won": 81,
+     "lost": 115,
+     "push": 0,
+     "units": -1.97,
+     "roi": -0.010051020408163268,
+     "flat_roi": -0.010051020408163271,
+     "se": 0.08557010148514993,
+     "proven": false
+    },
+    "blind": {
+     "bets": 249,
+     "won": 103,
+     "lost": 146,
+     "push": 0,
+     "units": -0.94,
+     "roi": -0.0037751004016064807,
+     "flat_roi": -0.003775100401606436,
+     "se": 0.07666308825219022,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "ride: hot (last 10 games 1+ goals over its season)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 182,
+     "won": 70,
+     "lost": 112,
+     "push": 0,
+     "units": -12.57,
+     "roi": -0.06906593406593407,
+     "flat_roi": -0.06906593406593407,
+     "se": 0.08935466073236636,
+     "proven": false
+    },
+    "blind": {
+     "bets": 250,
+     "won": 94,
+     "lost": 156,
+     "push": 0,
+     "units": -20.41,
+     "roi": -0.08163999999999985,
+     "flat_roi": -0.08164000000000002,
+     "se": 0.07659316479407735,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "due vs lucky: unlucky team vs a lucky one (6+ pts each way)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 36,
+     "won": 21,
+     "lost": 15,
+     "push": 0,
+     "units": 1.86,
+     "roi": 0.05153242072105172,
+     "flat_roi": 0.051532420721051735,
+     "se": 0.15071098902048796,
+     "proven": false
+    },
+    "blind": {
+     "bets": 32,
+     "won": 16,
+     "lost": 16,
+     "push": 0,
+     "units": -4.26,
+     "roi": -0.13299030691182293,
+     "flat_roi": -0.13299030691182293,
+     "se": 0.15634303430853277,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "due: 3+ net one-goal-game losses",
+    "verdict": "",
+    "in_sample": {
+     "bets": 700,
+     "won": 384,
+     "lost": 316,
+     "push": 0,
+     "units": -17.82,
+     "roi": -0.025457563551445232,
+     "flat_roi": -0.02545756355144525,
+     "se": 0.03358434133673875,
+     "proven": false
+    },
+    "blind": {
+     "bets": 899,
+     "won": 462,
+     "lost": 437,
+     "push": 0,
+     "units": -80.84,
+     "roi": -0.08992491512514685,
+     "flat_roi": -0.0899249151251467,
+     "se": 0.029664315920493817,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "due: record 6+ pts under its point differential",
+    "verdict": "",
+    "in_sample": {
+     "bets": 224,
+     "won": 118,
+     "lost": 106,
+     "push": 0,
+     "units": -16.02,
+     "roi": -0.07151220899195947,
+     "flat_roi": -0.0715122089919595,
+     "se": 0.059157752346858175,
+     "proven": false
+    },
+    "blind": {
+     "bets": 287,
+     "won": 145,
+     "lost": 142,
+     "push": 0,
+     "units": -29.68,
+     "roi": -0.10342338006308713,
+     "flat_roi": -0.10342338006308721,
+     "se": 0.05268403463546037,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "due: slumping (last 10 games 1+ goals under its season)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 168,
+     "won": 82,
+     "lost": 86,
+     "push": 0,
+     "units": -24.35,
+     "roi": -0.144963015225676,
+     "flat_roi": -0.144963015225676,
+     "se": 0.06801661919209837,
+     "proven": false
+    },
+    "blind": {
+     "bets": 231,
+     "won": 126,
+     "lost": 105,
+     "push": 0,
+     "units": -5.31,
+     "roi": -0.02296767032298855,
+     "flat_roi": -0.022967670322988555,
+     "se": 0.05908380440184739,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "fade: 3+ net one-goal-game wins",
+    "verdict": "",
+    "in_sample": {
+     "bets": 889,
+     "won": 497,
+     "lost": 392,
+     "push": 0,
+     "units": -2.89,
+     "roi": -0.003252249357286141,
+     "flat_roi": -0.003252249357286162,
+     "se": 0.02983342252852602,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1095,
+     "won": 543,
+     "lost": 552,
+     "push": 0,
+     "units": -127.1,
+     "roi": -0.11607112560820129,
+     "flat_roi": -0.11607112560820107,
+     "se": 0.02705246754154783,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "fade: hot team (last 10 games 1+ goals over its season)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 183,
+     "won": 102,
+     "lost": 81,
+     "push": 0,
+     "units": -0.5,
+     "roi": -0.002715947877464799,
+     "flat_roi": -0.002715947877464809,
+     "se": 0.06615555132178548,
+     "proven": false
+    },
+    "blind": {
+     "bets": 241,
+     "won": 134,
+     "lost": 107,
+     "push": 0,
+     "units": -3.65,
+     "roi": -0.01515651610212714,
+     "flat_roi": -0.015156516102127144,
+     "se": 0.05705938648302936,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "fade: record 6+ pts over its point differential",
+    "verdict": "",
+    "in_sample": {
+     "bets": 242,
+     "won": 136,
+     "lost": 106,
+     "push": 0,
+     "units": -1.39,
+     "roi": -0.005755470716642607,
+     "flat_roi": -0.005755470716642626,
+     "se": 0.05682142300438389,
+     "proven": false
+    },
+    "blind": {
+     "bets": 306,
+     "won": 164,
+     "lost": 142,
+     "push": 0,
+     "units": -17.52,
+     "roi": -0.05726759049227336,
+     "flat_roi": -0.05726759049227338,
+     "se": 0.05045125270514772,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "fade: slumping team (last 10 games 1+ goals under its season)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 158,
+     "won": 82,
+     "lost": 76,
+     "push": 0,
+     "units": -11.44,
+     "roi": -0.07240931454673646,
+     "flat_roi": -0.07240931454673648,
+     "se": 0.0715400504957016,
+     "proven": false
+    },
+    "blind": {
+     "bets": 262,
+     "won": 130,
+     "lost": 132,
+     "push": 0,
+     "units": -32.68,
+     "roi": -0.12473606275707391,
+     "flat_roi": -0.12473606275707397,
+     "se": 0.054827817216898646,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL due",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "ride: hot (last 10 games 1+ goals over its season)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 201,
+     "won": 108,
+     "lost": 93,
+     "push": 0,
+     "units": -9.86,
+     "roi": -0.049054782414368954,
+     "flat_roi": -0.04905478241436897,
+     "se": 0.06266911298189923,
+     "proven": false
+    },
+    "blind": {
+     "bets": 290,
+     "won": 161,
+     "lost": 129,
+     "push": 0,
+     "units": -6.11,
+     "roi": -0.021069725203300686,
+     "flat_roi": -0.021069725203300707,
+     "se": 0.051769663459153424,
+     "proven": false
+    }
+   }
+  ],
+  "control": {
+   "spots": 200,
+   "proven": 0,
+   "strong": 0
+  }
  }
 }

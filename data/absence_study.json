@@ -1,0 +1,749 @@
+{
+ "nba": {
+  "games": 1358,
+  "tune_games": 814,
+  "rows": [
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline dog",
+    "variant": "back: full strength vs a team missing its top player",
+    "verdict": "",
+    "in_sample": {
+     "bets": 4,
+     "won": 1,
+     "lost": 3,
+     "push": 0,
+     "units": -1.98,
+     "roi": -0.495,
+     "flat_roi": -0.495,
+     "se": 0.505,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1,
+     "won": 0,
+     "lost": 1,
+     "push": 0,
+     "units": -1.0,
+     "roi": -1.0,
+     "flat_roi": -1.0,
+     "se": null,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline dog",
+    "variant": "back: team missing 2+ of its top 3",
+    "verdict": "",
+    "in_sample": {
+     "bets": 39,
+     "won": 14,
+     "lost": 25,
+     "push": 0,
+     "units": 2.12,
+     "roi": 0.054358974358974375,
+     "flat_roi": 0.05435897435897438,
+     "se": 0.23629272168240872,
+     "proven": false
+    },
+    "blind": {
+     "bets": 69,
+     "won": 21,
+     "lost": 48,
+     "push": 0,
+     "units": -13.53,
+     "roi": -0.1960869565217391,
+     "flat_roi": -0.19608695652173916,
+     "se": 0.1502738644289323,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline dog",
+    "variant": "back: team missing 25%+ of its production",
+    "verdict": "",
+    "in_sample": {
+     "bets": 123,
+     "won": 46,
+     "lost": 77,
+     "push": 0,
+     "units": 5.09,
+     "roi": 0.041382113821138204,
+     "flat_roi": 0.04138211382113821,
+     "se": 0.12703522801325942,
+     "proven": false
+    },
+    "blind": {
+     "bets": 147,
+     "won": 49,
+     "lost": 98,
+     "push": 0,
+     "units": -17.5,
+     "roi": -0.11904761904761904,
+     "flat_roi": -0.11904761904761904,
+     "se": 0.10569706552741401,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline dog",
+    "variant": "back: team missing its top player",
+    "verdict": "",
+    "in_sample": {
+     "bets": 84,
+     "won": 29,
+     "lost": 55,
+     "push": 0,
+     "units": -1.34,
+     "roi": -0.01595238095238097,
+     "flat_roi": -0.01595238095238094,
+     "se": 0.15491786351563333,
+     "proven": false
+    },
+    "blind": {
+     "bets": 81,
+     "won": 28,
+     "lost": 53,
+     "push": 0,
+     "units": -9.91,
+     "roi": -0.12234567901234567,
+     "flat_roi": -0.12234567901234568,
+     "se": 0.13798978665964606,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline dog",
+    "variant": "fade: team missing 2+ of its top 3 (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 18,
+     "won": 7,
+     "lost": 11,
+     "push": 0,
+     "units": -1.08,
+     "roi": -0.059999999999999956,
+     "flat_roi": -0.059999999999999956,
+     "se": 0.287594258489873,
+     "proven": false
+    },
+    "blind": {
+     "bets": 39,
+     "won": 12,
+     "lost": 27,
+     "push": 0,
+     "units": -9.53,
+     "roi": -0.24435897435897438,
+     "flat_roi": -0.24435897435897438,
+     "se": 0.1886258980161565,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline dog",
+    "variant": "fade: team missing 25%+ of its production (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 68,
+     "won": 26,
+     "lost": 42,
+     "push": 0,
+     "units": -2.08,
+     "roi": -0.03058823529411762,
+     "flat_roi": -0.030588235294117635,
+     "se": 0.155422882072939,
+     "proven": false
+    },
+    "blind": {
+     "bets": 98,
+     "won": 33,
+     "lost": 65,
+     "push": 0,
+     "units": -15.27,
+     "roi": -0.1558163265306122,
+     "flat_roi": -0.15581632653061225,
+     "se": 0.12332768775330477,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline dog",
+    "variant": "fade: team missing its top player (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 52,
+     "won": 20,
+     "lost": 32,
+     "push": 0,
+     "units": -1.45,
+     "roi": -0.02788461538461538,
+     "flat_roi": -0.02788461538461538,
+     "se": 0.1755951604470721,
+     "proven": false
+    },
+    "blind": {
+     "bets": 68,
+     "won": 23,
+     "lost": 45,
+     "push": 0,
+     "units": -10.74,
+     "roi": -0.1579411764705882,
+     "flat_roi": -0.15794117647058825,
+     "se": 0.14722879992356389,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline favorite",
+    "variant": "back: full strength vs a team missing its top player",
+    "verdict": "",
+    "in_sample": {
+     "bets": 3,
+     "won": 2,
+     "lost": 1,
+     "push": 0,
+     "units": 0.69,
+     "roi": 0.23104056437389767,
+     "flat_roi": 0.23104056437389767,
+     "se": 0.6185449453209476,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1,
+     "won": 0,
+     "lost": 1,
+     "push": 0,
+     "units": -1.0,
+     "roi": -1.0,
+     "flat_roi": -1.0,
+     "se": null,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline favorite",
+    "variant": "back: team missing 2+ of its top 3",
+    "verdict": "",
+    "in_sample": {
+     "bets": 12,
+     "won": 6,
+     "lost": 6,
+     "push": 0,
+     "units": -1.22,
+     "roi": -0.10188409880300893,
+     "flat_roi": -0.10188409880300892,
+     "se": 0.2724331537125751,
+     "proven": false
+    },
+    "blind": {
+     "bets": 27,
+     "won": 16,
+     "lost": 11,
+     "push": 0,
+     "units": 1.31,
+     "roi": 0.048341868570700504,
+     "flat_roi": 0.048341868570700504,
+     "se": 0.1714809397347196,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline favorite",
+    "variant": "back: team missing 25%+ of its production",
+    "verdict": "",
+    "in_sample": {
+     "bets": 44,
+     "won": 22,
+     "lost": 22,
+     "push": 0,
+     "units": -4.84,
+     "roi": -0.11010886496406701,
+     "flat_roi": -0.110108864964067,
+     "se": 0.1364657310083871,
+     "proven": false
+    },
+    "blind": {
+     "bets": 57,
+     "won": 31,
+     "lost": 26,
+     "push": 0,
+     "units": -2.97,
+     "roi": -0.052077237350883376,
+     "flat_roi": -0.05207723735088339,
+     "se": 0.11660283075629753,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline favorite",
+    "variant": "back: team missing its top player",
+    "verdict": "",
+    "in_sample": {
+     "bets": 32,
+     "won": 16,
+     "lost": 16,
+     "push": 0,
+     "units": -3.44,
+     "roi": -0.10759654572443651,
+     "flat_roi": -0.1075965457244365,
+     "se": 0.16096873647945262,
+     "proven": false
+    },
+    "blind": {
+     "bets": 41,
+     "won": 24,
+     "lost": 17,
+     "push": 0,
+     "units": 0.27,
+     "roi": 0.006556200371195463,
+     "flat_roi": 0.006556200371195468,
+     "se": 0.13465799439226753,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline favorite",
+    "variant": "fade: team missing 2+ of its top 3 (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 16,
+     "won": 11,
+     "lost": 5,
+     "push": 0,
+     "units": 3.08,
+     "roi": 0.19260022060108467,
+     "flat_roi": 0.19260022060108473,
+     "se": 0.2091066854982941,
+     "proven": false
+    },
+    "blind": {
+     "bets": 30,
+     "won": 17,
+     "lost": 13,
+     "push": 0,
+     "units": -0.7,
+     "roi": -0.0234500512005441,
+     "flat_roi": -0.02345005120054411,
+     "se": 0.15948849191503447,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline favorite",
+    "variant": "fade: team missing 25%+ of its production (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 58,
+     "won": 29,
+     "lost": 29,
+     "push": 0,
+     "units": -7.35,
+     "roi": -0.12666271582365765,
+     "flat_roi": -0.12666271582365757,
+     "se": 0.1162841603072177,
+     "proven": false
+    },
+    "blind": {
+     "bets": 60,
+     "won": 33,
+     "lost": 27,
+     "push": 0,
+     "units": -2.67,
+     "roi": -0.044578231186670654,
+     "flat_roi": -0.04457823118667062,
+     "se": 0.11318114993799377,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "moneyline favorite",
+    "variant": "fade: team missing its top player (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 37,
+     "won": 20,
+     "lost": 17,
+     "push": 0,
+     "units": -1.72,
+     "roi": -0.04652976498916421,
+     "flat_roi": -0.04652976498916421,
+     "se": 0.14744411627394094,
+     "proven": false
+    },
+    "blind": {
+     "bets": 33,
+     "won": 17,
+     "lost": 16,
+     "push": 0,
+     "units": -4.02,
+     "roi": -0.12187514468307906,
+     "flat_roi": -0.12187514468307906,
+     "se": 0.15143073421527214,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "spread",
+    "variant": "back: full strength vs a team missing its top player",
+    "verdict": "",
+    "in_sample": {
+     "bets": 27,
+     "won": 17,
+     "lost": 10,
+     "push": 0,
+     "units": 5.27,
+     "roi": 0.1952854207282549,
+     "flat_roi": 0.19528542072825483,
+     "se": 0.1798386039430118,
+     "proven": false
+    },
+    "blind": {
+     "bets": 18,
+     "won": 12,
+     "lost": 6,
+     "push": 0,
+     "units": 4.91,
+     "roi": 0.2726060487143181,
+     "flat_roi": 0.2726060487143181,
+     "se": 0.21834957727190757,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "spread",
+    "variant": "back: team missing 2+ of its top 3",
+    "verdict": "",
+    "in_sample": {
+     "bets": 77,
+     "won": 33,
+     "lost": 44,
+     "push": 0,
+     "units": -13.85,
+     "roi": -0.17987860456107893,
+     "flat_roi": -0.17987860456107888,
+     "se": 0.108693079383611,
+     "proven": false
+    },
+    "blind": {
+     "bets": 223,
+     "won": 108,
+     "lost": 115,
+     "push": 0,
+     "units": -16.67,
+     "roi": -0.07476960930765507,
+     "flat_roi": -0.0747696093076551,
+     "se": 0.06410621789646621,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "spread",
+    "variant": "back: team missing 25%+ of its production",
+    "verdict": "",
+    "in_sample": {
+     "bets": 280,
+     "won": 135,
+     "lost": 145,
+     "push": 0,
+     "units": -22.25,
+     "roi": -0.07946473496837154,
+     "flat_roi": -0.07946473496837159,
+     "se": 0.05714248526169021,
+     "proven": false
+    },
+    "blind": {
+     "bets": 462,
+     "won": 231,
+     "lost": 231,
+     "push": 0,
+     "units": -20.59,
+     "roi": -0.04456822324176629,
+     "flat_roi": -0.044568223241766305,
+     "se": 0.04451663126641324,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "spread",
+    "variant": "back: team missing its top player",
+    "verdict": "",
+    "in_sample": {
+     "bets": 196,
+     "won": 89,
+     "lost": 107,
+     "push": 0,
+     "units": -26.14,
+     "roi": -0.13338106235932276,
+     "flat_roi": -0.1333810623593228,
+     "se": 0.06807828422822552,
+     "proven": false
+    },
+    "blind": {
+     "bets": 254,
+     "won": 130,
+     "lost": 124,
+     "push": 0,
+     "units": -5.82,
+     "roi": -0.02291005419227738,
+     "flat_roi": -0.022910054192277367,
+     "se": 0.06001812411378643,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "spread",
+    "variant": "fade: team missing 2+ of its top 3 (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 77,
+     "won": 44,
+     "lost": 33,
+     "push": 0,
+     "units": 6.87,
+     "roi": 0.0892163138614074,
+     "flat_roi": 0.08921631386140737,
+     "se": 0.10826291168065359,
+     "proven": false
+    },
+    "blind": {
+     "bets": 223,
+     "won": 115,
+     "lost": 108,
+     "push": 0,
+     "units": -3.59,
+     "roi": -0.016086557467984194,
+     "flat_roi": -0.01608655746798422,
+     "se": 0.06401711384494489,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "spread",
+    "variant": "fade: team missing 25%+ of its production (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 280,
+     "won": 145,
+     "lost": 135,
+     "push": 0,
+     "units": -3.22,
+     "roi": -0.011485889566593108,
+     "flat_roi": -0.01148588956659312,
+     "se": 0.05712974498879216,
+     "proven": false
+    },
+    "blind": {
+     "bets": 462,
+     "won": 231,
+     "lost": 231,
+     "push": 0,
+     "units": -20.21,
+     "roi": -0.043752480954258176,
+     "flat_roi": -0.04375248095425825,
+     "se": 0.04455496592476877,
+     "proven": false
+    }
+   },
+   {
+    "study": "NBA absences",
+    "sport": "nba",
+    "market": "spread",
+    "variant": "fade: team missing its top player (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 196,
+     "won": 107,
+     "lost": 89,
+     "push": 0,
+     "units": 8.24,
+     "roi": 0.042027298386935086,
+     "flat_roi": 0.04202729838693508,
+     "se": 0.06809173187570773,
+     "proven": false
+    },
+    "blind": {
+     "bets": 254,
+     "won": 124,
+     "lost": 130,
+     "push": 0,
+     "units": -17.12,
+     "roi": -0.06739730008091709,
+     "flat_roi": -0.06739730008091711,
+     "se": 0.060057413515760966,
+     "proven": false
+    }
+   }
+  ],
+  "control": {
+   "spots": 300,
+   "proven": 0,
+   "strong": 0
+  }
+ },
+ "nhl": {
+  "games": 163,
+  "tune_games": 97,
+  "rows": [
+   {
+    "study": "NHL absences",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "fade: team missing 25%+ of its production (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 0,
+     "won": 0,
+     "lost": 0,
+     "push": 0,
+     "units": 0.0,
+     "roi": null,
+     "flat_roi": null,
+     "se": null,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1,
+     "won": 0,
+     "lost": 1,
+     "push": 0,
+     "units": -1.0,
+     "roi": -1.0,
+     "flat_roi": -1.0,
+     "se": null,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL absences",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "fade: team missing its top player (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 0,
+     "won": 0,
+     "lost": 0,
+     "push": 0,
+     "units": 0.0,
+     "roi": null,
+     "flat_roi": null,
+     "se": null,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1,
+     "won": 0,
+     "lost": 1,
+     "push": 0,
+     "units": -1.0,
+     "roi": -1.0,
+     "flat_roi": -1.0,
+     "se": null,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL absences",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "back: team missing 25%+ of its production",
+    "verdict": "",
+    "in_sample": {
+     "bets": 0,
+     "won": 0,
+     "lost": 0,
+     "push": 0,
+     "units": 0.0,
+     "roi": null,
+     "flat_roi": null,
+     "se": null,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1,
+     "won": 1,
+     "lost": 0,
+     "push": 0,
+     "units": 0.8,
+     "roi": 0.8,
+     "flat_roi": 0.8,
+     "se": null,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL absences",
+    "sport": "nhl",
+    "market": "moneyline favorite",
+    "variant": "back: team missing its top player",
+    "verdict": "",
+    "in_sample": {
+     "bets": 0,
+     "won": 0,
+     "lost": 0,
+     "push": 0,
+     "units": 0.0,
+     "roi": null,
+     "flat_roi": null,
+     "se": null,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1,
+     "won": 1,
+     "lost": 0,
+     "push": 0,
+     "units": 0.59,
+     "roi": 0.5882352941176472,
+     "flat_roi": 0.5882352941176472,
+     "se": null,
+     "proven": false
+    }
+   }
+  ],
+  "control": {
+   "spots": 172,
+   "proven": 0,
+   "strong": 0
+  }
+ }
+}
