@@ -76,3 +76,51 @@ def test_elo_matches_the_spec_on_our_history():
     from sportsedge.d5.features import tune_elo
 
     assert tune_elo(load("nfl"), "nfl") == (20, 40)  # his model.json: nfl K 20 HFA 40
+
+
+def test_qb_key_is_his_adjusted_yards_per_attempt():
+    from types import SimpleNamespace as NS
+
+    from sportsedge.d5.qb import QBIndex, starters
+
+    rows = [NS(team="A", player="Starter", stats={"passing.C/ATT_A": 30, "passing.YDS": 300, "passing.TD": 2, "passing.INT": 0}),
+            NS(team="A", player="Backup", stats={"passing.C/ATT_A": 3, "passing.YDS": 20}),
+            NS(team="B", player="Other", stats={"passing.C/ATT_A": 30, "passing.YDS": 200, "passing.TD": 1, "passing.INT": 1}),
+            NS(team="B", player="Runner", stats={"rushing.YDS": 90})]
+    qbs = starters(rows)
+    assert qbs["A"][0] == "Starter" and qbs["B"][0] == "Other"
+    idx = QBIndex({"g1": {"date": "2026-10-10T19:00:00+00:00", "teams": qbs}})
+    a = (300 + 40 + 480) / 110
+    b = (200 + 20 - 45 + 480) / 110
+    assert abs(idx.key_edge("A", "B", NOW) - (a - b) / 2) < 1e-9
+    assert idx.key_edge("A", "Unknown", NOW) == 0.0  # a QB we haven't seen is never guessed
+    assert idx.key_edge("A", "B", datetime(2026, 10, 1, tzinfo=timezone.utc)) == 0.0  # only starts before the game
+
+
+def test_his_published_blend_and_weights_are_used():
+    from sportsedge.d5.features import FEATURES
+    from sportsedge.d5.model import SportModel, published
+
+    m = published(SportModel("ncaaf", 37.5, 100, [0.0] * (len(FEATURES) + 1), blend=[0.0, 0.0, 0.0, 0.11]))
+    assert m.blend == [0.0, 0.0112, -0.0651, 0.2029] and m.fit_blend == [0.0, 0.0, 0.0, 0.11]
+    assert m.w[1 + FEATURES.index("key")] == 0.309
+    assert published(m).fit_blend == [0.0, 0.0, 0.0, 0.11]  # applying it twice keeps our own fit
+
+
+def test_dog_score_bye_and_ice_cold_fire():
+    from types import SimpleNamespace as NS
+
+    from sportsedge.d5.board import _dog_scores
+    from sportsedge.d5.features import TeamState
+
+    dog = side(310, 0.288, 0.288, p_market=0.234, sport="ncaaf", eid="i", side="home")
+    fav = side(-395, 0.712, 0.712, p_market=0.766, sport="ncaaf", eid="i", side="away")
+    dog.team, fav.team = "Illinois", "Oregon"
+    td = TeamState(last=dog.start - timedelta(days=14), last_won=True, margins=[20, 15, -10, -12, 1], streak=1)
+    tf = TeamState(last=dog.start - timedelta(days=7), last_won=True, margins=[10, 7], streak=2)
+    _dog_scores([dog, fav], NS(teams={"Illinois": td, "Oregon": tf}))
+    notes = " ".join(dog.notes)
+    assert "off a bye" in notes  # 14 days off (the old check read rest capped at 10 and never fired)
+    assert "ice cold" in notes
+    assert round(dog.dog_score, 2) == round(5.4 - 1, 2)  # his Illinois: +5.4 base, +2 bye, -3 ice cold = 4.4
+    assert dog.dog_p is not None  # past the college gate of 4

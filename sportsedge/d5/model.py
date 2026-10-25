@@ -22,6 +22,26 @@ import numpy as np
 from .data import Game, load
 from .features import FEATURES, Replay, logit, sigmoid, tune_elo
 
+# Owner, Oct 25 (Illinois +310, his 2u Dog we passed on): the blend and calibration numbers his spec
+# publishes are the formula. Our own 900-game fit drifted from them (college home-dog lift .117 vs
+# his .203), so the board uses his; ours is kept in fit_blend for comparison.
+PUBLISHED_BLEND = {  # trust, move_w, cal, hdog
+    "nfl": [0.1451, 0.1081, 0.0150, -0.0658],
+    "ncaaf": [0.0, 0.0112, -0.0651, 0.2029],
+    "nba": [0.1464, 0.4441, 0.1400, 0.0293],
+    "mlb": [0.3245, -0.1165, 0.2806, 0.0259],
+    "nhl": [0.0940, 0.0785, 0.0984, 0.0654],
+    "ncaab": [0.0470, -0.1936, 0.1211, 0.1882],
+}
+PUBLISHED_NHL = [0.1158, 0.0092]  # b2b, rest
+# Inputs we hold no history for (the injury count and the QB key) can't be learned from our data,
+# so they take his published weights.
+PUBLISHED_W = {  # (inj, key)
+    "nfl": (0.110, 0.255), "ncaaf": (-0.110, 0.309), "nba": (-0.061, 0.0),
+    "mlb": (0.244, 0.093), "nhl": (0.116, -0.042), "ncaab": (0.0, 0.0),
+}
+PUBLISHED_BIAS = {"mlb": -0.0106, "nfl": -0.0111, "ncaaf": 0.0, "nba": -0.0288, "ncaab": 0.0029, "nhl": 0.005}
+
 WARMUP = 0.25
 OWN_N = 8000
 BLEND_N = 900
@@ -63,6 +83,7 @@ class SportModel:
     accuracy: float | None = None
     games: int = 0
     blend_games: int = 0
+    fit_blend: list[float] | None = None  # our own fit, for comparison (the board uses blend)
 
     def own(self, f: dict) -> float:
         x = [1.0] + [f[k] for k in FEATURES]
@@ -133,6 +154,18 @@ def fit(sport: str, games: list[Game] | None = None, root: Path | str = "data") 
                     won.append(y_)
         if len(said) >= 200:
             model.bias = float(min(max(np.mean(won) - np.mean(said), -0.06), 0.02))
+    return published(model)
+
+
+def published(model: SportModel) -> SportModel:
+    """His published blend, hockey formula and calibration replace our fitted ones."""
+    if model.fit_blend is None:
+        model.fit_blend = model.nhl if model.sport == "nhl" else model.blend
+    model.blend = list(PUBLISHED_BLEND[model.sport])
+    model.nhl = list(PUBLISHED_NHL)
+    model.bias = PUBLISHED_BIAS[model.sport]
+    for name, v in zip(("inj", "key"), PUBLISHED_W[model.sport]):
+        model.w[1 + FEATURES.index(name)] = v
     return model
 
 

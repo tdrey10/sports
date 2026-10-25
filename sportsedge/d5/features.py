@@ -4,7 +4,8 @@ Spec (D503 part 2, sections 3-4): Elo from 1500 with a learned home edge (0 at n
 margin-of-victory multiplier, and a one-time pull of 1/3 toward 1500 after a 75+ day break. The
 inputs are elo, form, rest, b2b, inj, key, revenge, letdown, bye, short, intl, alt, cold, weather,
 travel. inj and key need injury / player history we don't hold for past seasons, so they are 0
-in training and filled from today's injury report on the live board.
+in training (they take his published weights, see model.PUBLISHED_W); on the live board inj comes
+from today's injury report and key from the QB box scores (qb.py, football).
 """
 
 from __future__ import annotations
@@ -53,6 +54,9 @@ class TeamState:
     streak: int = 0  # + wins in a row, - losses in a row
     season_w: int = 0
     season_l: int = 0
+    margins: list = field(default_factory=list)  # this season's margins, in order
+    last_ml: float | None = None  # its moneyline in the last game
+    last_pts: float | None = None  # points it scored in the last game
 
 
 class Replay:
@@ -77,6 +81,7 @@ class Replay:
             t.form.clear()
             t.streak = 0
             t.season_w = t.season_l = 0
+            t.margins = []
 
     def ratings(self, g: Game) -> tuple[float, float]:
         h, a = self.teams[g.home], self.teams[g.away]
@@ -142,10 +147,12 @@ class Replay:
         a.rating -= d
         h.form.append(res - pe)
         a.form.append((1 - res) - (1 - pe))
-        for t, m, won in ((h, g.hs - g.as_, res == 1.0), (a, g.as_ - g.hs, res == 0.0)):
+        for t, m, won, ml, pts in ((h, g.hs - g.as_, res == 1.0, g.ml_h, g.hs), (a, g.as_ - g.hs, res == 0.0, g.ml_a, g.as_)):
             t.games += 1
             t.last = g.start
             t.last_margin = m
+            t.margins.append(m)
+            t.last_ml, t.last_pts = ml, pts
             t.last_won = won if res != 0.5 else None
             if res == 0.5:
                 t.streak = 0

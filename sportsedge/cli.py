@@ -693,9 +693,17 @@ def cmd_forecast_study(args) -> int:
 
 def cmd_d5_fit(args) -> int:
     """Refit the D503 engine: Elo K / home edge, the own-read model and the market blend per sport."""
-    from .d5 import model
+    from .d5 import model, qb
+    from .data.espn import EspnClient
 
     data_dir = Path(args.data_dir)
+    # Football QB starters from ESPN box scores (the spec's "key" input), this season, newest first.
+    client = EspnClient()
+    for sport in qb.QB_SPORTS:
+        try:
+            print(f"D503 {sport}: {qb.collect(sport, client, datetime.now(timezone.utc), data_dir)} new QB box scores")
+        except Exception as exc:  # no box scores today: the board reads the QBs it already has
+            print(f"D503 {sport}: QB box scores failed ({exc})")
     models = {}
     for sport in ("nfl", "ncaaf", "nba", "mlb", "nhl", "ncaab"):
         try:
