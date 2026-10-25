@@ -19,6 +19,7 @@ from ..tiers import Card
 from .data import Game, load
 from .features import FEATURES, Replay, logit, sigmoid
 from .model import SportModel, dec, fit, no_vig
+from .qb import QB_SPORTS, REASON_KEY, QBIndex, load_store
 
 log = logging.getLogger(__name__)
 
@@ -154,6 +155,7 @@ def build_sides(scan, model: SportModel, now: datetime, root="data") -> list[Sid
     sport = scan.sport.key
     games, _ = history(sport, now, root)
     r = _state(sport, model, games)
+    qbs = QBIndex(load_store(sport, root)) if sport in QB_SPORTS else None
     by_event: dict[str, dict[str, Pick]] = {}
     for p in scan.picks:
         if p.market == "h2h" and p.side in ("home", "away") and p.market_prob is not None:
@@ -179,7 +181,8 @@ def build_sides(scan, model: SportModel, now: datetime, root="data") -> list[Sid
         g = Game(sport, eid, start, ctx.home, ctx.away, neutral=ctx.neutral,
                  tzo=hs.home_tz, elev=hs.home_elev)
         inj_h, inj_a = ctx.injured.get(ctx.home, []), ctx.injured.get(ctx.away, [])
-        info = r.features(g, inj_out=(len(inj_h), len(inj_a)))
+        key = qbs.key_edge(ctx.home, ctx.away, start) if qbs is not None else 0.0
+        info = r.features(g, inj_out=(len(inj_h), len(inj_a)), key=key)
         if info is None or info["known"] < 5:
             continue
         f = info["f"]
@@ -247,6 +250,8 @@ def _reasons(sd: Side, model: SportModel, move: float) -> None:
         R.append("opponent on a back-to-back")
     if f["inj"] * 5 * s >= 1 and w["inj"] > 0:
         R.append("opponent missing key players")
+    if f["key"] * s >= REASON_KEY and w["key"] > 0:
+        R.append("better QB play lately")
     if move * s >= 0.08:
         R.append("sharp money moving this way")
     for k, label in (("revenge", "revenge spot: lost the last meeting"), ("letdown", "opponent's letdown spot"),
@@ -289,8 +294,13 @@ def _dog_scores(sides: list[Side], r: Replay) -> None:
             if base > 12:
                 base = 0.0 if sp in ("nfl", "nba") else 12.0
             td, tf = r.teams[dog.team], r.teams[fav.team]
-            rest_d = 10.0 if td.last is None else min(10.0, (dog.start - td.last).total_seconds() / 86400)
-            rest_f = 10.0 if tf.last is None else min(10.0, (fav.start - tf.last).total_seconds() / 86400)
+            days_d = 99.0 if td.last is None else (dog.start - td.last).total_seconds() / 86400
+            days_f = 99.0 if tf.last is None else (fav.start - tf.last).total_seconds() / 86400
+            rest_d, rest_f = min(10.0, days_d), min(10.0, days_f)
+            football = sp in ("nfl", "ncaaf")
+            # A football dog off a blowout loss (NFL 21+, college 30+): the market overreacts.
+            overreact = football and td.last_margin is not None and td.last_margin <= (-21 if sp == "nfl" else -30) \
+                and days_d <= 21
             items: list[tuple[float, str]] = []
             add = lambda pts, why: items.append((pts, why))  # noqa: E731
             if sp in ("nhl", "nfl", "ncaaf", "nba") and dog.drift >= 0.02:
@@ -300,8 +310,12 @@ def _dog_scores(sides: list[Side], r: Replay) -> None:
             if sp in ("nfl", "ncaaf", "ncaab"):
                 if tf.last_won is False:
                     add(2, "the favorite lost its last game")
-                elif td.last_won is False and tf.last_won is True:
+                elif td.last_won is False and tf.last_won is True and not overreact:
                     add(-3, "we lost our last, they won theirs")
+            if overreact:
+                add(3, "off a blowout loss: the market overreacts")
+            if sp in ("nfl", "ncaaf", "mlb") and td.last_won and td.last_ml is not None and td.last_ml >= 200:
+                add(-3, "hangover: a dog again right after winning as a +200 dog")
             if sp == "nba" and td.last_won is True and tf.last_won is False:
                 add(-2, "we won our last, they lost theirs")
             if sp == "nhl":
@@ -325,6 +339,8 @@ def _dog_scores(sides: list[Side], r: Replay) -> None:
                     add(1, "Monday night dog")
                 if td.streak >= 3:
                     add(1, "3+ game win streak")
+                if td.last_pts is not None and td.last_pts <= 10 and days_d <= 21:
+                    add(1, "scored 10 or fewer last game")
                 if td.season_w == 0 and td.season_l == 2:
                     add(3, "an 0-2 team")
                 if dog.side == "home" and td.home_tz is not None and td.home_tz >= -5 and tf.home_tz is not None \
@@ -333,7 +349,7 @@ def _dog_scores(sides: list[Side], r: Replay) -> None:
             if sp in ("nfl", "ncaaf"):
                 if td.last_margin is not None and td.last_margin >= 17 and rest_d <= 21:
                     add(2, "off a 17+ point win")
-                if 13 <= rest_d <= 30 and rest_f <= 8:
+                if 13 <= days_d <= 30 and days_f <= 8:  # (the old check read rest capped at 10: never fired)
                     add(3 if sp == "nfl" else 2, "off a bye vs a team that played")
                 if dog.neutral and dog.own > dog.p_market:
                     add(1.5, "neutral site and our read is over the price")
@@ -343,6 +359,13 @@ def _dog_scores(sides: list[Side], r: Replay) -> None:
                     add(1.5, ".700+ record")
                 if td.streak <= -3:
                     add(-3, "3+ game losing streak")
+            if football:
+                ms = td.margins
+                cold = len(ms) >= 5 and sum(ms[-3:]) / 3 <= sum(ms) / len(ms) - 7
+                if cold:
+                    add(-3, "ice cold: last 3 games 7+ points worse than its season")
+                    if sp == "ncaaf" and td.streak <= -3:
+                        add(2, "ice cold and a losing streak together (net -4)")
             if sp == "nba":
                 if td.streak >= 3:
                     add(-2, "dog on a 3+ win streak")
