@@ -1,0 +1,792 @@
+{
+ "rows": [
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline dog",
+   "variant": "due vs lucky: unlucky team vs a lucky one (6+ pts each way)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 49,
+    "won": 20,
+    "lost": 29,
+    "push": 0,
+    "units": 2.72,
+    "roi": 0.055510204081632646,
+    "flat_roi": 0.05551020408163264,
+    "se": 0.18706720145238,
+    "proven": false
+   },
+   "blind": {
+    "bets": 52,
+    "won": 26,
+    "lost": 26,
+    "push": 0,
+    "units": 16.49,
+    "roi": 0.3171153846153846,
+    "flat_roi": 0.31711538461538463,
+    "se": 0.1921471784869278,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline dog",
+   "variant": "due: 3+ net close-game losses",
+   "verdict": "",
+   "in_sample": {
+    "bets": 654,
+    "won": 248,
+    "lost": 406,
+    "push": 0,
+    "units": 14.42,
+    "roi": 0.022048929663608566,
+    "flat_roi": 0.022048929663608566,
+    "se": 0.05287386617780646,
+    "proven": false
+   },
+   "blind": {
+    "bets": 653,
+    "won": 228,
+    "lost": 425,
+    "push": 0,
+    "units": -44.96,
+    "roi": -0.06885145482388973,
+    "flat_roi": -0.06885145482388974,
+    "se": 0.051107406888302113,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline dog",
+   "variant": "due: record 6+ pts under its point differential",
+   "verdict": "",
+   "in_sample": {
+    "bets": 386,
+    "won": 137,
+    "lost": 249,
+    "push": 0,
+    "units": -23.15,
+    "roi": -0.059974093264248726,
+    "flat_roi": -0.0599740932642487,
+    "se": 0.06625062575121878,
+    "proven": false
+   },
+   "blind": {
+    "bets": 339,
+    "won": 140,
+    "lost": 199,
+    "push": 0,
+    "units": 25.88,
+    "roi": 0.07634218289085541,
+    "flat_roi": 0.07634218289085545,
+    "se": 0.07202691505872359,
+    "proven": true
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline dog",
+   "variant": "due: slumping (last 5 games 8+ pts under its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 292,
+    "won": 130,
+    "lost": 162,
+    "push": 0,
+    "units": 60.29,
+    "roi": 0.20647260273972604,
+    "flat_roi": 0.20647260273972604,
+    "se": 0.08204071627561657,
+    "proven": true
+   },
+   "blind": {
+    "bets": 326,
+    "won": 112,
+    "lost": 214,
+    "push": 0,
+    "units": -36.28,
+    "roi": -0.1112883435582822,
+    "flat_roi": -0.11128834355828221,
+    "se": 0.0701685060689087,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline dog",
+   "variant": "fade: 3+ net close-game wins",
+   "verdict": "",
+   "in_sample": {
+    "bets": 706,
+    "won": 241,
+    "lost": 465,
+    "push": 0,
+    "units": -73.04,
+    "roi": -0.10345609065155809,
+    "flat_roi": -0.10345609065155806,
+    "se": 0.048243733195683355,
+    "proven": false
+   },
+   "blind": {
+    "bets": 852,
+    "won": 317,
+    "lost": 535,
+    "push": 0,
+    "units": -24.41,
+    "roi": -0.02865023474178403,
+    "flat_roi": -0.02865023474178404,
+    "se": 0.04445899721895484,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline dog",
+   "variant": "fade: hot team (last 5 games 8+ pts over its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 297,
+    "won": 110,
+    "lost": 187,
+    "push": 0,
+    "units": -6.32,
+    "roi": -0.02127946127946127,
+    "flat_roi": -0.02127946127946128,
+    "se": 0.07632515375063266,
+    "proven": false
+   },
+   "blind": {
+    "bets": 348,
+    "won": 122,
+    "lost": 226,
+    "push": 0,
+    "units": -31.73,
+    "roi": -0.0911781609195402,
+    "flat_roi": -0.09117816091954024,
+    "se": 0.0680037795728213,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline dog",
+   "variant": "fade: record 6+ pts over its point differential",
+   "verdict": "",
+   "in_sample": {
+    "bets": 309,
+    "won": 115,
+    "lost": 194,
+    "push": 0,
+    "units": -14.44,
+    "roi": -0.046731391585760514,
+    "flat_roi": -0.046731391585760514,
+    "se": 0.07264641610319107,
+    "proven": false
+   },
+   "blind": {
+    "bets": 347,
+    "won": 123,
+    "lost": 224,
+    "push": 0,
+    "units": -29.05,
+    "roi": -0.08371757925072039,
+    "flat_roi": -0.08371757925072046,
+    "se": 0.06821435613948797,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline dog",
+   "variant": "fade: slumping team (last 5 games 8+ pts under its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 224,
+    "won": 91,
+    "lost": 133,
+    "push": 0,
+    "units": 9.91,
+    "roi": 0.04424107142857144,
+    "flat_roi": 0.04424107142857143,
+    "se": 0.0875421184187372,
+    "proven": false
+   },
+   "blind": {
+    "bets": 282,
+    "won": 94,
+    "lost": 188,
+    "push": 0,
+    "units": -41.12,
+    "roi": -0.1458156028368795,
+    "flat_roi": -0.14581560283687944,
+    "se": 0.07392744200872468,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline dog",
+   "variant": "ride: hot (last 5 games 8+ pts over its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 261,
+    "won": 97,
+    "lost": 164,
+    "push": 0,
+    "units": -11.58,
+    "roi": -0.04436781609195403,
+    "flat_roi": -0.044367816091954025,
+    "se": 0.07934208734456004,
+    "proven": false
+   },
+   "blind": {
+    "bets": 294,
+    "won": 123,
+    "lost": 171,
+    "push": 0,
+    "units": 18.24,
+    "roi": 0.06204081632653061,
+    "flat_roi": 0.06204081632653061,
+    "se": 0.07526747021463226,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline favorite",
+   "variant": "due vs lucky: unlucky team vs a lucky one (6+ pts each way)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 36,
+    "won": 17,
+    "lost": 19,
+    "push": 0,
+    "units": -6.59,
+    "roi": -0.18298166960642323,
+    "flat_roi": -0.18298166960642318,
+    "se": 0.14625564506812117,
+    "proven": false
+   },
+   "blind": {
+    "bets": 28,
+    "won": 20,
+    "lost": 8,
+    "push": 0,
+    "units": 7.28,
+    "roi": 0.25984009073234277,
+    "flat_roi": 0.25984009073234277,
+    "se": 0.15473634279866186,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline favorite",
+   "variant": "due: 3+ net close-game losses",
+   "verdict": "",
+   "in_sample": {
+    "bets": 316,
+    "won": 162,
+    "lost": 154,
+    "push": 0,
+    "units": -30.9,
+    "roi": -0.09779363032378625,
+    "flat_roi": -0.09779363032378609,
+    "se": 0.049758582559313376,
+    "proven": false
+   },
+   "blind": {
+    "bets": 286,
+    "won": 165,
+    "lost": 121,
+    "push": 0,
+    "units": 5.42,
+    "roi": 0.01894461748500066,
+    "flat_roi": 0.01894461748500064,
+    "se": 0.05193646299904833,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline favorite",
+   "variant": "due: record 6+ pts under its point differential",
+   "verdict": "",
+   "in_sample": {
+    "bets": 225,
+    "won": 112,
+    "lost": 113,
+    "push": 0,
+    "units": -29.25,
+    "roi": -0.12998285703735632,
+    "flat_roi": -0.1299828570373564,
+    "se": 0.05860503078386763,
+    "proven": false
+   },
+   "blind": {
+    "bets": 168,
+    "won": 102,
+    "lost": 66,
+    "push": 0,
+    "units": 12.0,
+    "roi": 0.07145592936924405,
+    "flat_roi": 0.07145592936924407,
+    "se": 0.06704173324679717,
+    "proven": true
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline favorite",
+   "variant": "due: slumping (last 5 games 8+ pts under its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 138,
+    "won": 60,
+    "lost": 78,
+    "push": 0,
+    "units": -31.71,
+    "roi": -0.22981774363460095,
+    "flat_roi": -0.22981774363460097,
+    "se": 0.07533320270720799,
+    "proven": false
+   },
+   "blind": {
+    "bets": 162,
+    "won": 91,
+    "lost": 71,
+    "push": 0,
+    "units": -0.96,
+    "roi": -0.005954658469594056,
+    "flat_roi": -0.005954658469594049,
+    "se": 0.0695281550199897,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline favorite",
+   "variant": "fade: 3+ net close-game wins",
+   "verdict": "",
+   "in_sample": {
+    "bets": 353,
+    "won": 198,
+    "lost": 155,
+    "push": 0,
+    "units": -5.11,
+    "roi": -0.014489264887155984,
+    "flat_roi": -0.014489264887156047,
+    "se": 0.04666656043604156,
+    "proven": false
+   },
+   "blind": {
+    "bets": 416,
+    "won": 241,
+    "lost": 175,
+    "push": 0,
+    "units": 5.49,
+    "roi": 0.013198935830188134,
+    "flat_roi": 0.013198935830188132,
+    "se": 0.04261437551802993,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline favorite",
+   "variant": "fade: hot team (last 5 games 8+ pts over its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 164,
+    "won": 84,
+    "lost": 80,
+    "push": 0,
+    "units": -17.35,
+    "roi": -0.1057977974942296,
+    "flat_roi": -0.10579779749422966,
+    "se": 0.06861190109118183,
+    "proven": false
+   },
+   "blind": {
+    "bets": 168,
+    "won": 86,
+    "lost": 82,
+    "push": 0,
+    "units": -15.44,
+    "roi": -0.09189126174650841,
+    "flat_roi": -0.09189126174650844,
+    "se": 0.06900273232637232,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline favorite",
+   "variant": "fade: record 6+ pts over its point differential",
+   "verdict": "",
+   "in_sample": {
+    "bets": 189,
+    "won": 99,
+    "lost": 90,
+    "push": 0,
+    "units": -15.44,
+    "roi": -0.08168330606299627,
+    "flat_roi": -0.0816833060629963,
+    "se": 0.06408688667047593,
+    "proven": false
+   },
+   "blind": {
+    "bets": 159,
+    "won": 88,
+    "lost": 71,
+    "push": 0,
+    "units": -5.77,
+    "roi": -0.036271164594325646,
+    "flat_roi": -0.036271164594325646,
+    "se": 0.06920531242723398,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline favorite",
+   "variant": "fade: slumping team (last 5 games 8+ pts under its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 165,
+    "won": 84,
+    "lost": 81,
+    "push": 0,
+    "units": -16.97,
+    "roi": -0.10283927032831734,
+    "flat_roi": -0.10283927032831734,
+    "se": 0.06906402761392536,
+    "proven": false
+   },
+   "blind": {
+    "bets": 179,
+    "won": 95,
+    "lost": 84,
+    "push": 0,
+    "units": -12.61,
+    "roi": -0.07044076085692574,
+    "flat_roi": -0.07044076085692572,
+    "se": 0.06591242862676885,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "moneyline favorite",
+   "variant": "ride: hot (last 5 games 8+ pts over its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 163,
+    "won": 100,
+    "lost": 63,
+    "push": 0,
+    "units": 13.48,
+    "roi": 0.08271043759712184,
+    "flat_roi": 0.08271043759712184,
+    "se": 0.06790191808049713,
+    "proven": true
+   },
+   "blind": {
+    "bets": 190,
+    "won": 106,
+    "lost": 84,
+    "push": 0,
+    "units": -5.58,
+    "roi": -0.029359094261422983,
+    "flat_roi": -0.029359094261422962,
+    "se": 0.06312054909883287,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "spread",
+   "variant": "due vs lucky: unlucky team vs a lucky one (6+ pts each way)",
+   "verdict": "PROVEN",
+   "in_sample": {
+    "bets": 151,
+    "won": 80,
+    "lost": 70,
+    "push": 1,
+    "units": 2.81,
+    "roi": 0.01862997600392661,
+    "flat_roi": 0.01862997600392658,
+    "se": 0.07755831843775682,
+    "proven": false
+   },
+   "blind": {
+    "bets": 137,
+    "won": 80,
+    "lost": 56,
+    "push": 1,
+    "units": 16.87,
+    "roi": 0.1231307303470049,
+    "flat_roi": 0.12313073034700484,
+    "se": 0.08035975854110966,
+    "proven": true
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "spread",
+   "variant": "due: 3+ net close-game losses",
+   "verdict": "",
+   "in_sample": {
+    "bets": 1743,
+    "won": 859,
+    "lost": 843,
+    "push": 41,
+    "units": -60.43,
+    "roi": -0.03467193619291512,
+    "flat_roi": -0.03467193619291438,
+    "se": 0.022624142594342967,
+    "proven": false
+   },
+   "blind": {
+    "bets": 1805,
+    "won": 897,
+    "lost": 879,
+    "push": 29,
+    "units": -60.91,
+    "roi": -0.03374388770889246,
+    "flat_roi": -0.033743887708892265,
+    "se": 0.02232888172846258,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "spread",
+   "variant": "due: record 6+ pts under its point differential",
+   "verdict": "",
+   "in_sample": {
+    "bets": 1106,
+    "won": 535,
+    "lost": 546,
+    "push": 25,
+    "units": -59.13,
+    "roi": -0.05345881251372553,
+    "flat_roi": -0.05345881251372523,
+    "se": 0.028405290683101218,
+    "proven": false
+   },
+   "blind": {
+    "bets": 956,
+    "won": 508,
+    "lost": 426,
+    "push": 22,
+    "units": 37.99,
+    "roi": 0.03973827831571403,
+    "flat_roi": 0.039738278315714005,
+    "se": 0.030486479598566003,
+    "proven": true
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "spread",
+   "variant": "due: slumping (last 5 games 8+ pts under its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 764,
+    "won": 398,
+    "lost": 353,
+    "push": 13,
+    "units": 9.68,
+    "roi": 0.012666901801624905,
+    "flat_roi": 0.012666901801624695,
+    "se": 0.03424289533375499,
+    "proven": false
+   },
+   "blind": {
+    "bets": 959,
+    "won": 484,
+    "lost": 469,
+    "push": 6,
+    "units": -28.06,
+    "roi": -0.02926140544309104,
+    "flat_roi": -0.029261405443091144,
+    "se": 0.030774232777724796,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "spread",
+   "variant": "fade: 3+ net close-game wins",
+   "verdict": "",
+   "in_sample": {
+    "bets": 1886,
+    "won": 943,
+    "lost": 923,
+    "push": 20,
+    "units": -63.93,
+    "roi": -0.03389715267389143,
+    "flat_roi": -0.03389715267389056,
+    "se": 0.021891756899946168,
+    "proven": false
+   },
+   "blind": {
+    "bets": 2253,
+    "won": 1116,
+    "lost": 1110,
+    "push": 27,
+    "units": -92.32,
+    "roi": -0.040976639317787784,
+    "flat_roi": -0.04097663931778715,
+    "se": 0.020025328209902774,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "spread",
+   "variant": "fade: hot team (last 5 games 8+ pts over its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 791,
+    "won": 371,
+    "lost": 403,
+    "push": 17,
+    "units": -64.83,
+    "roi": -0.0819629735585486,
+    "flat_roi": -0.08196297355854856,
+    "se": 0.03361432136585951,
+    "proven": false
+   },
+   "blind": {
+    "bets": 939,
+    "won": 456,
+    "lost": 466,
+    "push": 17,
+    "units": -50.22,
+    "roi": -0.05347821506564498,
+    "flat_roi": -0.0534782150656448,
+    "se": 0.0309300685384402,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "spread",
+   "variant": "fade: record 6+ pts over its point differential",
+   "verdict": "",
+   "in_sample": {
+    "bets": 944,
+    "won": 483,
+    "lost": 451,
+    "push": 10,
+    "units": -11.53,
+    "roi": -0.012215525481305712,
+    "flat_roi": -0.012215525481305901,
+    "se": 0.030916966708093564,
+    "proven": false
+   },
+   "blind": {
+    "bets": 889,
+    "won": 438,
+    "lost": 442,
+    "push": 9,
+    "units": -42.69,
+    "roi": -0.04801899904703733,
+    "flat_roi": -0.04801899904703737,
+    "se": 0.03191609336940227,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "spread",
+   "variant": "fade: slumping team (last 5 games 8+ pts under its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 764,
+    "won": 353,
+    "lost": 398,
+    "push": 13,
+    "units": -76.62,
+    "roi": -0.10028311131866655,
+    "flat_roi": -0.10028311131866646,
+    "se": 0.03422949083713804,
+    "proven": false
+   },
+   "blind": {
+    "bets": 959,
+    "won": 469,
+    "lost": 484,
+    "push": 6,
+    "units": -55.81,
+    "roi": -0.05820040341013784,
+    "flat_roi": -0.058200403410137797,
+    "se": 0.030806030155310346,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA due",
+   "sport": "nba",
+   "market": "spread",
+   "variant": "ride: hot (last 5 games 8+ pts over its season)",
+   "verdict": "",
+   "in_sample": {
+    "bets": 791,
+    "won": 403,
+    "lost": 371,
+    "push": 17,
+    "units": -3.96,
+    "roi": -0.005004915081285291,
+    "flat_roi": -0.005004915081285398,
+    "se": 0.03359784335322215,
+    "proven": false
+   },
+   "blind": {
+    "bets": 939,
+    "won": 466,
+    "lost": 456,
+    "push": 17,
+    "units": -30.65,
+    "roi": -0.03263660734662477,
+    "flat_roi": -0.03263660734662484,
+    "se": 0.030945266727521303,
+    "proven": false
+   }
+  }
+ ],
+ "control": {
+  "spots": 300,
+  "proven": 0,
+  "strong": 0
+ }
+}
