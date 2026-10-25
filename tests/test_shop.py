@@ -21,14 +21,15 @@ class Client:
 
 def money(units=1.0, american=-115):
     p = make_pick(market="h2h", point=None, american=american, sport="nba", win_prob=0.552)
-    return Card(tier="value", units=units, headline="h", reasons=["first", "second"], sport="nba", sport_name="NBA",
+    return Card(tier="value", units=units, headline=f"Minnesota Timberwolves ML at {american:+.0f}: off a blowout win.", reasons=["first", "second"], sport="nba", sport_name="NBA",
                 pick=p, home="Minnesota Timberwolves", away="Toronto Raptors", proven="STRONG: test")
 
 
 def test_a_money_pick_moves_to_the_best_us_book_and_says_so():
     c, client = money(), Client()
     assert shop.shop([c], client=client) == 1 and client.calls == 1
-    assert (c.pick.book, c.pick.american) == ("FanDuel", -108)  # Pinnacle's -102 can't be bet from the US
+    assert (c.pick.book, c.pick.american) == ("FanDuel", -108)
+    assert c.headline == "Minnesota Timberwolves ML at -108: off a blowout win."  # Pinnacle's -102 can't be bet from the US
     assert c.reasons[1] == "💸 Best price: FanDuel -108 (the board had fanduel -115). Checked 2 books. Bet it there."
     assert abs(c.pick.ev - (0.552 * (1 + 100 / 108) - 1)) < 1e-9
 
