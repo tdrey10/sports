@@ -207,6 +207,28 @@ def _team_due(root: Path | str, season: int, now: datetime) -> dict[str, dict]:
     return out
 
 
+def _broad(pos: str) -> str:
+    """ESPN lists NBA players as G, F or C (sometimes PG/SG/SF/PF)."""
+    return {"PG": "G", "SG": "G", "SF": "F", "PF": "F"}.get(pos, pos)
+
+
+def _lineup(team: str, starts: list, this: dict, pos_of) -> dict[str, str]:
+    """PG/SG/SF/PF/C from the team's 5 most frequent starters over its last 5 games. ESPN only says
+    G, F or C, so the five are ordered guard -> big (G, F, C; within one, more assists and fewer
+    rebounds = the smaller spot) and handed PG, SG, SF, PF, C in that order."""
+    recent = sorted(starts)[-25:]
+    five = [n for n, _ in Counter(n for _, n, _ in recent).most_common(5)]
+    rank = {"G": 0, "F": 1, "C": 2}
+
+    def size(n: str) -> tuple:
+        line = this.get((team, n))
+        reb = line.per_game("reb") if line else 0.0
+        ast = line.per_game("ast") if line else 0.0
+        return rank.get(_broad(pos_of(n)), 1), reb - ast
+
+    return dict(zip(POSITIONS, sorted(five, key=size)))
+
+
 def build(now: datetime, root: Path | str = "data", injuries: dict | None = None,
           games_today: list[dict] | None = None, study: dict | None = None) -> dict:
     """The report the NBA tab shows. ``injuries``: team -> {"out": [(player, pos)], "questionable": [...]};
@@ -280,14 +302,7 @@ def build(now: datetime, root: Path | str = "data", injuries: dict | None = None
     due = _team_due(root, season, now)
     inj = injuries or {}
     for team in sorted(set(t for t, _ in this) | set(due) | set(inj)):
-        recent_starts = sorted(starts.get(team, []))[-25:]
-        cnt = Counter((n, pos_of(n) or p) for _, n, p in recent_starts)
-        lineup = {}
-        for (n, pos), _ in cnt.most_common():
-            slot = pos if pos in POSITIONS else {"G": "SG" if "PG" in lineup else "PG",
-                                                 "F": "SF" if "PF" in lineup else "PF"}.get(pos, pos)
-            if slot and slot not in lineup:
-                lineup[slot] = n
+        lineup = _lineup(team, starts.get(team, []), this, pos_of)
         t_inj = inj.get(team, {})
         out_names = {n for n, _ in t_inj.get("out", [])}
         q_names = {n for n, _ in t_inj.get("questionable", [])}
@@ -308,8 +323,9 @@ def build(now: datetime, root: Path | str = "data", injuries: dict | None = None
         for slot in POSITIONS:
             n = lineup.get(slot)
             if n and (n in out_names or n in q_names):
-                subs = sorted((p for p in players if p["team"] == team and p["pos"] == by_name.get((team, n), {}).get("pos")
-                               and p["name"] != n and p["name"] not in out_names), key=lambda p: -p["mpg"])
+                broad = _broad(by_name.get((team, n), {}).get("pos", ""))
+                subs = sorted((p for p in players if p["team"] == team and _broad(p["pos"]) == broad
+                               and p["name"] not in lineup.values() and p["name"] not in out_names), key=lambda p: -p["mpg"])
                 holes.append({"slot": slot, "starter": n, "status": "out" if n in out_names else "questionable",
                               "next": subs[0]["name"] if subs else None})
         teams[team] = {"lineup": lineup, "hurt": hurt, "holes": holes,
