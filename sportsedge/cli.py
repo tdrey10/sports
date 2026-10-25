@@ -883,7 +883,7 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--data-dir", default="data", help="where the pick ledger lives (default ./data)")
         sp.add_argument("--site", default="site", help="where the dashboard is written (default ./site)")
         sp.add_argument("--tz", default="America/Los_Angeles", help="time zone for 'today' (default Pacific)")
-        sp.add_argument("--start-bankroll", type=float, default=1000.0)
+        sp.add_argument("--start-bankroll", type=float, default=100_000.0)
         sp.add_argument("--history-days", type=int, default=14, help="demo only: days of simulated history")
         sp.add_argument("--odds-source", choices=["espn", "oddsapi"], default="espn",
                         help="espn (free, DraftKings lines) or oddsapi (many books, needs ODDS_API_KEY)")
