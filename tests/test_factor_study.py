@@ -82,3 +82,10 @@ def test_sick_players_come_off_the_injury_report():
         {"athlete": {"displayName": "Paul George"}, "details": {"type": "Knee"}, "shortComment": "knee soreness"},
         {"athlete": {"displayName": "Kelly Oubre Jr."}, "shortComment": "Oubre is out with the flu."}]}]}
     assert parse_illness(data) == {"Philadelphia 76ers": ["Joel Embiid", "Kelly Oubre Jr."]}
+
+
+def test_every_price_carries_its_team():
+    from sportsedge.cli import line_text
+
+    m = {"away": "Tampa Bay Buccaneers", "home": "Carolina Panthers", "away_ml": 130.0, "home_ml": -155.0, "spread": -3.0}
+    assert line_text(m) == "Tampa Bay Buccaneers +130 · Carolina Panthers -155 · spread: Carolina Panthers -3"

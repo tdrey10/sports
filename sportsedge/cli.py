@@ -652,6 +652,17 @@ def _nba_report(data_dir: Path, scans, now: datetime, budget: int = 40) -> None:
     _game_studies(client, data_dir, now)
 
 
+def line_text(m: dict) -> str:
+    """A game's prices with the team on every number (owner, Oct 25: the Bucs were read as the -155
+    favorite when Carolina was; unlabeled home/away columns can't be read backwards if nobody reads
+    them)."""
+    price = lambda v: "n/a" if v is None else f"{v:+.0f}" if v != 100 else "EVEN"  # noqa: E731
+    bits = [f"{m['away']} {price(m.get('away_ml'))}", f"{m['home']} {price(m.get('home_ml'))}"]
+    if m.get("spread") is not None:
+        bits.append(f"spread: {m['home']} {m['spread']:+g}" if m["spread"] else "spread: pick'em")
+    return " · ".join(bits)
+
+
 def _game_studies(client, data_dir: Path, now: datetime) -> None:
     """Owner, Oct 25: 'a study on every game played in every sport.' Each report's games get every
     situation each team is in and what the factor study (data/factor_study.json) says about it, plus
@@ -675,6 +686,7 @@ def _game_studies(client, data_dir: Path, now: datetime) -> None:
             continue
         n = 0
         for m in rep["matchups"]:
+            m["line"] = line_text(m)
             rows = studies.get(f"{m['away']} @ {m['home']}")
             if rows is not None:
                 m["study"] = rows
