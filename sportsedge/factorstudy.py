@@ -382,6 +382,25 @@ def _recent(root: Path, sport: str, names: dict[str, str], after: datetime) -> l
     return sorted(out, key=lambda g: g.start)
 
 
+_HIST: dict = {}
+
+
+def history(sport: str, root="data", lines_dir=None) -> tuple[list[G], dict[str, str]]:
+    """Every final we hold, oldest first (the archive, then last night's games from data/games), and
+    display name -> archive team id. Cached per run."""
+    root = Path(root)
+    lines_dir = Path(lines_dir) if lines_dir else root / "lines" / "espn"
+    key = (sport, str(root), str(lines_dir), datetime.now(timezone.utc).strftime("%Y-%m-%d %H"))
+    if key not in _HIST:
+        games = load(lines_dir / sport, sport)
+        names = _names(root, sport, games)
+        newer = _recent(root, sport, names, games[-1].start if games else datetime.min.replace(tzinfo=timezone.utc))
+        for g in newer:
+            g.season = games[-1].season if games else 0
+        _HIST[key] = (games + newer, names)
+    return _HIST[key]
+
+
 def load_results(path: Path) -> dict:
     """{sport: {(market, variant): row}} from data/factor_study.json."""
     import json
@@ -417,11 +436,9 @@ def game_study(sport: str, matchups: list[dict], root="data", lines_dir=None, re
     folder = lines_dir / sport
     if sport not in SPORTS or not any(folder.glob("*.csv.gz")) or not matchups:
         return {}
-    games = load(folder, sport)
-    names = _names(root, sport, games)
-    newer = _recent(root, sport, names, games[-1].start if games else datetime.min.replace(tzinfo=timezone.utc))
+    games, names = history(sport, root, lines_dir)
     tr = Tracker(sport)
-    for g in games + newer:
+    for g in games:
         tr._new_season(g.season or tr.season)
         tr.add(g)
     res = (results if results is not None else load_results(root / "factor_study.json")).get(sport, {})

@@ -53,6 +53,13 @@ GAP_CAP = 0.08
 # luck control. His formula hasn't been through one, yet his ladder posted the 49ers at 3u (Oct 25,
 # a loss). Until it passes, a D503 Lock or Dog is posted at no more than 1u.
 UNPROVEN_MAX = 1.0
+# The blind test of his board (owner, Oct 25: 'test D503's formula our way'): fit on games before July
+# 2022, his choose() replayed day by day on 2022-26 at closing prices. Only his NHL Lock passed (107
+# bets, 71-36, +14.7%, standard error 7.9%; up every season). Everything else posts at 0u (tiers.gate):
+# NFL money -0.8%, college football +0.2% (its Dogs +13.5% on 110, inside the noise), NBA -25.9%,
+# MLB -5.8%, college hoops -1.3%. Half a unit: it was found by looking, and it has no tuning check.
+PROVEN_TIERS = {("nhl", "lock"): "D503 NHL Lock: blind 2022-26, 107 bets, +14.7% (PROVEN)"}
+PROVEN_UNITS = 0.5
 
 _cache: dict[str, tuple[list[Game], Replay]] = {}
 _tiers: dict[str, dict] = {}
@@ -724,7 +731,13 @@ def build(scans, now: datetime, models: dict[str, SportModel], taken: set[str] |
     chosen += night_picks(sides, now, chosen, posted_events)
     chosen += choose_early(sides, now, posted_events)
     print(f"D503 board: {len(sides)} sides, " + ", ".join(f"{t} {s.team} {s.odds:+.0f} {u:g}u" for t, u, s, _ in chosen))
-    return [_card(t, u, s, label, names.get(s.sport, s.sport)) for t, u, s, label in chosen]
+    cards = [_card(t, u, s, label, names.get(s.sport, s.sport)) for t, u, s, label in chosen]
+    for c in cards:
+        tag = PROVEN_TIERS.get((c.sport, c.tier))
+        if tag and c.units > 0:
+            c.proven, c.units = tag, PROVEN_UNITS
+            c.reasons.insert(0, f"✅ Proven: {tag}.")
+    return cards
 
 
 __all__ = ["build", "build_sides", "choose", "Side", "D5_SPORTS"]

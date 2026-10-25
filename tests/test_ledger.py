@@ -30,7 +30,7 @@ def make_pick(market="spreads", side="home", point=-3.5, american=-110, player=N
 
 
 def card(pick, tier="value", units=1.0):
-    return Card(tier=tier, units=units, headline="h", reasons=["r"], sport=pick.sport,
+    return Card(tier=tier, units=units, headline="h", reasons=["r"], sport=pick.sport, proven="test",
                 sport_name="NFL", pick=pick, home="Home", away="Away")
 
 
@@ -179,7 +179,9 @@ def test_simulated_history_and_dashboard(tmp_path):
     res = run_cycle(provider, sports, L, legacy, provider.now)
     assert any(e.settled for e in L.entries.values())
     stats = L.stats(provider.now)
-    assert stats["overall"]["won"] + stats["overall"]["lost"] > 0
+    # Made-up teams pass no blind test, so every pick is 0u (owner's rule): they're graded with the leans.
+    assert stats["overall"]["won"] + stats["overall"]["lost"] == 0
+    assert stats["all_picks"]["won"] + stats["all_picks"]["lost"] > 0
     data = build_data(L, {**brains, **res.brains}, res.weights, sports, provider.now, demo=True)
     html = render_html(data)
     assert html.startswith("<!doctype html>") and "<title>Follow Me, Instead Of Your Dreams</title>" in html.split("<body>")[0]

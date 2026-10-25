@@ -474,7 +474,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     return "";
   }
   // A Lock or Dog posted with no units (old board, before Oct 25) shows as the lean it was.
-  const tierOf = (e) => (["lock", "dog"].includes(e.tier) && !(e.units > 0) ? "lean" : e.tier);
+  // Owner, Oct 25: only proven bets carry units; a Lock, Dog or value pick without units is a lean.
+  const tierOf = (e) => (["lock", "dog", "value"].includes(e.tier) && !(e.units > 0) ? "lean" : e.tier);
   const addBtn = () => "";  // straight bets only: no parlay slip
   const more = (e) => (e.reasons && e.reasons.length ? `<details class="more"><summary>Stats &amp; why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "");
   // A won bet gets a green "Cashed" stamp across it; a lost one gets a big red L.

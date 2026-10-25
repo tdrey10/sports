@@ -11,7 +11,7 @@ from .edge import Settings
 from .engine import Engine, SportScan
 from .ledger import Ledger
 from .sports import SPORTS, SportConfig
-from .tiers import BEST_BETS, build_cards
+from .tiers import BEST_BETS, build_cards, gate
 
 log = logging.getLogger(__name__)
 
@@ -100,19 +100,38 @@ def run_cycle(
             models = d5_models if d5_models is not None else load_models(d5_models_path)
             d5_cards = d5board.build(out.scans, now, models, taken=set(ledger.taken_today(now)),
                                      posted_events=set(ledger.open_events(now)), root=d5_root)
-    taken = set(ledger.taken_today(now)) | {c.tier for c in d5_cards if c.tier in ("lock", "dog")}
-    # Owner, Oct 25: the D503 money plays are the day's Top bets, biggest stake first; the old
-    # board fills whatever slots are left.
+    # Owner, Oct 25: only bets that passed a blind test get money. Every card without one goes to 0u
+    # (a Lock or Dog without one is a lean); the proven spots on today's games carry the units.
+    d5_cards = [gate(c) for c in d5_cards]
+    proven_cards: list = []
+    if not held:
+        from . import proven
+
+        try:
+            proven_cards = proven.find(out.scans, now, d5_root)
+        except Exception as exc:  # the proven finder never stops the board
+            log.warning("proven spots failed: %s", exc, exc_info=True)
+    taken = set(ledger.taken_today(now)) | {c.tier for c in d5_cards if c.tier in ("lock", "dog") and c.units > 0}
+    # The Lock and Dog come from proven bets only: the best proven favorite and the best proven dog.
+    for tier, is_it in (("lock", lambda c: c.pick.market == "h2h" and c.pick.american < 0),
+                        ("dog", lambda c: c.pick.market == "h2h" and c.pick.american > 0)):
+        if tier not in taken:
+            pick = next((c for c in proven_cards if is_it(c)), None)
+            if pick:
+                pick.tier = tier
+                taken.add(tier)
+    taken |= {"lock", "dog"}  # no unproven Lock or Dog from the old board either
     best_taken = ledger.best_taken(now)
-    if d503:
-        money = sorted((c for c in d5_cards if c.units > 0), key=lambda c: (c.units, c.pick.ev), reverse=True)
-        for c in money[:max(BEST_BETS - best_taken, 0)]:
-            best_taken += 1
-            c.best_rank = best_taken
-    cards = [] if held else d5_cards + build_cards(
-        legacy_scans, settings, now, taken_today=taken, best_taken=best_taken,
-        posted_today=ledger.posted_today(now), posted_events=ledger.open_events(now),
-    )
+    money = sorted((c for c in proven_cards + d5_cards if c.units > 0), key=lambda c: (c.units, c.pick.ev), reverse=True)
+    for c in money[:max(BEST_BETS - best_taken, 0)]:
+        best_taken += 1
+        c.best_rank = best_taken
+    proven_events = {c.pick.event_id for c in proven_cards}
+    cards = [] if held else proven_cards + [c for c in d5_cards if not (c.units == 0 and c.pick.event_id in proven_events)] + [
+        gate(c) for c in build_cards(
+            legacy_scans, settings, now, taken_today=taken, best_taken=best_taken,
+            posted_today=ledger.posted_today(now), posted_events=ledger.open_events(now),
+        )]
     # Owner, Oct 23/25: a Lock or Dog always carries units; one the old board would post at 0u
     # ("Lean Dog", "best live dog... no units") is not posted at all. Leans stay leans.
     cards = [c for c in cards if not (c.tier in ("lock", "dog") and c.units <= 0)]

@@ -90,6 +90,7 @@ class Card:
     best_rank: int | None = None  # 1..BEST_BETS for the day's best bets
     score: float | None = None  # edge score 0-100 (see edge.edge_score)
     spots: list[str] = field(default_factory=list)  # early-bet spots this pick is in (tracked separately)
+    proven: str = ""  # the blind test this bet passed; without one it can't carry units (gate below)
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -620,3 +621,18 @@ def build_cards(
             )
         )
     return cards
+
+
+NO_PROOF = "No units: this kind of bet hasn't beaten the books in a blind test yet (owner's rule: only proven bets get money)."
+
+
+def gate(card: Card) -> Card:
+    """Owner, Oct 25 ('go ahead with all four'): only bets that passed a blind test get money. Every
+    other card posts at 0u, and a Lock or Dog without one is a lean (a Lock or Dog always has units)."""
+    if card.units > 0 and not card.proven:
+        card.units, card.best_rank = 0.0, None
+        if card.tier in ("lock", "dog"):
+            card.tier = "lean"
+        if NO_PROOF not in card.reasons:
+            card.reasons.insert(0, NO_PROOF)
+    return card
