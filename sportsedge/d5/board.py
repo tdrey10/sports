@@ -222,7 +222,9 @@ def build_sides(scan, model: SportModel, now: datetime, root="data") -> list[Sid
                       p if s == 1 else 1 - p, ph_own if s == 1 else 1 - ph_own, raw if s == 1 else 1 - raw,
                       info["elo_pts"] * s, drift, f, s, team_games=ts.season_w + ts.season_l, intl=g.intl,
                       neutral=ctx.neutral,
-                      rest=info["rest_h"] if s == 1 else info["rest_a"], rest_opp=info["rest_a"] if s == 1 else info["rest_h"],
+                      # days since the last game, uncapped (the early "bye" spot needs 13+; the
+                      # model's rest input is capped at 10 and never saw one)
+                      rest=info["days_h"] if s == 1 else info["days_a"], rest_opp=info["days_a"] if s == 1 else info["days_h"],
                       last_margin=ts.last_margin, streak=ts.streak, record=(ts.season_w, ts.season_l),
                       venue_tz=hs.home_tz, team_tz=ts.home_tz, qb_out=qb_h if s == 1 else qb_a)
             _reasons(sd, model, move)

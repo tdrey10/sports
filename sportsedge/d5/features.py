@@ -127,7 +127,9 @@ class Replay:
             lag = lambda t: abs(g.tzo - t.home_tz) / 3 if t.home_tz is not None else 0.0  # noqa: E731
             f["travel"] = lag(a) - lag(h)
         known = min(h.games, a.games)
+        days = lambda t: 99.0 if t.last is None else (g.start - t.last).total_seconds() / 86400  # noqa: E731
         return {"f": f, "p_elo": pe, "known": known, "rest_h": rest_h, "rest_a": rest_a,
+                "days_h": days(h), "days_a": days(a),  # uncapped: a bye is 13+ days
                 "elo_pts": rh - ra + (0 if g.neutral else self.hfa), "rh": rh, "ra": ra}
 
     # ------------------------------------------------------------------ results
