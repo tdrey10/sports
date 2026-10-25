@@ -128,6 +128,8 @@ button, select { font: inherit; color: inherit; }
 .board .day small { font-size: 15px; }
 .board .day .yest b { font: 700 15px/1.2 var(--mono); }
 .board .day + .all { border-left: 0; }
+.board > div:nth-child(n+3) { grid-column: span 2; }
+.board .day .day-head { margin: 10px 0 0; font: 700 12px/1.2 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .board .day .usd { font: 700 18px/1.2 var(--mono); color: var(--ink, #fff); }
 .day-picks { list-style: none; margin: 8px auto 0; padding: 0; max-width: 520px; text-align: left; display: grid; gap: 6px; }
 .day-picks li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; font-size: 14px; padding: 6px 0; border-top: 1px solid var(--line); }
@@ -140,7 +142,7 @@ button, select { font: inherit; color: inherit; }
 .stake.lean { background: transparent; color: var(--muted); border: 1px solid var(--line); }
 .board .all + div { border-left: 0; }
 @media (max-width: 560px) { .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .board > div:nth-child(5) { border-left: 0; } .board > div:nth-child(n+5) { border-top: 1px solid var(--line); } }
+  .board > div:nth-child(n+3) { grid-column: span 1; } }
 
 /* ---------- tabs + filters ---------- */
 .tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; padding-block: 4px;
@@ -879,7 +881,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const todays = DATA.entries.filter((e) => e.units > 0 && e.status !== "void" && dayOf(e.commence_time) === nowDay())
       .sort((a, b) => a.commence_time.localeCompare(b.commence_time));
     const res = (e) => (e.settled ? `<b class="${cls(e.profit)}">${SETTLED[e.status]} ${signed(e.profit || 0, 2)}u</b>` : `<i>${isOpen(e) ? timeOf(e) : "playing"}</i>`);
-    const list = todays.length ? `<ul class="day-picks">${todays.map((e) => `<li><span>${esc(e.selection)} ${odds(e.odds)}</span><span>${uTxt(e.units)} (${usd(e.units * U())})</span>${res(e)}</li>`).join("")}</ul>` : "";
+    const list = todays.length ? `<p class="day-head">Today's money plays (the unit plays)</p><ul class="day-picks">${todays.map((e) => `<li><span>${esc(e.selection)} ${odds(e.odds)}</span><span>${uTxt(e.units)} (${usd(e.units * U())})</span>${res(e)}</li>`).join("")}</ul>` : "";
     const todayBox = `<div class="day"><span>Today's units · 1 unit = ${usd(U())}</span><b class="${td.graded ? cls(td.units) : ""}">${td.graded ? signed(td.units, 2) + "u" : "0u"}</b>
         <small class="usd">${td.graded ? usdSigned(td.units * U()) : "$0"}</small>
         <small>${tdLine}${openLine}</small>${list}
@@ -887,8 +889,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     $("scoreboard").innerHTML = todayBox + `<div class="all"><span>Season · money plays (the picks with units)</span><b class="${cls(o.units)}">${signed(o.units, 1)}u</b>
         <small>${o.dollars == null ? "" : usdSigned(o.dollars) + " · "}${rec(o)} · ${pct(o.win_pct)} won · ${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
       <div><span>Leans</span><b>${rec(lean)}</b><small>${pct(lean.won + lean.lost ? lean.won / (lean.won + lean.lost) : null)} won · no units, not bets</small></div>
-      <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${usd(st.bankroll)}</b><small>from ${usd(st.start_bankroll)} · 1 unit = ${usd(U())}</small></div>
-      <div><span>Beat the close</span><b>${pct(o.beat_close)}</b><small>avg CLV ${o.clv == null ? "–" : signed(o.clv * 100, 1) + "%"}</small></div>`;
+      <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${usd(st.bankroll)}</b><small>from ${usd(st.start_bankroll)} · 1 unit = ${usd(U())}</small></div>`;
     const counts = { today: bestToday().length, parlays: (DATA.parlays || []).filter((p) => p.day === today()).length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
       early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length, scores: liveGames(),
       predict: (DATA.forecasts || []).filter((f) => f.status === "pending" && pickedSport(f.sport)).length };
