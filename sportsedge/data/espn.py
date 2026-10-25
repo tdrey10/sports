@@ -278,8 +278,35 @@ def parse_injuries(data: dict) -> dict[str, list[tuple[str, str, str]]]:
             status = item.get("status") or (item.get("type") or {}).get("description") or ""
             position = (athlete.get("position") or {}).get("abbreviation") or ""
             if name:
-                players.append((name, status, position))
+                players.append((name, refine_status(status, item.get("shortComment") or item.get("longComment") or ""), position))
     return out
+
+
+_CALLS = {
+    "Probable": ("probable", "expected to play", "will play", "plans to play", "is available", "upgraded to available",
+                 "cleared to play", "good to go", "will suit up", "in the lineup"),
+    "Out": ("ruled out", "will not play", "won't play", "will miss", "is out for", "is out against", "will sit", "sidelined for"),
+    "Doubtful": ("doubtful",),
+    "Questionable": ("questionable", "game-time decision", "uncertain"),
+}
+
+
+def refine_status(status: str, comment: str) -> str:
+    """ESPN lists anyone short of fully healthy as 'Day-To-Day'; the call (probable, questionable,
+    doubtful, out) is in the written update. Owner, Oct 25: a probable player counts as playing.
+    The call named last wins ('upgraded from questionable to probable' -> Probable). An explicit
+    status (Out, Doubtful, Probable...) is kept as is."""
+    s = (status or "").strip()
+    if s.lower() not in ("day-to-day", "questionable", ""):
+        return s
+    c = (comment or "").lower()
+    best, at = None, -1
+    for call, words in _CALLS.items():
+        for w in words:
+            i = c.rfind(w)
+            if i > at:
+                best, at = call, i
+    return best or s
 
 
 def _parse_stat(raw: str) -> list[float] | None:
