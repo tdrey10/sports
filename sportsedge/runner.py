@@ -113,6 +113,9 @@ def run_cycle(
         legacy_scans, settings, now, taken_today=taken, best_taken=best_taken,
         posted_today=ledger.posted_today(now), posted_events=ledger.open_events(now),
     )
+    # Owner, Oct 23/25: a Lock or Dog always carries units; one the old board would post at 0u
+    # ("Lean Dog", "best live dog... no units") is not posted at all. Leans stay leans.
+    cards = [c for c in cards if not (c.tier in ("lock", "dog") and c.units <= 0)]
     out.published = len(ledger.publish(cards, now))
     if d503 and not held:
         _audit(ledger, now, d5_root)
