@@ -456,6 +456,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     if (e.status === "live" && e.live) return `<span class="live-dot">${esc(e.away)} ${e.live.away ?? ""}, ${esc(e.home)} ${e.live.home ?? ""} · ${esc(e.live.detail || "")}</span>`;
     return "";
   }
+  // A Lock or Dog posted with no units (old board, before Oct 25) shows as the lean it was.
+  const tierOf = (e) => (["lock", "dog"].includes(e.tier) && !(e.units > 0) ? "lean" : e.tier);
   const addBtn = () => "";  // straight bets only: no parlay slip
   const more = (e) => (e.reasons && e.reasons.length ? `<details class="more"><summary>Stats &amp; why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "");
   // A won bet gets a green "Cashed" stamp across it; a lost one gets a big red L.
@@ -465,7 +467,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
   function row(e, opts = {}) {
     return `<div class="row">${stamp(e)}
-      <div class="sel"><span class="tag ${e.tier}">${TIER[e.tier] || e.tier}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
+      <div class="sel"><span class="tag ${tierOf(e)}">${TIER[tierOf(e)] || tierOf(e)}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
       <div class="odds"><b>${odds(e.odds)}</b><small>${needs(e)}</small>${stake(e)}</div>
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${opts.matchup ? `<span class="muted">${esc(e.matchup)} · ${timeOf(e)}</span>` : ""}${moveText(e)}${statusText(e)}${addBtn(e)}</div>
@@ -514,7 +516,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     .sort((a, b) => b.units - a.units || score(b) - score(a) || a.best_rank - b.best_rank)  // biggest stake first.map((e, i) => Object.assign({}, e, { rank: i + 1 }));
 
   function renderHero() {
-    const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
+    const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && x.units > 0 && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
     if (!e) {
       $("hero").innerHTML = `<div class="ticket-empty"><b>Bet on it, the heat is coming</b></div>`;
       return;
@@ -533,7 +535,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const items = DATA.entries.filter(onBoard);
     const potd = ["lock", "dog", "prop"].map((t) => {
       // A real (units) pick beats a lean one posted earlier the same day.
-      const e = items.filter((x) => x.tier === t).sort((a, b) => b.units - a.units)[0];
+      const e = items.filter((x) => x.tier === t && (x.units > 0 || t === "prop")).sort((a, b) => b.units - a.units)[0];
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
       if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">Bet on it, the heat is coming</p></div>`;
@@ -543,8 +545,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     }).join("");
     const best = bestToday();
     const sharpBets = items.filter((e) => e.tier === "sharp");
-    const rest = items.filter((e) => !isLive(e) && !["early", "lean", "sharp"].includes(e.tier) && !e.player && !e.best_rank);
-    const leans = items.filter((e) => e.tier === "lean");
+    const rest = items.filter((e) => !isLive(e) && !["early", "lean", "sharp"].includes(tierOf(e)) && !e.player && !e.best_rank);
+    const leans = items.filter((e) => tierOf(e) === "lean" && !isLive(e));
     const topNote = best.length ? `${best.length} of 10 cleared the bar · ranked by edge score` : "Ranked by edge score";
     return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("Bet on it, the heat is coming."))
       + (sharpBets.length ? panel("Sharp value", "A book paying more than it should, straight up", bySport(sharpBets)) : "")
