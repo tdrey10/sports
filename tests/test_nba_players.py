@@ -58,7 +58,8 @@ def test_build_flags_cold_players_holes_and_injury_share(tmp_path):
     assert t["lineup"]["PG"] == "Pat Guard" and t["holes"][0]["next"] == "Sub Guard"
     assert round(t["minutes_out"], 2) == round(33 / 53, 2)
     notes = " ".join(rep["matchups"][0]["notes"])
-    assert "PG Pat Guard out" in notes and "Pat Guard (Home Team) is cold" in notes
+    assert "Team without Pat Guard (33 min, 12.0 pts a game)" in notes and "Sub Guard likely starts at PG for Pat Guard" in notes
+    assert "Pat Guard (Home Team) is cold" in notes
 
 
 def test_luck_is_record_minus_point_differential():
