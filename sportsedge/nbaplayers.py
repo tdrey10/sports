@@ -189,20 +189,20 @@ def _team_due(root: Path | str, season: int, now: datetime) -> dict[str, dict]:
             d["slump"] = round(t.slump(), 1)
             notes = []
             if d["luck"] <= -0.06:
-                notes.append(f"due: record {abs(d['luck']) * 100:.0f} pts under what its point differential says")
+                notes.append(f"due: their record's {abs(d['luck']) * 100:.0f} pts worse than their point differential says, they've been unlucky")
             elif d["luck"] >= 0.06:
-                notes.append(f"lucky: record {d['luck'] * 100:.0f} pts over its point differential")
+                notes.append(f"lucky: their record's {d['luck'] * 100:.0f} pts better than their point differential says, the bill's coming")
             if t.close <= -3:
-                notes.append(f"{-t.close} more close losses than wins")
+                notes.append(f"lost {-t.close} more close ones than they won")
             elif t.close >= 3:
-                notes.append(f"{t.close} more close wins than losses")
+                notes.append(f"won {t.close} more close ones than they lost")
             if d["slump"] <= -8:
-                notes.append(f"slumping: last 5 games {abs(d['slump']):.0f} pts a game under its season")
+                notes.append(f"slumping: {abs(d['slump']):.0f} pts a game worse the last 5 than their season")
             elif d["slump"] >= 8:
-                notes.append(f"hot: last 5 games {d['slump']:.0f} pts a game over its season")
+                notes.append(f"rollin': {d['slump']:.0f} pts a game better the last 5 than their season")
             d["notes"] = notes
         else:
-            d["notes"] = [f"{t.games} games in: luck reads start at {DUE_GAMES}"]
+            d["notes"] = [f"only {t.games} games in, luck reads kick in at {DUE_GAMES}"]
         out[name] = d
     return out
 
@@ -404,9 +404,9 @@ def build(now: datetime, root: Path | str = "data", injuries: dict | None = None
                     notes.append(f"{short}: {hole['starter']} ({hole['slot']}) is questionable{with_him(hole['starter'])}"
                                  + (f"; {hole['next']} starts if he sits." if hole["next"] else "."))
             for n in t.get("cold", [])[:2]:
-                notes.append(f"{n} ({name}) is cold")
+                notes.append(f"{n} ({short}) is ice cold right now 🥶")
             for n in t.get("hot", [])[:2]:
-                notes.append(f"{n} ({name}) is hot")
+                notes.append(f"{n} ({short}) is cookin' 🔥")
             for n in ((t.get("due") or {}).get("notes") or [])[:2]:
                 if "games in" not in n:
                     notes.append(f"{name}: {n}")
