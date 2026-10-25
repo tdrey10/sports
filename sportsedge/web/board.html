@@ -289,6 +289,12 @@ details.more ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; display:
 .chart { width: 100%; height: 110px; display: block; }
 .table-wrap { overflow-x: auto; }
 .rep-seg { margin: 0 0 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.roster { list-style: none; margin: 8px 0 0; padding: 0; }
+.roster .ro { padding: 10px 0; border-top: 1px solid var(--line); display: grid; gap: 3px; }
+.team-pick { width: 100%; margin: 6px 0 4px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line-2);
+  background: var(--surface-2); color: var(--fg); font: 600 16px/1.2 var(--body); }
+.tag.tier-key { background: var(--accent); color: #fff; } .tag.tier-starter { border: 1px solid var(--accent); }
+.tag.tier-rotation { opacity: .85; } .tag.tier-bench { opacity: .6; }
 .nba td, .nba th { white-space: normal; vertical-align: top; }
 .nba td:first-child, .nba th:first-child { text-align: left; }
 .nba td small { white-space: nowrap; }
@@ -372,7 +378,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
   const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"], ["tennis", "Tennis"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
-  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["scores", "Live Scores"], ["predict", "Predictions"], ["nba", "Reports"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
+  const TABS = [["today", "Today"], ["parlays", "Parlays"], ["live", "Live"], ["nba", "Reports"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
   const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
     live: "Live", live_win: "Live · likely winner", live_plus: "Live · plus money", sharp: "Sharp value" };
   const state = { tab: "today", sport: "all", market: "all", rep: "nba" };
@@ -653,9 +659,11 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       ["dabble2", "Dabble 2-team"], ["dabble3", "Dabble 3-team"], ["dabble4", "Dabble 4-team"], ["dabble5", "Dabble 5-team"], ["dabble8", "Dabble 8-team"]]
       .map(([n, name]) => { const s = st[n] || { won: 0, lost: 0, units: 0 };
       return `<tr><td>${name}</td><td>${rec(s)}</td><td class="${cls(s.units)}">${signed(s.units, 2)}u</td><td>${s.roi == null ? "–" : signed(s.roi * 100, 0) + "%"}</td></tr>`; }).join("");
-    return teaserPanel() + panel("Parlays of the day", "The Heat when every leg is legit · Wanna Dabble? for fun every day",
+    // Owner, Oct 25: parlays of the day first, then the teasers.
+    return panel("Parlays of the day", "The Heat when every leg is legit · Wanna Dabble? for fun every day",
         (todays.length ? `<div class="grid two">${todays.map((p) => parlayCard(p, ids, p.id === topId)).join("")}</div>` : "") + note
         + `<p class="small muted"><b>🔥 The Heat</b>: every leg is a real unit play, so it's rare. Stakes stay small: ½u on a 2-team, ¼u on a 3- or 4-team, 0.1u on an 8-team. <b>Wanna Dabble?</b>: a 2-, 3-, 4-, 5- and 8-team every day when possible, no units, leans filling in where the unit plays run out. Best rated first: the grade is the parlay's edge on our numbers (A +10% or more, B +3%, C about even, D below −5%), and each leg shows its win chance against what its price needs. Every leg has to win, so parlays lose more often than straight bets.</p>`)
+      + teaserPanel()
       + panel("Parlay record", "Separate from the straight bets",
         `<div class="table-wrap"><table><thead><tr><th>Parlay</th><th>Record</th><th>Profit</th><th>ROI</th></tr></thead><tbody>${rows}</tbody></table></div>`)
       + (earlier.length ? panel("Earlier parlays", "Last 7 days", `<div class="grid two">${earlier.map((p) => parlayCard(p, ids)).join("")}</div>`) : "");
@@ -739,12 +747,94 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
            <p class="small muted">Only STRONG angles carry units. The popular "due" ideas (close-game losers, fading the hot team) lose at the real price; the books already price them.</p>`) : "") + `</div>`;
   }
 
-  // Owner, Oct 25: the same report for football. One tab, a button per sport.
-  const REPORTS = [["nba", "NBA"], ["nfl", "NFL"], ["ncaaf", "College football"]];
+  // Owner, Oct 25: the same report for football and hockey. One tab, a button per sport.
+  const REPORTS = [["nba", "NBA"], ["nfl", "NFL"], ["ncaaf", "College football"], ["nhl", "NHL"], ["tennis", "Tennis"]];
   function viewReports() {
     const chips = `<div class="seg rep-seg">${REPORTS.map(([k, n]) => `<button data-rep="${k}" aria-pressed="${state.rep === k}">${n}</button>`).join("")}</div>`;
     const name = (REPORTS.find(([k]) => k === state.rep) || REPORTS[0])[1];
-    return chips + (state.rep === "nba" ? viewNba() : viewFootball((DATA.reports || {})[state.rep], name));
+    const R = state.rep === "nba" ? DATA.nba : (DATA.reports || {})[state.rep];
+    const body = state.rep === "nba" ? viewNba() : state.rep === "nhl" ? viewNhl(R) : state.rep === "tennis" ? viewTennis(R) : viewFootball(R, name);
+    return chips + body + (R && R.teams ? rosterPanel(R, state.rep) : "");
+  }
+
+  // Owner, Oct 25: tennis too. Every player in the next 36 hours of matches.
+  function viewTennis(R) {
+    if (!R) return panel("Tennis report", "", empty("The tennis report builds on the next engine run."));
+    const icon = (f) => (f === "cold" ? " 🥶" : f === "hot" ? " 🔥" : "");
+    const line = (p) => `<b>${esc(p.name)}</b>${icon(p.form)} <small>#${p.rank ?? "–"} · ${p.rating}</small><br>
+      <span class="small muted">${p.season} this year${p.surface_rec ? ` (${p.surface_rec} on this surface)` : ""} · last 10 ${p.last10 || "–"}${p.streak ? " · " + p.streak : ""} · ${p.load7} matches this week${p.days_off != null ? ` · ${Math.round(p.days_off)}d off` : ""}</span>`;
+    const cards = (R.matches || []).slice(0, 40).map((m) => `<article class="nba-game">
+        <div class="muted small">${esc(m.tour)} · ${esc(m.event)}${m.round ? " · " + esc(m.round) : ""} · ${esc(m.surface)} · ${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}</div>
+        <div>${line(m.a)}</div><div>${line(m.b)}</div>
+        <div class="small">Head to head: ${esc(m.h2h)}</div>
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}</article>`).join("");
+    const list = (ps, none) => ps.length ? `<ul class="reads">${ps.map((p) => `<li><b>${esc(p.name)}</b> · ${p.last10} in the last 10, ${p.season} this season${p.streak ? " · " + p.streak : ""}</li>`).join("")}</ul>` : empty(none);
+    const hurt = (R.hurt || []).map((p) => `<li><b>${esc(p.name)}</b> · ${esc(p.health.join("; "))}</li>`).join("");
+    return `<div class="nba">` + panel("Tennis matches", "Next 36 hours · rank and rating = our surface-aware rating (tour rank among players active this year) · research, no units",
+        cards ? `<div class="grid">${cards}</div>` : empty("No matches on the schedule in the next 36 hours."))
+      + panel("Health flags", `Retirements or walkovers in the last 60 days, or 30+ days off`, hurt ? `<ul class="reads">${hurt}</ul>` : empty("Nobody flagged."))
+      + panel("Who's hot 🔥", "Last 10 matches 20+ pts better than their season (15+ matches)", list(R.hot || [], "Nobody's hot right now."))
+      + panel("Who's shitting the bed 🥶", "Last 10 matches 20+ pts worse than their season", list(R.cold || [], "Nobody's cold right now.")) + `</div>`;
+  }
+
+  // Owner, Oct 25: "look at the entire roster... who's important and impactful and who's not?"
+  // Every player who has played for the team: tier by his share of the team's production, his
+  // line, the team's margin with him and without him, form and today's status.
+  function rosterPanel(R, sport) {
+    const teams = R.teams || {};
+    const slate = (R.matchups || []).flatMap((m) => [m.away, m.home]).filter((t) => teams[t]);
+    const names = [...new Set([...slate, ...Object.keys(teams).sort()])].filter((t) => (teams[t].roster || []).length);
+    if (!names.length) return "";
+    state.team = state.team || {};
+    const pick = names.includes(state.team[sport]) ? state.team[sport] : names[0];
+    const t = teams[pick];
+    const opts = names.map((n) => `<option value="${esc(n)}"${n === pick ? " selected" : ""}>${esc(n)}${slate.includes(n) ? " · plays today" : ""}</option>`).join("");
+    const badge = (tier) => `<span class="tag tier-${tier.toLowerCase()}">${tier}</span>`;
+    const status = (p) => (p.status ? ` <small class="${p.status === "out" ? "neg" : ""}">${p.status}</small>` : "") + (p.form === "cold" ? " 🥶" : p.form === "hot" ? " 🔥" : "");
+    const rows = (t.roster || []).map((p) => `<li class="ro"><div>${esc(p.name)} <small>${esc(p.pos || "")}${p.unit ? " · " + p.unit : ""} · ${p.gp} g</small>${status(p)}</div>
+      <div class="small muted">${esc(p.line)}</div>
+      <div class="small">${badge(p.tier)} ${pct(p.share)} of the team's ${p.unit || "production"}${p.ww && p.ww.diff != null
+        ? ` · with/without <b class="${cls(p.ww.diff)}">${signed(p.ww.diff, 1)}</b> (${p.ww.n_without} games without)` : p.ww && p.ww.n_with > 3 ? " · hasn't missed a game" : ""}</div></li>`).join("");
+    const out = t.production_out;
+    const outTxt = out == null ? "" : typeof out === "number" ? (out ? ` · missing ${pct(out)} of its production today` : "")
+      : ` · missing ${pct(out.offense)} of its offense, ${pct(out.defense)} of its defense today`;
+    const d = t.due || {};
+    return panel("Rosters", "Every player who has played this season · tier = share of the team's production · with/without = the team's average margin with him minus without him",
+      `<select class="team-pick" data-team-sport="${sport}" aria-label="Team">${opts}</select>
+       <p class="small">${d.w != null ? `${d.w}-${d.l}, ${signed(d.diff, 1)} a game` : ""}${outTxt}${(d.notes || []).length ? " · " + esc(d.notes.join("; ")) : ""}</p>
+       <ul class="roster">${rows}</ul>`);
+  }
+
+  function viewNhl(R) {
+    if (!R) return panel("NHL report", "", empty("The NHL report builds on the next engine run."));
+    const short = (t) => String(t || "").split(" ").slice(-1)[0];
+    const games = (R.matchups || []).map((m) => {
+      const ml = (x) => (x == null ? "" : ` ${odds(x)}`);
+      return `<article class="nba-game"><strong>${esc(m.away)}${ml(m.away_ml)} @ ${esc(m.home)}${ml(m.home_ml)}</strong>
+        <div class="muted small">${fmt(m.start, { weekday: "short", hour: "numeric", minute: "2-digit" })}</div>
+        ${m.notes.length ? `<ul class="reads">${m.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul>` : `<p class="muted small">Both #1 goalies set, key players healthy, nobody due.</p>`}</article>`;
+    }).join("");
+    const teams = Object.entries(R.teams || {});
+    const goalies = teams.filter(([, t]) => (t.goalies || []).length).map(([n, t]) => { const g = t.goalies[0];
+      return `<tr><td>${esc(short(n))}</td><td>${esc(g.name)}${g.status ? ` <small class="neg">${g.status}</small>` : ""}${g.form === "cold" ? " 🥶" : g.form === "hot" ? " 🔥" : ""}<br><small>${t.goalies.slice(1, 3).map((x) => `${esc(x.name)} ${x.starts} GS`).join(" · ")}</small></td>
+        <td>${g.starts}</td><td>${g.sv == null ? "–" : g.sv.toFixed(3)}</td><td>${g.last5 == null ? "–" : g.last5.toFixed(3)}</td><td>${g.gaa}</td></tr>`; }).join("");
+    const hurt = teams.filter(([, t]) => t.hurt.some((h) => h.key && h.key !== "Bench")).map(([n, t]) =>
+      `<tr><td>${esc(n)}</td><td>${t.hurt.filter((h) => h.key && h.key !== "Bench").map((h) => `${esc(h.name)} <small>${esc(h.key)} · ${h.status}</small>`).join("<br>")}</td><td>${pct(t.production_out)}</td></tr>`).join("");
+    const due = teams.filter(([, t]) => t.due && t.due.luck != null).sort((a, b) => a[1].due.luck - b[1].due.luck).map(([n, t]) => { const d = t.due;
+      return `<tr><td>${esc(n)}</td><td>${d.w}-${d.l}</td><td>${signed(d.diff, 2)}</td><td>${signed(d.luck * 100, 0)}</td><td>${d.close > 0 ? "+" : ""}${d.close}</td><td class="small">${esc((d.notes || []).join("; "))}</td></tr>`; }).join("");
+    const st = R.study;
+    const studyRows = st ? st.rows.filter((r) => r.blind.bets >= 60).sort((a, b) => (b.blind.flat_roi ?? -1) - (a.blind.flat_roi ?? -1)).slice(0, 8)
+      .map((r) => `<tr><td>${esc(r.variant)} <small>${esc(r.market)}</small></td><td>${r.in_sample.bets} · ${signed((r.in_sample.flat_roi || 0) * 100, 1)}%</td><td class="${cls(r.blind.flat_roi)}">${r.blind.bets} · ${signed((r.blind.flat_roi || 0) * 100, 1)}%</td><td>${esc(r.verdict || "–")}</td></tr>`).join("") : "";
+    return `<div class="nba">` + panel("NHL games", "Goalies, key skaters, injuries and luck, game by game · research, no units", games ? `<div class="grid">${games}</div>` : empty("No NHL games on the board right now."))
+      + panel("Goalies", "Each team's #1 (most starts in its last 10) · save % this season and his last 5 starts · 🥶 / 🔥 = last 5 is .015 off his season",
+          goalies ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>#1 goalie</th><th>GS</th><th>SV%</th><th>Last 5</th><th>GAA</th></tr></thead><tbody>${goalies}</tbody></table></div>` : empty("Box scores are still loading."))
+      + panel("Who's hurt", "Key, starter and rotation players and #1 goalies on today's injury report · share of the team's production out",
+          hurt ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Out / questionable</th><th>Out</th></tr></thead><tbody>${hurt}</tbody></table></div>` : empty("No key players listed."))
+      + panel("Who's due", "Luck = win % minus what the goal differential says (reads start at 10 games) · close = net one-goal wins",
+          due ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Record</th><th>Diff</th><th>Luck</th><th>Close</th><th>Notes</th></tr></thead><tbody>${due}</tbody></table></div>` : empty("Not enough games yet."))
+      + (st ? panel("Does it beat the price?", `Blind test at the closing price (tune 2018-21, blind 2022 on) · luck control: ${st.control.proven} of ${st.control.spots} random sets passed`,
+          `<div class="table-wrap"><table><thead><tr><th>Angle</th><th>Tuning</th><th>Blind</th><th>Verdict</th></tr></thead><tbody>${studyRows}</tbody></table></div>
+           <p class="small muted">Only STRONG angles carry units.</p>`) : "") + `</div>`;
   }
 
   function viewFootball(R, label) {
@@ -1024,6 +1114,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     else if (t.dataset.sport) { state.sport = t.dataset.sport; save(); render(); }
     else if (t.dataset.market) { state.market = t.dataset.market; save(); render(); }
     else if (t.dataset.rep) { state.rep = t.dataset.rep; save(); render(); }
+  });
+  document.addEventListener("change", (ev) => {
+    const s = ev.target.closest("select[data-team-sport]");
+    if (!s) return;
+    state.team = Object.assign({}, state.team, { [s.dataset.teamSport]: s.value });
+    save(); render();
   });
   render();
   if (location.protocol.startsWith("http")) {

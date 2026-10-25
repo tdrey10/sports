@@ -46,6 +46,7 @@ PARAMS = {
     "nfl": Params("NFL", 4, 2.37, 7, 3, 10, 0.15, 2),
     "ncaaf": Params("College football", 4, 2.37, 7, 3, 14, 0.15, 2),
     "mlb": Params("MLB", 20, 1.83, 1, 10, 1.5, 0.06, 4, spread=False),
+    "nhl": Params("NHL", 10, 2.0, 1, 10, 1.0, 0.06, 3, spread=False),
 }
 DUE_SPORTS = tuple(PARAMS)
 
@@ -109,8 +110,8 @@ def features(games: list[G], p: Params = PARAMS["nba"]) -> list[dict | None]:
 def rules(p: Params) -> dict:
     """name -> test on (this side's numbers, the opponent's)."""
     lk, cn, sl, rc = p.luck, p.close_n, p.slump, p.recent
-    unit = "runs" if p.name == "MLB" else "pts"
-    close = "one-run" if p.name == "MLB" else "close"
+    unit = {"MLB": "runs", "NHL": "goals"}.get(p.name, "pts")
+    close = {"MLB": "one-run", "NHL": "one-goal"}.get(p.name, "close")
     return {
         f"due: record {lk * 100:.0f}+ pts under its point differential": lambda me, op: me["luck"] <= -lk,
         f"fade: record {lk * 100:.0f}+ pts over its point differential": lambda me, op: op["luck"] >= lk,

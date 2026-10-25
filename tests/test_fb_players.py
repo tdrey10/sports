@@ -25,7 +25,7 @@ def test_parse_reads_passing_rushing_receiving():
     by = {(r[1], r[2]): r[3:] for r in rows}
     assert by[("Starter QB", "passing")] == [22, 31, 288, 2, 1]
     assert by[("Lead Back", "rushing")] == [18, 96, 1, 0, 0]
-    assert ("Linebacker", "defensive") not in by  # defense is left out
+    assert by[("Linebacker", "defensive")] == [9, 0, 0, 0, 0]  # defense counts now (whole roster)
 
 
 def _store(root, games):
