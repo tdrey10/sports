@@ -70,7 +70,7 @@ def profile(rows_by_player: dict[str, list[dict]], p: str, now: datetime, surfac
     if wos:
         health.append(f"gave a walkover in the last {HEALTH_DAYS} days")
     if days_off is not None and days_off >= LAYOFF_DAYS:
-        health.append(f"{days_off:.0f} days since the last match (rust)")
+        health.append(f"no tour-level match in {days_off:.0f} days (rust, or grinding Challengers)")
     return {"name": name, "rating": round(rating), "rank": rank, "season": f"{w}-{len(yr) - w}",
             "surface_rec": f"{ws}-{len(on) - ws}" if on else None, "last10": f"{w10}-{len(last10) - w10}" if last10 else None,
             "streak": (f"W{streak}" if kind else f"L{streak}") if streak >= 2 else None, "form": tag,
