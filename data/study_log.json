@@ -295,5 +295,16 @@
   "luck_control": "100 random tenths of the same bets through the same bar: 0 passed, 0 strong",
   "verdict": "none wired: 1 of 16 variants cleared the bar (about what luck gives, ~0.1 expected at 1 in 150), and it is not STRONG. Divisional dog spread: blind +4.7% on 412, tuning only +0.9% on 1,536, and it is just the flip side of divisional favorites on the spread losing (-12.5% blind). Divisional dog moneyline lost blind (-5.4% on 250), divisional overs lose in both arms (-6%) but a bet that loses at -110 is not a signal to take the under (under -1.9% blind). Dropped; recheck when more seasons are in.",
   "action": "logged; no change to bet rules"
+ },
+ {
+  "date": "2026-10-26",
+  "idea": "Cover streaks: spread bets on the side whose own (or opponent's) last game covered or missed the spread by a big margin (NFL/NBA/NCAAB 10+ pts, NCAAF 14+), 16 variants",
+  "sports": "nfl, ncaaf, nba, ncaab",
+  "data": "data/lines/espn closing lines 2018+ (sportsedge/atsstudy.py)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all spread bets through the same bar: 0 passed, 0 strong",
+  "verdict": "none proven: 0 of 16 variants cleared the bar and every one lost blind (-0.2% to -8.8%; biggest samples NBA/NCAAB ~2,300-4,800 bets each at -1.5% to -7%). The spread does not overreact to a big cover or miss; the -110 vig is the only thing showing. Dropped.",
+  "action": "logged; no change to bet rules"
  }
 ]
