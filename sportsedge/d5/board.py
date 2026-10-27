@@ -516,6 +516,19 @@ def _capped(units: float, sd: Side) -> float:
     return min(units, UNPROVEN_MAX)
 
 
+def nhl_lock(chosen: list, sides: list[Side], now: datetime, taken=frozenset(), posted_events=frozenset()) -> list:
+    """The NHL Lock passed its blind test as the best Lock on an NHL-only board (the test ran one sport
+    at a time); on the shared board it only shows when hockey has the top Lock overall. So it's picked
+    on its own and takes the Lock slot (an unproven Lock from another sport would be a 0u lean anyway)."""
+    if "lock" in taken or any(t == "lock" and s.sport == "nhl" for t, _, s, _ in chosen):
+        return chosen
+    own = [c for c in choose([s for s in sides if s.sport == "nhl"], now, taken, posted_events) if c[0] == "lock"]
+    if not own:
+        return chosen
+    eid = own[0][2].eid  # it may already be on the board as a value play or lean: it moves up
+    return [c for c in chosen if c[0] != "lock" and c[2].eid != eid] + [own[0]]
+
+
 def _pt_day(d: datetime) -> str:
     return d.astimezone(PT).date().isoformat()
 
@@ -728,6 +741,7 @@ def build(scans, now: datetime, models: dict[str, SportModel], taken: set[str] |
             log.warning("D503 board for %s failed: %s", sport, exc, exc_info=True)
     LAST_SIDES[:] = sides
     chosen = choose(sides, now, taken, posted_events)
+    chosen = nhl_lock(chosen, sides, now, taken, posted_events)
     chosen += night_picks(sides, now, chosen, posted_events)
     chosen += choose_early(sides, now, posted_events)
     print(f"D503 board: {len(sides)} sides, " + ", ".join(f"{t} {s.team} {s.odds:+.0f} {u:g}u" for t, u, s, _ in chosen))

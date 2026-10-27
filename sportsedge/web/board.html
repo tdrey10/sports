@@ -595,7 +595,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const rest = items.filter((e) => !isLive(e) && !["early", "lean", "sharp"].includes(tierOf(e)) && !e.player && !e.best_rank);
     const leans = items.filter((e) => tierOf(e) === "lean" && !isLive(e));
     const topNote = best.length ? `${best.length} of 10 cleared the bar · ranked by edge score` : "Ranked by edge score";
-    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>` : empty("Bet on it, the heat is coming."))
+    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>`
+      : empty("No money plays yet today. Only bets that beat the books in a blind test get units, and no game is in one of those spots yet. Leans are below; the board checks again every hour."))
       + (sharpBets.length ? panel("Sharp value", "A book is slippin' and paying more than it should, straight up", bySport(sharpBets)) : "")
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
       + panel("The board", "Everything else we're rockin' with today", rest.length ? bySport(rest) : empty("Nothin' else worth your money today, homie. We don't force it."))
