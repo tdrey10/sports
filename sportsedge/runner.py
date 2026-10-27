@@ -122,7 +122,8 @@ def run_cycle(
                 taken.add(tier)
     taken |= {"lock", "dog"}  # no unproven Lock or Dog from the old board either
     best_taken = ledger.best_taken(now)
-    money = sorted((c for c in proven_cards + d5_cards if c.units > 0), key=lambda c: (c.units, c.pick.ev), reverse=True)
+    money = sorted((c for c in proven_cards + d5_cards if c.units > 0 and c.tier != "early"),  # early: own section
+                   key=lambda c: (c.units, c.pick.ev), reverse=True)
     for c in money[:max(BEST_BETS - best_taken, 0)]:
         best_taken += 1
         c.best_rank = best_taken
