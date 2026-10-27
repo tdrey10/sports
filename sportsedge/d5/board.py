@@ -58,7 +58,16 @@ UNPROVEN_MAX = 1.0
 # bets, 71-36, +14.7%, standard error 7.9%; up every season). Everything else posts at 0u (tiers.gate):
 # NFL money -0.8%, college football +0.2% (its Dogs +13.5% on 110, inside the noise), NBA -25.9%,
 # MLB -5.8%, college hoops -1.3%. Half a unit: it was found by looking, and it has no tuning check.
-PROVEN_TIERS = {("nhl", "lock"): "D503 NHL Lock: blind 2022-26, 107 bets, +14.7% (PROVEN)"}
+PROVEN_TIERS = {
+    ("nhl", "lock"): "D503 NHL Lock: blind 2022-26, 107 bets, +14.7% (PROVEN)",
+    # Owner, Oct 27 (chose 1/2u, NFL and college): his early dogs, run 3 days out at the opening line
+    # on 2023-26 (model fit before July 2022), beat the closing line 64% of the time in the NFL (39 bets,
+    # +35.6%) and 60% in college football (200 bets, +6.2%), against 45% / 50% for every dog at the
+    # open. The W-L isn't past its standard error yet; the line move is the proof the owner took.
+    ("nfl", "early"): "D503 early NFL dog: beat the close 64% blind 2023-26 (39 bets, +35.6%)",
+    ("ncaaf", "early"): "D503 early college dog: beat the close 60% blind 2023-26 (200 bets, +6.2%)",
+}
+UNTESTED_SPOTS = {"hammered"}  # needs midweek prices we don't hold
 PROVEN_UNITS = 0.5
 
 _cache: dict[str, tuple[list[Game], Replay]] = {}
@@ -746,8 +755,10 @@ def build(scans, now: datetime, models: dict[str, SportModel], taken: set[str] |
     chosen += choose_early(sides, now, posted_events)
     print(f"D503 board: {len(sides)} sides, " + ", ".join(f"{t} {s.team} {s.odds:+.0f} {u:g}u" for t, u, s, _ in chosen))
     cards = [_card(t, u, s, label, names.get(s.sport, s.sport)) for t, u, s, label in chosen]
-    for c in cards:
+    for c, (t, _, sd, _) in zip(cards, chosen):
         tag = PROVEN_TIERS.get((c.sport, c.tier))
+        if t == "early" and not set(early_spots(sd)[0]) - UNTESTED_SPOTS:
+            tag = None  # only the spot we couldn't test: a lean
         if tag and c.units > 0:
             c.proven, c.units = tag, PROVEN_UNITS
             c.reasons.insert(0, f"✅ Proven: {tag}.")

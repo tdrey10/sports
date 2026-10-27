@@ -50,5 +50,5 @@ def test_only_spots_that_passed_are_looked_for(tmp_path):
     assert got == {("nba", "back: off a blowout win (20+)"), ("nfl", "under, wind 15+ mph")}
 
 
-def test_his_nhl_lock_is_the_only_d503_bet_that_passed():
-    assert set(PROVEN_TIERS) == {("nhl", "lock")}
+def test_only_his_nhl_lock_and_early_football_dogs_carry_units():
+    assert set(PROVEN_TIERS) == {("nhl", "lock"), ("nfl", "early"), ("ncaaf", "early")}
