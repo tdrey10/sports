@@ -184,3 +184,18 @@ def test_a_lock_far_over_the_market_is_one_unit():
     near = side(-142, 0.64, 0.64, p_market=0.58, sport="nfl")
     near.w_p = 0.64
     assert lock_units(near) == 3.0
+
+
+def test_the_nhl_lock_is_picked_on_its_own_board():
+    """It passed blind as the best Lock on an NHL-only board; another sport's bigger Lock can't hide it."""
+    from sportsedge.d5.board import nhl_lock
+
+    nba = side(-140, 0.70, 0.70, p_market=0.58, sport="nba", eid="n1")
+    nhl = side(-130, 0.62, 0.62, p_market=0.565, sport="nhl", eid="h1")
+    for s in (nba, nhl):
+        s.w_p = s.p
+    chosen = choose([nba, nhl], NOW)
+    assert [(t, s.sport) for t, _, s, _ in chosen if t == "lock"] == [("lock", "nba")]
+    got = nhl_lock(chosen, [nba, nhl], NOW)
+    assert [(t, s.sport) for t, _, s, _ in got if t == "lock"] == [("lock", "nhl")]
+    assert nhl_lock(chosen, [nba, nhl], NOW, taken={"lock"}) == chosen  # a Lock already posted today
