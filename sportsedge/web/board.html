@@ -208,6 +208,19 @@ button, select { font: inherit; color: inherit; }
 .tag { display: inline-block; font: 700 11px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; border-radius: 6px;
   padding: 4px 6px; background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); white-space: nowrap; }
 .tag.lock { background: var(--win-soft); color: var(--win); border-color: transparent; }
+/* Owner, Oct 28 (+EV spec): the grade on every pick, from its validation evidence. */
+.grade { display: inline-block; min-width: 2.4em; text-align: center; font: 900 13px/1 var(--mono); padding: 5px 7px; border-radius: 6px; border: 1px solid var(--line-2); }
+.grade.g-ap { background: #1e7d46; color: #fff; border-color: transparent; }
+.grade.g-a { background: #2f9e5b; color: #fff; border-color: transparent; }
+.grade.g-b { background: #c08a1e; color: #111; border-color: transparent; }
+.grade.g-c { background: transparent; color: var(--muted); }
+.grade.g-no { background: transparent; color: #ff6b6b; border-color: #ff6b6b; }
+.sc-table { width: 100%; font-size: 13px; border-collapse: collapse; table-layout: fixed; }
+.sc-table td { padding: 4px 0; vertical-align: top; overflow-wrap: anywhere; white-space: normal; text-align: left; font-weight: 600; }
+.sc-table li { text-align: left; }
+.sc-table td:first-child { color: var(--muted); padding-right: 8px; width: 34%; }
+.sc-table ul { margin: 0; padding-left: 16px; }
+.potd, .bet, .row { min-width: 0; }
 .tag.dog, .tag.early { background: var(--accent-soft); color: var(--accent-2); border-color: transparent; }
 .tag.prop { background: var(--info-soft); color: var(--info); border-color: transparent; }
 .tag.live, .tag.live_win, .tag.live_plus { background: var(--live-soft); color: var(--accent-2); border-color: transparent; }
@@ -494,6 +507,28 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   // Owner, Oct 25: only proven bets carry units; a Lock, Dog or value pick without units is a lean.
   const tierOf = (e) => (["lock", "dog", "value"].includes(e.tier) && !(e.units > 0) ? "lean" : e.tier);
   const addBtn = () => "";  // straight bets only: no parlay slip
+  const GRADE_CLS = { "A+": "g-ap", A: "g-a", B: "g-b", C: "g-c", "NO BET": "g-no" };
+  const gradeBadge = (e) => (e.grade ? `<span class="grade ${GRADE_CLS[e.grade] || ""}" title="Grade">${esc(e.grade)}</span>` : "");
+  const pctv = (x) => (x == null ? "n/a" : (x * 100).toFixed(1) + "%");
+  // Every field the +EV spec asks for on a candidate; anything we couldn't fill says so.
+  function scoreDetails(e) {
+    const s = e.scorecard;
+    if (!s) return "";
+    const rows = [
+      ["Grade", `<b>${esc(s.grade)}</b>: ${esc(s.why)}`],
+      ["Book · odds", `${esc(s.book)} ${odds(s.odds)} <span class="muted">(checked ${esc(fmt(s.checked_at, { hour: "numeric", minute: "2-digit" }))})</span>`],
+      ["Our win chance", `${pctv(s.model_prob)} <span class="muted">(range ${pctv(s.range[0])}–${pctv(s.range[1])}: ${esc(s.range_how)})</span>`],
+      ["Price says", `${pctv(s.implied_prob)} with the book's cut · ${s.fair_market_prob == null ? "no-vig n/a" : pctv(s.fair_market_prob) + " without it"}`],
+      ["Fair odds", s.fair_odds == null ? "n/a" : odds(s.fair_odds)],
+      ["Edge", s.edge_pts == null ? "n/a" : `${signed(s.edge_pts, 1)} pts`],
+      ["Expected value", `${signed(s.ev_pct, 1)}% of the stake`],
+      ["Worst price to bet", s.min_odds == null ? "n/a" : odds(s.min_odds)],
+      ["Validation", esc(s.validation)],
+      ["Why", `<ul>${(s.factors || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`],
+      ["Risks", `<ul>${(s.risks || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`],
+    ];
+    return `<details class="more"><summary>📋 Scorecard · grade ${esc(s.grade)}</summary><table class="sc-table">${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")}</table></details>`;
+  }
   const more = (e) => (e.reasons && e.reasons.length ? `<details class="more"><summary>Stats &amp; why</summary><ul>${e.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul></details>` : "");
   // A won bet gets a green "Cashed" stamp across it; a lost one gets a big red L.
   function stamp(e) {
@@ -502,24 +537,24 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
   function row(e, opts = {}) {
     return `<div class="row">${stamp(e)}
-      <div class="sel"><span class="tag ${tierOf(e)}">${TIER[tierOf(e)] || tierOf(e)}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
+      <div class="sel">${gradeBadge(e)}<span class="tag ${tierOf(e)}">${TIER[tierOf(e)] || tierOf(e)}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
       <div class="odds"><b>${odds(e.odds)}</b><small>${needs(e)}</small>${stake(e)}</div>
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${opts.matchup ? `<span class="muted">${esc(e.matchup)} · ${timeOf(e)}</span>` : ""}${moveText(e)}${statusText(e)}${addBtn(e)}</div>
-      ${pickInj(e)}${more(e)}</div>`;
+      ${pickInj(e)}${scoreDetails(e)}${more(e)}</div>`;
   }
   function bet(e) {
     const kind = e.player ? "Prop" : LABEL[e.market] || e.market_label;
     return `<article class="bet">${stamp(e)}
       <div class="rk" aria-label="Rank ${e.rank}">${e.rank}</div>
       <div class="sport-badge">${esc(sportHead(e.sport))}</div>
-      <div class="sel"><strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${TIER[e.tier]}</span>` : ""}</div>
+      <div class="sel">${gradeBadge(e)}<strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${TIER[e.tier]}</span>` : ""}</div>
       <div class="price"><b>${odds(e.odds)}</b><small>${signed(e.ev * 100, 1)}% EV</small>${stake(e)}</div>
       <div class="sub">${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}</div>
       <div class="gauge">${meter(e)}<span class="small muted">${needs(e)}</span></div>
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${moveText(e)}${statusText(e)}${addBtn(e)}</div>
-      ${pickInj(e)}${more(e)}</article>`;
+      ${pickInj(e)}${scoreDetails(e)}${more(e)}</article>`;
   }
   // Owner, Oct 25: "a study on every game." Every situation each team is in, tested blind on years of
   // closing lines: the ones that showed an edge (and anyone out sick) up top, the rest folded away.
@@ -586,9 +621,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
       if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">Bet on it, the heat is coming</p></div>`;
-      return `<div class="potd">${stamp(e)}<span class="kind">${label}</span><h3>${esc(e.selection)}</h3>
+      return `<div class="potd">${stamp(e)}<span class="kind">${label}</span><h3>${gradeBadge(e)} ${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${wins(e)}</span></div><p class="small">${needs(e)}</p>${stake(e)}
-        <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${more(e)}</div>`;
+        <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${scoreDetails(e)}${more(e)}</div>`;
     }).join("");
     const best = bestToday();
     const sharpBets = items.filter((e) => e.tier === "sharp");
@@ -602,7 +637,26 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + panel("The board", "Everything else we're rockin' with today", rest.length ? bySport(rest) : empty("Nothin' else worth your money today, homie. We don't force it."))
       + panel("Leans", "No units on these. Just who we'd ride with in the other games and their fair price (nothing past −300). Only sprinkle it if your book's paying more than that.",
           (leans.length ? bySport(leans) : "") + (reads().length ? bySport(reads().map((r) => Object.assign({}, r, { sport: r.f.sport, commence_time: r.f.commence_time })),
-            (g) => `<ul class="reads">${g.map(readRow).join("")}</ul>`) : (leans.length ? "" : empty("That's every game today, fam."))));
+            (g) => `<ul class="reads">${g.map(readRow).join("")}</ul>`) : (leans.length ? "" : empty("That's every game today, fam."))))
+      + noBetPanel();
+  }
+
+  // Owner, Oct 28 (+EV spec: "prefer NO BET"): every game today we passed on, and why.
+  function noBetPanel() {
+    const picked = new Set(DATA.entries.filter((e) => e.status === "pending" || e.status === "live").map((e) => e.event_id));
+    const now = Date.now(), soon = now + 24 * 3600e3;
+    const games = (DATA.forecasts || []).filter((f) => f.status === "pending" && pickedSport(f.sport) && !picked.has(f.event_id)
+      && new Date(f.commence_time).getTime() > now && new Date(f.commence_time).getTime() <= soon)
+      .sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time));
+    if (!games.length) return "";
+    const why = (f) => {
+      if (f.model_home == null || f.market_home == null) return "missing a price or a model read";
+      const gap = Math.abs(f.model_home - f.market_home) * 100;
+      return gap < 2 ? `our number matches the market (within ${gap.toFixed(1)} pts)` : `the model differs by ${gap.toFixed(1)} pts, but no tested spot backs it`;
+    };
+    const li = (f) => `<li><span class="grade g-no">NO BET</span> <b>${esc(f.away)} @ ${esc(f.home)}</b> <small class="muted">· ${esc(f.sport_name || f.sport)} · ${esc(fmt(f.commence_time, { weekday: "short", hour: "numeric", minute: "2-digit" }))} · ${esc(why(f))}</small></li>`;
+    return panel("No bet", "Games we passed on today, and why. No edge we can defend means no bet.",
+      `<details class="more"><summary>${games.length} game${games.length > 1 ? "s" : ""} passed</summary><ul class="reads">${games.map(li).join("")}</ul></details>`);
   }
 
   // Our read on today's games with no pick (from the predictions): the side we have, its win
@@ -946,7 +1000,16 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         `<div class="table-wrap"><table><thead><tr><th></th><th>Money plays</th><th>Units</th><th>ROI</th><th>Leans</th></tr></thead><tbody>${line("Us", rv.ours)}${line(rv.theirs.reported ? "D503 <small>(his count)</small>" : "D503", rv.theirs)}</tbody></table></div>`
         + (today ? `<p class="small muted">D503's straight picks today:</p><ul class="small">${today}</ul>` : ""));
     })() : "";
-    return h2h + (sportRows ? panel("By sport", "Units come from money plays only · leans are a W-L, no units", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Money plays</th><th>All picks W-L</th><th>Win</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
+    const graded = DATA.entries.filter((e) => e.grade && e.settled && e.status !== "void");
+    const gradeRows = ["A+", "A", "B", "C", "NO BET"].map((g) => {
+      const xs = graded.filter((e) => e.grade === g);
+      if (!xs.length) return "";
+      const w = xs.filter((e) => e.status.endsWith("won")).length, l = xs.filter((e) => e.status.endsWith("lost")).length;
+      const u = xs.filter((e) => e.units > 0).reduce((a, e) => a + (e.profit || 0), 0);
+      return `<tr><td>${gradeBadge({ grade: g })}</td><td>${w}-${l}</td><td class="${cls(u)}">${signed(u, 2)}u</td></tr>`;
+    }).join("");
+    const byGrade = gradeRows ? panel("By grade", "Every graded pick since grades started (Oct 28) · units are money plays only", `<div class="table-wrap"><table><thead><tr><th>Grade</th><th>W-L</th><th>Units</th></tr></thead><tbody>${gradeRows}</tbody></table></div>`) : "";
+    return byGrade + h2h + (sportRows ? panel("By sport", "Units come from money plays only · leans are a W-L, no units", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Money plays</th><th>All picks W-L</th><th>Win</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
       + panel("By early-bet spot", "Each spot keeps its own record (W-L and how often it beat the closing line)", spotRows
           ? `<div class="table-wrap"><table><thead><tr><th>Spot</th><th>W-L</th><th>CLV</th></tr></thead><tbody>${spotRows}</tbody></table></div>`
           : empty("No graded picks in a spot yet."))

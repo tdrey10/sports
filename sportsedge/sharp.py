@@ -49,6 +49,10 @@ MAX_EV_BY_SPORT = {"nfl": 0.04, "ncaaf": 0.04}
 # Only football's price shopping has passed the blind test (shopstudy: 2%+ over the other books,
 # 75-86 blind bets, +20% to +40%); the other sports' value bets post at 0u until theirs does.
 SHOP_PROVEN = {k: "Football price shopping (2%+ over the other books): PROVEN blind" for k in ("nfl", "ncaaf")}
+SHOP_EVIDENCE = {"kind": "PROVEN", "blind_bets": 75, "blind_roi": 0.198, "blind_se": 0.177, "tune_bets": 261,
+                 "tune_roi": 0.021, "text": "Price-shopping study, NFL + college football 2020 on: the best price 2%+ over "
+                 "the other books' consensus, 1h before kickoff. Blind 75 bets +19.8% (SE 17.7%); tuning 261 bets +2.1%.",
+                 "risk": "Built on a public multi-book archive, not yet re-proven on our own saved prices."}
 MAX_FAVORITE = -170
 MAX_UNITS = 1.0  # new method: small until its CLV record is in
 CORE_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific: tennis checks
@@ -224,7 +228,7 @@ def cards(cfg: SportConfig, events: list[dict], espn_games: list, now: datetime,
         ]
         out.append(Card(tier="sharp", units=units, headline=headline, reasons=reasons, sport=cfg.key,
                         sport_name=cfg.name, pick=pick, home=game.home, away=game.away,
-                        proven=SHOP_PROVEN.get(cfg.key, "")))
+                        proven=SHOP_PROVEN.get(cfg.key, ""), evidence=SHOP_EVIDENCE if cfg.key in SHOP_PROVEN else None))
     return out
 
 
@@ -354,7 +358,9 @@ def tennis_cards(key: str, events: list[dict], now: datetime, proven: bool = Fal
             reasons = reasons[:3] + facts[:max(MAX_FACTS - len(reasons), 8)] + reasons[3:]
         out.append(Card(tier="sharp", units=units, headline=headline, reasons=reasons, sport=cfg.key,
                         sport_name=f"Tennis · {tour.upper()}", pick=pick, home=home, away=away,
-                        proven="Tennis value: its own graded record" if proven else ""))
+                        proven="Tennis value: its own graded record" if proven else "",
+                        evidence={"kind": "RECORD", "text": "Tennis value: our own graded tennis value picks passed their record test.",
+                                  "why": "Its own graded record passed; no separate blind study."} if proven else None))
     return out
 
 

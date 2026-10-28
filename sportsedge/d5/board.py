@@ -67,6 +67,19 @@ PROVEN_TIERS = {
     ("nfl", "early"): "D503 early NFL dog: beat the close 64% blind 2023-26 (39 bets, +35.6%)",
     ("ncaaf", "early"): "D503 early college dog: beat the close 60% blind 2023-26 (200 bets, +6.2%)",
 }
+PROVEN_EVIDENCE = {
+    ("nhl", "lock"): {"kind": "PROVEN", "blind_bets": 107, "blind_roi": 0.147, "blind_se": 0.079,
+                      "text": "His board replayed day by day on 2022-26 (model fit before July 2022), at closing prices: "
+                              "NHL Lock 107 bets 71-36 +14.7% (SE 7.9%), up every season.",
+                      "risk": "Found by looking at slices of his board; no tuning-period check."},
+    ("nfl", "early"): {"kind": "CLV", "blind_bets": 39, "blind_roi": 0.356, "blind_se": 0.213,
+                       "why": "Beats the closing line 64% of the time (every dog at the open: 45%); the win/loss sample is still small.",
+                       "text": "Early NFL dogs at the opening line, 2023-26: 39 bets 21-18 +35.6%, beat the close 64% (all dogs 45%)."},
+    ("ncaaf", "early"): {"kind": "CLV", "blind_bets": 200, "blind_roi": 0.062, "blind_se": 0.106,
+                         "why": "Beats the closing line 60% of the time (every dog at the open: 50%); the win/loss isn't proven.",
+                         "text": "Early college football dogs at the opening line, 2023-26: 200 bets +6.2%, beat the close 60% (all dogs 50%).",
+                         "risk": "Lost money in 2025 (-10.5%)."},
+}
 UNTESTED_SPOTS = {"hammered"}  # needs midweek prices we don't hold
 PROVEN_UNITS = 0.5
 
@@ -760,7 +773,7 @@ def build(scans, now: datetime, models: dict[str, SportModel], taken: set[str] |
         if t == "early" and not set(early_spots(sd)[0]) - UNTESTED_SPOTS:
             tag = None  # only the spot we couldn't test: a lean
         if tag and c.units > 0:
-            c.proven, c.units = tag, PROVEN_UNITS
+            c.proven, c.units, c.evidence = tag, PROVEN_UNITS, PROVEN_EVIDENCE[(c.sport, c.tier)]
             c.reasons.insert(0, f"✅ Proven: {tag}.")
     return cards
 
