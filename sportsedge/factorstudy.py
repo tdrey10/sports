@@ -277,6 +277,15 @@ def _markets(g: G, side: str) -> list[tuple[str, float, float]]:
     return out
 
 
+def _totals(g: G) -> list[tuple[str, float, float]]:
+    """[("over", price, result), ("under", price, result)] at the closing total, or []."""
+    if not g.total or not g.total_odds.get("over") or not g.total_odds.get("under"):
+        return []
+    pts = g.hs + g.as_
+    over = 1.0 if pts > g.total else 0.0 if pts < g.total else 0.5
+    return [("over", g.total_odds["over"], over), ("under", g.total_odds["under"], 1.0 - over)]
+
+
 def study(games: list[G], sport: str, n_random: int = 100, seed: int = 25) -> tuple[dict, dict, Tracker]:
     tr = Tracker(sport)
     recs: dict = {}
@@ -304,6 +313,22 @@ def study(games: list[G], sport: str, n_random: int = 100, seed: int = 25) -> tu
                             put(control, (market, k), g, pr, res)
                     for direction, name in acts:
                         put(recs, (market, f"{direction}: {name}"), g, pr, res)
+            # Over/unders (owner, Oct 28: more proven spots from our own data): each situation, by
+            # whether the home or the road team is in it; wind and rain once for the game.
+            tot = _totals(g)
+            if tot:
+                spots = set()
+                for side, who in (("home", "home team"), ("away", "road team")):
+                    other = "away" if side == "home" else "home"
+                    for direction, name in active(sport, c[side], c[other]):
+                        if direction == "back":
+                            spots.add(name if name in GAME_WIDE else f"{who} {name}")
+                for market, pr, res in tot:
+                    for k in range(n_random):
+                        if picks[k]:
+                            put(control, (market, k), g, pr, res)
+                    for name in spots:
+                        put(recs, (market, name), g, pr, res)
         tr.add(g)
     return recs, control, tr
 

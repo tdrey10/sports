@@ -83,7 +83,7 @@ def _fits(market: str, pick: Pick | None) -> bool:
         return MAX_FAV <= pick.american <= -101
     if market == "moneyline dog":
         return DOG[0] <= pick.american <= DOG[1]
-    return market in ("spread", "under")
+    return market in ("spread", "under", "over")
 
 
 def _card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
@@ -137,7 +137,8 @@ def find(scans, now: datetime, root="data") -> list[Card]:
 
         def add(eid, market, side, row, label, scan=scan, prices=prices, found=found):
             ctx = scan.contexts[eid]
-            key = {"moneyline favorite": "h2h", "moneyline dog": "h2h", "spread": "spreads", "under": "totals"}[market]
+            key = {"moneyline favorite": "h2h", "moneyline dog": "h2h", "spread": "spreads", "under": "totals",
+                   "over": "totals"}[market]
             pick = prices.get(eid, {}).get((key, side))
             if _fits(market, pick) and not ctx.injuries_unknown:
                 found.append((eid, _card(scan.sport.name, ctx, pick, row, label)))
@@ -163,6 +164,13 @@ def find(scans, now: datetime, root="data") -> list[Card]:
                         label = (f"{who}: {r['team']} {r['factor']}" if x["bet"] == "fade"
                                  else f"{who} {r['factor']}")
                         add(eid, x["market"], side, row, label)
+                # Over/unders: the game's spots, by home or road team (as factorstudy tested them).
+                spots = {(r["factor"] if r["factor"] in factorstudy.GAME_WIDE
+                          else f"{'home team' if r['side'] == 'home' else 'road team'} {r['factor']}")
+                         for r in study.get(f"{g['away']} @ {g['home']}", [])}
+                for f in facts:
+                    if f["market"] in ("over", "under") and f["variant"] in spots:
+                        add(eid, f["market"], f["market"], f, f"{g['away']} @ {g['home']}: {f['variant']}")
         # 2. Who's due.
         due = [r for r in mine if r["kind"] == "due"]
         if due and sport in nbastudy.PARAMS:
