@@ -92,6 +92,8 @@ class Entry:
     result_value: float | None = None
     profit: float | None = None  # in units (leans: as if 1 unit)
     graded_at: str | None = None
+    grade: str = ""  # A+, A, B, C or NO BET when posted (scorecard.py)
+    scorecard: dict | None = None
 
     @property
     def start(self) -> datetime:
@@ -318,6 +320,8 @@ class Ledger:
                 history=[[now.isoformat(), p.american, p.point]],
                 close_odds=p.american,
                 close_fair=p.market_prob,
+                grade=card.grade,
+                scorecard=card.scorecard,
             )
             if card.best_rank and card.units > 0 and next_rank <= BEST_BETS:
                 e.best_rank = next_rank

@@ -104,7 +104,11 @@ def _card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
     ]
     head = f"{pick.selection} at {pick.american:+.0f}: {label}. {word} in the blind test ({b['flat_roi']:+.1%} on {b['bets']} bets)."
     return Card(tier="value", units=units, headline=head, reasons=reasons, sport=pick.sport, sport_name=sport_name,
-                pick=pick, home=ctx.home, away=ctx.away, proven=f"{word}: {row.get('study', '')} · {row['variant']}")
+                pick=pick, home=ctx.home, away=ctx.away, proven=f"{word}: {row.get('study', '')} · {row['variant']}",
+                evidence={"kind": word, "blind_bets": b["bets"], "blind_roi": b["flat_roi"], "blind_se": b.get("se"),
+                          "tune_bets": t["bets"], "tune_roi": t["flat_roi"],
+                          "text": f"{row.get('study', '')}: {row['variant']}. Blind {b['bets']} bets {b['flat_roi']:+.1%} "
+                                  f"(standard error {b.get('se') or 0:.1%}); tuning {t['bets']} bets {t['flat_roi']:+.1%}."})
 
 
 def _phi(z: float) -> float:

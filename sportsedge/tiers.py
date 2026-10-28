@@ -91,6 +91,9 @@ class Card:
     score: float | None = None  # edge score 0-100 (see edge.edge_score)
     spots: list[str] = field(default_factory=list)  # early-bet spots this pick is in (tracked separately)
     proven: str = ""  # the blind test this bet passed; without one it can't carry units (gate below)
+    evidence: dict | None = None  # that test's numbers (scorecard.py): kind, blind bets / ROI / SE, text
+    grade: str = ""  # A+, A, B, C or NO BET (scorecard.py)
+    scorecard: dict | None = None
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -635,4 +638,8 @@ def gate(card: Card) -> Card:
             card.tier = "lean"
         if NO_PROOF not in card.reasons:
             card.reasons.insert(0, NO_PROOF)
-    return card
+    from datetime import datetime, timezone
+
+    from .scorecard import attach
+
+    return attach(card, datetime.now(timezone.utc))
