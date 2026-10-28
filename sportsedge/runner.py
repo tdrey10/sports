@@ -123,6 +123,7 @@ def run_cycle(
             proven_cards = proven.find(out.scans, now, d5_root)
         except Exception as exc:  # the proven finder never stops the board
             log.warning("proven spots failed: %s", exc, exc_info=True)
+    _hold_questionable(proven_cards + d5_cards, out.scans, d5_root)
     taken = set(ledger.taken_today(now)) | {c.tier for c in d5_cards if c.tier in ("lock", "dog") and c.units > 0}
     # The Lock and Dog come from proven bets only: the best proven favorite and the best proven dog.
     for tier, is_it in (("lock", lambda c: c.pick.market == "h2h" and c.pick.american < 0),
@@ -196,6 +197,34 @@ def _audit(ledger: Ledger, now: datetime, root: str) -> None:
             print(f"D503 audit: {sum(r['status'] == 'caught' for r in rows)} of {len(rows)} of his money picks today caught")
     except Exception as exc:  # the audit never stops a run
         log.warning("D503 audit failed: %s", exc)
+
+
+def _hold_questionable(cards, scans, root: str) -> int:
+    """Owner, Oct 28: when a sport's study shows that betting into a key player's unresolved questionable
+    status loses to the close, a money pick on that side waits at 0u until the status is final."""
+    import json
+
+    from . import injurytiming
+
+    try:
+        timing = json.loads((Path(root) / "injury_timing.json").read_text())
+    except (OSError, ValueError):
+        return 0
+    ctxs = {s.sport.key: s.contexts for s in scans}
+    held = 0
+    for c in cards:
+        if c.units <= 0:
+            continue
+        ctx = (ctxs.get(c.sport) or {}).get(c.pick.event_id)
+        who = injurytiming.holding(timing.get(c.sport), c, ctx, c.sport, root)
+        if who:
+            c.units, c.best_rank = 0.0, None
+            if c.tier in ("lock", "dog"):
+                c.tier = "lean"
+            c.reasons.insert(0, f"⏸ On hold: {who} is questionable. Betting before a key player's status is "
+                                "final has lost to the closing line in our study; it posts if he's cleared.")
+            held += 1
+    return held
 
 
 def simulate_history(

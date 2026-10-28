@@ -796,6 +796,23 @@ def cmd_nba_study(args) -> int:
     for r in fs.values():
         print(factorstudy.report(r))
     (data_dir / "factor_study.json").write_text(json.dumps(fs, separators=(",", ":")))
+    # Owner, Oct 28: college hoops efficiency / tempo and NBA pace, against the closing spread and total.
+    from . import effstudy
+
+    try:
+        eff = effstudy.run_all(data_dir)
+        print(effstudy.report(eff))
+        (data_dir / "eff_study.json").write_text(json.dumps(eff, separators=(",", ":")))
+    except Exception as exc:
+        print(f"efficiency study failed: {exc}")
+    from . import propusage
+
+    try:
+        pu = propusage.run(data_dir)
+        print(propusage.report(pu))
+        (data_dir / "prop_usage.json").write_text(json.dumps(pu, indent=1))
+    except Exception as exc:
+        print(f"usage study failed: {exc}")
     # Owner, Oct 28: when a player is ruled out, do the books move far enough, fast enough?
     from . import injurytiming
 
