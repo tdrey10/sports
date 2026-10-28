@@ -426,6 +426,12 @@ class Workspace:
         snaps = archive.log_snapshots(self.data_dir / f"{prefix}odds", res.scans, now)
         props = archive.log_prop_lines(self.data_dir / f"{prefix}props", res.scans, now)
         print(f"logged {snaps} game-line snapshots and {props} prop lines")
+        from . import injurytiming
+
+        try:  # Owner, Oct 28: every injury status change, with the time we saw it (the injury-timing study)
+            print(f"logged {injurytiming.log(self.data_dir / f'{prefix}injuries', res.scans, now, root=self.data_dir)} injury changes")
+        except Exception as exc:  # logging never stops the board
+            print(f"injury log failed: {exc}")
         remaining = getattr(getattr(self.provider, "odds", None), "requests_remaining", None)
         if remaining is not None:
             print(f"The Odds API credits remaining: {remaining}")
@@ -794,6 +800,18 @@ def cmd_nba_study(args) -> int:
     for r in fs.values():
         print(factorstudy.report(r))
     (data_dir / "factor_study.json").write_text(json.dumps(fs, separators=(",", ":")))
+    # Owner, Oct 28: when a player is ruled out, do the books move far enough, fast enough?
+    from . import injurytiming
+
+    timing = {}
+    for sport in injurytiming.SPORTS:
+        try:
+            timing[sport] = injurytiming.run(sport, data_dir)
+        except Exception as exc:
+            print(f"{sport.upper()} injury timing failed: {exc}")
+            continue
+        print(injurytiming.report(timing[sport]))
+    (data_dir / "injury_timing.json").write_text(json.dumps(timing, indent=1))
     return 0
 
 
