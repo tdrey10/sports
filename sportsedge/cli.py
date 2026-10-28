@@ -652,6 +652,12 @@ def _nba_report(data_dir: Path, scans, now: datetime, budget: int = 40) -> None:
     _game_studies(client, data_dir, now)
 
 
+def _has_played(rep: dict, team: str, player: str) -> bool:
+    """Whether a player shows up in his team's box scores this season (no roster = can't tell: yes)."""
+    roster = ((rep.get("teams") or {}).get(team) or {}).get("roster")
+    return roster is None or any(r.get("name") == player for r in roster)
+
+
 def line_text(m: dict) -> str:
     """A game's prices with the team on every number (owner, Oct 25: the Bucs were read as the -155
     favorite when Carolina was; unlabeled home/away columns can't be read backwards if nobody reads
@@ -692,7 +698,10 @@ def _game_studies(client, data_dir: Path, now: datetime) -> None:
                 m["study"] = rows
                 m["study_notes"] = factorstudy.notes(rows)
                 n += 1
-            ill = [f"🤒 {p} ({t}) is on the report sick" for t in (m["away"], m["home"]) for p in sick.get(t, [])]
+            # Only players who've played this season (owner, Oct 27: Porzingis hasn't played in a long
+            # time; flagging him as news when the line has had it for weeks is misleading).
+            ill = [f"🤒 {p} ({t}) is on the report sick" for t in (m["away"], m["home"]) for p in sick.get(t, [])
+                   if _has_played(rep, t, p)]
             if ill:
                 m["study_notes"] = ill + m.get("study_notes", [])
         path.write_text(json.dumps(rep, separators=(",", ":")))
