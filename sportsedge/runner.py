@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from .brain import BrainReport
 from .edge import Settings
@@ -24,6 +25,7 @@ class CycleResult:
     brains: dict[str, BrainReport] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
     weights: dict[str, float] = field(default_factory=dict)
+    injury_changes: int = 0
 
 
 def refresh_scores(provider, ledger: Ledger, now: datetime) -> int:
@@ -58,6 +60,7 @@ def run_cycle(
     d5_models: dict | None = None,
     d5_models_path: str = "data/d5_models.json",
     d5_root: str = "data",
+    injury_dir: str | None = None,
 ) -> CycleResult:
     """``props_sports`` limits player props to those sport keys (None = every sport)."""
     out = CycleResult()
@@ -85,6 +88,15 @@ def run_cycle(
         if scan.brain:
             out.brains[cfg.key] = scan.brain
     _funnel(out.scans, settings)
+    if injury_dir:
+        # Owner, Oct 28: every injury status change, logged with the time we saw it (the injury-timing study),
+        # before the proven finder so a proven "just ruled out" spot can post on this same run.
+        from . import injurytiming
+
+        try:
+            out.injury_changes = injurytiming.log(Path(injury_dir), out.scans, now, root=d5_root)
+        except Exception as exc:  # logging never stops the board
+            log.warning("injury log failed: %s", exc)
     held = settings.board_hour is not None and now.astimezone(ledger.tz).hour < settings.board_hour
     # Owner, Oct 24: the D503 formula runs the board for its six sports; the old board keeps the rest
     # (soccer, UFC). The D503 Lock / Dog go first, so the old board never posts a second one.

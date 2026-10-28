@@ -4,7 +4,8 @@ Every spot that beat the closing line on seasons it never saw (STRONG: tuning an
 a standard error; PROVEN: blind by a standard error and a tuning profit) is looked for on today's games:
 - the game-factor study (factorstudy.py), except a team's own split (too few games per team);
 - the "who's due" study (nbastudy.py): luck and slumps;
-- the line studies: the windy NFL under, and the college hoops favorite the spread says is cheap.
+- the line studies: the windy NFL under, and the college hoops favorite the spread says is cheap;
+- injury timing (injurytiming.py): the other team when a player is just ruled out, once that passes.
 A game in one posts at the spot's price window with units: STRONG 1u, PROVEN 1/2u. Everything else
 posts at 0u (tiers.gate). The owner's -150 cap on favorites holds.
 """
@@ -124,7 +125,8 @@ def find(scans, now: datetime, root="data") -> list[Card]:
     for scan in scans:
         sport = scan.sport.key
         mine = [r for r in rows if r["sport"] == sport]
-        if sport not in SPORTS or not mine or not scan.contexts:
+        timing = _load(Path(root) / "injury_timing.json").get(sport)
+        if sport not in SPORTS or not (mine or timing) or not scan.contexts:
             continue
         prices = _prices(scan)
         games = {}
@@ -213,6 +215,18 @@ def find(scans, now: datetime, root="data") -> list[Card]:
                         if ps - fair[side] >= 0.04:
                             add(eid, "moneyline favorite", side, r,
                                 f"{g[side]} moneyline is cheaper than the spread says ({ps:.0%} vs {fair[side]:.0%})")
+        # 4. Injury timing: a player just ruled out, if betting the other team on fresh news passed blind.
+        if timing:
+            from . import injurytiming
+
+            for news in injurytiming.recent(sport, now, root):
+                eid, hit = news["event_id"], injurytiming.spot(timing, news)
+                if eid not in games or hit is None:
+                    continue
+                side = "away" if news["side"] == "home" else "home"
+                pick = prices.get(eid, {}).get(("h2h", side))
+                market = "moneyline favorite" if pick and pick.american < 0 else "moneyline dog"
+                add(eid, market, side, hit[0], f"{games[eid][side]}: {news['team']} just ruled out {news['player']}")
         for eid, card in found:
             cur = out.get(eid)
             if cur is None or (card.units, card.pick.ev) > (cur.units, cur.pick.ev):

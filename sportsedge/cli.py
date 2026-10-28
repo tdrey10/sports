@@ -388,6 +388,7 @@ class Workspace:
             teaser_study=None if self.demo else self._nfl_history(),
             forecast_study=None if self.demo else self._forecast_study(),
             d5_models_path=str(self.data_dir / "d5_models.json"), d5_root=str(self.data_dir),
+            injury_dir=str(self.data_dir / f"{'demo-' if self.demo else ''}injuries"),
         )
         self.brains.update(res.brains)
         self.weights = res.weights
@@ -426,12 +427,7 @@ class Workspace:
         snaps = archive.log_snapshots(self.data_dir / f"{prefix}odds", res.scans, now)
         props = archive.log_prop_lines(self.data_dir / f"{prefix}props", res.scans, now)
         print(f"logged {snaps} game-line snapshots and {props} prop lines")
-        from . import injurytiming
-
-        try:  # Owner, Oct 28: every injury status change, with the time we saw it (the injury-timing study)
-            print(f"logged {injurytiming.log(self.data_dir / f'{prefix}injuries', res.scans, now, root=self.data_dir)} injury changes")
-        except Exception as exc:  # logging never stops the board
-            print(f"injury log failed: {exc}")
+        print(f"logged {res.injury_changes} injury changes")
         remaining = getattr(getattr(self.provider, "odds", None), "requests_remaining", None)
         if remaining is not None:
             print(f"The Odds API credits remaining: {remaining}")
