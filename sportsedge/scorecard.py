@@ -59,6 +59,20 @@ def grade(card) -> tuple[str, str]:
     return "NO BET", "No positive edge at this price."
 
 
+def score(card, g: str, ev_pct: float, edge_pts: float | None, lo: float, dec: float, risks: list[str]) -> dict:
+    """The 100-point readout (owner, Oct 28): projection accuracy 30, EV 30, market edge 15, data quality 15,
+    risk 10. Design weights, not proven ones: the letter grade stays on the evidence, and a bet with no
+    positive EV is NO BET whatever this says."""
+    ev = card.evidence or {}
+    proj = {"STRONG": 30, "PROVEN": 24, "CLV": 15, "RECORD": 15}.get(ev.get("kind"), 5)
+    val = round(max(min(ev_pct / 10, 1), 0) * 30)
+    mkt = 0 if edge_pts is None else round(max(min(edge_pts / 5, 1), 0) * 15)
+    data = 15 - (5 if card.pick.market_prob is None else 0) - (5 if any("questionable" in r.lower() for r in card.reasons) else 0)
+    risk = 0 if lo * dec - 1 <= 0 else 5 if any(r.startswith("Small sample") for r in risks) else 10
+    parts = {"projection": proj, "ev": val, "market": mkt, "data": data, "risk": risk}
+    return {"total": sum(parts.values()) if g != "NO BET" else 0, **parts}
+
+
 def build(card, now: datetime) -> dict:
     """Every field of the spec's required output that we can fill honestly; missing ones say so."""
     pk = card.pick
@@ -83,8 +97,11 @@ def build(card, now: datetime) -> dict:
         risks.append("Sensitive: at the low end of the range there's no edge.")
     if not risks:
         risks.append("Lines move: bet it only at the minimum price or better.")
+    ev_pct = (pk.win_prob * dec - 1) * 100
+    edge_pts = None if mp is None else (pk.win_prob - mp) * 100
     return {
         "grade": g, "why": why,
+        "score": score(card, g, ev_pct, edge_pts, lo, dec, risks),
         "checked_at": now.isoformat(), "book": pk.book, "odds": pk.american,
         "model_prob": round(pk.win_prob, 4),
         "engine_prob": round(pk.model_prob, 4),

@@ -42,3 +42,9 @@ def test_a_strong_spot_too_thin_at_this_price_drops_to_a():
     thin = dict(STRONG, blind_roi=0.03, blind_se=0.05)  # low end of the range has no edge
     s = build(card(evidence=thin, win=1.03 / (1 + 100 / 115)), NOW)
     assert s["grade"] == "A" and any("Sensitive" in r for r in s["risks"])
+
+
+def test_the_100_point_score_reads_the_parts_and_a_no_bet_is_zero():
+    s = build(card(evidence=STRONG), NOW)["score"]
+    assert s["projection"] == 30 and s["risk"] == 10 and s["total"] == sum(v for k, v in s.items() if k != "total")
+    assert build(card(proven="", units=0.0, win=0.50, market=0.53), NOW)["score"]["total"] == 0

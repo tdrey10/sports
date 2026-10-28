@@ -508,14 +508,27 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const tierOf = (e) => (["lock", "dog", "value"].includes(e.tier) && !(e.units > 0) ? "lean" : e.tier);
   const addBtn = () => "";  // straight bets only: no parlay slip
   const GRADE_CLS = { "A+": "g-ap", A: "g-a", B: "g-b", C: "g-c", "NO BET": "g-no" };
-  const gradeBadge = (e) => (e.grade ? `<span class="grade ${GRADE_CLS[e.grade] || ""}" title="Grade">${esc(e.grade)}</span>` : "");
+  // Live edge monitor (owner, Oct 28): the grade is re-checked at today's price. Past the minimum price the
+  // edge is gone, so an open pick reads NO BET now (and comes back if the price does).
+  const gradeNow = (e) => {
+    if (!e.grade || e.settled || e.status !== "pending" || e.current_odds == null || !e.win_prob) return e.grade;
+    if (e.current_point != null && e.point != null && e.current_point !== e.point) return e.grade;
+    return e.win_prob * dec(e.current_odds) - 1 <= 0 ? "NO BET" : e.grade;
+  };
+  const gradeBadge = (e) => {
+    if (!e.grade) return "";
+    const g = gradeNow(e);
+    if (g !== e.grade) return `<span class="grade g-no" title="Posted as ${esc(e.grade)}; at ${odds(e.current_odds)} the edge is gone">NO BET now</span> <s class="muted small">${esc(e.grade)}</s>`;
+    return `<span class="grade ${GRADE_CLS[e.grade] || ""}" title="Grade">${esc(e.grade)}</span>`;
+  };
   const pctv = (x) => (x == null ? "n/a" : (x * 100).toFixed(1) + "%");
   // Every field the +EV spec asks for on a candidate; anything we couldn't fill says so.
   function scoreDetails(e) {
     const s = e.scorecard;
     if (!s) return "";
     const rows = [
-      ["Grade", `<b>${esc(s.grade)}</b>: ${esc(s.why)}`],
+      ["Grade", `<b>${esc(s.grade)}</b>: ${esc(s.why)}` + (gradeNow(e) !== e.grade ? ` <b class="neg">Now NO BET: at ${odds(e.current_odds)} the edge is gone.</b>` : "")],
+      ...(s.score ? [["Score", `<b>${s.score.total}/100</b> <span class="muted">(projection ${s.score.projection}/30 · EV ${s.score.ev}/30 · market edge ${s.score.market}/15 · data ${s.score.data}/15 · risk ${s.score.risk}/10; design weights, the grade follows the evidence)</span>`]] : []),
       ["Book · odds", `${esc(s.book)} ${odds(s.odds)} <span class="muted">(checked ${esc(fmt(s.checked_at, { hour: "numeric", minute: "2-digit" }))})</span>`],
       ["Our win chance", `${pctv(s.model_prob)} <span class="muted">(range ${pctv(s.range[0])}–${pctv(s.range[1])}: ${esc(s.range_how)})</span>`],
       ["Price says", `${pctv(s.implied_prob)} with the book's cut · ${s.fair_market_prob == null ? "no-vig n/a" : pctv(s.fair_market_prob) + " without it"}`],
