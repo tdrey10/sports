@@ -1,0 +1,209 @@
+{
+ "props": 690,
+ "split": "2026-10-24T02:00:00+00:00",
+ "rows": [
+  {
+   "study": "NBA usage (points props)",
+   "sport": "nba",
+   "market": "over",
+   "variant": "usage: a rotation teammate out, points 1.5+ over the line",
+   "verdict": "no edge",
+   "in_sample": {
+    "bets": 178,
+    "won": 84,
+    "lost": 94,
+    "push": 0,
+    "units": -20.96,
+    "roi": -0.1177332681973619,
+    "flat_roi": -0.11773326819736205,
+    "se": 0.07015159566237561,
+    "proven": false
+   },
+   "blind": {
+    "bets": 161,
+    "won": 88,
+    "lost": 73,
+    "push": 0,
+    "units": 3.52,
+    "roi": 0.021874156089657017,
+    "flat_roi": 0.02187415608965696,
+    "se": 0.07357961622845888,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA usage (points props)",
+   "sport": "nba",
+   "market": "over",
+   "variant": "usage: points 1.5+ over the line",
+   "verdict": "no edge",
+   "in_sample": {
+    "bets": 191,
+    "won": 87,
+    "lost": 104,
+    "push": 0,
+    "units": -28.35,
+    "roi": -0.14841793762804448,
+    "flat_roi": -0.14841793762804467,
+    "se": 0.06754710615996604,
+    "proven": false
+   },
+   "blind": {
+    "bets": 197,
+    "won": 110,
+    "lost": 87,
+    "push": 0,
+    "units": 8.65,
+    "roi": 0.043919664533215594,
+    "flat_roi": 0.043919664533215545,
+    "se": 0.06631355744364356,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA usage (points props)",
+   "sport": "nba",
+   "market": "over",
+   "variant": "usage: points 3+ over the line",
+   "verdict": "no edge",
+   "in_sample": {
+    "bets": 149,
+    "won": 69,
+    "lost": 80,
+    "push": 0,
+    "units": -20.0,
+    "roi": -0.13422818791946303,
+    "flat_roi": -0.13422818791946317,
+    "se": 0.07662897780647239,
+    "proven": false
+   },
+   "blind": {
+    "bets": 133,
+    "won": 76,
+    "lost": 57,
+    "push": 0,
+    "units": 9.09,
+    "roi": 0.06832298136645973,
+    "flat_roi": 0.06832298136645955,
+    "se": 0.0805278746387816,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA usage (points props)",
+   "sport": "nba",
+   "market": "over",
+   "variant": "usage: points 5+ over the line",
+   "verdict": "no edge",
+   "in_sample": {
+    "bets": 104,
+    "won": 50,
+    "lost": 54,
+    "push": 0,
+    "units": -10.52,
+    "roi": -0.1011705685618729,
+    "flat_roi": -0.10117056856187297,
+    "se": 0.09203871571219827,
+    "proven": false
+   },
+   "blind": {
+    "bets": 87,
+    "won": 55,
+    "lost": 32,
+    "push": 0,
+    "units": 15.83,
+    "roi": 0.1819090454772615,
+    "flat_roi": 0.18190904547726128,
+    "se": 0.09721392436412056,
+    "proven": true
+   }
+  },
+  {
+   "study": "NBA usage (points props)",
+   "sport": "nba",
+   "market": "under",
+   "variant": "usage: points 1.5+ under the line",
+   "verdict": "collecting",
+   "in_sample": {
+    "bets": 28,
+    "won": 11,
+    "lost": 17,
+    "push": 0,
+    "units": -7.43,
+    "roi": -0.26552795031055887,
+    "flat_roi": -0.2655279503105591,
+    "se": 0.17572012737752293,
+    "proven": false
+   },
+   "blind": {
+    "bets": 45,
+    "won": 28,
+    "lost": 17,
+    "push": 0,
+    "units": 7.35,
+    "roi": 0.16328502415458937,
+    "flat_roi": 0.1632850241545893,
+    "se": 0.13664861803256886,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA usage (points props)",
+   "sport": "nba",
+   "market": "under",
+   "variant": "usage: points 3+ under the line",
+   "verdict": "collecting",
+   "in_sample": {
+    "bets": 10,
+    "won": 5,
+    "lost": 5,
+    "push": 0,
+    "units": -0.65,
+    "roi": -0.0652173913043479,
+    "flat_roi": -0.0652173913043479,
+    "se": 0.31159420289855067,
+    "proven": false
+   },
+   "blind": {
+    "bets": 16,
+    "won": 4,
+    "lost": 12,
+    "push": 0,
+    "units": -8.52,
+    "roi": -0.532608695652174,
+    "flat_roi": -0.532608695652174,
+    "se": 0.2090237457228064,
+    "proven": false
+   }
+  },
+  {
+   "study": "NBA usage (points props)",
+   "sport": "nba",
+   "market": "under",
+   "variant": "usage: points 5+ under the line",
+   "verdict": "collecting",
+   "in_sample": {
+    "bets": 2,
+    "won": 1,
+    "lost": 1,
+    "push": 0,
+    "units": -0.13,
+    "roi": -0.0652173913043479,
+    "flat_roi": -0.0652173913043479,
+    "se": 0.9347826086956521,
+    "proven": false
+   },
+   "blind": {
+    "bets": 4,
+    "won": 1,
+    "lost": 3,
+    "push": 0,
+    "units": -2.13,
+    "roi": -0.532608695652174,
+    "flat_roi": -0.532608695652174,
+    "se": 0.467391304347826,
+    "proven": false
+   }
+  }
+ ]
+}
