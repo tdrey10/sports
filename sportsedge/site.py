@@ -101,8 +101,8 @@ def _scrub(obj):
     if isinstance(obj, str):
         out = obj.replace(OLD_ENGINE_MARK, ENGINE_MARK).replace("D503's ", "").replace("D503 ", "")
         return out[:1].upper() + out[1:] if out != obj else out
-    if isinstance(obj, list):
-        return [_scrub(x) for x in obj]
+    if isinstance(obj, list):  # the engine line itself isn't shown at all (owner: "I don't want to see it")
+        return [_scrub(x) for x in obj if x not in (ENGINE_MARK, OLD_ENGINE_MARK)]
     if isinstance(obj, dict):
         return {k: _scrub(v) for k, v in obj.items()}
     return obj
