@@ -183,7 +183,7 @@ def _audit(ledger: Ledger, now: datetime, root: str) -> None:
     from . import rival
     from .d5 import audit
     from .d5.board import LAST_SIDES
-    from .ledger import D503_MARK
+    from .ledger import is_formula_pick
 
     if not LAST_SIDES:  # the board read no D503 games: nothing to compare (and no fetch)
         return
@@ -191,7 +191,7 @@ def _audit(ledger: Ledger, now: datetime, root: str) -> None:
         picks = rival.fetch(Path(root) / "rival_picks.json")
         today = ledger.day_of(now)
         posted = {(e.event_id, e.side): e.tier for e in ledger.entries.values()
-                  if e.units > 0 and e.status != "void" and any(D503_MARK in r for r in e.reasons)}
+                  if e.units > 0 and e.status != "void" and is_formula_pick(e.reasons)}
         rows = audit.run(picks, LAST_SIDES, posted, now, Path(root) / "d5_audit.json", days=(today,))
         if rows:
             print(f"D503 audit: {sum(r['status'] == 'caught' for r in rows)} of {len(rows)} of his money picks today caught")

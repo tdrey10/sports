@@ -10,7 +10,7 @@ from pathlib import Path
 
 from .brain import BrainReport
 from .spots import SPOTS
-from .ledger import Ledger
+from .ledger import ENGINE_MARK, OLD_ENGINE_MARK, Ledger
 from .sports import SPORTS, SportConfig
 
 KEEP_DAYS = 30  # settled picks shown in "latest results" (stats always use the full ledger)
@@ -58,6 +58,7 @@ def build_data(
         d = e.to_dict()
         d["settled"] = e.settled
         entries.append(d)
+    entries = [_scrub(d) for d in entries]
     in_ledger = {e["sport"] for e in entries}
     shown = [c for c in sports if c.key in in_ledger] or sports
     return {
@@ -85,13 +86,26 @@ def build_data(
         "ufc": ufc or {},
         "clv_trust": ledger.clv_trust(now),
         "parlays": [v for v in ledger.parlay_views() if v["created_at"] >= cutoff.isoformat()],
-        # Head to head with the D503 engine: straight picks, same start date, graded the same way.
-        "rival": _rival(rival, ledger, now, rival_reported),
+        # Owner, Oct 28: no head to head and no "D503" anywhere on the page.
+        "rival": None,
         # The NBA player report (nbaplayers.py): research, no units.
         "nba": nba,
         # The football reports (fbplayers.py): {"nfl": ..., "ncaaf": ...}. Research, no units.
         "reports": reports or {},
     }
+
+
+def _scrub(obj):
+    """Owner, Oct 28: "I don't want it to say D503 formula anywhere on the page" (picks posted before
+    the rename still carry the old wording)."""
+    if isinstance(obj, str):
+        out = obj.replace(OLD_ENGINE_MARK, ENGINE_MARK).replace("D503's ", "").replace("D503 ", "")
+        return out[:1].upper() + out[1:] if out != obj else out
+    if isinstance(obj, list):
+        return [_scrub(x) for x in obj]
+    if isinstance(obj, dict):
+        return {k: _scrub(v) for k, v in obj.items()}
+    return obj
 
 
 def _rival(picks, ledger, now, reported=None):

@@ -1004,15 +1004,6 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const labels = DATA.spot_labels || {};
     const spotRows = Object.entries(st.by_spot || {}).map(([k, s]) => `<tr><td>${esc(labels[k] || k)}</td><td>${rec(s)}</td><td class="${cls(s.clv)}">${s.clv == null ? "–" : signed(s.clv * 100, 1) + "%"}</td></tr>`).join("");
     const recent = DATA.entries.filter((e) => e.settled && e.status !== "void" && visible(e)).sort((a, b) => (b.graded_at || "").localeCompare(a.graded_at || "")).slice(0, 15);
-    const rv = DATA.rival;
-    const h2h = rv ? (() => {
-      const line = (name, r) => `<tr><td>${name}</td><td>${rec(r.money)}</td><td class="${cls(r.money.units)}">${signed(r.money.units, 1)}u</td><td>${r.money.staked ? signed(r.money.units / r.money.staked * 100, 0) + "%" : "–"}</td><td>${rec(r.leans)}</td></tr>`;
-      const today = (rv.today || []).map((p) => { const l = (p.legs || [])[0] || {};
-        return `<li>${esc((l.league || "").toUpperCase())} ${esc(l.team || "")} ${l.market === "ml" ? "ML" : esc(l.market || "")} ${odds(p.american)} · ${p.units > 0 ? p.units + "u" : "lean"}${l.edge == null ? "" : ` · his edge ${signed(l.edge * 100, 1)}%`}${p.status && p.status !== "open" ? ` · ${esc(p.status)}` : ""}</li>`; }).join("");
-      return panel("Head to head", `Us vs. the D503 engine since ${esc(rv.since)} · units are money plays only; leans are just a W-L, no units · D503's record is his own dashboard's count (it also counts his early value plays and unit parlay legs)`,
-        `<div class="table-wrap"><table><thead><tr><th></th><th>Money plays</th><th>Units</th><th>ROI</th><th>Leans</th></tr></thead><tbody>${line("Us", rv.ours)}${line(rv.theirs.reported ? "D503 <small>(his count)</small>" : "D503", rv.theirs)}</tbody></table></div>`
-        + (today ? `<p class="small muted">D503's straight picks today:</p><ul class="small">${today}</ul>` : ""));
-    })() : "";
     const graded = DATA.entries.filter((e) => e.grade && e.settled && e.status !== "void");
     const gradeRows = ["A+", "A", "B", "C", "NO BET"].map((g) => {
       const xs = graded.filter((e) => e.grade === g);
@@ -1022,7 +1013,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       return `<tr><td>${gradeBadge({ grade: g })}</td><td>${w}-${l}</td><td class="${cls(u)}">${signed(u, 2)}u</td></tr>`;
     }).join("");
     const byGrade = gradeRows ? panel("By grade", "Every graded pick since grades started (Oct 28) · units are money plays only", `<div class="table-wrap"><table><thead><tr><th>Grade</th><th>W-L</th><th>Units</th></tr></thead><tbody>${gradeRows}</tbody></table></div>`) : "";
-    return byGrade + h2h + (sportRows ? panel("By sport", "Units come from money plays only · leans are a W-L, no units", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Money plays</th><th>All picks W-L</th><th>Win</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
+    return byGrade + (sportRows ? panel("By sport", "Units come from money plays only · leans are a W-L, no units", `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Money plays</th><th>All picks W-L</th><th>Win</th></tr></thead><tbody>${sportRows}</tbody></table></div>`) : "")
       + panel("By early-bet spot", "Each spot keeps its own record (W-L and how often it beat the closing line)", spotRows
           ? `<div class="table-wrap"><table><thead><tr><th>Spot</th><th>W-L</th><th>CLV</th></tr></thead><tbody>${spotRows}</tbody></table></div>`
           : empty("No graded picks in a spot yet."))
