@@ -208,11 +208,22 @@ def spot(res: dict | None, news: dict) -> tuple[dict, str] | None:
     """The passed group (key players first) this news falls in, as a proven-spot row, or None."""
     for name in (("key", "all") if is_key(news) else ("all",)):
         r = (res or {}).get(name)
-        if r and r.get("verdict") in ("PROVEN", "STRONG"):
+        if r and r.get("verdict") in ("PROVEN", "STRONG", "CLV"):
             who = "a key player" if name == "key" else "a player"
             return {"verdict": r["verdict"], "blind": r["blind"], "in_sample": r["in_sample"],
+                    "clv_blind": r.get("clv_blind"), "clv_in_sample": r.get("clv_in_sample"),
                     "study": "Injury timing", "variant": f"the other team when {who} is ruled out (fresh news)"}, name
     return None
+
+
+def _clv(bets: list[dict]) -> dict:
+    """Beating the close, which needs no final score: how often, its standard error, and by how much."""
+    n = len(bets)
+    if not n:
+        return {"bets": 0, "beat_close": None, "se": None, "avg_clv": None}
+    rate = sum(b["clv"] > 0 for b in bets) / n
+    return {"bets": n, "beat_close": round(rate, 3), "se": round(math.sqrt(rate * (1 - rate) / n), 3),
+            "avg_clv": round(sum(b["clv"] for b in bets) / n, 4)}
 
 
 def run(sport: str, root="data") -> dict:
@@ -229,10 +240,21 @@ def run(sport: str, root="data") -> dict:
         verdict = "collecting" if len(graded) < MIN_BETS else ""
         if not verdict and blind["flat_roi"] - blind["se"] > 0 and (tune["flat_roi"] or 0) > 0:
             verdict = "STRONG" if tune["flat_roi"] - tune["se"] > 0 else "PROVEN"
+        # Or edge (owner, Oct 28: units if it's proven to have good value "or edge"): every bet, graded or
+        # not, split by time; the blind half beats the closing line more than half the time by a standard
+        # error, with the tuning half above half too and the average beat positive. The same proof the
+        # owner took for the early football dogs (1/2u, grade B).
+        timed = sorted(rows, key=lambda r: r["seen_at"])
+        ch = len(timed) // 2
+        ctune, cblind = _clv(timed[:ch]), _clv(timed[ch:])
+        if verdict in ("", "collecting") and len(timed) >= MIN_BETS and cblind["beat_close"] - cblind["se"] > 0.5 \
+                and ctune["beat_close"] > 0.5 and cblind["avg_clv"] > 0:
+            verdict = "CLV"
         res[name] = {"n": len(rows), "avg_news_move": round(sum(r["news_move"] for r in rows) / len(rows), 4),
                      "avg_drift": round(sum(r["drift"] for r in rows) / len(rows), 4),
                      "drift_same_way": round(drift_same, 3), "graded": len(graded),
-                     "in_sample": tune, "blind": blind, "all_bets": _stats(graded), "verdict": verdict or "no edge"}
+                     "in_sample": tune, "blind": blind, "all_bets": _stats(graded),
+                     "clv_in_sample": ctune, "clv_blind": cblind, "verdict": verdict or "no edge"}
     return res
 
 
@@ -248,6 +270,9 @@ def report(res: dict) -> str:
         b = r["all_bets"]
         rec = "" if not b["bets"] else (f"; betting the other team at the news: {b['bets']} bets {b['flat_roi']:+.1%}, "
                                         f"beat the close {b['beat_close']:.0%}")
+        cb = r.get("clv_blind") or {}
+        if cb.get("bets"):
+            rec += f"; blind half beat the close {cb['beat_close']:.0%} of {cb['bets']}"
         lines.append(f"  {name}: line moved {r['avg_news_move'] * 100:+.1f} pts on the news, then {r['avg_drift'] * 100:+.1f} "
                      f"more by the close ({r['drift_same_way']:.0%} kept moving the same way){rec}. Verdict: {r['verdict']}.")
     return "\n".join(lines)

@@ -25,7 +25,7 @@ from .tiers import Card
 
 log = logging.getLogger(__name__)
 
-UNITS = {"STRONG": 1.0, "PROVEN": 0.5}
+UNITS = {"STRONG": 1.0, "PROVEN": 0.5, "CLV": 0.5}  # CLV: beats the close blind (the "or edge" proof)
 MAX_FAV = -150  # owner's rule (the studies tested to -170)
 DOG = (100, 300)
 SPORTS = ("nfl", "ncaaf", "nba", "ncaab", "nhl", "mlb")
@@ -90,6 +90,8 @@ def _fits(market: str, pick: Pick | None) -> bool:
 def _card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
     """A proven-spot card: its win chance is the price's break-even plus the edge the blind test kept
     after one standard error (so the ledger's break-even rule reads the test, not the old model)."""
+    if row["verdict"] == "CLV":
+        return _clv_card(sport_name, ctx, pick, row, label)
     b, t = row["blind"], row["in_sample"]
     keep = max((b.get("flat_roi") or 0) - (b.get("se") or 0), 0.01)
     dec = american_to_decimal(pick.american)
@@ -110,6 +112,25 @@ def _card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
                           "tune_bets": t["bets"], "tune_roi": t["flat_roi"],
                           "text": f"{row.get('study', '')}: {row['variant']}. Blind {b['bets']} bets {b['flat_roi']:+.1%} "
                                   f"(standard error {b.get('se') or 0:.1%}); tuning {t['bets']} bets {t['flat_roi']:+.1%}."})
+
+
+def _clv_card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
+    """A spot proven by beating the closing line (its win-loss record still too short): 1/2u, grade B. Its
+    win chance is the price's break-even plus the average amount it beat the close by."""
+    b, t = row["clv_blind"], row["clv_in_sample"]
+    dec = american_to_decimal(pick.american)
+    p = min(1 / dec + max(b["avg_clv"], 0.005), 0.97)
+    pick = replace(pick, win_prob=p, model_prob=p, ev=p * dec - 1)
+    units = UNITS["CLV"]
+    why = (f"Beat the closing line {b['beat_close']:.0%} of {b['bets']} blind bets (by {b['avg_clv'] * 100:.1f} pts on "
+           f"average); tuning {t['beat_close']:.0%} of {t['bets']}. The win-loss record is still too short to prove it.")
+    reasons = [f"✅ Proven edge · {units:g}u: {label}.", why,
+               "Beating the close is the market's own verdict that we got a better price than it ended at."]
+    head = f"{pick.selection} at {pick.american:+.0f}: {label}. Beats the closing line {b['beat_close']:.0%} blind."
+    return Card(tier="value", units=units, headline=head, reasons=reasons, sport=pick.sport, sport_name=sport_name,
+                pick=pick, home=ctx.home, away=ctx.away, proven=f"CLV: {row.get('study', '')} · {row['variant']}",
+                evidence={"kind": "CLV", "why": why, "text": f"{row.get('study', '')}: {row['variant']}. {why}",
+                          "risk": "Proven on price (beating the close), not yet on wins and losses."})
 
 
 def _phi(z: float) -> float:
