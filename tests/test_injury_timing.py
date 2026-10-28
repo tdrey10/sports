@@ -67,3 +67,35 @@ def test_the_study_measures_the_move_on_the_news_and_after_it(tmp_path):
     res = injurytiming.run("nba", tmp_path)
     assert res["all"]["drift_same_way"] == 1.0 and res["all"]["verdict"] == "collecting"
     assert "kept moving the same way" in injurytiming.report(res)
+
+
+def test_once_it_passes_blind_fresh_news_posts_the_other_team_with_units(tmp_path):
+    """Owner, Oct 28: 'I want the pick to have units if it is proven to have good value.'"""
+    import dataclasses
+    import json
+
+    from sportsedge import proven
+    from tests.test_ledger import make_pick
+
+    out = tmp_path / "injuries"
+    injurytiming.log(out, [scan()], T0, root=tmp_path)
+    news = T0 + timedelta(hours=2)
+    injurytiming.log(out, [scan(out=["Star"])], news, root=tmp_path)
+    passed = {"verdict": "PROVEN", "blind": {"bets": 120, "flat_roi": 0.09, "se": 0.07},
+              "in_sample": {"bets": 120, "flat_roi": 0.04, "se": 0.08}}
+    (tmp_path / "injury_timing.json").write_text(json.dumps({"nba": {"all": passed}}))
+    away = dataclasses.replace(make_pick(market="h2h", side="away", point=None, american=120, sport="nba", event_id="g1"),
+                               commence_time=START)
+    s = scan(out=["Star"])
+    s.picks = [away]
+    s.sport.name = "NBA"
+    for ctx in s.contexts.values():
+        ctx.neutral, ctx.wind_mph = False, None
+    [c] = proven.find([s], news + timedelta(minutes=5), tmp_path)
+    assert (c.pick.side, c.units, c.proven.split(":")[0]) == ("away", 0.5, "PROVEN")
+    assert "Home just ruled out Star" in c.headline
+    # Stale news (an hour old) doesn't post: the study bet at the price when the news broke.
+    assert proven.find([s], news + timedelta(hours=1), tmp_path) == []
+    # Still collecting: no units.
+    (tmp_path / "injury_timing.json").write_text(json.dumps({"nba": {"all": {**passed, "verdict": "collecting"}}}))
+    assert proven.find([s], news + timedelta(minutes=5), tmp_path) == []

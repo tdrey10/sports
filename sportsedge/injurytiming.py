@@ -12,7 +12,9 @@ The study asks:
 - Did it keep moving the same way until the close (drift)? If so the books under-reacted at first,
   and a bet on the other team when the news broke beat the close.
 - Did that bet win money? Split by time: the first half tunes, the second half is blind.
-It gets no units until it passes the blind standard (proven.py); until then it reports "collecting".
+It reports "collecting" until it has MIN_BETS graded bets. Once the blind half passes (PROVEN or
+STRONG, the same standard as every spot), proven.py posts it with units: the other team's moneyline
+when fresh news breaks (owner, Oct 28: "I want the pick to have units if it is proven").
 """
 
 from __future__ import annotations
@@ -29,6 +31,8 @@ FIELDS = ["seen_at", "event_id", "start", "team", "side", "player", "pos", "tier
 BOOK = "draftkings"  # the board's book: one consistent line over time
 MIN_BETS = 100  # below this the study is still collecting
 KEY_TIERS = ("Key", "Starter")
+MAX_FAV, DOG = -150, (100, 300)
+NEWS_MINUTES = 45  # a proven spot posts only on fresh news: the price the study bet at
 
 
 # --- Logging -------------------------------------------------------------------------------------
@@ -170,6 +174,8 @@ def events(sport: str, root="data") -> list[dict]:
                "bet_price": price,
                # beat the close: the other team's closing no-vig chance is above the break-even of our price
                "clv": round((1 - p(close)) - 1 / american_to_decimal(price), 4)}
+        if not (MAX_FAV <= price <= -101 or DOG[0] <= price <= DOG[1]):
+            continue  # only prices the live board can post (owner's -150 cap; dogs to +300)
         if c["event_id"] in finals:
             hs, as_ = finals[c["event_id"]]
             won = (as_ > hs) if other == "away" else (hs > as_)
@@ -182,9 +188,36 @@ def events(sport: str, root="data") -> list[dict]:
     return list(first.values())
 
 
+def is_key(row: dict) -> bool:
+    return row.get("tier") in KEY_TIERS or (row.get("pos") or "").upper() == "QB"
+
+
+def recent(sport: str, now: datetime, root="data") -> list[dict]:
+    """Players ruled out in the last NEWS_MINUTES before a game that hasn't started."""
+    out = []
+    for c in _read(Path(root) / "injuries" / sport):
+        if c["now"] != "out" or c["was"] not in ("active", "questionable"):
+            continue
+        seen, start = datetime.fromisoformat(c["seen_at"]), datetime.fromisoformat(c["start"])
+        if start > now and 0 <= (now - seen).total_seconds() <= NEWS_MINUTES * 60:
+            out.append(c)
+    return out
+
+
+def spot(res: dict | None, news: dict) -> tuple[dict, str] | None:
+    """The passed group (key players first) this news falls in, as a proven-spot row, or None."""
+    for name in (("key", "all") if is_key(news) else ("all",)):
+        r = (res or {}).get(name)
+        if r and r.get("verdict") in ("PROVEN", "STRONG"):
+            who = "a key player" if name == "key" else "a player"
+            return {"verdict": r["verdict"], "blind": r["blind"], "in_sample": r["in_sample"],
+                    "study": "Injury timing", "variant": f"the other team when {who} is ruled out (fresh news)"}, name
+    return None
+
+
 def run(sport: str, root="data") -> dict:
     ev = events(sport, root)
-    key = [e for e in ev if e["tier"] in KEY_TIERS or (e["pos"] or "").upper() == "QB"]
+    key = [e for e in ev if is_key(e)]
     res = {"sport": sport, "news": len(ev), "key_news": len(key)}
     for name, rows in (("all", ev), ("key", key)):
         if not rows:
@@ -222,4 +255,4 @@ def report(res: dict) -> str:
 
 SPORTS = ("nfl", "ncaaf", "nba", "nhl", "mlb", "ncaab")
 
-__all__ = ["events", "log", "report", "run"]
+__all__ = ["events", "log", "recent", "report", "run", "spot"]
