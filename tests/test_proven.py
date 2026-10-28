@@ -52,3 +52,25 @@ def test_only_spots_that_passed_are_looked_for(tmp_path):
 
 def test_only_his_nhl_lock_and_early_football_dogs_carry_units():
     assert set(PROVEN_TIERS) == {("nhl", "lock"), ("nfl", "early"), ("ncaaf", "early")}
+
+
+def test_a_proven_over_posts_when_the_road_team_is_at_altitude(monkeypatch, tmp_path):
+    """Owner, Oct 28 (more proven spots from our own data): college hoops over, road team at altitude."""
+    import json
+    from datetime import datetime, timedelta, timezone
+
+    from sportsedge import factorstudy
+
+    row = {"market": "over", "variant": "road team visiting altitude", "verdict": "STRONG", "study": "College hoops game factors",
+           "blind": {"bets": 549, "flat_roi": 0.154, "se": 0.04}, "in_sample": {"bets": 494, "flat_roi": 0.071}}
+    (tmp_path / "factor_study.json").write_text(json.dumps({"ncaab": {"rows": [row]}}))
+    monkeypatch.setattr(factorstudy, "game_study", lambda *a, **k: {"Kansas Jayhawks @ Colorado Buffaloes": [
+        {"team": "Kansas Jayhawks", "side": "away", "factor": "visiting altitude", "markets": [], "best": "untested"}]})
+    now = datetime(2026, 11, 10, 15, tzinfo=timezone.utc)
+    over = make_pick(market="totals", side="over", point=141.5, american=-110, sport="ncaab", event_id="g1")
+    over = __import__("dataclasses").replace(over, commence_time=now + timedelta(hours=8))
+    ctx = SimpleNamespace(home="Colorado Buffaloes", away="Kansas Jayhawks", neutral=False, injuries_unknown=[], wind_mph=None,
+                          event=SimpleNamespace(commence_time=now + timedelta(hours=8)))
+    scan = SimpleNamespace(sport=SimpleNamespace(key="ncaab", name="College Basketball"), picks=[over], contexts={"g1": ctx})
+    got = proven.find([scan], now, tmp_path)
+    assert [(c.pick.side, c.units, c.proven.split(":")[0]) for c in got] == [("over", 1.0, "STRONG")]
