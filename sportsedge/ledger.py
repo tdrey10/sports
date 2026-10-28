@@ -38,7 +38,13 @@ CLV_PRIOR = 30  # picks of "no edge" the CLV average is shrunk toward
 GRADE_AFTER = timedelta(hours=2)  # earliest a game can be final
 
 
-D503_MARK = "Engine: D503 formula."
+ENGINE_MARK = "Engine: Script Leaks ratings."  # marks a pick from the rebuilt formula board (owner, Oct 28: no "D503" on the page)
+OLD_ENGINE_MARK = "Engine: D503 formula."  # picks posted before the rename
+D503_MARKS = (ENGINE_MARK, OLD_ENGINE_MARK)
+
+
+def is_formula_pick(reasons) -> bool:
+    return any(m in (reasons or []) for m in D503_MARKS)
 
 # Owner, Oct 25 (his sizing, the D503 spec): a $100,000 bankroll, 1 unit = $1,000, +$500 for every
 # full $50,000 the bankroll grows ($150k -> $1,500 a unit), set each morning from that bankroll.
@@ -343,7 +349,7 @@ class Ledger:
         for e in sorted(self.entries.values(), key=lambda e: (not e.event_id.isdigit(), e.created_at)):
             if e.status != "pending" or e.start <= now or e.tier in LIVE_TIERS or e.tier == "sharp":
                 continue  # live and sharp-value bets have their own checks (and their own CLV record)
-            if D503_MARK in (e.reasons or []):
+            if is_formula_pick(e.reasons):
                 continue  # the D503 formula: a posted pick never changes
             if e.tier == "dog" and e.win_prob < DOG_FLOOR_WIN:
                 # A Dog of the Day is a dog with a real shot (40%+ on our number), not a long shot.

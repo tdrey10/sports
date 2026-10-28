@@ -17,6 +17,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from ..edge import Pick
+from ..ledger import ENGINE_MARK
 from ..tiers import Card
 from .data import Game, load
 from .features import FEATURES, Replay, logit, sigmoid
@@ -59,17 +60,17 @@ UNPROVEN_MAX = 1.0
 # NFL money -0.8%, college football +0.2% (its Dogs +13.5% on 110, inside the noise), NBA -25.9%,
 # MLB -5.8%, college hoops -1.3%. Half a unit: it was found by looking, and it has no tuning check.
 PROVEN_TIERS = {
-    ("nhl", "lock"): "D503 NHL Lock: blind 2022-26, 107 bets, +14.7% (PROVEN)",
+    ("nhl", "lock"): "NHL Lock formula: blind 2022-26, 107 bets, +14.7% (PROVEN)",
     # Owner, Oct 27 (chose 1/2u, NFL and college): his early dogs, run 3 days out at the opening line
     # on 2023-26 (model fit before July 2022), beat the closing line 64% of the time in the NFL (39 bets,
     # +35.6%) and 60% in college football (200 bets, +6.2%), against 45% / 50% for every dog at the
     # open. The W-L isn't past its standard error yet; the line move is the proof the owner took.
-    ("nfl", "early"): "D503 early NFL dog: beat the close 64% blind 2023-26 (39 bets, +35.6%)",
-    ("ncaaf", "early"): "D503 early college dog: beat the close 60% blind 2023-26 (200 bets, +6.2%)",
+    ("nfl", "early"): "Early NFL dog: beat the close 64% blind 2023-26 (39 bets, +35.6%)",
+    ("ncaaf", "early"): "Early college dog: beat the close 60% blind 2023-26 (200 bets, +6.2%)",
 }
 PROVEN_EVIDENCE = {
     ("nhl", "lock"): {"kind": "PROVEN", "blind_bets": 107, "blind_roi": 0.147, "blind_se": 0.079,
-                      "text": "His board replayed day by day on 2022-26 (model fit before July 2022), at closing prices: "
+                      "text": "The board replayed day by day on 2022-26 (model fit before July 2022), at closing prices: "
                               "NHL Lock 107 bets 71-36 +14.7% (SE 7.9%), up every season.",
                       "risk": "Found by looking at slices of his board; no tuning-period check."},
     ("nfl", "early"): {"kind": "CLV", "blind_bets": 39, "blind_roi": 0.356, "blind_se": 0.213,
@@ -731,7 +732,7 @@ def _card(tier: str, units: float, s: Side, label: str, sport_name: str) -> Card
         why.append(f"Line since the open: {'money ran away' if s.drift > 0 else 'money came in'} "
                    f"({abs(s.drift) * 100:.1f} pts).")
     why += s.notes[:6]
-    why.append("Engine: D503 formula.")
+    why.append(ENGINE_MARK)
     return Card(tier=tier, units=units, headline=head, reasons=why, sport=s.sport, sport_name=sport_name, pick=pk,
                 home=s.home, away=s.away)
 
