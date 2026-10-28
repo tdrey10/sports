@@ -99,3 +99,28 @@ def test_once_it_passes_blind_fresh_news_posts_the_other_team_with_units(tmp_pat
     # Still collecting: no units.
     (tmp_path / "injury_timing.json").write_text(json.dumps({"nba": {"all": {**passed, "verdict": "collecting"}}}))
     assert proven.find([s], news + timedelta(minutes=5), tmp_path) == []
+
+
+def test_or_edge_beating_the_close_blind_earns_half_a_unit_before_the_record_is_long_enough(tmp_path, monkeypatch):
+    """Owner, Oct 28: units if it's proven to have good value 'or edge'. Beating the closing line needs no
+    final score, so it can prove itself first: 1/2u, grade B."""
+    import dataclasses
+
+    from sportsedge import proven, scorecard
+    from tests.test_ledger import make_pick
+
+    def ev(i, clv):
+        return {"seen_at": f"2026-10-{1 + i // 10:02d}T{i % 10:02d}:00", "event_id": f"g{i}", "team": "T", "pos": "",
+                "tier": "", "news_move": -0.03, "drift": -0.01, "clv": clv}
+    rows = [ev(i, 0.02 if i % 4 else -0.01) for i in range(120)]  # beats the close 75%, no finals yet
+    monkeypatch.setattr(injurytiming, "events", lambda sport, root="data": rows)
+    res = injurytiming.run("nba")
+    assert res["all"]["verdict"] == "CLV" and res["all"]["graded"] == 0
+    hit, _ = injurytiming.spot(res, {"tier": ""})
+    pick = dataclasses.replace(make_pick(market="h2h", side="away", point=None, american=120, sport="nba"))
+    c = proven._card("NBA", NS(home="Home", away="Away"), pick, hit, "Away: Home just ruled out Star")
+    assert c.units == 0.5 and c.proven.startswith("CLV") and c.pick.ev > 0
+    assert scorecard.grade(c)[0] == "B"
+    # Beating the close only half the time is no edge.
+    monkeypatch.setattr(injurytiming, "events", lambda sport, root="data": [ev(i, 0.02 if i % 2 else -0.02) for i in range(120)])
+    assert injurytiming.run("nba")["all"]["verdict"] == "collecting"
