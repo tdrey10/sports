@@ -89,3 +89,12 @@ def test_every_price_carries_its_team():
 
     m = {"away": "Tampa Bay Buccaneers", "home": "Carolina Panthers", "away_ml": 130.0, "home_ml": -155.0, "spread": -3.0}
     assert line_text(m) == "Tampa Bay Buccaneers +130 · Carolina Panthers -155 · spread: Carolina Panthers -3"
+
+
+def test_a_sick_flag_only_for_players_who_have_played_this_season():
+    from sportsedge.cli import _has_played
+
+    rep = {"teams": {"Golden State Warriors": {"roster": [{"name": "Stephen Curry"}]}}}
+    assert _has_played(rep, "Golden State Warriors", "Stephen Curry")
+    assert not _has_played(rep, "Golden State Warriors", "Kristaps Porzingis")  # out for weeks: the line has it
+    assert _has_played({}, "Anyone", "Someone")  # no roster to check against
