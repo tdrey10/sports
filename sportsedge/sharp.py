@@ -126,9 +126,10 @@ class SharpClient:
         resp.raise_for_status()
         return {s["key"] for s in resp.json() if s.get("active")}
 
-    def odds(self, cfg: SportConfig) -> list[dict]:
+    def odds(self, cfg: SportConfig, markets: tuple[str, ...] = MARKETS) -> list[dict]:
+        """Each market costs one credit per request."""
         resp = self.session.get(f"{API}/sports/{cfg.odds_key}/odds", params={
-            "apiKey": self.api_key, "markets": ",".join(MARKETS), "oddsFormat": "american",
+            "apiKey": self.api_key, "markets": ",".join(markets), "oddsFormat": "american",
             "bookmakers": ",".join((SHARP,) + US_BOOKS),
         }, timeout=20)
         self._track(resp)
