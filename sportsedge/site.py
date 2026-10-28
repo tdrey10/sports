@@ -129,8 +129,8 @@ APP_MANIFEST = {
 
 
 def write_app(out_dir: str | Path, data: dict) -> Path:
-    """The page as its own website, ready to save to a phone's Home Screen: the duck as the icon,
-    "Hambino" as the name, opening full screen like an app."""
+    """The page as its own website, ready to save to a phone's Home Screen: the Script Leaks icon,
+    "Script Leaks" as the name, opening full screen like an app."""
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     (out / "index.html").write_text(render_html(data, standalone=True, app=True))
@@ -156,7 +156,7 @@ def render_html(data: dict, standalone: bool = True, app: bool = False) -> str:
         uri = "data:image/jpeg;base64," + base64.b64encode(mascot.read_bytes()).decode()
         body = body.replace("__MASCOT__", uri)
     thumb = web.joinpath("thumb.jpg")
-    if thumb.is_file():  # the duck: the wide-screen cover, which is what the gallery thumbnail shows
+    if thumb.is_file():  # the Script Leaks cover (Lillard's shot): the wide-screen cover, which is what the gallery thumbnail shows
         uri = "data:image/jpeg;base64," + base64.b64encode(thumb.read_bytes()).decode()
         body = body.replace("__THUMB__", uri)
     if not standalone:
