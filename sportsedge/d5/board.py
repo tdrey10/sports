@@ -773,6 +773,8 @@ def build(scans, now: datetime, models: dict[str, SportModel], taken: set[str] |
         if t == "early" and not set(early_spots(sd)[0]) - UNTESTED_SPOTS:
             tag = None  # only the spot we couldn't test: a lean
         if tag and c.units > 0:
+            # The card's own line says the formula's size; it posts at the proven size, so say that.
+            c.reasons = [r.replace(f" · {c.units:g}u", f" · {PROVEN_UNITS:g}u", 1) for r in c.reasons]
             c.proven, c.units, c.evidence = tag, PROVEN_UNITS, PROVEN_EVIDENCE[(c.sport, c.tier)]
             c.reasons.insert(0, f"✅ Proven: {tag}.")
     return cards
