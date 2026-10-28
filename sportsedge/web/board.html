@@ -613,7 +613,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function renderHero() {
     const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && x.units > 0 && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
     if (!e) {
-      $("hero").innerHTML = `<div class="ticket-empty"><b>Bet on it, the heat is coming</b></div>`;
+      $("hero").innerHTML = `<div class="ticket-empty"><b>No it’s not rigged</b></div>`;
       return;
     }
     const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
@@ -633,7 +633,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const e = items.filter((x) => x.tier === t && (x.units > 0 || t === "prop")).sort((a, b) => b.units - a.units)[0];
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
-      if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">Bet on it, the heat is coming</p></div>`;
+      if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">No it’s not rigged</p></div>`;
       return `<div class="potd">${stamp(e)}<span class="kind">${label}</span><h3>${gradeBadge(e)} ${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${wins(e)}</span></div><p class="small">${needs(e)}</p>${stake(e)}
         <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${scoreDetails(e)}${more(e)}</div>`;
@@ -967,7 +967,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const items = DATA.entries.filter((e) => isLive(e) && onBoard(e)).sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
     const latest = (t) => items.find((e) => e.tier === t);
     const slot = (t, title, extra) => { const e = latest(t);
-      return `<div class="slot ${extra}"><span class="kind">${title}</span>${e ? row(e, { matchup: true }) : `<p class="empty">Bet on it, the heat is coming</p>`}</div>`; };
+      return `<div class="slot ${extra}"><span class="kind">${title}</span>${e ? row(e, { matchup: true }) : `<p class="empty">No it’s not rigged</p>`}</div>`; };
     const shown = new Set([latest("live_win"), latest("live_plus")].filter(Boolean).map((e) => e.id));
     const earlier = items.filter((e) => !shown.has(e.id));
     // The one live bet we'd take right now: the open one with the best edge score.
