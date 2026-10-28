@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 import os
 from dataclasses import replace
+from datetime import datetime, timezone
 
 from .data.base import NameMatcher
 from .odds import american_to_decimal
@@ -21,10 +22,10 @@ from .sports import SPORTS
 log = logging.getLogger(__name__)
 
 
-def best_book(ev: dict, side: str) -> tuple[str, float] | None:
-    """(book, price) with the best moneyline for a side among the US books."""
+def best_book(ev: dict, side: str, now: datetime | None = None) -> tuple[str, float] | None:
+    """(book, price) with the best moneyline for a side among the US books with fresh prices."""
     best = None
-    for book, markets in _prices(ev).items():
+    for book, markets in _prices(ev, now).items():
         if book not in US_BOOKS:
             continue  # Pinnacle can't be bet from the US
         q = markets.get(("h2h", None), {}).get(side)
@@ -40,6 +41,7 @@ def shop(cards, is_new=lambda c: True, client: SharpClient | None = None) -> int
     if not todo or not (client or os.environ.get("ODDS_API_KEY")):
         return 0
     client = client or SharpClient()
+    now = datetime.now(timezone.utc)
     better = 0
     for sport in dict.fromkeys(c.sport for c in todo):
         if client.remaining is not None and client.remaining - CREDIT_FLOOR < 1:
@@ -54,12 +56,12 @@ def shop(cards, is_new=lambda c: True, client: SharpClient | None = None) -> int
             m = NameMatcher([c.home, c.away])
             ev = next((e for e in events if m.match(e.get("home_team", "")) == c.home
                        and m.match(e.get("away_team", "")) == c.away), None)
-            found = best_book(ev, c.pick.side) if ev else None
+            found = best_book(ev, c.pick.side, now) if ev else None
             if found is None:
                 continue
             book, price = found
             name = BOOK_NAMES.get(book, book)
-            n = len({b for b in _prices(ev) if b in US_BOOKS})
+            n = len({b for b in _prices(ev, now) if b in US_BOOKS})
             if price > c.pick.american:
                 old_book, old = c.pick.book, c.pick.american
                 c.pick = replace(c.pick, american=price, book=name,

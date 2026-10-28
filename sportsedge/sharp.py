@@ -136,11 +136,28 @@ class SharpClient:
         return resp.json()
 
 
-def _prices(ev: dict) -> dict[str, dict[tuple, dict[str, float]]]:
-    """book -> (market, point key) -> side -> american price."""
+STALE_MINUTES = 30  # owner's +EV spec: reject stale prices; a book that hasn't updated in this long is skipped
+
+
+def fresh(b: dict, now: datetime | None) -> bool:
+    """Whether a bookmaker's prices were updated within STALE_MINUTES of now (no stamp or no now: yes)."""
+    stamp = b.get("last_update")
+    if now is None or not stamp:
+        return True
+    try:
+        seen = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+    except ValueError:
+        return True
+    return now - seen <= timedelta(minutes=STALE_MINUTES)
+
+
+def _prices(ev: dict, now: datetime | None = None) -> dict[str, dict[tuple, dict[str, float]]]:
+    """book -> (market, point key) -> side -> american price; books with stale prices left out."""
     home, away = ev["home_team"], ev["away_team"]
     out: dict[str, dict] = {}
     for b in ev.get("bookmakers", []):
+        if not fresh(b, now):
+            continue
         for m in b.get("markets", []):
             for o in m.get("outcomes", []):
                 name = o.get("name")
@@ -155,8 +172,8 @@ def _prices(ev: dict) -> dict[str, dict[tuple, dict[str, float]]]:
 
 
 def find_value(cfg: SportConfig, ev: dict, now: datetime) -> list[dict]:
-    """Every US-book price that beats Pinnacle's no-vig line by MIN_EV or more."""
-    prices = _prices(ev)
+    """Every US-book price that beats Pinnacle's no-vig line by MIN_EV or more (stale books left out)."""
+    prices = _prices(ev, now)
     sharp = prices.get(SHARP)
     if not sharp:
         return []
