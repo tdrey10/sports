@@ -317,5 +317,15 @@
     "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 48 tries)",
     "verdict": "none wired: 2 of 48 variants technically cleared the bar, neither STRONG, about what luck gives. NBA lock favorite off a blowout win (blind +8.3% on 152, tuning +5.6% on 140) has no mirror: NCAAB/NCAAF/NHL/MLB lock favorites off a blowout win all lose blind (-1% to -12%) and it is a letdown spot that should hurt, not help. NCAAF dog off a blowout loss (blind +14.5% on 201) was flat in tuning (+0.9% on 129, under 1 SE) and the same spot loses in NCAAB (-16.5% on 621) and is flat elsewhere. The NHL lock favorite bounce-back passed tuning (+8.7%) but lost blind (-10.5%). Dropped; recheck NBA letdown and NCAAF bounce-back when more seasons are in.",
     "action": "logged; no change to bet rules"
+  },
+  {
+    "date": "2026-10-28",
+    "idea": "Totals by rest and fatigue: unders and overs when a team is on a back-to-back or its 3rd game in 4 days, both on a back-to-back, both rested 3+ days (daily sports), a short week or both off a bye (NFL/NCAAF), 44 variants",
+    "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+    "data": "data/lines/espn closing totals 2018+ (sportsedge/reststudy.py)",
+    "tuning": "seasons through 2021",
+    "blind": "2022 on",
+    "luck_control": "100 random tenths of all totals (random over/under) through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 44 tries)",
+    "verdict": "none wired: 1 of 44 variants technically cleared the bar, not STRONG, about what luck gives (p~0.25 of at least one). NFL under when both teams are off a bye/long break: blind +12.6% on 163, tuning +4.7% on 136 (under 1 SE), and the NCAAF twin is flat (-1.1% blind, +0.1% tuning). Everything else loses about the vig: back-to-back and 3rd-in-4 unders/overs both lose in every daily sport (-1% to -11%), NBA both-back-to-back under +2.4% blind but -7.1% tuning. The totals market already prices fatigue. Dropped; recheck NFL bye unders when more seasons are in."
   }
 ]
