@@ -14,8 +14,8 @@ import requests
 log = logging.getLogger(__name__)
 
 API = "https://api.github.com"
-ISSUE_TITLE = "The Great Hambino live bets"
-OLD_TITLES = ("Funky Buttlovin live bets",)  # the issue keeps working if it was never renamed
+ISSUE_TITLE = "Script Leaks live bets"
+OLD_TITLES = ("The Great Hambino live bets", "Funky Buttlovin live bets",)  # the issue keeps working if it was never renamed
 
 
 class GitHubIssueNotifier:
@@ -42,7 +42,7 @@ class GitHubIssueNotifier:
             else:
                 resp = self.session.post(f"{API}/repos/{self.repo}/issues", json={
                     "title": ISSUE_TITLE,
-                    "body": "New live bets from The Great Hambino are posted here as comments, so the GitHub app "
+                    "body": "New live bets from Script Leaks are posted here as comments, so the GitHub app "
                             "notifies your phone. Keep this issue open.",
                 })
                 resp.raise_for_status()

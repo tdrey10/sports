@@ -1,4 +1,4 @@
-<title>Follow Me, Instead Of Your Dreams</title>
+<title>Script Leaks</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
@@ -341,7 +341,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 <main class="wrap">
   <header class="mast">
     <p class="eyebrow" id="updated"><span class="dot"></span>Loading…</p>
-    <h1><small>Follow Me,</small><span>Instead Of Your Dreams</span></h1>
+    <h1><span>Script Leaks</span></h1>
     <div class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   </header>
   <div id="demo"></div>
@@ -1028,7 +1028,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 
   function renderTop() {
     const st = DATA.stats, o = st.overall;
-    $("updated").innerHTML = `<span class="dot"></span>Sports picks engine · updated ${esc(fmt(DATA.generated_at, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}`;
+    $("updated").innerHTML = `<span class="dot"></span>Script Leaks · updated ${esc(fmt(DATA.generated_at, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}`;
     $("demo").innerHTML = DATA.demo ? `<div class="demo">Demo data: made-up teams and odds so you can see how it works. Nothing here is a real bet.</div>` : "";
     const ap = st.all_picks || { won: 0, lost: 0, push: 0, units: 0 };
     // Leans carry no units, so they show as a W-L only (all picks minus the money plays).
