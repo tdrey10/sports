@@ -226,10 +226,67 @@ def _clv(bets: list[dict]) -> dict:
             "avg_clv": round(sum(b["clv"] for b in bets) / n, 4)}
 
 
+def questionable_events(sport: str, root="data") -> list[dict]:
+    """Each key player newly listed questionable before a game, with a bet on HIS team at the price then:
+    did that bet beat the close? (Owner, Oct 28: hold picks while a key player's status is unresolved?)"""
+    root = Path(root)
+    paths = _ml_path(_read(root / "odds" / sport))
+    finals = _finals(root / "games" / sport)
+    first: dict[tuple[str, str], dict] = {}
+    for c in sorted(_read(root / "injuries" / sport), key=lambda c: c["seen_at"]):
+        if c["now"] != "questionable" or c["was"] != "active" or not is_key(c) or c["seen_at"] >= c["start"]:
+            continue
+        path = [s for s in paths.get(c["event_id"], []) if s[0] < c["start"]]
+        at = [s for s in path if s[0] >= c["seen_at"]]
+        if not at:
+            continue
+        news, close = at[0], at[-1]
+        home = c["side"] == "home"
+        price = news[2] if home else news[3]
+        if not (MAX_FAV <= price <= -101 or DOG[0] <= price <= DOG[1]):
+            continue
+        p_close = close[1] if home else 1 - close[1]
+        row = {**c, "bet_price": price, "clv": round(p_close - 1 / american_to_decimal(price), 4)}
+        if c["event_id"] in finals:
+            hs, as_ = finals[c["event_id"]]
+            won = (hs > as_) if home else (as_ > hs)
+            row["ret"] = 0.0 if hs == as_ else (american_to_decimal(price) - 1 if won else -1.0)
+        first.setdefault((c["event_id"], c["team"]), row)
+    return list(first.values())
+
+
+def _hold_verdict(rows: list[dict]) -> dict:
+    """HOLD when betting into a key questionable player loses to the close, blind: the later half beats the
+    close less than half the time by a standard error, and the earlier half is under half too."""
+    timed = sorted(rows, key=lambda r: r["seen_at"])
+    h = len(timed) // 2
+    tune, blind = _clv(timed[:h]), _clv(timed[h:])
+    v = "collecting" if len(timed) < MIN_BETS else "no hold"
+    if v == "no hold" and blind["beat_close"] + blind["se"] < 0.5 and tune["beat_close"] < 0.5 and blind["avg_clv"] < 0:
+        v = "HOLD"
+    return {"n": len(timed), "clv_in_sample": tune, "clv_blind": blind, "verdict": v}
+
+
+def holding(timing: dict | None, card, ctx, sport: str, root="data") -> str | None:
+    """The key player who is questionable on the bet's side, if this sport's study says to hold; else None."""
+    if not timing or (timing.get("questionable") or {}).get("verdict") != "HOLD" or ctx is None:
+        return None
+    side = card.pick.side
+    teams = [ctx.home] if side == "home" else [ctx.away] if side == "away" else [ctx.home, ctx.away]
+    tiers = _tiers(sport, root)
+    for team in teams:
+        tier = (tiers.get(team) or {}).get("tiers", {})
+        for p, pos in ctx.questionable.get(team, []):
+            if is_key({"tier": tier.get(p, ""), "pos": pos}):
+                return p
+    return None
+
+
 def run(sport: str, root="data") -> dict:
     ev = events(sport, root)
     key = [e for e in ev if is_key(e)]
-    res = {"sport": sport, "news": len(ev), "key_news": len(key)}
+    res = {"sport": sport, "news": len(ev), "key_news": len(key),
+           "questionable": _hold_verdict(questionable_events(sport, root))}
     for name, rows in (("all", ev), ("key", key)):
         if not rows:
             continue
@@ -260,8 +317,12 @@ def run(sport: str, root="data") -> dict:
 
 def report(res: dict) -> str:
     s = res["sport"].upper()
+    q = res.get("questionable") or {}
+    qline = (f"{s} key player questionable: {q.get('n', 0)} bets into it"
+             + (f", blind half beat the close {q['clv_blind']['beat_close']:.0%}" if (q.get("clv_blind") or {}).get("bets") else "")
+             + f". Verdict: {q.get('verdict', 'collecting')}.")
     if not res.get("all"):
-        return f"{s} injury timing: no ruled-out news matched to lines yet (collecting)."
+        return f"{s} injury timing: no ruled-out news matched to lines yet (collecting).\n{qline}"
     lines = [f"{s} injury timing: {res['news']} players ruled out before a game ({res['key_news']} key players)."]
     for name in ("all", "key"):
         r = res.get(name)
@@ -275,9 +336,10 @@ def report(res: dict) -> str:
             rec += f"; blind half beat the close {cb['beat_close']:.0%} of {cb['bets']}"
         lines.append(f"  {name}: line moved {r['avg_news_move'] * 100:+.1f} pts on the news, then {r['avg_drift'] * 100:+.1f} "
                      f"more by the close ({r['drift_same_way']:.0%} kept moving the same way){rec}. Verdict: {r['verdict']}.")
+    lines.append(qline)
     return "\n".join(lines)
 
 
 SPORTS = ("nfl", "ncaaf", "nba", "nhl", "mlb", "ncaab")
 
-__all__ = ["events", "log", "recent", "report", "run", "spot"]
+__all__ = ["events", "holding", "log", "questionable_events", "recent", "report", "run", "spot"]

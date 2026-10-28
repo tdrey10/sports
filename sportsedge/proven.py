@@ -5,6 +5,7 @@ a standard error; PROVEN: blind by a standard error and a tuning profit) is look
 - the game-factor study (factorstudy.py), except a team's own split (too few games per team);
 - the "who's due" study (nbastudy.py): luck and slumps;
 - the line studies: the windy NFL under, and the college hoops favorite the spread says is cheap;
+- efficiency and tempo (effstudy.py): the ratings' projected spread or total far off today's line;
 - injury timing (injurytiming.py): the other team when a player is just ruled out, once that passes.
 A game in one posts at the spot's price window with units: STRONG 1u, PROVEN 1/2u. Everything else
 posts at 0u (tiers.gate). The owner's -150 cap on favorites holds.
@@ -51,6 +52,13 @@ def passed(root="data") -> list[dict]:
         for r in res.get("rows", []):
             if r.get("verdict"):
                 out.append({**r, "kind": "due", "sport": sport})
+    for sport, res in _load(root / "eff_study.json").items():
+        for r in res.get("rows", []):
+            if r.get("verdict"):
+                out.append({**r, "kind": "eff", "sport": sport})
+    for r in _load(root / "prop_usage.json").get("rows", []):
+        if r.get("verdict") in UNITS:
+            out.append({**r, "kind": "props"})
     for r in _load(root / "line_studies.json").get("rows", []):
         key = (r.get("study"), r.get("variant"))
         if r.get("verdict") and key in LINE_SPOTS:
@@ -236,7 +244,58 @@ def find(scans, now: datetime, root="data") -> list[Card]:
                         if ps - fair[side] >= 0.04:
                             add(eid, "moneyline favorite", side, r,
                                 f"{g[side]} moneyline is cheaper than the spread says ({ps:.0%} vs {fair[side]:.0%})")
-        # 4. Injury timing: a player just ruled out, if betting the other team on fresh news passed blind.
+        # 4. Efficiency and tempo (effstudy.py): the ratings' projection against today's line.
+        eff = [r for r in mine if r["kind"] == "eff"]
+        if eff:
+            from . import effstudy
+
+            try:
+                rt, pc, names = effstudy.current(sport, root)
+            except Exception as exc:  # a study failing never stops the board
+                log.warning("proven efficiency %s: %s", sport, exc)
+                rt = None
+            for eid, g in (games.items() if rt else ()):
+                ids = {s: names.get(g[s]) for s in ("home", "away")}
+                if not all(ids.values()):
+                    continue
+                over = prices.get(eid, {}).get(("totals", "over"))
+                total = over.point if over else None
+                hits = []
+                if rt.ready(ids["home"], ids["away"]):
+                    ph, pa = rt.project(ids["home"], ids["away"], g["neutral"])
+                    hits += effstudy.edges(sport, ph, pa, g["spread"], total)
+                if pc.ready(ids["home"], ids["away"]):
+                    hits += effstudy.pace_edges(sport, pc.total(ids["home"], ids["away"]), total)
+                for market, side, variant in hits:
+                    row = next((r for r in eff if (r["market"], r["variant"]) == (market, variant)), None)
+                    if row:
+                        add(eid, market, side, row, f"{g['away']} @ {g['home']}: {variant}")
+        # 5. NBA usage on points props (propusage.py): his scoring with the shots of teammates ruled out.
+        usage = [r for r in mine if r["kind"] == "props"]
+        if usage:
+            from . import propusage
+
+            try:
+                book = propusage.current(root)
+            except Exception as exc:
+                log.warning("proven props: %s", exc)
+                book = None
+            for p in (scan.picks if book else ()):
+                if p.market != propusage.MARKET or not p.player or p.event_id not in games or p.american < MAX_FAV:
+                    continue
+                ctx = scan.contexts[p.event_id]
+                if ctx.injuries_unknown:
+                    continue
+                team = book.team_of.get(p.player)
+                got = book.project(p.player, set(ctx.injuries.get(team, []))) if team else None
+                if got is None or p.point is None:
+                    continue
+                for side, variant in propusage.variants(got[0], p.point, got[1]):
+                    row = next((r for r in usage if (r["market"], r["variant"]) == (side, variant)), None)
+                    if row and p.side == side:
+                        label = f"{p.player} projects {got[0]:.1f} points vs a {p.point:g} line"
+                        found.append((f"{p.event_id}:{p.player}", _card(scan.sport.name, ctx, p, row, label)))
+        # 6. Injury timing: a player just ruled out, if betting the other team on fresh news passed blind.
         if timing:
             from . import injurytiming
 

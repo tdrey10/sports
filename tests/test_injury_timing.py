@@ -124,3 +124,31 @@ def test_or_edge_beating_the_close_blind_earns_half_a_unit_before_the_record_is_
     # Beating the close only half the time is no edge.
     monkeypatch.setattr(injurytiming, "events", lambda sport, root="data": [ev(i, 0.02 if i % 2 else -0.02) for i in range(120)])
     assert injurytiming.run("nba")["all"]["verdict"] == "collecting"
+
+
+def test_a_key_questionable_player_holds_a_money_pick_once_the_study_says_hold(tmp_path, monkeypatch):
+    """Owner, Oct 28: if betting into a star's unresolved questionable tag loses to the close, wait."""
+    import json
+
+    from sportsedge import runner
+    from sportsedge.tiers import Card
+    from tests.test_ledger import make_pick
+
+    rows = [{"seen_at": f"2026-10-{1 + i // 10:02d}T{i % 10:02d}:00", "clv": -0.02 if i % 4 else 0.01} for i in range(120)]
+    q = injurytiming._hold_verdict(rows)
+    assert q["verdict"] == "HOLD"  # beat the close only 25% of the time
+    assert injurytiming._hold_verdict(rows[:50])["verdict"] == "collecting"
+    (tmp_path / "injury_timing.json").write_text(json.dumps({"nba": {"questionable": q}}))
+    monkeypatch.setattr(injurytiming, "_tiers", lambda sport, root: {"Home": {"tiers": {"Star": "Key", "Bench": "Rotation"}}})
+    pick = make_pick(market="h2h", side="home", point=None, american=-120, sport="nba", event_id="g1")
+    card = Card(tier="lock", units=1.0, headline="h", reasons=["r"], sport="nba", sport_name="NBA", pick=pick,
+                home="Home", away="Away", proven="STRONG: test")
+    ctx = NS(home="Home", away="Away", questionable={"Home": [("Star", "G")]})
+    scan_ = NS(sport=NS(key="nba"), contexts={"g1": ctx})
+    assert runner._hold_questionable([card], [scan_], str(tmp_path)) == 1
+    assert (card.units, card.tier) == (0.0, "lean") and "Star is questionable" in card.reasons[0]
+    # A bench player's tag holds nothing.
+    card2 = Card(tier="value", units=1.0, headline="h", reasons=["r"], sport="nba", sport_name="NBA", pick=pick,
+                 home="Home", away="Away", proven="STRONG: test")
+    ctx.questionable = {"Home": [("Bench", "F")]}
+    assert runner._hold_questionable([card2], [scan_], str(tmp_path)) == 0 and card2.units == 1.0
