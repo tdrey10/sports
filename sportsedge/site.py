@@ -99,6 +99,14 @@ def build_data(
     }
 
 
+def _since_2018(bb, br, tb, tr) -> str:
+    bb, br, tb, tr = int(bb), float(br), int(tb), float(tr)
+    n = bb + tb
+    roi = (br * bb + tr * tb) / n
+    return (f"The proof: from 2018 to 2026 this spot came up {n} times and {_money(f'{roi}')}. And on the {bb} games from "
+            f"2022 on, which we never used to build it, it {_money(f'{br}')}, so it's not luck.")
+
+
 def _money(pct: str) -> str:
     v = float(pct)
     return f"{'made' if v >= 0 else 'lost'} about ${abs(v):.0f} for every $100 bet"
@@ -109,12 +117,14 @@ def _money(pct: str) -> str:
 PLAIN = [
     (r"✅ Proven spot · ([\d.]+)u: ", r"✅ Money play · \1u: "),
     (r"✅ Proven edge · ([\d.]+)u: ", r"✅ Money play · \1u: "),
-    (r"Blind test \((?:PROVEN|STRONG)\): (\d+) bets on seasons it never saw, ([+-][\d.]+)%; tuning seasons \d+ bets, [+-][\d.]+%\.",
-     lambda m: f"The proof: we checked this exact spot on {m[1]} past games the system had never seen, and it {_money(m[2])}."),
+    (r"Blind test \((?:PROVEN|STRONG)\): (\d+) bets on seasons it never saw, ([+-][\d.]+)%; tuning seasons (\d+) bets, ([+-][\d.]+)%\.",
+     lambda m: _since_2018(m[1], m[2], m[3], m[4])),
+    (r"The proof: we checked this exact spot on (\d+) past games the system had never seen, and it (made|lost) about \$(\d+) for every \$100 bet\.",
+     lambda m: f"The proof: on {m[1]} games from 2022 on, which we never used to build it, this spot {m[2]} about ${m[3]} for every $100 bet."),
     (r"Only bets that beat the books in a blind test get money\. This one did\.",
      "We only put money on spots that already made money in the past. This one did."),
     (r"(?:PROVEN|STRONG) in the blind test \(([+-][\d.]+)% on (\d+) bets\)\.",
-     lambda m: f"This spot {_money(m[1])} ({m[2]} past bets)."),
+     lambda m: f"This spot {_money(m[1])} on {m[2]} games since 2022."),
     (r"💸 Best price: (.+?) ([+-]\d+) \(the board had (\S+) ([+-]\d+)\)\. Checked (\d+) books\. Bet it there\.",
      lambda m: f"💸 Best price: {m[1]} {m[2]} ({BOOK_NAMES.get(m[3], m[3])} only had {m[4]}). We checked {m[5]} sportsbooks, so bet it at {m[1]}."),
     (r"💸 Checked (\d+) books: (\S+) (.+?) is the best price\.",
