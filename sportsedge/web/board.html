@@ -635,16 +635,19 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + (parlays ? `<p class="small muted">${esc(N.you)}'s parlays:</p><ul class="small">${parlays}</ul>` : ""));
   }
   function renderHero() {
-    const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && x.units > 0 && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
+    // Owner, Oct 29: the banner names a pick on a later game a Future Lock, never the Lock of the day.
+    const open = bestToday();
+    const e = open.find((x) => !isFuture(x)) || DATA.entries.filter((x) => x.tier === "lock" && x.units > 0 && onBoard(x) && !x.settled && !isFuture(x)).sort((a, b) => b.units - a.units)[0]
+      || open[0];
     if (!e) {
       $("hero").innerHTML = `<div class="ticket-empty"><b>No it’s not rigged</b></div>`;
       return;
     }
-    const kind = e.best_rank && e.day === today() ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
+    const kind = isFuture(e) ? `${tierOf(e) === "dog" ? "Early Dog" : "Future Lock"} · ${fmt(e.commence_time, { weekday: "long" })}` : e.best_rank ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
     $("hero").innerHTML = `<div class="ticket">${stamp(e)}
       <div class="t-head"><span class="t-kind">${kind}</span><span class="t-sport">${esc(e.sport_name)} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)} · ${timeOf(e)}</span></div>
       <h2>${esc(e.selection)}</h2>
-      <div class="t-row"><span class="t-odds">${odds(e.odds)}</span><span class="t-pay">${wins(e)}<br><b>wins ${pct(e.win_prob)}</b> on our numbers · needs ${pct(implied(e.odds))}<br>${stake(e)}</span></div>
+      <div class="t-row"><span class="t-odds">${odds(e.odds)}</span><span class="t-pay">${wins(e)}<br><b>we say ${pct(e.win_prob)}</b> · needs ${pct(implied(e.odds))} to pay<br>${stake(e)}</span></div>
       <p>${esc(e.headline)}</p>
       <div class="t-stub">${meter(e)}<span class="small muted">${esc(e.matchup)}</span><span>${statusText(e)} ${moveText(e)}</span>${addBtn(e)}</div>
     </div>`;
