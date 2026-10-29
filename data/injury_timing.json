@@ -104,7 +104,7 @@
    "avg_news_move": -0.135,
    "avg_drift": 0.0,
    "drift_same_way": 0.0,
-   "graded": 0,
+   "graded": 1,
    "in_sample": {
     "bets": 0,
     "flat_roi": null,
@@ -112,16 +112,18 @@
     "beat_close": null
    },
    "blind": {
-    "bets": 0,
-    "flat_roi": null,
-    "se": null,
-    "beat_close": null
+    "bets": 1,
+    "wins": 0,
+    "flat_roi": -1.0,
+    "se": 0.0,
+    "beat_close": 0.0
    },
    "all_bets": {
-    "bets": 0,
-    "flat_roi": null,
-    "se": null,
-    "beat_close": null
+    "bets": 1,
+    "wins": 0,
+    "flat_roi": -1.0,
+    "se": 0.0,
+    "beat_close": 0.0
    },
    "clv_in_sample": {
     "bets": 0,
@@ -142,7 +144,7 @@
    "avg_news_move": -0.135,
    "avg_drift": 0.0,
    "drift_same_way": 0.0,
-   "graded": 0,
+   "graded": 1,
    "in_sample": {
     "bets": 0,
     "flat_roi": null,
@@ -150,16 +152,18 @@
     "beat_close": null
    },
    "blind": {
-    "bets": 0,
-    "flat_roi": null,
-    "se": null,
-    "beat_close": null
+    "bets": 1,
+    "wins": 0,
+    "flat_roi": -1.0,
+    "se": 0.0,
+    "beat_close": 0.0
    },
    "all_bets": {
-    "bets": 0,
-    "flat_roi": null,
-    "se": null,
-    "beat_close": null
+    "bets": 1,
+    "wins": 0,
+    "flat_roi": -1.0,
+    "se": 0.0,
+    "beat_close": 0.0
    },
    "clv_in_sample": {
     "bets": 0,
@@ -201,25 +205,26 @@
    "avg_news_move": -0.0123,
    "avg_drift": 0.0,
    "drift_same_way": 0.0,
-   "graded": 1,
+   "graded": 2,
    "in_sample": {
-    "bets": 0,
-    "flat_roi": null,
-    "se": null,
-    "beat_close": null
-   },
-   "blind": {
     "bets": 1,
     "wins": 0,
     "flat_roi": -1.0,
     "se": 0.0,
     "beat_close": 0.0
    },
-   "all_bets": {
+   "blind": {
     "bets": 1,
-    "wins": 0,
-    "flat_roi": -1.0,
+    "wins": 1,
+    "flat_roi": 1.1,
     "se": 0.0,
+    "beat_close": 0.0
+   },
+   "all_bets": {
+    "bets": 2,
+    "wins": 1,
+    "flat_roi": 0.05,
+    "se": 1.05,
     "beat_close": 0.0
    },
    "clv_in_sample": {
@@ -241,7 +246,7 @@
    "avg_news_move": -0.0093,
    "avg_drift": 0.0,
    "drift_same_way": 0.0,
-   "graded": 0,
+   "graded": 1,
    "in_sample": {
     "bets": 0,
     "flat_roi": null,
@@ -249,16 +254,18 @@
     "beat_close": null
    },
    "blind": {
-    "bets": 0,
-    "flat_roi": null,
-    "se": null,
-    "beat_close": null
+    "bets": 1,
+    "wins": 1,
+    "flat_roi": 1.1,
+    "se": 0.0,
+    "beat_close": 0.0
    },
    "all_bets": {
-    "bets": 0,
-    "flat_roi": null,
-    "se": null,
-    "beat_close": null
+    "bets": 1,
+    "wins": 1,
+    "flat_roi": 1.1,
+    "se": 0.0,
+    "beat_close": 0.0
    },
    "clv_in_sample": {
     "bets": 0,
