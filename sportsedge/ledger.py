@@ -36,6 +36,7 @@ def break_even(american: float) -> float:
     return 1 / american_to_decimal(american)
 CLV_PRIOR = 30  # picks of "no edge" the CLV average is shrunk toward
 GRADE_AFTER = timedelta(hours=2)  # earliest a game can be final
+RECHECK = timedelta(days=5)  # graded picks this recent are re-checked against their own game's final
 
 
 ENGINE_MARK = "Engine: Script Leaks ratings."  # marks a pick from the rebuilt formula board (owner, Oct 28: no "D503" on the page)
@@ -463,8 +464,11 @@ class Ledger:
         """Update live scores and grade finished picks. Returns picks graded."""
         open_entries = [e for e in self.entries.values() if not e.settled and e.start <= now
                         and not e.sport.startswith("tennis_")]  # tennis: graded by tennis.grade_entries
+        # Re-check picks graded in the last few days against their own game (a wrong match is corrected).
+        recheck = [e for e in self.entries.values() if e.settled and e.status != "void" and e.final
+                   and now - e.start < RECHECK and not e.sport.startswith("tennis_") and e.tier not in LIVE_TIERS]
         by_sport: dict[str, list[Entry]] = defaultdict(list)
-        for e in open_entries:
+        for e in open_entries + recheck:
             by_sport[e.sport].append(e)
         graded = 0
         for sport, entries in by_sport.items():
@@ -473,6 +477,12 @@ class Ledger:
             boxes: dict[str, list[PlayerGame]] = {}
             for e in entries:
                 game = find_game(results, e)
+                if e.settled:
+                    if game is not None and game.completed and game.home_score is not None \
+                            and e.final != f"{e.away} {game.away_score:.0f} @ {e.home} {game.home_score:.0f}":
+                        regrade(e, game, now)
+                        graded += 1
+                    continue
                 if game is None:
                     if now - e.start > timedelta(days=4):
                         e.status, e.graded_at = "void", now.isoformat()  # postponed / never played
@@ -677,8 +687,19 @@ def _market_group(e: "Entry") -> str:
 
 
 def find_game(results: list[GameResult], e: Entry) -> GameResult | None:
+    """The game this pick was on: by ESPN event id when we have it, else the same teams nearest in time.
+    (Owner, Oct 28: a Brewers-Rays series pick was graded with the night before's score - the first
+    same-teams game within 36 hours was taken, not this one.)"""
+    eid = getattr(e, "event_id", None)
+    if eid:
+        same = next((g for g in results if g.event_id == eid), None)
+        if same is not None:
+            return same
     start = e.start
-    near = [g for g in results if abs((g.date - start).total_seconds()) < 36 * 3600]
+    # An ESPN pick whose own game isn't in the results is never graded on a game a day away (a series).
+    window = 12 * 3600 if str(eid or "").isdigit() else 36 * 3600
+    near = sorted((g for g in results if abs((g.date - start).total_seconds()) < window),
+                  key=lambda g: abs((g.date - start).total_seconds()))
     for g in near:
         if g.home == e.home and g.away == e.away:
             return g
@@ -689,6 +710,17 @@ def find_game(results: list[GameResult], e: Entry) -> GameResult | None:
         if g.home == home and g.away == away:
             return g
     return None
+
+
+def regrade(e: Entry, game: GameResult, now: datetime) -> None:
+    """A game pick graded with the wrong game's score: grade it again on its own game, and say so."""
+    if e.player is not None:
+        return  # props are settled from their own box score
+    before = (e.status, e.final)
+    grade(e, game, None, now)
+    note = f"Regraded: first graded {before[0]} on the wrong game's score ({before[1]})."
+    if note not in e.reasons:
+        e.reasons.append(note)
 
 
 def grade(e: Entry, game: GameResult, box: list[PlayerGame] | None, now: datetime) -> None:
