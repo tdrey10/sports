@@ -112,7 +112,8 @@ def _card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
         _track_record(b, t, word),
         "We only put money on spots that already made money in the past. This one did.",
     ]
-    head = f"{pick.selection} at {pick.american:+.0f}: {label}. {_cents(b['flat_roi'])} for every $1 bet in this spot ({b['bets']} past bets)."
+    n, roi = full_record(b, t)
+    head = f"{pick.selection} at {pick.american:+.0f}: {label}. {_cents(roi)} for every $1 bet in this spot since 2018 ({n} bets)."
     return Card(tier="value", units=units, headline=head, reasons=reasons, sport=pick.sport, sport_name=sport_name,
                 pick=pick, home=ctx.home, away=ctx.away, proven=f"{word}: {row.get('study', '')} · {row['variant']}",
                 evidence={"kind": word, "blind_bets": b["bets"], "blind_roi": b["flat_roi"], "blind_se": b.get("se"),
@@ -124,13 +125,21 @@ def _cents(roi: float) -> str:
     return f"Made {roi * 100:.0f}¢" if roi >= 0 else f"Lost {abs(roi) * 100:.0f}¢"
 
 
+def full_record(b: dict, t: dict) -> tuple[int, float]:
+    """(bets, return per $1) over every season tested, 2018-2026: the tuning and blind seasons together."""
+    n = (b.get("bets") or 0) + (t.get("bets") or 0)
+    if not n:
+        return 0, 0.0
+    return n, ((b.get("flat_roi") or 0) * (b.get("bets") or 0) + (t.get("flat_roi") or 0) * (t.get("bets") or 0)) / n
+
+
 def _track_record(b: dict, t: dict, word: str) -> str:
-    """The test in plain words (owner, Oct 29: 'how you would talk to your homies')."""
-    out = (f"The proof: we checked this exact spot on {b['bets']} past games the system had never seen, and it "
-           f"{'made' if b['flat_roi'] >= 0 else 'lost'} about ${abs(b['flat_roi']) * 100:.0f} for every $100 bet.")
-    if word == "STRONG":
-        out += f" It made money on the older games we built it from too ({t['bets']} bets), so it's the real deal."
-    return out
+    """The test in plain words (owner, Oct 29: 'how you would talk to your homies'; 'can we do it from
+    2018-2026?' - the whole record, then the part that proves it isn't luck)."""
+    n, roi = full_record(b, t)
+    return (f"The proof: from 2018 to 2026 this spot came up {n} times and {'made' if roi >= 0 else 'lost'} about "
+            f"${abs(roi) * 100:.0f} for every $100 bet. And on the {b['bets']} games from 2022 on, which we never used "
+            f"to build it, it {'made' if b['flat_roi'] >= 0 else 'lost'} ${abs(b['flat_roi']) * 100:.0f} per $100, so it's not luck.")
 
 
 def _clv_card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
