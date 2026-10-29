@@ -659,7 +659,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const sharpBets = items.filter((e) => e.tier === "sharp");
     const rest = items.filter((e) => !isLive(e) && !["early", "lean", "sharp"].includes(tierOf(e)) && !e.player && !e.best_rank);
     const leans = items.filter((e) => tierOf(e) === "lean" && !isLive(e));
-    const topNote = best.length ? `${best.length} of 10 cleared the bar · ranked by edge score` : "Ranked by edge score";
+    const topNote = best.length ? `${best.length} made the cut · best ones first` : "Best ones first";
     return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>`
       : empty("No money plays yet today. Only bets that beat the books in a blind test get units, and no game is in one of those spots yet. Leans are below; the board checks again every hour."))
       + (sharpBets.length ? panel("Sharp value", "A book is slippin' and paying more than it should, straight up", bySport(sharpBets)) : "")
@@ -842,9 +842,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + panel("Who's hot 🔥", "His last 5: shooting 6+ pts better and scoring 15%+ more. He's cookin'.", formTable(form("hot"), "Nobody's hot right now."))
       + panel("Starters by position", "Who's been starting at each spot the last 5 games · 🥶 playing like a bum · 🔥 cookin'",
           lineups ? `<div class="table-wrap"><table><thead><tr><th>Team</th>${POS.map((x) => `<th>${x}</th>`).join("")}</tr></thead><tbody>${lineups}</tbody></table></div>` : empty("Still pulling the box scores, hang tight."))
-      + panel("Who's due", "Luck = their record minus what their point differential says it should be (kicks in at 10 games) · close = net wins in 5-point games · last 5 = average margin. Unlucky teams are due.",
+      + panel("Who's due", "Luck = how many more (or fewer) games they've won than their scoring says they should have (after 10 games) · close = wins minus losses in games decided by 5 or less · last 5 = how much they've won or lost by lately. Unlucky teams usually bounce back.",
           due ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Record</th><th>Diff</th><th>Luck</th><th>Close</th><th>Last 5</th><th>Notes</th></tr></thead><tbody>${due}</tbody></table></div>` : empty("Not enough games yet, give it a minute."))
-      + (st ? panel("Does it beat the price?", `Blind test on 10 seasons at the closing price (tune 2018-21, blind 2022 on) · luck control: ${st.control.proven} of ${st.control.spots} random sets passed`,
+      + (st ? panel("Does it beat the price?", `We built these on 2018-21 and checked them on 2022 on, games they never saw · only spots that made money on both count`,
           `<div class="table-wrap"><table><thead><tr><th>Angle</th><th>Tuning</th><th>Blind</th><th>Verdict</th></tr></thead><tbody>${studyRows}</tbody></table></div>
            <p class="small muted">Only STRONG angles get units. The popular "due" stuff (close-game losers, fading the hot team) loses at the real price. The books already got those priced in.</p>`) : "") + `</div>`;
   }
@@ -933,9 +933,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
           goalies ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>#1 goalie</th><th>GS</th><th>SV%</th><th>Last 5</th><th>GAA</th></tr></thead><tbody>${goalies}</tbody></table></div>` : empty("Still pulling the box scores, hang tight."))
       + panel("Who's hurt", "Key guys, starters, rotation players and #1 goalies on today's injury report · how much of the team's production is sitting",
           hurt ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Out / questionable</th><th>Out</th></tr></thead><tbody>${hurt}</tbody></table></div>` : empty("No key guys banged up."))
-      + panel("Who's due", "Luck = their record minus what their goal differential says it should be (kicks in at 10 games) · close = net one-goal wins. Unlucky teams are due.",
+      + panel("Who's due", "Luck = how many more (or fewer) games they've won than their goals say they should have (after 10 games) · close = wins minus losses in one-goal games. Unlucky teams usually bounce back.",
           due ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Record</th><th>Diff</th><th>Luck</th><th>Close</th><th>Notes</th></tr></thead><tbody>${due}</tbody></table></div>` : empty("Not enough games yet, give it a minute."))
-      + (st ? panel("Does it beat the price?", `Blind test at the closing price (tune 2018-21, blind 2022 on) · luck control: ${st.control.proven} of ${st.control.spots} random sets passed`,
+      + (st ? panel("Does it beat the price?", `We built these on 2018-21 and checked them on 2022 on, games they never saw · only spots that made money on both count`,
           `<div class="table-wrap"><table><thead><tr><th>Angle</th><th>Tuning</th><th>Blind</th><th>Verdict</th></tr></thead><tbody>${studyRows}</tbody></table></div>
            <p class="small muted">Only STRONG angles get units.</p>`) : "") + `</div>`;
   }
@@ -974,9 +974,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
           qbs ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>QB</th><th>Adj YPA</th><th>Last 3</th><th>TD-INT</th></tr></thead><tbody>${qbs}</tbody></table></div>` : empty("Still pulling the box scores, hang tight."))
       + panel("Who's shitting the bed 🥶", "Last 3 games: QB 1.5+ yds a throw under his season, RB 1.2+ yds a carry under, receiver at 60% of his usual yards or less. Straight bums right now.", formTable(formRows("cold"), "No bums right now. Everybody's holding it down."))
       + panel("Who's hot 🔥", "Same thing the other way. Cookin'.", formTable(formRows("hot"), "Nobody's hot right now."))
-      + panel("Who's due", "Luck = their record minus what their point differential says it should be (kicks in at 4 games) · close = net one-score wins (7 pts or less). Unlucky teams are due.",
+      + panel("Who's due", "Luck = how many more (or fewer) games they've won than their scoring says they should have (after 4 games) · close = wins minus losses in one-score games (7 or less). Unlucky teams usually bounce back.",
           due ? `<div class="table-wrap"><table><thead><tr><th>Team</th><th>Record</th><th>Diff</th><th>Luck</th><th>Close</th><th>Notes</th></tr></thead><tbody>${due}</tbody></table></div>` : empty("Not enough games yet, give it a minute."))
-      + (st ? panel("Does it beat the price?", `Blind test at the closing price (tune 2018-21, blind 2022 on) · luck control: ${st.control.proven} of ${st.control.spots} random sets passed`,
+      + (st ? panel("Does it beat the price?", `We built these on 2018-21 and checked them on 2022 on, games they never saw · only spots that made money on both count`,
           `<div class="table-wrap"><table><thead><tr><th>Angle</th><th>Tuning</th><th>Blind</th><th>Verdict</th></tr></thead><tbody>${studyRows}</tbody></table></div>
            <p class="small muted">Only STRONG angles get units.</p>`) : "") + `</div>`;
   }
@@ -1105,7 +1105,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       `<div class="model"><ul>
         ${all.g ? `<li>Picks the straight-up winner <b>${pct(all.w / all.g, 0)}</b> of the time on ${all.g.toLocaleString()} recent games it never saw.</li>` : ""}
         ${keys.length ? `<li>Learned NFL key numbers from real scores: ${keys.map((k) => k[0]).join(", ")}.</li>` : ""}
-        <li>Top bets are ranked by edge score: 60 points for the size of the edge, 40 for how likely it is to cash. Only picks with a real edge and no warnings make the list.</li>
+        <li>Top bets go best first: the bigger the edge and the more likely it cashes, the higher it ranks. Only picks with a real edge and nothing shady make the list.</li>
         <li>Prices blend our numbers with the market's no-vig odds. ${weights ? "Current trust: " + weights + "." : "Trust is set by the studies and re-learned from graded picks."}</li>
         <li>Live picks need the model to agree with the market's direction; a "likely winner" needs 60%+ on our numbers.</li></ul></div>
        ${rows ? `<div class="table-wrap"><table><thead><tr><th>Sport</th><th>Games</th><th>Winner</th><th>vs coin flip</th></tr></thead><tbody>${rows}</tbody></table></div>` : ""}`);
