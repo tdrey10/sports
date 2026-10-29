@@ -509,7 +509,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   const tierOf = (e) => (["lock", "dog", "value"].includes(e.tier) && !(e.units > 0) ? "lean" : e.tier);
   // Owner, Oct 29: "Can't be the lock of the day when the game is on Saturday. That's gotta be like future locks."
   const isFuture = (e) => dayOf(e.commence_time) > nowDay();
-  const tierName = (e) => { const t = tierOf(e); return (["lock", "dog"].includes(t) && isFuture(e) ? "Future " : "") + (TIER[t] || t); };
+  // Owner, Oct 29: "Even the dog of the day needs to be today's pick. So if it's an early dog. Name it early dogs."
+  const tierName = (e) => { const t = tierOf(e); if (isFuture(e) && t === "dog") return "Early Dog"; return (t === "lock" && isFuture(e) ? "Future " : "") + (TIER[t] || t); };
   const addBtn = () => "";  // straight bets only: no parlay slip
   const GRADE_CLS = { "A+": "g-ap", A: "g-a", B: "g-b", C: "g-c", "NO BET": "g-no" };
   // Live edge monitor (owner, Oct 28): the grade is re-checked at today's price. Past the minimum price the
