@@ -49,3 +49,23 @@ def test_a_pick_sent_in_chat_waits_in_the_inbox_and_is_filed_once(tmp_path):
     assert rivalry.send(tmp_path, "nba", "Lakers", -120, NOW).startswith("In: Los Angeles Lakers")
     assert rivalry._file_inbox(tmp_path) == 1 and rivalry._file_inbox(tmp_path) == 0
     assert len(Ledger.load(rivalry.path(tmp_path)).entries) == 1
+
+
+def test_the_doctors_parlay_is_filed_and_settles_on_its_legs(tmp_path):
+    """Owner, Oct 29: 'Also track my parlay I give you. Can you call it The Doctor vs Grim.'"""
+    snapshots(tmp_path)
+    with (tmp_path / "odds" / "nba" / "2026-10.csv").open("a", newline="") as f:
+        csv.writer(f).writerow([NOW.isoformat(), "g2", START.isoformat(), "Miami Heat", "Atlanta Hawks", "h2h", "home", "",
+                                "draftkings", -150])
+    legs = [rivalry.parse_leg("nba|Lakers|-120"), rivalry.parse_leg("nba|Heat|-150")]
+    assert rivalry.send_parlay(tmp_path, legs, NOW).startswith("In: 2-leg parlay")
+    assert rivalry._file_parlays(tmp_path) == 1 and rivalry._file_parlays(tmp_path) == 0
+    L = Ledger.load(tmp_path / rivalry.LEGS)
+    finals = [GameResult("g1", START, "Los Angeles Lakers", "Boston Celtics", 110, 100, state="post"),
+              GameResult("g2", START, "Miami Heat", "Atlanta Hawks", 99, 101, state="post")]
+    L.refresh(lambda s, a, b: finals, lambda s, g: [], START + timedelta(hours=4))
+    L.save(tmp_path / rivalry.LEGS)
+    board = rivalry.scoreboard(Ledger(), tmp_path)
+    assert board["names"] == {"you": "The Doctor", "us": "Grim"}
+    assert board["parlays"]["you"]["lost"] == 1 and board["your_parlays"][0]["status"] == "lost"
+    assert rivalry.parse_leg("nfl|Bills|-110|spread -3.5")[3:5] == ("spreads", -3.5)
