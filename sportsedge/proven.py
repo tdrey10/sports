@@ -108,18 +108,29 @@ def _card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
     units = UNITS[row["verdict"]]
     word = "STRONG" if row["verdict"] == "STRONG" else "PROVEN"
     reasons = [
-        f"✅ Proven spot · {units:g}u: {label}.",
-        (f"Blind test ({word}): {b['bets']} bets on seasons it never saw, {b['flat_roi']:+.1%}; "
-         f"tuning seasons {t['bets']} bets, {t['flat_roi']:+.1%}."),
-        "Only bets that beat the books in a blind test get money. This one did.",
+        f"✅ Money play · {units:g}u: {label}.",
+        _track_record(b, t, word),
+        "We only put money on spots that already made money in the past. This one did.",
     ]
-    head = f"{pick.selection} at {pick.american:+.0f}: {label}. {word} in the blind test ({b['flat_roi']:+.1%} on {b['bets']} bets)."
+    head = f"{pick.selection} at {pick.american:+.0f}: {label}. {_cents(b['flat_roi'])} for every $1 bet in this spot ({b['bets']} past bets)."
     return Card(tier="value", units=units, headline=head, reasons=reasons, sport=pick.sport, sport_name=sport_name,
                 pick=pick, home=ctx.home, away=ctx.away, proven=f"{word}: {row.get('study', '')} · {row['variant']}",
                 evidence={"kind": word, "blind_bets": b["bets"], "blind_roi": b["flat_roi"], "blind_se": b.get("se"),
                           "tune_bets": t["bets"], "tune_roi": t["flat_roi"],
-                          "text": f"{row.get('study', '')}: {row['variant']}. Blind {b['bets']} bets {b['flat_roi']:+.1%} "
-                                  f"(standard error {b.get('se') or 0:.1%}); tuning {t['bets']} bets {t['flat_roi']:+.1%}."})
+                          "text": _track_record(b, t, word)})
+
+
+def _cents(roi: float) -> str:
+    return f"Made {roi * 100:.0f}¢" if roi >= 0 else f"Lost {abs(roi) * 100:.0f}¢"
+
+
+def _track_record(b: dict, t: dict, word: str) -> str:
+    """The test in plain words (owner, Oct 29: 'how you would talk to your homies')."""
+    out = (f"The proof: we checked this exact spot on {b['bets']} past games the system had never seen, and it "
+           f"{'made' if b['flat_roi'] >= 0 else 'lost'} about ${abs(b['flat_roi']) * 100:.0f} for every $100 bet.")
+    if word == "STRONG":
+        out += f" It made money on the older games we built it from too ({t['bets']} bets), so it's the real deal."
+    return out
 
 
 def _clv_card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
@@ -130,11 +141,12 @@ def _clv_card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
     p = min(1 / dec + max(b["avg_clv"], 0.005), 0.97)
     pick = replace(pick, win_prob=p, model_prob=p, ev=p * dec - 1)
     units = UNITS["CLV"]
-    why = (f"Beat the closing line {b['beat_close']:.0%} of {b['bets']} blind bets (by {b['avg_clv'] * 100:.1f} pts on "
-           f"average); tuning {t['beat_close']:.0%} of {t['bets']}. The win-loss record is still too short to prove it.")
-    reasons = [f"✅ Proven edge · {units:g}u: {label}.", why,
-               "Beating the close is the market's own verdict that we got a better price than it ended at."]
-    head = f"{pick.selection} at {pick.american:+.0f}: {label}. Beats the closing line {b['beat_close']:.0%} blind."
+    why = (f"The proof: {b['beat_close']:.0%} of the time ({b['bets']} past bets), we got a better price than the odds "
+           f"ended up at right before the game. That means the books moved our way after we bet: the sharp money agreed. "
+           f"Not enough wins and losses yet to judge it on those.")
+    reasons = [f"✅ Money play · {units:g}u: {label}.", why,
+               "When the odds keep moving your way after you bet, you're getting good prices. That's how you win long term."]
+    head = f"{pick.selection} at {pick.american:+.0f}: {label}. We beat the final odds on this spot {b['beat_close']:.0%} of the time."
     return Card(tier="value", units=units, headline=head, reasons=reasons, sport=pick.sport, sport_name=sport_name,
                 pick=pick, home=ctx.home, away=ctx.away, proven=f"CLV: {row.get('study', '')} · {row['variant']}",
                 evidence={"kind": "CLV", "why": why, "text": f"{row.get('study', '')}: {row['variant']}. {why}",

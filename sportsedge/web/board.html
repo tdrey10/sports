@@ -449,7 +449,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     ? `${usd(e.units * U())} wins ${usd(e.units * U() * (dec(e.odds) - 1))}`
     : `$100 wins $${(100 * (dec(e.odds) - 1)).toFixed(0)}`);
   // Our win chance next to what the price needs to break even: a good bet always wins more than it needs.
-  const needs = (e) => `wins ${pct(e.win_prob)} · needs ${pct(implied(e.odds))}`;
+  const needs = (e) => `we say ${pct(e.win_prob)} · needs ${pct(implied(e.odds))} to pay`;
   const SETTLED = { won: "Won", lost: "Lost", push: "Push", void: "Void", half_won: "Half won", half_lost: "Half lost" };
   const LABEL = { h2h: "Moneyline", spreads: "Spread", totals: "Total" };
 
@@ -527,18 +527,17 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const s = e.scorecard;
     if (!s) return "";
     const rows = [
-      ["Grade", `<b>${esc(s.grade)}</b>: ${esc(s.why)}` + (gradeNow(e) !== e.grade ? ` <b class="neg">Now NO BET: at ${odds(e.current_odds)} the edge is gone.</b>` : "")],
-      ...(s.score ? [["Score", `<b>${s.score.total}/100</b> <span class="muted">(projection ${s.score.projection}/30 · EV ${s.score.ev}/30 · market edge ${s.score.market}/15 · data ${s.score.data}/15 · risk ${s.score.risk}/10; design weights, the grade follows the evidence)</span>`]] : []),
-      ["Book · odds", `${esc(s.book)} ${odds(s.odds)} <span class="muted">(checked ${esc(fmt(s.checked_at, { hour: "numeric", minute: "2-digit" }))})</span>`],
-      ["Our win chance", `${pctv(s.model_prob)} <span class="muted">(range ${pctv(s.range[0])}–${pctv(s.range[1])}: ${esc(s.range_how)})</span>`],
-      ["Price says", `${pctv(s.implied_prob)} with the book's cut · ${s.fair_market_prob == null ? "no-vig n/a" : pctv(s.fair_market_prob) + " without it"}`],
-      ["Fair odds", s.fair_odds == null ? "n/a" : odds(s.fair_odds)],
-      ["Edge", s.edge_pts == null ? "n/a" : `${signed(s.edge_pts, 1)} pts`],
-      ["Expected value", `${signed(s.ev_pct, 1)}% of the stake`],
-      ["Worst price to bet", s.min_odds == null ? "n/a" : odds(s.min_odds)],
-      ["Validation", esc(s.validation)],
-      ["Why", `<ul>${(s.factors || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`],
-      ["Risks", `<ul>${(s.risks || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`],
+      ["Grade", `<b>${esc(s.grade)}</b>: ${esc(s.why)}` + (gradeNow(e) !== e.grade ? ` <b class="neg">Now NO BET: at ${odds(e.current_odds)} it's not worth it anymore.</b>` : "")],
+      ...(s.score ? [["Score", `<b>${s.score.total}/100</b> <span class="muted">(proof ${s.score.projection}/30 · value ${s.score.ev}/30 · beats the odds ${s.score.market}/15 · info ${s.score.data}/15 · safety ${s.score.risk}/10)</span>`]] : []),
+      ["Where to bet", `${esc(s.book)} ${odds(s.odds)} <span class="muted">(checked ${esc(fmt(s.checked_at, { hour: "numeric", minute: "2-digit" }))})</span>`],
+      ["We think they win", `${pctv(s.model_prob)} of the time <span class="muted">(somewhere ${pctv(s.range[0])}–${pctv(s.range[1])}, ${esc(s.range_how)})</span>`],
+      ["The odds think", `${pctv(s.fair_market_prob == null ? s.implied_prob : s.fair_market_prob)}`],
+      ["What the odds should be", s.fair_odds == null ? "n/a" : odds(s.fair_odds)],
+      ["Expected profit", `about ${s.ev_pct >= 0 ? "+" : "-"}$${Math.abs(s.ev_pct).toFixed(0)} for every $100 bet, over the long run`],
+      ["Don't bet it worse than", s.min_odds == null ? "n/a" : odds(s.min_odds)],
+      ["Track record", esc(s.validation)],
+      ["Why we like it", `<ul>${(s.factors || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`],
+      ["What could go wrong", `<ul>${(s.risks || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`],
     ];
     return `<details class="more"><summary>📋 Scorecard · grade ${esc(s.grade)}</summary><table class="sc-table">${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")}</table></details>`;
   }
@@ -562,7 +561,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div class="rk" aria-label="Rank ${e.rank}">${e.rank}</div>
       <div class="sport-badge">${esc(sportHead(e.sport))}</div>
       <div class="sel">${gradeBadge(e)}<strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${TIER[e.tier]}</span>` : ""}</div>
-      <div class="price"><b>${odds(e.odds)}</b><small>${signed(e.ev * 100, 1)}% EV</small>${stake(e)}</div>
+      <div class="price"><b>${odds(e.odds)}</b><small>${e.ev >= 0 ? "+" : "-"}$${Math.abs(e.ev * 100).toFixed(0)} per $100</small>${stake(e)}</div>
       <div class="sub">${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}</div>
       <div class="gauge">${meter(e)}<span class="small muted">${needs(e)}</span></div>
       <p class="why">${esc(e.headline)}</p>
