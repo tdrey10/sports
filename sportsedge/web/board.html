@@ -609,6 +609,17 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     .sort((a, b) => b.units - a.units || score(b) - score(a) || a.best_rank - b.best_rank)  // biggest stake first
     .map((e, i) => Object.assign({}, e, { rank: i + 1 }));
 
+  // Owner, Oct 29: "You come out with your leans. And I'll give you my picks. We can see whose record is better."
+  function rivalryPanel() {
+    const R = DATA.rivalry;
+    if (!R) return "";
+    const line = (name, r) => `<tr><td>${name}</td><td>${r.won}-${r.lost}${r.push ? "-" + r.push : ""}</td><td class="${cls(r.units)}">${signed(r.units, 1)}u</td><td>${r.pending}</td></tr>`;
+    const ahead = R.you.units === R.leans.units ? "Dead even." : R.you.units > R.leans.units ? "You're up. 👑" : "Script Leaks is up. 😤";
+    const picks = (R.your_picks || []).map((p) => `<li>${esc(p.selection)} ${odds(p.odds)} · ${esc(p.matchup)}${p.final ? ` · <b class="${p.status === "won" ? "pos" : p.status === "lost" ? "neg" : ""}">${esc(SETTLED[p.status] || p.status)}</b> ${esc(p.final)}` : ""}</li>`).join("");
+    return panel("You vs. Script Leaks", `Your picks against our leans since ${fmt(R.since, { month: "short", day: "numeric" })} · 1 unit flat on every pick · ${ahead}`,
+      `<div class="table-wrap"><table><thead><tr><th></th><th>Record</th><th>Units</th><th>Still to play</th></tr></thead><tbody>${line("You", R.you)}${line("Script Leaks leans", R.leans)}</tbody></table></div>`
+      + (picks ? `<p class="small muted">Your picks:</p><ul class="small">${picks}</ul>` : `<p class="small muted">Send your picks in the chat and they show up here.</p>`));
+  }
   function renderHero() {
     const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && x.units > 0 && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
     if (!e) {
@@ -647,6 +658,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + (sharpBets.length ? panel("Sharp value", "A book is slippin' and paying more than it should, straight up", bySport(sharpBets)) : "")
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
       + panel("The board", "Everything else we're rockin' with today", rest.length ? bySport(rest) : empty("Nothin' else worth your money today, homie. We don't force it."))
+      + rivalryPanel()
       + panel("Leans", "No units on these. Just who we'd ride with in the other games and their fair price (nothing past −300). Only sprinkle it if your book's paying more than that.",
           (leans.length ? bySport(leans) : "") + (reads().length ? bySport(reads().map((r) => Object.assign({}, r, { sport: r.f.sport, commence_time: r.f.commence_time })),
             (g) => `<ul class="reads">${g.map(readRow).join("")}</ul>`) : (leans.length ? "" : empty("That's every game today, fam."))))
