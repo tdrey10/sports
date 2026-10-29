@@ -44,6 +44,17 @@ OLD_ENGINE_MARK = "Engine: D503 formula."  # picks posted before the rename
 D503_MARKS = (ENGINE_MARK, OLD_ENGINE_MARK)
 
 
+PROVEN_GRADES = ("A+", "A", "B")
+MISTAKEN_PULLS = ("Pulled: we only had them winning", "Withdrawn before the game: wins only",
+                  "Withdrawn before the game: this kind of bet hasn't", "Withdrawn before the game: no longer beats")
+
+
+def _proven(e) -> bool:
+    """A money pick that passed a test (graded A+, A or B when posted)."""
+    proof = (e.scorecard or {}).get("validation") or "None"
+    return e.units > 0 and e.grade in PROVEN_GRADES and not proof.startswith("None")
+
+
 def is_formula_pick(reasons) -> bool:
     return any(m in (reasons or []) for m in D503_MARKS)
 
@@ -347,11 +358,21 @@ class Ledger:
 
         pulled = []
         seen: dict[tuple, Entry] = {}
+        # Owner, Oct 29: a proven money pick was pulled by these older checks (Boston College +245, a 32%
+        # dog, "Dog of the Day is for dogs that can win"). A proven pick has passed its own test at its
+        # own price: it stays, and one pulled by mistake goes back up before its game.
+        for e in self.entries.values():
+            if e.status == "void" and _proven(e) and e.start > now and e.reasons \
+                    and e.reasons[0].startswith(MISTAKEN_PULLS):
+                e.status, e.profit, e.graded_at = "pending", None, None
+                e.reasons = e.reasons[1:]
         for e in sorted(self.entries.values(), key=lambda e: (not e.event_id.isdigit(), e.created_at)):
             if e.status != "pending" or e.start <= now or e.tier in LIVE_TIERS or e.tier == "sharp":
                 continue  # live and sharp-value bets have their own checks (and their own CLV record)
             if is_formula_pick(e.reasons):
                 continue  # the D503 formula: a posted pick never changes
+            if _proven(e):
+                continue  # a proven money pick passed its own test at this price (it posts once, like the above)
             if e.tier == "dog" and e.win_prob < DOG_FLOOR_WIN:
                 # A Dog of the Day is a dog with a real shot (40%+ on our number), not a long shot.
                 e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()

@@ -531,8 +531,8 @@ def build_cards(
             for key in in_spots:
                 proven = f"{pick.sport}:{key}" in settings.spot_weights
                 bullets.append(f"Spot: {SPOTS[key].label}"
-                               + (" (proven blind: weighted into the read)." if proven
-                                  else " (tracked; not proven blind yet, so it adds nothing to the read)."))
+                               + (" (proven, counts toward the pick)." if proven
+                                  else " (we're watching this one, not proven yet)."))
         if tier in UNIT_TIERS and id(pick) not in lean_ids:
             if line := track_line(pick, settings):
                 bullets.append(line)

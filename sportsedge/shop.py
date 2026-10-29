@@ -95,10 +95,10 @@ def _shop_moneyline(c, ev: dict, now: datetime) -> bool:
         c.pick = replace(c.pick, american=price, book=name,
                          ev=c.pick.win_prob * american_to_decimal(price) - 1)
         c.headline = c.headline.replace(f"{old:+.0f}", f"{price:+.0f}")  # it was written at the board's price
-        c.reasons.insert(1, f"💸 Best price: {name} {price:+.0f} (the board had {old_book} {old:+.0f}). "
-                            f"Checked {n} books. Bet it there.")
+        c.reasons.insert(1, f"💸 Best price: {name} {price:+.0f} ({BOOK_NAMES.get(old_book, old_book)} only had {old:+.0f}). "
+                            f"We checked {n} sportsbooks, so bet it at {name}.")
         return True
-    c.reasons.insert(1, f"💸 Checked {n} books: {c.pick.book} {c.pick.american:+.0f} is the best price.")
+    c.reasons.insert(1, f"💸 We checked {n} sportsbooks: {BOOK_NAMES.get(c.pick.book, c.pick.book)} {c.pick.american:+.0f} is the best price out there.")
     return False
 
 

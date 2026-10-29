@@ -60,25 +60,25 @@ UNPROVEN_MAX = 1.0
 # NFL money -0.8%, college football +0.2% (its Dogs +13.5% on 110, inside the noise), NBA -25.9%,
 # MLB -5.8%, college hoops -1.3%. Half a unit: it was found by looking, and it has no tuning check.
 PROVEN_TIERS = {
-    ("nhl", "lock"): "NHL Lock formula: blind 2022-26, 107 bets, +14.7% (PROVEN)",
+    ("nhl", "lock"): "NHL Lock: made $15 for every $100 over 107 past picks",
     # Owner, Oct 27 (chose 1/2u, NFL and college): his early dogs, run 3 days out at the opening line
     # on 2023-26 (model fit before July 2022), beat the closing line 64% of the time in the NFL (39 bets,
     # +35.6%) and 60% in college football (200 bets, +6.2%), against 45% / 50% for every dog at the
     # open. The W-L isn't past its standard error yet; the line move is the proof the owner took.
-    ("nfl", "early"): "Early NFL dog: beat the close 64% blind 2023-26 (39 bets, +35.6%)",
-    ("ncaaf", "early"): "Early college dog: beat the close 60% blind 2023-26 (200 bets, +6.2%)",
+    ("nfl", "early"): "Early NFL dog: the odds moved our way 64% of the time (39 past picks)",
+    ("ncaaf", "early"): "Early college dog: the odds moved our way 60% of the time (200 past picks)",
 }
 PROVEN_EVIDENCE = {
     ("nhl", "lock"): {"kind": "PROVEN", "blind_bets": 107, "blind_roi": 0.147, "blind_se": 0.079,
-                      "text": "The board replayed day by day on 2022-26 (model fit before July 2022), at closing prices: "
-                              "NHL Lock 107 bets 71-36 +14.7% (SE 7.9%), up every season.",
-                      "risk": "Found by looking at slices of his board; no tuning-period check."},
+                      "text": "We replayed this pick on every day of 2022-26: 107 picks, 71-36, made about $15 for every $100, "
+                              "and made money every season.",
+                      "risk": "Only one version of it has been checked, so keep the bet small."},
     ("nfl", "early"): {"kind": "CLV", "blind_bets": 39, "blind_roi": 0.356, "blind_se": 0.213,
-                       "why": "Beats the closing line 64% of the time (every dog at the open: 45%); the win/loss sample is still small.",
-                       "text": "Early NFL dogs at the opening line, 2023-26: 39 bets 21-18 +35.6%, beat the close 64% (all dogs 45%)."},
+                       "why": "After we bet, the odds moved our way 64% of the time (a random early dog: 45%). Not enough wins and losses yet to judge on those.",
+                       "text": "Early NFL dogs, 2023-26: 39 picks, 21-18, made about $36 for every $100; the odds moved our way 64% of the time."},
     ("ncaaf", "early"): {"kind": "CLV", "blind_bets": 200, "blind_roi": 0.062, "blind_se": 0.106,
-                         "why": "Beats the closing line 60% of the time (every dog at the open: 50%); the win/loss isn't proven.",
-                         "text": "Early college football dogs at the opening line, 2023-26: 200 bets +6.2%, beat the close 60% (all dogs 50%).",
+                         "why": "After we bet, the odds moved our way 60% of the time (a random early dog: 50%). The wins and losses alone don't prove it yet.",
+                         "text": "Early college football dogs, 2023-26: 200 picks, made about $6 for every $100; the odds moved our way 60% of the time.",
                          "risk": "Lost money in 2025 (-10.5%)."},
 }
 UNTESTED_SPOTS = {"hammered"}  # needs midweek prices we don't hold

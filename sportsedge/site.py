@@ -11,6 +11,7 @@ from pathlib import Path
 from .brain import BrainReport
 from .spots import SPOTS
 from .ledger import ENGINE_MARK, OLD_ENGINE_MARK, Ledger
+from .sharp import BOOK_NAMES
 from .sports import SPORTS, SportConfig
 
 KEEP_DAYS = 30  # settled picks shown in "latest results" (stats always use the full ledger)
@@ -95,11 +96,91 @@ def build_data(
     }
 
 
+def _money(pct: str) -> str:
+    v = float(pct)
+    return f"{'made' if v >= 0 else 'lost'} about ${abs(v):.0f} for every $100 bet"
+
+
+# Owner, Oct 29: "too much jargon... needs to be in layman's terms". Picks posted before the plain-talk
+# change carry the old wording; it's translated when the page is built.
+PLAIN = [
+    (r"✅ Proven spot · ([\d.]+)u: ", r"✅ Money play · \1u: "),
+    (r"✅ Proven edge · ([\d.]+)u: ", r"✅ Money play · \1u: "),
+    (r"Blind test \((?:PROVEN|STRONG)\): (\d+) bets on seasons it never saw, ([+-][\d.]+)%; tuning seasons \d+ bets, [+-][\d.]+%\.",
+     lambda m: f"The proof: we checked this exact spot on {m[1]} past games the system had never seen, and it {_money(m[2])}."),
+    (r"Only bets that beat the books in a blind test get money\. This one did\.",
+     "We only put money on spots that already made money in the past. This one did."),
+    (r"(?:PROVEN|STRONG) in the blind test \(([+-][\d.]+)% on (\d+) bets\)\.",
+     lambda m: f"This spot {_money(m[1])} ({m[2]} past bets)."),
+    (r"💸 Best price: (.+?) ([+-]\d+) \(the board had (\S+) ([+-]\d+)\)\. Checked (\d+) books\. Bet it there\.",
+     lambda m: f"💸 Best price: {m[1]} {m[2]} ({BOOK_NAMES.get(m[3], m[3])} only had {m[4]}). We checked {m[5]} sportsbooks, so bet it at {m[1]}."),
+    (r"💸 Checked (\d+) books: (\S+) (.+?) is the best price\.",
+     lambda m: f"💸 We checked {m[1]} sportsbooks: {BOOK_NAMES.get(m[2], m[2])} {m[3]} is the best price out there."),
+    (r"Our read (\d+)% · own read \d+% · market \(no vig\) (\d+)%[^.]*\.",
+     r"We give them a \1% chance to win. The betting odds give them \2%."),
+    (r"Lean (.+?): (\d+)% on our numbers \(needs (\d+)% at ([+-]\d+)\)\.",
+     lambda m: f"Small lean on {m[1]}: we think they win {m[2]}% of the time. At {m[4]} you need {m[3]}% to make money"
+               + (", so it's close." if int(m[2]) >= int(m[3]) else ", so it's not worth a bet.")),
+    (r"we got em (\d+)%, the price needs (\d+)%\.", r"we think they win \1% of the time, and this price only needs \2% to pay off."),
+    (r"Line since the open: money came in \([\d.]+ pts\)\.", "Since the odds opened, the money has been coming in on them."),
+    (r"Line since the open: money ran away \([\d.]+ pts\)\.", "Since the odds opened, the money has been going against them."),
+    (r"No units: this kind of bet hasn't beaten the books in a blind test yet \(owner's rule: only proven bets get money\)\.",
+     "No money on this one: this kind of bet hasn't proven it makes money yet. We only bet spots that already have."),
+    (r"beat the close (\d+)% blind [\d-]+ \((\d+) bets, [^)]*\)", r"the odds moved our way \1% of the time (\2 past picks)"),
+    (r"blind 2022-26, 107 bets, \+14\.7% \(PROVEN\)", "made $15 for every $100 over 107 past picks"),
+    (r"(.+?): (?:back|fade): (.+?)\. Blind (\d+) bets ([+-][\d.]+)% \(standard error [\d.]+%\); tuning (\d+) bets [+-][\d.]+%\.",
+     lambda m: f"The proof: we checked this exact spot on {m[3]} past games the system had never seen, and it {_money(m[4])}."),
+    (r"Beats the closing line (\d+)% of the time \(every dog at the open: (\d+)%\);.*",
+     r"After we bet, the odds moved our way \1% of the time (a random early dog: \2%). The wins and losses alone don't prove it yet."),
+    (r"Early (NFL|college football) dogs at the opening line, 2023-26: (.+?), beat the close (\d+)% \(all dogs \d+%\)\.",
+     r"Early \1 dogs, 2023-26: \2; the odds moved our way \3% of the time."),
+    (r"the blind test's return, plus or minus one standard error", "based on how this spot did in past games"),
+    (r"estimate: the model's read plus or minus \d+ points \(not validated\)", "our numbers' best guess, give or take (not proven)"),
+    (r"Not validated: the model's raw edges lost money in our blind tests\.", "Not proven: our numbers alone have lost money in past tests."),
+    (r"Small sample: (\d+) blind bets\.", r"Not a huge sample yet: \1 past bets."),
+    (r"The win/loss record is inside its standard error: it could still be luck\.", "The win-loss record could still be luck."),
+    (r"A player is questionable: if the news turns, the price will move\.", "A player is questionable. If he sits or plays, the odds will move."),
+    (r"Sensitive: at the low end of the range there's no edge\.", "Thin: if we're a little off, there's no edge."),
+    (r"Lines move: bet it only at the minimum price or better\.", "Odds move. Only bet it at the minimum price or better."),
+    (r"None: no blind test behind this kind of bet\.", "None: this kind of bet hasn't been proven."),
+    (r"A STRONG spot: it made money on the seasons used to build it AND on seasons it never saw, and it stays \+EV at the low end of its tested range\.",
+     "Our best kind of bet: this spot made money on old games AND on games the system never saw, and the price is still good even if we're a little off."),
+    (r"A STRONG spot, but at this price the edge is thin at the low end of its tested range\.", "A strong spot, but at this price there's not much room for error."),
+    (r"A PROVEN spot: it beat the books on seasons it never saw, by more than random swing\.",
+     "A proven spot: it beat the books on games the system never saw, by more than luck."),
+    (r"The model sees an edge, but this kind of bet has never passed a blind test\. A lean: no units\.",
+     "Our numbers like it, but this kind of bet hasn't proven it makes money. Just a lean, no money."),
+    (r"No positive edge at this price\.", "Not worth it at this price."),
+    # Catch-alls for older wording anywhere on the page.
+    (r"No units: ", "No money on this: "),
+    (r"\(tracked; not proven blind yet, so it adds nothing to the read\)", "(we're watching this one, not proven yet)"),
+    (r"\(proven blind: weighted into the read\)", "(proven, counts toward the pick)"),
+    (r"bet before the close", "bet early"),
+    (r"hasn't beaten the closing line in a blind test yet", "hasn't proven it makes money yet"),
+    (r" in a blind test", ""),
+    (r"[Bb]lind test", "test on past games"),
+    (r"blind bets", "past bets"),
+    (r"the tuning seasons", "the older seasons"),
+    (r"beat(s?) the close\b", r"beat\1 the final odds"),
+    (r"the closing line", "the final odds before the game"),
+    (r"Pinnacle's fair line", "the sharpest sportsbook's fair price"),
+    (r"by more than luck over", "by more than luck, over"),
+]
+
+
+def _plain(text: str) -> str:
+    import re
+
+    for pat, rep in PLAIN:
+        text = re.sub(pat, rep, text)
+    return text
+
+
 def _scrub(obj):
     """Owner, Oct 28: "I don't want it to say D503 formula anywhere on the page" (picks posted before
-    the rename still carry the old wording)."""
+    the rename still carry the old wording), and Oct 29: plain talk, no jargon."""
     if isinstance(obj, str):
-        out = obj.replace(OLD_ENGINE_MARK, ENGINE_MARK).replace("D503's ", "").replace("D503 ", "")
+        out = _plain(obj.replace(OLD_ENGINE_MARK, ENGINE_MARK).replace("D503's ", "").replace("D503 ", ""))
         return out[:1].upper() + out[1:] if out != obj else out
     if isinstance(obj, list):  # the engine line itself isn't shown at all (owner: "I don't want to see it")
         return [_scrub(x) for x in obj if x not in (ENGINE_MARK, OLD_ENGINE_MARK)]

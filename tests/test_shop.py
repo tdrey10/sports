@@ -30,7 +30,7 @@ def test_a_money_pick_moves_to_the_best_us_book_and_says_so():
     assert shop.shop([c], client=client) == 1 and client.calls == 1
     assert (c.pick.book, c.pick.american) == ("FanDuel", -108)
     assert c.headline == "Minnesota Timberwolves ML at -108: off a blowout win."  # Pinnacle's -102 can't be bet from the US
-    assert c.reasons[1] == "💸 Best price: FanDuel -108 (the board had fanduel -115). Checked 2 books. Bet it there."
+    assert c.reasons[1] == "💸 Best price: FanDuel -108 (FanDuel only had -115). We checked 2 sportsbooks, so bet it at FanDuel."
     assert abs(c.pick.ev - (0.552 * (1 + 100 / 108) - 1)) < 1e-9
 
 

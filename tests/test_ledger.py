@@ -473,3 +473,18 @@ def test_a_pick_graded_on_the_wrong_game_is_regraded_and_says_so():
     assert e.status == "won" and e.profit > 0 and e.final == "Away 2 @ Home 9"
     assert e.reasons[-1].startswith("Regraded: first graded lost")
     assert L.refresh(lambda s, a, b: [tuesday, wednesday], lambda s, g: [], START + timedelta(hours=6)) == 0  # once
+
+
+def test_a_proven_money_pick_is_never_pulled_and_one_pulled_by_mistake_goes_back_up():
+    """Owner, Oct 29: Boston College +245 (a proven spot, grade A) was pulled as a 'Dog of the Day' under 40%."""
+    from types import SimpleNamespace
+
+    L = Ledger()
+    (e,) = L.publish([card(make_pick(market="h2h", point=None, american=245, win_prob=0.32), tier="dog", units=0.5)], NOW)
+    e.grade, e.scorecard = "A", {"validation": "Made $15 for every $100 on 167 past games."}
+    settings = SimpleNamespace(max_favorite=-150)
+    assert L.withdraw(settings, NOW) == [] and e.status == "pending"
+    e.status, e.profit = "void", 0.0  # the old bug
+    e.reasons = ["Pulled: we only had them winning 32%. Dog of the Day is for dogs we think can actually win."] + e.reasons
+    L.withdraw(settings, NOW)
+    assert e.status == "pending" and not e.reasons[0].startswith("Pulled")

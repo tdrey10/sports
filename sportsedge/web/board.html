@@ -461,7 +461,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     return Math.round(10 * (60 * Math.min(Math.max(ev / 0.1, 0), 1) * Math.min(q / 0.45, 1) + 40 * Math.min(Math.max((q - 0.4) / 0.35, 0), 1))) / 10;
   }
   const meter = (e) => { const v = Math.round(score(e));
-    return `<span class="meter" style="--v:${v}" role="img" aria-label="Edge score ${v} out of 100"><span class="lbl"><small>Edge</small>${v}</span><span class="bar"><i></i></span></span>`; };
+    return `<span class="meter" style="--v:${v}" role="img" aria-label="Rating ${v} out of 100"><span class="lbl"><small>Rating</small>${v}</span><span class="bar"><i></i></span></span>`; };
 
   // Owner, Oct 25: judge the price BEFORE the game, while it can still be bet: where we posted it,
   // where it is now, which way it moved, and the worst price that's still worth it (our fair price).
