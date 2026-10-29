@@ -722,10 +722,10 @@ def _card(tier: str, units: float, s: Side, label: str, sport_name: str) -> Card
                  kelly=max(0.0, (read * s.dec - 1) / (s.dec - 1)), fair_american=_fair(read))
     head = (f"{s.team} at {s.odds:+.0f}: we think they win {read:.0%} of the time, and this price only needs {be:.0%} to pay off."
             if units > 0 else
-            f"Small lean on {s.team}: we think they win {s.p:.0%} of the time. At {s.odds:+.0f} you need {be:.0%} to make money"
-            + (", so it's close." if s.p >= be else ", so it's not worth a bet."))
+            f"Small lean on {s.team}: we think they win {read:.0%} of the time. At {s.odds:+.0f} you need {be:.0%} to make money"
+            + (", so it's close." if read >= be else ", so it's not worth a bet."))
     why = [f"{label}{f' · {units:g}u' if units else ' · no units'}" + (" (thin edge)" if units == 0.5 and tier in ("lock", "dog") else ""),
-           f"We give them a {s.p:.0%} chance to win. The betting odds give them {s.p_market:.0%}."]
+           f"We give them a {read:.0%} chance to win. The betting odds give them {s.p_market:.0%}."]
     if s.reasons:
         why.append("Why: " + "; ".join(s.reasons[:3]) + ".")
     if s.drift:
