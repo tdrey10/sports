@@ -199,6 +199,7 @@ button, select { font: inherit; color: inherit; }
 .potd { position: relative; border-radius: 12px; padding: 14px; display: grid; gap: 6px; align-content: start;
   background: var(--surface-2); border: 1px solid var(--line); }
 .potd .kind { font: 800 15px/1 var(--display); letter-spacing: .12em; text-transform: uppercase; color: var(--accent-2); }
+.day-head { margin: 14px 0 6px; font-size: 1rem; }
 .potd h3 { font: 700 19px/1.15 var(--body); overflow-wrap: anywhere; }
 .potd .price { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .potd .price b { font: 700 28px/1 var(--mono); }
@@ -657,13 +658,21 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${wins(e)}</span></div><p class="small">${needs(e)}</p>${stake(e)}
         <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${scoreDetails(e)}${more(e)}</div>`;
     }).join("");
-    const best = bestToday();
+    // Owner, Oct 29: "label them good money plays... so today's bets and future bets are separate at first."
+    const all = bestToday();
+    const best = all.filter((e) => dayOf(e.commence_time) <= nowDay());
+    const later = all.filter((e) => dayOf(e.commence_time) > nowDay());
     const sharpBets = items.filter((e) => e.tier === "sharp");
     const rest = items.filter((e) => !isLive(e) && !["early", "lean", "sharp"].includes(tierOf(e)) && !e.player && !e.best_rank);
     const leans = items.filter((e) => tierOf(e) === "lean" && !isLive(e));
-    const topNote = best.length ? `${best.length} money plays still open · soonest game first` : "Soonest game first";
-    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map(bet).join("")}</div>`
-      : empty("No money plays yet today. Only bets that beat the books in a blind test get units, and no game is in one of those spots yet. Leans are below; the board checks again every hour."))
+    const topNote = best.length ? `${best.length} money plays for today's games · soonest first` : "Today's games";
+    const byDay = {};
+    later.forEach((e) => (byDay[dayOf(e.commence_time)] = byDay[dayOf(e.commence_time)] || []).push(e));
+    const laterHtml = Object.keys(byDay).sort().map((d) => `<h3 class="day-head">${esc(fmt(byDay[d][0].commence_time, { weekday: "long", month: "short", day: "numeric" }))}</h3>`
+      + `<div class="top">${byDay[d].map((e, i) => bet(Object.assign({}, e, { rank: i + 1 }))).join("")}</div>`).join("");
+    return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map((e, i) => bet(Object.assign({}, e, { rank: i + 1 }))).join("")}</div>`
+      : empty(later.length ? "No money plays on today's games. The good ones coming up are right below." : "No money plays yet today. We only put money on spots that already made money in the past, and no game is in one of those spots yet. The board checks again every hour."))
+      + (later.length ? panel("Good money plays coming up", `${later.length} money plays on games later this week · lock in the price now, it's already worth it`, laterHtml) : "")
       + (sharpBets.length ? panel("Sharp value", "A book is slippin' and paying more than it should, straight up", bySport(sharpBets)) : "")
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
       + panel("The board", "Everything else we're rockin' with today", rest.length ? bySport(rest) : empty("Nothin' else worth your money today, homie. We don't force it."))
