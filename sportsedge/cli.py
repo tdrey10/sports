@@ -580,6 +580,17 @@ def cmd_live(args) -> int:
     return 0
 
 
+def _rivalry(ledger, data_dir):
+    """The Doctor vs Grim scoreboard from the saved ledgers (no grading, no network)."""
+    from . import rivalry
+
+    try:
+        return rivalry.scoreboard(ledger, data_dir)
+    except Exception as exc:  # the page still builds
+        print(f"The Doctor vs Grim scoreboard failed: {exc}")
+        return None
+
+
 def cmd_page(args) -> int:
     """Write the dashboard as an Artifact-ready page from the saved ledger (no network)."""
     import hashlib
@@ -606,7 +617,7 @@ def cmd_page(args) -> int:
     data = build_data(ledger, brains, weights, resolve(args.sports), datetime.now(timezone.utc), ufc=_ufc(data_dir),
                       studies=load_studies(data_dir / "studies.json"), props=load_props(data_dir / "studies.json"),
                       rival=rival.fetch(data_dir / "rival_picks.json"), nba=_load_json(data_dir / "nba_report.json"),
-                      reports=_reports(data_dir),
+                      reports=_reports(data_dir), rivalry=_rivalry(ledger, data_dir),
                       rival_reported=rival.fetch_reported(data_dir / "rival_dashboard.html"))
     Path(args.out).write_text(render_html(data, standalone=args.standalone))
     if args.app_dir:
@@ -976,6 +987,15 @@ def cmd_my_pick(args) -> int:
     return 0
 
 
+def cmd_my_parlay(args) -> int:
+    """Owner, Oct 29: record one of The Doctor's parlays."""
+    from . import rivalry
+
+    legs = [rivalry.parse_leg(x) for x in args.legs]
+    print(rivalry.send_parlay(args.data_dir, legs, datetime.now(timezone.utc)))
+    return 0
+
+
 def cmd_shop_study(args) -> int:
     """Price shopping vs the consensus of other books, NFL and college football, blind."""
     from . import shopstudy
@@ -1237,6 +1257,10 @@ def build_parser() -> argparse.ArgumentParser:
     mp.add_argument("--total", nargs=2, metavar=("OVER_UNDER", "POINTS"), default=None)
     mp.add_argument("--data-dir", default="data")
     mp.set_defaults(func=cmd_my_pick)
+    mx = sub.add_parser("my-parlay", help="record one of your parlays: legs like 'nba|Lakers|-120' or 'nfl|Bills|-110|spread -3.5'")
+    mx.add_argument("legs", nargs="+")
+    mx.add_argument("--data-dir", default="data")
+    mx.set_defaults(func=cmd_my_parlay)
     ss = sub.add_parser("shop-study", help="price shopping vs consensus, NFL and college football, blind")
     ss.add_argument("--fetch", action="store_true", help="refresh the odds history and results first")
     ss.add_argument("--data-dir", default="data")

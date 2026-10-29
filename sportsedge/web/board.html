@@ -613,12 +613,19 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   function rivalryPanel() {
     const R = DATA.rivalry;
     if (!R) return "";
+    const N = R.names || { you: "The Doctor", us: "Grim" };
     const line = (name, r) => `<tr><td>${name}</td><td>${r.won}-${r.lost}${r.push ? "-" + r.push : ""}</td><td class="${cls(r.units)}">${signed(r.units, 1)}u</td><td>${r.pending}</td></tr>`;
-    const ahead = R.you.units === R.leans.units ? "Dead even." : R.you.units > R.leans.units ? "You're up. 👑" : "Script Leaks is up. 😤";
-    const picks = (R.your_picks || []).map((p) => `<li>${esc(p.selection)} ${odds(p.odds)} · ${esc(p.matchup)}${p.final ? ` · <b class="${p.status === "won" ? "pos" : p.status === "lost" ? "neg" : ""}">${esc(SETTLED[p.status] || p.status)}</b> ${esc(p.final)}` : ""}</li>`).join("");
-    return panel("You vs. Script Leaks", `Your picks against our leans since ${fmt(R.since, { month: "short", day: "numeric" })} · 1 unit flat on every pick · ${ahead}`,
-      `<div class="table-wrap"><table><thead><tr><th></th><th>Record</th><th>Units</th><th>Still to play</th></tr></thead><tbody>${line("You", R.you)}${line("Script Leaks leans", R.leans)}</tbody></table></div>`
-      + (picks ? `<p class="small muted">Your picks:</p><ul class="small">${picks}</ul>` : `<p class="small muted">Send your picks in the chat and they show up here.</p>`));
+    const table = (you, us) => `<div class="table-wrap"><table><thead><tr><th></th><th>Record</th><th>Units</th><th>Open</th></tr></thead><tbody>${line("🩺 " + N.you, you)}${line("💀 " + N.us, us)}</tbody></table></div>`;
+    const lead = (you, us) => you.units === us.units ? "Dead even." : you.units > us.units ? `${N.you} is up. 👑` : `${N.us} is up. 😤`;
+    const tag = (st) => `<b class="${st === "won" ? "pos" : st === "lost" ? "neg" : ""}">${esc(SETTLED[st] || st)}</b>`;
+    const picks = (R.your_picks || []).map((p) => `<li>${esc(p.selection)} ${odds(p.odds)} · ${esc(p.matchup)}${p.final ? ` · ${tag(p.status)} ${esc(p.final)}` : ""}</li>`).join("");
+    const P = R.parlays || { you: { won: 0, lost: 0, push: 0, units: 0, pending: 0 }, us: { won: 0, lost: 0, push: 0, units: 0, pending: 0 } };
+    const parlays = (R.your_parlays || []).map((p) => `<li>${odds(p.odds)} · ${p.legs.map(esc).join(" + ")} · ${tag(p.status)}</li>`).join("");
+    return panel(`The Doctor vs Grim`, `🩺 ${esc(N.you)} (you) vs 💀 ${esc(N.us)} (Script Leaks' leans) since ${fmt(R.since, { month: "short", day: "numeric" })} · 1 unit flat on every pick`,
+      `<p class="small"><b>Straight picks</b> · ${lead(R.you, R.leans)}</p>` + table(R.you, R.leans)
+      + `<p class="small"><b>Parlays</b> · ${lead(P.you, P.us)}</p>` + table(P.you, P.us)
+      + (picks ? `<p class="small muted">${esc(N.you)}'s picks:</p><ul class="small">${picks}</ul>` : `<p class="small muted">Send your picks in the chat and they show up here.</p>`)
+      + (parlays ? `<p class="small muted">${esc(N.you)}'s parlays:</p><ul class="small">${parlays}</ul>` : ""));
   }
   function renderHero() {
     const e = bestToday()[0] || DATA.entries.filter((x) => x.tier === "lock" && x.units > 0 && onBoard(x) && !x.settled).sort((a, b) => b.units - a.units)[0];
