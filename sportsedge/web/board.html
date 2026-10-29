@@ -507,6 +507,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   // A Lock or Dog posted with no units (old board, before Oct 25) shows as the lean it was.
   // Owner, Oct 25: only proven bets carry units; a Lock, Dog or value pick without units is a lean.
   const tierOf = (e) => (["lock", "dog", "value"].includes(e.tier) && !(e.units > 0) ? "lean" : e.tier);
+  // Owner, Oct 29: "Can't be the lock of the day when the game is on Saturday. That's gotta be like future locks."
+  const isFuture = (e) => dayOf(e.commence_time) > nowDay();
+  const tierName = (e) => { const t = tierOf(e); return (["lock", "dog"].includes(t) && isFuture(e) ? "Future " : "") + (TIER[t] || t); };
   const addBtn = () => "";  // straight bets only: no parlay slip
   const GRADE_CLS = { "A+": "g-ap", A: "g-a", B: "g-b", C: "g-c", "NO BET": "g-no" };
   // Live edge monitor (owner, Oct 28): the grade is re-checked at today's price. Past the minimum price the
@@ -550,7 +553,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
   function row(e, opts = {}) {
     return `<div class="row">${stamp(e)}
-      <div class="sel">${gradeBadge(e)}<span class="tag ${tierOf(e)}">${TIER[tierOf(e)] || tierOf(e)}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
+      <div class="sel">${gradeBadge(e)}<span class="tag ${tierOf(e)}">${tierName(e)}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
       <div class="odds"><b>${odds(e.odds)}</b><small>${needs(e)}</small>${stake(e)}</div>
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${opts.matchup ? `<span class="muted">${esc(e.matchup)} · ${timeOf(e)}</span>` : ""}${moveText(e)}${statusText(e)}${addBtn(e)}</div>
@@ -561,7 +564,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     return `<article class="bet">${stamp(e)}
       <div class="rk" aria-label="Rank ${e.rank}">${e.rank}</div>
       <div class="sport-badge">${esc(sportHead(e.sport))}</div>
-      <div class="sel">${gradeBadge(e)}<strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${TIER[e.tier]}</span>` : ""}</div>
+      <div class="sel">${gradeBadge(e)}<strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${tierName(e)}</span>` : ""}</div>
       <div class="price"><b>${odds(e.odds)}</b><small>${e.ev >= 0 ? "+" : "-"}$${Math.abs(e.ev * 100).toFixed(0)} per $100</small>${stake(e)}</div>
       <div class="sub">${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}</div>
       <div class="gauge">${meter(e)}<span class="small muted">${needs(e)}</span></div>
@@ -650,7 +653,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const items = DATA.entries.filter(onBoard);
     const potd = ["lock", "dog", "prop"].map((t) => {
       // A real (units) pick beats a lean one posted earlier the same day.
-      const e = items.filter((x) => x.tier === t && (x.units > 0 || t === "prop")).sort((a, b) => b.units - a.units)[0];
+      const e = items.filter((x) => x.tier === t && (x.units > 0 || t === "prop") && !isFuture(x)).sort((a, b) => b.units - a.units)[0];
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
       if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">No it’s not rigged</p></div>`;

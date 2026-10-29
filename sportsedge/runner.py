@@ -129,7 +129,9 @@ def run_cycle(
     for tier, is_it in (("lock", lambda c: c.pick.market == "h2h" and c.pick.american < 0),
                         ("dog", lambda c: c.pick.market == "h2h" and c.pick.american > 0)):
         if tier not in taken:
-            pick = next((c for c in proven_cards if is_it(c)), None)
+            # Owner, Oct 29: the Lock / Dog of the Day is a game played today (a later one is a future lock).
+            pick = next((c for c in proven_cards if is_it(c)
+                         and ledger.day_of(c.pick.commence_time) == ledger.day_of(now)), None)
             if pick:
                 pick.tier = tier
                 taken.add(tier)
