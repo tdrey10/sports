@@ -182,7 +182,7 @@
  },
  "nhl": {
   "sport": "nhl",
-  "news": 3,
+  "news": 5,
   "key_news": 1,
   "questionable": {
    "n": 0,
@@ -201,10 +201,10 @@
    "verdict": "collecting"
   },
   "all": {
-   "n": 3,
-   "avg_news_move": -0.0062,
-   "avg_drift": 0.0,
-   "drift_same_way": 0.0,
+   "n": 5,
+   "avg_news_move": -0.0074,
+   "avg_drift": -0.0012,
+   "drift_same_way": 0.2,
    "graded": 2,
    "in_sample": {
     "bets": 1,
@@ -228,16 +228,16 @@
     "beat_close": 0.0
    },
    "clv_in_sample": {
-    "bets": 1,
-    "beat_close": 0.0,
-    "se": 0.0,
-    "avg_clv": -0.024
-   },
-   "clv_blind": {
     "bets": 2,
     "beat_close": 0.0,
     "se": 0.0,
-    "avg_clv": -0.0237
+    "avg_clv": -0.0235
+   },
+   "clv_blind": {
+    "bets": 3,
+    "beat_close": 0.0,
+    "se": 0.0,
+    "avg_clv": -0.0213
    },
    "verdict": "collecting"
   },
