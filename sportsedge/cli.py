@@ -983,6 +983,9 @@ def cmd_my_pick(args) -> int:
         market, point = "spreads", args.spread
     if args.total:
         market, side, point = "totals", args.total[0].lower(), float(args.total[1])
+    if args.cancel:
+        print(rivalry.cancel(args.data_dir, args.sport, args.team, datetime.now(timezone.utc), market))
+        return 0
     print(rivalry.send(args.data_dir, args.sport, args.team, args.odds, datetime.now(timezone.utc), market, point, side))
     return 0
 
@@ -1255,6 +1258,7 @@ def build_parser() -> argparse.ArgumentParser:
     mp.add_argument("odds", type=float)
     mp.add_argument("--spread", type=float, default=None, help="the team's spread, e.g. -3.5")
     mp.add_argument("--total", nargs=2, metavar=("OVER_UNDER", "POINTS"), default=None)
+    mp.add_argument("--cancel", action="store_true", help="take this pick back before its game")
     mp.add_argument("--data-dir", default="data")
     mp.set_defaults(func=cmd_my_pick)
     mx = sub.add_parser("my-parlay", help="record one of your parlays: legs like 'nba|Lakers|-120' or 'nfl|Bills|-110|spread -3.5'")

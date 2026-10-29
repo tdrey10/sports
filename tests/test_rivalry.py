@@ -69,3 +69,17 @@ def test_the_doctors_parlay_is_filed_and_settles_on_its_legs(tmp_path):
     assert board["names"] == {"you": "The Doctor", "us": "Grim"}
     assert board["parlays"]["you"]["lost"] == 1 and board["your_parlays"][0]["status"] == "lost"
     assert rivalry.parse_leg("nfl|Bills|-110|spread -3.5")[3:5] == ("spreads", -3.5)
+
+
+def test_a_changed_pick_is_taken_back_before_its_game(tmp_path):
+    """Owner, Oct 29: "I'm gonna change my pick. Panthers +3 1/2 instead of Packers.\""""
+    snapshots(tmp_path)
+    rivalry.send(tmp_path, "nba", "Lakers", -110, NOW, "spreads", -3.5)
+    rivalry._file_inbox(tmp_path)
+    rivalry.cancel(tmp_path, "nba", "Lakers", NOW + timedelta(hours=1), "spreads")
+    rivalry.send(tmp_path, "nba", "Celtics", -110, NOW + timedelta(hours=1), "spreads", 3.5)
+    rivalry._file_inbox(tmp_path)
+    picks = {e.selection: e.status for e in Ledger.load(rivalry.path(tmp_path)).entries.values()}
+    assert picks == {"Los Angeles Lakers -3.5": "void", "Boston Celtics +3.5": "pending"}
+    rivalry._file_inbox(tmp_path)  # filing again changes nothing
+    assert {e.selection: e.status for e in Ledger.load(rivalry.path(tmp_path)).entries.values()} == picks

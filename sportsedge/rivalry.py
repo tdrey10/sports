@@ -108,6 +108,40 @@ def send(root, sport: str, team: str, odds: float, now: datetime, market: str = 
     return f"In: {name} at {odds:+.0f} ({away} @ {home})."
 
 
+def cancel(root, sport: str, team: str, now: datetime, market: str = "h2h") -> str:
+    """Take back one of the owner's picks before its game (owner, Oct 29: "I'm gonna change my pick")."""
+    import csv
+
+    found = _game(root, sport, team, now)
+    if found is None:
+        raise ValueError(f"no upcoming {sport.upper()} game found for {team}")
+    f = Path(root) / INBOX
+    with f.open("a", newline="") as fh:
+        csv.DictWriter(fh, fieldnames=INBOX_FIELDS).writerow(
+            {"added_at": now.isoformat(), "sport": sport, "team": team, "odds": 0, "market": f"cancel:{market}",
+             "point": "", "side": ""})
+    return f"Out: {found[4]} {market} ({found[3]} @ {found[2]})."
+
+
+def _cancel(root, r) -> bool:
+    when = datetime.fromisoformat(r["added_at"])
+    found = _game(root, r["sport"], r["team"], when)
+    if found is None:
+        return False
+    eid, _, _, _, name = found
+    ledger = Ledger.load(path(root))
+    hit = False
+    for e in ledger.entries.values():
+        if e.event_id == eid and e.market == r["market"].split(":", 1)[1] and name in e.selection \
+                and e.status == "pending" and e.start > when:
+            e.status, e.profit, e.graded_at = "void", 0.0, when.isoformat()
+            e.reasons = ["Changed pick: taken back before the game."] + list(e.reasons)
+            hit = True
+    if hit:
+        ledger.save(path(root))
+    return hit
+
+
 def _file_inbox(root) -> int:
     import csv
 
@@ -117,6 +151,9 @@ def _file_inbox(root) -> int:
     n = 0
     with f.open() as fh:
         for r in csv.DictReader(fh):
+            if r["market"].startswith("cancel:"):
+                _cancel(root, r)
+                continue
             try:
                 msg = add(root, r["sport"], r["team"], float(r["odds"]), datetime.fromisoformat(r["added_at"]),
                           r["market"] or "h2h", float(r["point"]) if r["point"] else None, r["side"] or None)
@@ -275,4 +312,4 @@ def scoreboard(ours: Ledger, root) -> dict | None:
             "parlays": {"you": you_p, "us": grim_p}, "your_parlays": your_parlays}
 
 
-__all__ = ["add", "parse_leg", "refresh", "scoreboard", "send", "send_parlay"]
+__all__ = ["add", "cancel", "parse_leg", "refresh", "scoreboard", "send", "send_parlay"]
