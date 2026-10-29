@@ -671,8 +671,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const laterHtml = Object.keys(byDay).sort().map((d) => `<h3 class="day-head">${esc(fmt(byDay[d][0].commence_time, { weekday: "long", month: "short", day: "numeric" }))}</h3>`
       + `<div class="top">${byDay[d].map((e, i) => bet(Object.assign({}, e, { rank: i + 1 }))).join("")}</div>`).join("");
     return panel("Top bets today", topNote, best.length ? `<div class="top">${best.map((e, i) => bet(Object.assign({}, e, { rank: i + 1 }))).join("")}</div>`
-      : empty(later.length ? "No money plays on today's games. The good ones coming up are right below." : "No money plays yet today. We only put money on spots that already made money in the past, and no game is in one of those spots yet. The board checks again every hour."))
-      + (later.length ? panel("Good money plays coming up", `${later.length} money plays on games later this week · lock in the price now, it's already worth it`, laterHtml) : "")
+      : empty(later.length ? "No money plays on today's games. Getting in early on later games is right below." : "No money plays yet today. We only put money on spots that already made money in the past, and no game is in one of those spots yet. The board checks again every hour."))
+      + (later.length ? panel("Getting in early", `${later.length} money plays on games later this week · lock in the price now, it's already worth it`, laterHtml) : "")
       + (sharpBets.length ? panel("Sharp value", "A book is slippin' and paying more than it should, straight up", bySport(sharpBets)) : "")
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
       + panel("The board", "Everything else we're rockin' with today", rest.length ? bySport(rest) : empty("Nothin' else worth your money today, homie. We don't force it."))
