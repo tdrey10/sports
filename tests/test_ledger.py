@@ -446,3 +446,30 @@ def test_overall_record_counts_every_pick_put_out():
     assert (st["all_picks"]["won"], st["all_picks"]["lost"]) == (2, 1)  # void left out
     assert (st["overall"]["won"], st["overall"]["lost"]) == (1, 0)  # money plays only
     assert abs(st["all_picks"]["units"] - 1.41) < 1e-9
+
+
+def test_a_series_pick_is_graded_on_its_own_game_not_last_nights():
+    """Owner, Oct 28: the Brewers won Wednesday, but the pick was graded with Tuesday's 4-3 loss (the same two
+    teams 24 hours earlier). Here the home -3.5 pick lost on that score and won its own game. Grading matches the ESPN event id, else the nearest game in time."""
+    L = Ledger()
+    (e,) = L.publish([card(make_pick(event_id="g3"))], NOW)
+    tuesday = GameResult("g2", START - timedelta(days=1), "Home", "Away", 4, 3, state="post")
+    wednesday_live = GameResult("g3", START, "Home", "Away", None, None, state="in", live_home=1, live_away=2)
+    L.refresh(lambda s, a, b: [tuesday, wednesday_live], lambda s, g: [], START + timedelta(hours=2, minutes=30))
+    assert e.status == "live"  # not "lost" on Tuesday's score
+    wednesday = GameResult("g3", START, "Home", "Away", 9, 2, state="post")
+    L.refresh(lambda s, a, b: [tuesday, wednesday], lambda s, g: [], START + timedelta(hours=4))
+    assert e.status == "won" and e.final == "Away 2 @ Home 9"
+
+
+def test_a_pick_graded_on_the_wrong_game_is_regraded_and_says_so():
+    L = Ledger()
+    (e,) = L.publish([card(make_pick(event_id="g3"))], NOW)
+    tuesday = GameResult("g2", START - timedelta(days=1), "Home", "Away", 4, 3, state="post")
+    grade(e, tuesday, None, START + timedelta(hours=3))  # the old bug's result
+    assert e.status == "lost"
+    wednesday = GameResult("g3", START, "Home", "Away", 9, 2, state="post")
+    assert L.refresh(lambda s, a, b: [tuesday, wednesday], lambda s, g: [], START + timedelta(hours=5)) == 1
+    assert e.status == "won" and e.profit > 0 and e.final == "Away 2 @ Home 9"
+    assert e.reasons[-1].startswith("Regraded: first graded lost")
+    assert L.refresh(lambda s, a, b: [tuesday, wednesday], lambda s, g: [], START + timedelta(hours=6)) == 0  # once
