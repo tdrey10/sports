@@ -626,7 +626,7 @@ def build_cards(
     return cards
 
 
-NO_PROOF = "No units: this kind of bet hasn't beaten the books in a blind test yet (owner's rule: only proven bets get money)."
+NO_PROOF = "No money on this one: this kind of bet hasn't proven it makes money yet. We only bet spots that already have."
 
 
 def gate(card: Card) -> Card:

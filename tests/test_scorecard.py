@@ -32,7 +32,7 @@ def test_grades_follow_the_evidence_not_the_models_confidence():
     assert build(card(evidence=proven), NOW)["grade"] == "A"
     clv = {"kind": "CLV", "blind_bets": 200, "blind_roi": 0.062, "blind_se": 0.106, "why": "beats the close"}
     sc = build(card(american=310, win=0.26, market=0.24, evidence=clv), NOW)
-    assert sc["grade"] == "B" and any("standard error" in r for r in sc["risks"])
+    assert sc["grade"] == "B" and any("could still be luck" in r for r in sc["risks"])
     lean = gate(card(proven="", win=0.60, market=0.53))  # the model loves it, nothing validated it
     assert (lean.units, lean.grade) == (0.0, "C") and lean.scorecard["validation"].startswith("None")
     assert gate(card(proven="", win=0.50, market=0.53)).grade == "NO BET"
@@ -41,7 +41,7 @@ def test_grades_follow_the_evidence_not_the_models_confidence():
 def test_a_strong_spot_too_thin_at_this_price_drops_to_a():
     thin = dict(STRONG, blind_roi=0.03, blind_se=0.05)  # low end of the range has no edge
     s = build(card(evidence=thin, win=1.03 / (1 + 100 / 115)), NOW)
-    assert s["grade"] == "A" and any("Sensitive" in r for r in s["risks"])
+    assert s["grade"] == "A" and any("Thin" in r for r in s["risks"])
 
 
 def test_the_100_point_score_reads_the_parts_and_a_no_bet_is_zero():

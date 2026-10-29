@@ -720,17 +720,16 @@ def _card(tier: str, units: float, s: Side, label: str, sport_name: str) -> Card
     be = 1 / s.dec
     pk = replace(s.pick, win_prob=read, model_prob=s.own, ev=read * s.dec - 1,
                  kelly=max(0.0, (read * s.dec - 1) / (s.dec - 1)), fair_american=_fair(read))
-    head = (f"{s.team} at {s.odds:+.0f}: we got em {read:.0%}, the price needs {be:.0%}."
-            if units > 0 else f"Lean {s.team}: {s.p:.0%} on our numbers (needs {be:.0%} at {s.odds:+.0f}).")
+    head = (f"{s.team} at {s.odds:+.0f}: we think they win {read:.0%} of the time, and this price only needs {be:.0%} to pay off."
+            if units > 0 else
+            f"Small lean on {s.team}: we think they win {s.p:.0%} of the time. At {s.odds:+.0f} you need {be:.0%} to make money"
+            + (", so it's close." if s.p >= be else ", so it's not worth a bet."))
     why = [f"{label}{f' · {units:g}u' if units else ' · no units'}" + (" (thin edge)" if units == 0.5 and tier in ("lock", "dog") else ""),
-           f"Our read {s.p:.0%} · own read {s.own:.0%} · market (no vig) {s.p_market:.0%}"
-           + (f" · weighed read {s.w_p:.0%}" if s.w_p is not None else "")
-           + (f" · dog score {s.dog_score:+.1f}" if s.dog_score is not None else "") + "."]
+           f"We give them a {s.p:.0%} chance to win. The betting odds give them {s.p_market:.0%}."]
     if s.reasons:
         why.append("Why: " + "; ".join(s.reasons[:3]) + ".")
     if s.drift:
-        why.append(f"Line since the open: {'money ran away' if s.drift > 0 else 'money came in'} "
-                   f"({abs(s.drift) * 100:.1f} pts).")
+        why.append("Since the odds opened, the money has been " + ("going against them." if s.drift > 0 else "coming in on them."))
     why += s.notes[:6]
     why.append(ENGINE_MARK)
     return Card(tier=tier, units=units, headline=head, reasons=why, sport=s.sport, sport_name=sport_name, pick=pk,

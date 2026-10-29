@@ -33,10 +33,10 @@ def _range(card, dec: float) -> tuple[float, float, str]:
     if ev.get("blind_roi") is not None and ev.get("blind_se") is not None:
         lo = (1 + ev["blind_roi"] - ev["blind_se"]) / dec
         hi = (1 + ev["blind_roi"] + ev["blind_se"]) / dec
-        return max(lo, 0.01), min(hi, 0.99), "the blind test's return, plus or minus one standard error"
+        return max(lo, 0.01), min(hi, 0.99), "based on how this spot did in past games"
     p = card.pick.win_prob
     return (max(p - UNVALIDATED_ERR, 0.01), min(p + UNVALIDATED_ERR, 0.99),
-            f"estimate: the model's read plus or minus {UNVALIDATED_ERR * 100:.0f} points (not validated)")
+            "our numbers' best guess, give or take (not proven)")
 
 
 def grade(card) -> tuple[str, str]:
@@ -46,17 +46,17 @@ def grade(card) -> tuple[str, str]:
     kind = ev.get("kind")
     if card.units > 0 and kind == "STRONG":
         if lo * dec - 1 > 0:
-            return "A+", "A STRONG spot: it made money on the seasons used to build it AND on seasons it never saw, and it stays +EV at the low end of its tested range."
-        return "A", "A STRONG spot, but at this price the edge is thin at the low end of its tested range."
+            return "A+", "Our best kind of bet: this spot made money on old games AND on games the system never saw, and the price is still good even if we're a little off."
+        return "A", "A strong spot, but at this price there's not much room for error."
     if card.units > 0 and kind == "PROVEN":
-        return "A", "A PROVEN spot: it beat the books on seasons it never saw, by more than random swing."
+        return "A", "A proven spot: it beat the books on games the system never saw, by more than luck."
     if card.units > 0 and kind in ("CLV", "RECORD"):
-        return "B", ev.get("why") or "Evidence short of a full blind pass; small stake."
+        return "B", ev.get("why") or "Good signs but not fully proven yet, so a small bet."
     if card.units > 0:
-        return "B", "Carries units under a rule the owner set; see the evidence."
+        return "B", "A bet you approved; see the proof below."
     if p * dec - 1 > 0:
-        return "C", "The model sees an edge, but this kind of bet has never passed a blind test. A lean: no units."
-    return "NO BET", "No positive edge at this price."
+        return "C", "Our numbers like it, but this kind of bet hasn't proven it makes money. Just a lean, no money."
+    return "NO BET", "Not worth it at this price."
 
 
 def score(card, g: str, ev_pct: float, edge_pts: float | None, lo: float, dec: float, risks: list[str]) -> dict:
@@ -84,19 +84,19 @@ def build(card, now: datetime) -> dict:
     factors = [r for r in card.reasons if not r.startswith(("✅", "💸", "No units", "Lean ·", "Lock of", "Dog of"))][:4]
     risks = []
     if not ev:
-        risks.append("Not validated: the model's raw edges lost money in our blind tests.")
+        risks.append("Not proven: our numbers alone have lost money in past tests.")
     if ev.get("blind_bets") is not None and ev["blind_bets"] < SMALL_SAMPLE:
-        risks.append(f"Small sample: {ev['blind_bets']} blind bets.")
+        risks.append(f"Not a huge sample yet: {ev['blind_bets']} past bets.")
     if ev.get("blind_roi") is not None and ev.get("blind_se") is not None and ev["blind_roi"] - ev["blind_se"] <= 0:
-        risks.append("The win/loss record is inside its standard error: it could still be luck.")
+        risks.append("The win-loss record could still be luck.")
     if ev.get("risk"):
         risks.append(ev["risk"])
     if any("questionable" in r.lower() for r in card.reasons):
-        risks.append("A player is questionable: if the news turns, the price will move.")
+        risks.append("A player is questionable. If he sits or plays, the odds will move.")
     if lo * dec - 1 <= 0 < pk.win_prob * dec - 1:
-        risks.append("Sensitive: at the low end of the range there's no edge.")
+        risks.append("Thin: if we're a little off, there's no edge.")
     if not risks:
-        risks.append("Lines move: bet it only at the minimum price or better.")
+        risks.append("Odds move. Only bet it at the minimum price or better.")
     ev_pct = (pk.win_prob * dec - 1) * 100
     edge_pts = None if mp is None else (pk.win_prob - mp) * 100
     return {
@@ -112,7 +112,7 @@ def build(card, now: datetime) -> dict:
         "ev_pct": round((pk.win_prob * dec - 1) * 100, 1),
         "range": [round(lo, 4), round(hi, 4)], "range_how": how,
         "min_odds": _odds(pk.win_prob),
-        "validation": ev.get("text") or "None: no blind test behind this kind of bet.",
+        "validation": ev.get("text") or "None: this kind of bet hasn't been proven.",
         "factors": factors, "risks": risks,
     }
 
