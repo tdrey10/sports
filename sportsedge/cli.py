@@ -464,6 +464,15 @@ class Workspace:
         from .site import build_data, write_site
 
         self.ledger.save(self.ledger_path)
+        rivalry = None
+        if not self.demo:  # Owner, Oct 29: his picks vs our leans, graded the same way
+            from . import rivalry as rv
+
+            try:
+                rv.refresh(self.provider, self.data_dir, now)
+                rivalry = rv.scoreboard(self.ledger, self.data_dir)
+            except Exception as exc:
+                print(f"your-picks scoreboard failed: {exc}")
         self.brain_path.write_text(json.dumps(
             {"brains": {k: asdict(v) for k, v in self.brains.items()}, "weights": self.weights}, indent=1))
         from .study import load_props
@@ -472,7 +481,7 @@ class Workspace:
                           studies=self.studies, ufc=_ufc(self.data_dir, self.demo),
                           props=load_props(self.data_dir / ("demo-studies.json" if self.demo else "studies.json")),
                           nba=None if self.demo else _load_json(self.data_dir / "nba_report.json"),
-                          reports={} if self.demo else _reports(self.data_dir))
+                          reports={} if self.demo else _reports(self.data_dir), rivalry=rivalry)
         path = write_site(self.site_dir, data)
         o = data["stats"]["overall"]
         print(f"dashboard: {path}  (record {o['won']}-{o['lost']}, {o['units']:+.1f}u, bankroll ${data['stats']['bankroll']:,.2f})")
@@ -954,6 +963,19 @@ def cmd_soccer_study(args) -> int:
     return 0
 
 
+def cmd_my_pick(args) -> int:
+    """Owner, Oct 29: record one of his picks for the you-vs-the-leans scoreboard."""
+    from . import rivalry
+
+    market, point, side = "h2h", None, None
+    if args.spread is not None:
+        market, point = "spreads", args.spread
+    if args.total:
+        market, side, point = "totals", args.total[0].lower(), float(args.total[1])
+    print(rivalry.send(args.data_dir, args.sport, args.team, args.odds, datetime.now(timezone.utc), market, point, side))
+    return 0
+
+
 def cmd_shop_study(args) -> int:
     """Price shopping vs the consensus of other books, NFL and college football, blind."""
     from . import shopstudy
@@ -1207,6 +1229,14 @@ def build_parser() -> argparse.ArgumentParser:
     sc.add_argument("--data-dir", default="data")
     sc.set_defaults(func=cmd_soccer_study)
 
+    mp = sub.add_parser("my-pick", help="record one of your picks for the you-vs-the-leans scoreboard")
+    mp.add_argument("sport")
+    mp.add_argument("team")
+    mp.add_argument("odds", type=float)
+    mp.add_argument("--spread", type=float, default=None, help="the team's spread, e.g. -3.5")
+    mp.add_argument("--total", nargs=2, metavar=("OVER_UNDER", "POINTS"), default=None)
+    mp.add_argument("--data-dir", default="data")
+    mp.set_defaults(func=cmd_my_pick)
     ss = sub.add_parser("shop-study", help="price shopping vs consensus, NFL and college football, blind")
     ss.add_argument("--fetch", action="store_true", help="refresh the odds history and results first")
     ss.add_argument("--data-dir", default="data")

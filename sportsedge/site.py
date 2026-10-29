@@ -50,6 +50,7 @@ def build_data(
     rival_reported: dict | None = None,
     nba: dict | None = None,
     reports: dict | None = None,
+    rivalry: dict | None = None,
 ) -> dict:
     cutoff = now - timedelta(days=KEEP_DAYS)
     entries = []
@@ -93,6 +94,8 @@ def build_data(
         "nba": nba,
         # The football reports (fbplayers.py): {"nfl": ..., "ncaaf": ...}. Research, no units.
         "reports": reports or {},
+        # Owner, Oct 29: his picks vs our leans (rivalry.py).
+        "rivalry": rivalry,
     }
 
 
