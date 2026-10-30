@@ -980,6 +980,7 @@
    "selection": "Calgary Flames ML",
    "headline": "Your pick: Calgary Flames ML at -105.",
    "reasons": [
+    "Changed pick: taken back before the game.",
     "Your pick."
    ],
    "book": "",
@@ -1003,12 +1004,12 @@
    ],
    "close_odds": -105.0,
    "close_fair": null,
-   "status": "pending",
+   "status": "void",
    "live": null,
    "final": null,
    "result_value": null,
-   "profit": null,
-   "graded_at": null,
+   "profit": 0.0,
+   "graded_at": "2026-10-30T20:54:11.766380+00:00",
    "grade": "NO BET",
    "scorecard": {
     "grade": "NO BET",
@@ -1031,6 +1032,93 @@
     "fair_odds": 100,
     "edge_pts": null,
     "ev_pct": -2.4,
+    "range": [
+     0.45,
+     0.55
+    ],
+    "range_how": "our numbers' best guess, give or take (not proven)",
+    "min_odds": 100,
+    "validation": "None: this kind of bet hasn't been proven.",
+    "factors": [
+     "Your pick."
+    ],
+    "risks": [
+     "Not proven: our numbers alone have lost money in past tests."
+    ]
+   }
+  },
+  {
+   "id": "f935556f34fcf4b6",
+   "created_at": "2026-10-30T20:54:12.121667+00:00",
+   "day": "2026-10-30",
+   "tier": "lean",
+   "units": 0.0,
+   "sport": "nhl",
+   "sport_name": "NHL",
+   "event_id": "401892613",
+   "commence_time": "2026-10-31T00:00:00+00:00",
+   "home": "Calgary Flames",
+   "away": "Seattle Kraken",
+   "matchup": "Seattle Kraken @ Calgary Flames",
+   "market": "h2h",
+   "market_label": "Moneyline",
+   "side": "away",
+   "point": null,
+   "player": null,
+   "selection": "Seattle Kraken ML",
+   "headline": "Your pick: Seattle Kraken ML at -115.",
+   "reasons": [
+    "Your pick."
+   ],
+   "book": "",
+   "odds": -115.0,
+   "model_prob": 0.5,
+   "win_prob": 0.5,
+   "ev": 0.0,
+   "market_prob": null,
+   "best_rank": null,
+   "score": null,
+   "spots": [],
+   "current_odds": -115.0,
+   "current_point": null,
+   "current_book": "",
+   "history": [
+    [
+     "2026-10-30T20:54:12.121667+00:00",
+     -115.0,
+     null
+    ]
+   ],
+   "close_odds": -115.0,
+   "close_fair": null,
+   "status": "pending",
+   "live": null,
+   "final": null,
+   "result_value": null,
+   "profit": null,
+   "graded_at": null,
+   "grade": "NO BET",
+   "scorecard": {
+    "grade": "NO BET",
+    "why": "Not worth it at this price.",
+    "score": {
+     "total": 0,
+     "projection": 5,
+     "ev": 0,
+     "market": 0,
+     "data": 10,
+     "risk": 0
+    },
+    "checked_at": "2026-10-30T21:10:09.318592+00:00",
+    "book": "",
+    "odds": -115.0,
+    "model_prob": 0.5,
+    "engine_prob": 0.5,
+    "implied_prob": 0.5349,
+    "fair_market_prob": null,
+    "fair_odds": 100,
+    "edge_pts": null,
+    "ev_pct": -6.5,
     "range": [
      0.45,
      0.55
