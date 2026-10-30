@@ -1,7 +1,7 @@
 {
  "nba": {
-  "games": 1390,
-  "tune_games": 834,
+  "games": 1393,
+  "tune_games": 835,
   "rows": [
    {
     "study": "NBA absences",
@@ -68,25 +68,25 @@
     "variant": "back: team missing 25%+ of its production",
     "verdict": "",
     "in_sample": {
-     "bets": 134,
+     "bets": 135,
      "won": 49,
-     "lost": 85,
+     "lost": 86,
      "push": 0,
-     "units": 1.09,
-     "roi": 0.00813432835820895,
-     "flat_roi": 0.00813432835820896,
-     "se": 0.11980397560170833,
+     "units": 0.09,
+     "roi": 0.0006666666666666623,
+     "flat_roi": 0.0006666666666666722,
+     "se": 0.11914747842128874,
      "proven": false
     },
     "blind": {
-     "bets": 136,
+     "bets": 135,
      "won": 46,
-     "lost": 90,
+     "lost": 89,
      "push": 0,
-     "units": -13.5,
-     "roi": -0.09926470588235292,
-     "flat_roi": -0.09926470588235295,
-     "se": 0.11121303980068883,
+     "units": -12.5,
+     "roi": -0.09259259259259257,
+     "flat_roi": -0.0925925925925926,
+     "se": 0.11183810077319174,
      "proven": false
     }
    },
@@ -155,25 +155,25 @@
     "variant": "fade: team missing 25%+ of its production (bet the opponent)",
     "verdict": "",
     "in_sample": {
-     "bets": 72,
+     "bets": 73,
      "won": 27,
-     "lost": 45,
+     "lost": 46,
      "push": 0,
-     "units": -3.98,
-     "roi": -0.05527777777777775,
-     "flat_roi": -0.055277777777777766,
-     "se": 0.14940518112304313,
+     "units": -4.98,
+     "roi": -0.06821917808219176,
+     "flat_roi": -0.06821917808219176,
+     "se": 0.14791155756380067,
      "proven": false
     },
     "blind": {
-     "bets": 94,
+     "bets": 93,
      "won": 32,
-     "lost": 62,
+     "lost": 61,
      "push": 0,
-     "units": -13.37,
-     "roi": -0.14223404255319153,
-     "flat_roi": -0.1422340425531915,
-     "se": 0.12693311037917257,
+     "units": -12.37,
+     "roi": -0.13301075268817206,
+     "flat_roi": -0.13301075268817206,
+     "se": 0.12796623496794335,
      "proven": false
     }
    },
@@ -474,25 +474,25 @@
     "variant": "back: team missing 25%+ of its production",
     "verdict": "",
     "in_sample": {
-     "bets": 299,
-     "won": 144,
-     "lost": 155,
+     "bets": 301,
+     "won": 145,
+     "lost": 156,
      "push": 0,
-     "units": -23.98,
-     "roi": -0.08021380508691729,
-     "flat_roi": -0.08021380508691732,
-     "se": 0.05530538084542963,
+     "units": -24.06,
+     "roi": -0.07992691626266558,
+     "flat_roi": -0.07992691626266563,
+     "se": 0.05512426948661753,
      "proven": false
     },
     "blind": {
-     "bets": 443,
-     "won": 222,
-     "lost": 221,
+     "bets": 441,
+     "won": 221,
+     "lost": 220,
      "push": 0,
-     "units": -18.86,
-     "roi": -0.0425659530651282,
-     "flat_roi": -0.042565953065128205,
-     "se": 0.04545576912360658,
+     "units": -18.78,
+     "roi": -0.04259102751423518,
+     "flat_roi": -0.0425910275142352,
+     "se": 0.045557370526275724,
      "proven": false
     }
    },
@@ -561,25 +561,25 @@
     "variant": "fade: team missing 25%+ of its production (bet the opponent)",
     "verdict": "",
     "in_sample": {
-     "bets": 299,
-     "won": 155,
-     "lost": 144,
+     "bets": 301,
+     "won": 156,
+     "lost": 145,
      "push": 0,
-     "units": -3.0,
-     "roi": -0.010022153914672953,
-     "flat_roi": -0.010022153914672966,
-     "se": 0.055301943161697766,
+     "units": -3.07,
+     "roi": -0.010201654799206934,
+     "flat_roi": -0.010201654799206945,
+     "se": 0.05512063986478155,
      "proven": false
     },
     "blind": {
-     "bets": 443,
-     "won": 221,
-     "lost": 222,
+     "bets": 441,
+     "won": 220,
+     "lost": 221,
      "push": 0,
-     "units": -20.43,
-     "roi": -0.046124314354460794,
-     "flat_roi": -0.046124314354460884,
-     "se": 0.045491535937226435,
+     "units": -20.36,
+     "roi": -0.046165526496489924,
+     "flat_roi": -0.046165526496490014,
+     "se": 0.04559337639809396,
      "proven": false
     }
    },
@@ -620,8 +620,8 @@
   }
  },
  "nhl": {
-  "games": 202,
-  "tune_games": 121,
+  "games": 213,
+  "tune_games": 127,
   "rows": [
    {
     "study": "NHL absences",
@@ -741,7 +741,7 @@
    }
   ],
   "control": {
-   "spots": 197,
+   "spots": 198,
    "proven": 0,
    "strong": 0
   }
