@@ -57,7 +57,7 @@
     "tuning": "2020-2022",
     "blind": "2023+",
     "luck_control": "0/96 random spots",
-    "verdict": "promising, not proven: 24h at 2%+ made +40% blind in both sports but on 28 and 58 bets; NCAAF 6h 2%+ blind 61 bets +20.7% (\u00b120.5) but lost in tuning. Reruns daily (shopstudy)."
+    "verdict": "promising, not proven: 24h at 2%+ made +40% blind in both sports but on 28 and 58 bets; NCAAF 6h 2%+ blind 61 bets +20.7% (±20.5) but lost in tuning. Reruns daily (shopstudy)."
   },
   {
     "date": "2026-10-14",
@@ -114,7 +114,7 @@
     "tuning": "2018-2021 set the 15% cut points and the tuning record",
     "blind": "2022 on, 48 variants (6 sports x 8)",
     "luck_control": "100 random tenths of all games betting over or under through the same bar: 0 of 100 passed",
-    "verdict": "none proven: the market already prices recent scoring. Best looks (under-streaks then over) were +4-6% blind with \u00b15-8% error and lost or barely made money in tuning (NFL -6.5%, NCAAF -6.9%). Dropped. Code: sportsedge/scoringstudy.py (rerunnable, not in the daily run)."
+    "verdict": "none proven: the market already prices recent scoring. Best looks (under-streaks then over) were +4-6% blind with ±5-8% error and lost or barely made money in tuning (NFL -6.5%, NCAAF -6.9%). Dropped. Code: sportsedge/scoringstudy.py (rerunnable, not in the daily run)."
   },
   {
     "date": "2026-10-16",
@@ -337,5 +337,15 @@
     "blind": "2022 on",
     "luck_control": "100 random tenths of all totals (random over/under) through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 40 tries)",
     "verdict": "none wired: 0 of 40 variants cleared the bar. Four passed one arm only: NFL under on big spreads (tuning +9.3% on 164, blind -12.3% on 119), NFL under pick'em (blind +12.7% on 158, tuning -3.0%), NCAAF over pick'em (blind +6.8% on 240, tuning -2.5%), NBA over big spread (tuning +5.7%, blind -0.7% on 1,139) - each flips between arms, so noise. High/low total levels lose about the vig everywhere (NCAAB over high totals -4.2% blind on 6,946; NBA over high -4.7% on 2,709). The totals market prices game shape fine. Dropped."
+  },
+  {
+    "date": "2026-10-30",
+    "idea": "Season over rates and rematch totals: over/under when both teams' games so far this season ran over (60%+) or under (40%-) their posted totals, and when the last meeting this season went over or under",
+    "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+    "data": "data/lines/espn closing totals 2018+ (sportsedge/overratestudy.py)",
+    "tuning": "seasons through 2021",
+    "blind": "2022 on",
+    "luck_control": "100 random tenths of all totals (random over/under) through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 48 tries)",
+    "verdict": "none wired: 2 of 48 variants technically cleared the bar, neither STRONG, about what luck gives: NFL over after the last meeting went under (tuning +4.8% on 114, blind +8.7% on 122) and NCAAF over when both teams' games run under (tuning +1.5% on 92, blind +13.0% on 101). Both sit on ~100 bets with a tiny tuning edge, and their mirror spots (NFL under after a meeting that went over, NCAAF under when both run over) point the other way or flip, so noise. Everything else loses about the vig (MLB/NHL/NBA/NCAAB rematch totals -2% to -9%). The totals market already prices a team's over habit and the last meeting. Dropped."
   }
 ]
