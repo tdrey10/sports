@@ -1158,9 +1158,13 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         <small class="usd">${td.graded ? usdSigned(td.units * U()) : "$0"}</small>
         <small>${tdLine}${openLine}</small>${list}
         <small class="yest">Yesterday: <b class="${yd.graded ? cls(yd.units) : ""}">${yd.graded ? signed(yd.units, 2) + "u" : "no money plays"}</b>${yd.graded ? ` (${rec(yd.rec)})` : ""}</small></div>`;
-    $("scoreboard").innerHTML = todayBox + `<div class="all"><span>Season · money plays (the ones with units on 'em)</span><b class="${cls(o.units)}">${signed(o.units, 1)}u</b>
-        <small>${o.dollars == null ? "" : usdSigned(o.dollars) + " · "}${rec(o)} · ${pct(o.win_pct)} won · ${o.roi == null ? "–" : signed(o.roi * 100, 1) + "% ROI"}</small></div>
-      <div><span>Leans</span><b>${rec(lean)}</b><small>${pct(lean.won + lean.lost ? lean.won / (lean.won + lean.lost) : null)} won · no units, not bets</small></div>
+    // Owner, Oct 31: the record restarts with the proven-only system; the old one stays, apart; leans apart too.
+    const pe = st.proven_era || o, old = st.old_system, ls = st.leans_since;
+    const since = st.since ? fmt(st.since, { month: "short", day: "numeric" }) : "";
+    $("scoreboard").innerHTML = todayBox + `<div class="all"><span>Money plays since ${esc(since)} · proven picks only</span><b class="${cls(pe.units)}">${signed(pe.units, 1)}u</b>
+        <small>${pe.dollars == null ? "" : usdSigned(pe.dollars) + " · "}${rec(pe)} · ${pct(pe.win_pct)} won · ${pe.roi == null ? "–" : signed(pe.roi * 100, 1) + "% ROI"}</small>
+        ${old && old.won + old.lost ? `<small class="muted">Old system before ${esc(since)} (retired): ${rec(old)} · ${signed(old.units, 1)}u</small>` : ""}</div>
+      <div><span>Leans since ${esc(since)}</span><b>${ls ? rec(ls) : rec(lean)}</b><small>${pct(ls ? ls.win_pct : (lean.won + lean.lost ? lean.won / (lean.won + lean.lost) : null))} won · no money, not bets · all-time ${rec(lean)}</small></div>
       <div><span>Bankroll</span><b class="${cls(st.bankroll - st.start_bankroll)}">${usd(st.bankroll)}</b><small>from ${usd(st.start_bankroll)} · 1 unit = ${usd(U())}</small></div>`;
     const counts = { today: bestToday().length, parlays: (DATA.parlays || []).filter((p) => p.day === today()).length, live: DATA.entries.filter((e) => isLive(e) && onBoard(e)).length, props: DATA.entries.filter((e) => e.player && onBoard(e)).length,
       early: DATA.entries.filter((e) => e.tier === "early" && onBoard(e)).length, scores: liveGames(),

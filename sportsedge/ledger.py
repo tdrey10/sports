@@ -45,6 +45,7 @@ D503_MARKS = (ENGINE_MARK, OLD_ENGINE_MARK)
 
 
 PROVEN_GRADES = ("A+", "A", "B")
+PROVEN_START = "2026-10-25T20:00"  # the proven-only system went live (only proven spots get money from here)
 MISTAKEN_PULLS = ("Pulled: we only had them winning", "Withdrawn before the game: wins only",
                   "Withdrawn before the game: this kind of bet hasn't", "Withdrawn before the game: no longer beats")
 
@@ -641,6 +642,12 @@ class Ledger:
             "start_bankroll": self.start_bankroll,
             "bankroll": round(bank, 2),
             "overall": summary(plays),
+            # Owner, Oct 31: "split record... reset the record... separate record between leans". The record
+            # starts over with the proven-only system (Oct 25); the old system's record is kept, apart.
+            "since": PROVEN_START,
+            "proven_era": summary([e for e in plays if e.created_at >= PROVEN_START]),
+            "old_system": summary([e for e in plays if e.created_at < PROVEN_START]),
+            "leans_since": summary([e for e in leans if e.created_at >= PROVEN_START]),
             # Every graded pick we put out, bet or not (leans count as 1 unit). Parlays stay separate.
             "all_picks": summary(settled),
             "last7": summary([e for e in plays if e.start >= week_ago]),
