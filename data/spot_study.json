@@ -79,7 +79,65 @@
     "bets": 41,
     "roi": 0.124
    }
-  ]
+  ],
+  "first_half": [
+   {
+    "market": "moneyline dog",
+    "spot": "fade: off an upset win as a dog",
+    "in_sample": {
+     "bets": 109,
+     "roi": 0.0548
+    },
+    "blind": {
+     "bets": 145,
+     "roi": 0.0548
+    }
+   },
+   {
+    "market": "moneyline favorite",
+    "spot": "fade: on a 3+ game losing streak",
+    "in_sample": {
+     "bets": 61,
+     "roi": 0.0645
+    },
+    "blind": {
+     "bets": 83,
+     "roi": -0.0599
+    }
+   }
+  ],
+  "ratings": {
+   "ratings close to the price": {
+    "in_sample": {
+     "bets": 133,
+     "roi": 0.0207
+    },
+    "blind": {
+     "bets": 218,
+     "roi": 0.0988
+    }
+   },
+   "ratings much better than the price": {
+    "in_sample": {
+     "bets": 8,
+     "roi": -0.1653
+    },
+    "blind": {
+     "bets": 12,
+     "roi": 0.3204
+    }
+   },
+   "ratings much worse than the price": {
+    "in_sample": {
+     "bets": 9,
+     "roi": 0.6846
+    },
+    "blind": {
+     "bets": 19,
+     "roi": 0.035
+    }
+   }
+  }
  },
  "nba": {
   "timing": [
@@ -126,7 +184,53 @@
     "bets": 101,
     "roi": 0.1494
    }
-  ]
+  ],
+  "first_half": [
+   {
+    "market": "moneyline favorite",
+    "spot": "back: off a blowout win (20+)",
+    "in_sample": {
+     "bets": 161,
+     "roi": 0.0939
+    },
+    "blind": {
+     "bets": 89,
+     "roi": 0.0502
+    }
+   }
+  ],
+  "ratings": {
+   "ratings close to the price": {
+    "in_sample": {
+     "bets": 141,
+     "roi": 0.0732
+    },
+    "blind": {
+     "bets": 146,
+     "roi": 0.1784
+    }
+   },
+   "ratings much better than the price": {
+    "in_sample": {
+     "bets": 4,
+     "roi": 0.371
+    },
+    "blind": {
+     "bets": 13,
+     "roi": -0.1603
+    }
+   },
+   "ratings much worse than the price": {
+    "in_sample": {
+     "bets": 5,
+     "roi": 0.0344
+    },
+    "blind": {
+     "bets": 17,
+     "roi": -0.2105
+    }
+   }
+  }
  },
  "mlb": {
   "timing": [
@@ -173,6 +277,52 @@
     "bets": 126,
     "roi": -0.0595
    }
-  ]
+  ],
+  "first_half": [
+   {
+    "market": "moneyline dog",
+    "spot": "back: dome team playing outside",
+    "in_sample": {
+     "bets": 412,
+     "roi": -0.0398
+    },
+    "blind": {
+     "bets": 919,
+     "roi": 0.4169
+    }
+   }
+  ],
+  "ratings": {
+   "ratings close to the price": {
+    "in_sample": {
+     "bets": 224,
+     "roi": -0.1007
+    },
+    "blind": {
+     "bets": 365,
+     "roi": 0.1105
+    }
+   },
+   "ratings much better than the price": {
+    "in_sample": {
+     "bets": 251,
+     "roi": 0.1287
+    },
+    "blind": {
+     "bets": 476,
+     "roi": 0.0476
+    }
+   },
+   "ratings much worse than the price": {
+    "in_sample": {
+     "bets": 18,
+     "roi": -0.47
+    },
+    "blind": {
+     "bets": 30,
+     "roi": 0.1593
+    }
+   }
+  }
  }
 }
