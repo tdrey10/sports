@@ -22,6 +22,8 @@ START = datetime(2026, 10, 29, 7, tzinfo=timezone.utc)  # midnight Pacific, Oct 
 LEAN_TIERS = ("lean", "early", "value", "lock", "dog")
 FILE = "my_picks.json"
 LEGS = "my_parlay_legs.json"
+GRIM_LEGS = "grim_parlay_legs.json"  # Grim's own contest parlays (owner, Oct 31: "log that as Grim's parlay")
+GRIM_INBOX = "grim_parlays_inbox.csv"
 
 
 def path(root) -> Path:
@@ -181,7 +183,7 @@ def parse_leg(spec: str) -> tuple:
     return sport, team, odds, market, point, side
 
 
-def send_parlay(root, legs: list[tuple], now: datetime) -> str:
+def send_parlay(root, legs: list[tuple], now: datetime, grim: bool = False) -> str:
     """Put a parlay in the inbox: every leg must be on an upcoming game we have."""
     import csv
 
@@ -193,8 +195,8 @@ def send_parlay(root, legs: list[tuple], now: datetime) -> str:
         if found is None:
             raise ValueError(f"no upcoming {sport.upper()} game found for {team}")
         names.append(f"{found[4]} {odds:+.0f}")
-    pid = "doc-" + now.strftime("%Y%m%d%H%M%S")
-    f = Path(root) / PARLAY_INBOX
+    pid = ("grim-" if grim else "doc-") + now.strftime("%Y%m%d%H%M%S")
+    f = Path(root) / (GRIM_INBOX if grim else PARLAY_INBOX)
     new = not f.exists()
     with f.open("a", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=PARLAY_FIELDS)
@@ -206,7 +208,7 @@ def send_parlay(root, legs: list[tuple], now: datetime) -> str:
     return f"In: {len(legs)}-leg parlay: " + " + ".join(names) + "."
 
 
-def _file_parlays(root) -> int:
+def _file_parlays(root, inbox: str = PARLAY_INBOX, legs_file: str = LEGS) -> int:
     import csv
     from collections import defaultdict
 
@@ -214,14 +216,14 @@ def _file_parlays(root) -> int:
     from .odds import american_to_decimal
     from .parlays import Parlay
 
-    f = Path(root) / PARLAY_INBOX
+    f = Path(root) / inbox
     if not f.exists():
         return 0
     groups = defaultdict(list)
     with f.open() as fh:
         for r in csv.DictReader(fh):
             groups[r["parlay"]].append(r)
-    lp = Path(root) / LEGS
+    lp = Path(root) / legs_file
     ledger = Ledger.load(lp)
     have = {p.id for p in ledger.parlays}
     n = 0
@@ -255,8 +257,9 @@ def refresh(provider, root, now: datetime) -> int:
 
     _file_inbox(root)
     _file_parlays(root)
+    _file_parlays(root, GRIM_INBOX, GRIM_LEGS)
     graded = 0
-    for p in (path(root), Path(root) / LEGS):
+    for p in (path(root), Path(root) / LEGS, Path(root) / GRIM_LEGS):
         if p.exists():
             ledger = Ledger.load(p)
             graded += refresh_scores(provider, ledger, now)
@@ -337,7 +340,9 @@ def scoreboard(ours: Ledger, root) -> dict | None:
     recent = sorted(yours, key=lambda e: e.start, reverse=True)[:10]
     legs = Ledger.load(Path(root) / LEGS)
     you_p, your_parlays = _parlay_record(legs.parlays, legs.entries)
-    grim_p, _ = _parlay_record([p for p in ours.parlays if p.created_at >= START.isoformat()], ours.entries)
+    gl = Ledger.load(Path(root) / GRIM_LEGS)
+    entries = {**ours.entries, **gl.entries}
+    grim_p, grim_parlays = _parlay_record([p for p in ours.parlays if p.created_at >= START.isoformat()] + gl.parlays, entries)
     return {"since": START.isoformat(), "names": {"you": "The Doctor", "us": "Grim"},
             "leans": _flat(grim), "you": _record(yours),
             "grim_picks": [{"selection": e.selection, "matchup": e.matchup, "odds": e.odds, "start": e.start.isoformat(),
@@ -345,7 +350,7 @@ def scoreboard(ours: Ledger, root) -> dict | None:
                            for e in sorted(grim, key=lambda e: e.start, reverse=True)[:10]],
             "your_picks": [{"selection": e.selection, "matchup": e.matchup, "odds": e.odds, "start": e.start.isoformat(),
                             "status": e.status, "final": e.final} for e in recent],
-            "parlays": {"you": you_p, "us": grim_p}, "your_parlays": your_parlays}
+            "parlays": {"you": you_p, "us": grim_p}, "your_parlays": your_parlays, "grim_parlays": grim_parlays}
 
 
 __all__ = ["add", "cancel", "grim_picks", "parse_leg", "refresh", "scoreboard", "send", "send_parlay"]
