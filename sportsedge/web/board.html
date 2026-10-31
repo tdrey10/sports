@@ -627,6 +627,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const tag = (st) => `<b class="${st === "won" ? "pos" : st === "lost" ? "neg" : ""}">${esc(SETTLED[st] || st)}</b>`;
     const picks = (R.your_picks || []).map((p) => `<li>${esc(p.selection)} ${odds(p.odds)} · ${esc(p.matchup)}${p.final ? ` · ${tag(p.status)} ${esc(p.final)}` : ""}</li>`).join("");
     const P = R.parlays || { you: { won: 0, lost: 0, push: 0, units: 0, pending: 0 }, us: { won: 0, lost: 0, push: 0, units: 0, pending: 0 } };
+    const gparlays = (R.grim_parlays || []).map((p) => `<li>${odds(p.odds)} · ${p.legs.map(esc).join(" + ")} · ${tag(p.status)}</li>`).join("");
     const parlays = (R.your_parlays || []).map((p) => `<li>${odds(p.odds)} · ${p.legs.map(esc).join(" + ")} · ${tag(p.status)}</li>`).join("");
     const grim = (R.grim_picks || []).map((p) => `<li>${p.money ? "💰 " : ""}${esc(p.selection)} ${odds(p.odds)} · ${esc(p.matchup)}${p.final ? ` · ${tag(p.status)} ${esc(p.final)}` : ""}</li>`).join("");
     return panel(`The Doctor vs Grim`, `🩺 ${esc(N.you)} (you) vs 💀 ${esc(N.us)} (Script Leaks' money plays, plus its best pick on days without one) since ${fmt(R.since, { month: "short", day: "numeric" })} · 1 unit flat on every pick`,
@@ -634,7 +635,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + `<p class="small"><b>Parlays</b> · ${lead(P.you, P.us)}</p>` + table(P.you, P.us)
       + (picks ? `<p class="small muted">${esc(N.you)}'s picks:</p><ul class="small">${picks}</ul>` : `<p class="small muted">Send your picks in the chat and they show up here.</p>`)
       + (parlays ? `<p class="small muted">${esc(N.you)}'s parlays:</p><ul class="small">${parlays}</ul>` : "")
-      + (grim ? `<p class="small muted">${esc(N.us)}'s picks (💰 = money play):</p><ul class="small">${grim}</ul>` : ""));
+      + (grim ? `<p class="small muted">${esc(N.us)}'s picks (💰 = money play):</p><ul class="small">${grim}</ul>` : "")
+      + (gparlays ? `<p class="small muted">${esc(N.us)}'s parlays:</p><ul class="small">${gparlays}</ul>` : ""));
   }
   function renderHero() {
     // Owner, Oct 29: the banner names a pick on a later game a Future Lock, never the Lock of the day.
