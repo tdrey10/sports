@@ -1,1 +1,178 @@
-{"ncaaf": {"timing": [{"market": "moneyline dog", "spot": "fade: off an upset win as a dog", "bets": 130, "open": {"bets": 130, "roi": 0.2475}, "close": {"bets": 130, "roi": 0.2355}, "moved_our_way": 0.423}, {"market": "moneyline favorite", "spot": "fade: on a 3+ game losing streak", "bets": 83, "open": {"bets": 83, "roi": 0.1442}, "close": {"bets": 83, "roi": 0.0641}, "moved_our_way": 0.542}], "stacking": {"1 spot": {"bets": 433, "roi": 0.0983}}, "bands": [{"market": "moneyline dog", "spot": "fade: off an upset win as a dog", "odds": "+100 to +149", "bets": 106, "roi": 0.1923}, {"market": "moneyline dog", "spot": "fade: off an upset win as a dog", "odds": "+150 to +199", "bets": 72, "roi": -0.1013}, {"market": "moneyline dog", "spot": "fade: off an upset win as a dog", "odds": "+200 to +300", "bets": 99, "roi": 0.1984}, {"market": "moneyline favorite", "spot": "fade: on a 3+ game losing streak", "odds": "-115 to -101", "bets": 35, "roi": -0.1213}, {"market": "moneyline favorite", "spot": "fade: on a 3+ game losing streak", "odds": "-130 to -116", "bets": 38, "roi": 0.1899}, {"market": "moneyline favorite", "spot": "fade: on a 3+ game losing streak", "odds": "-150 to -131", "bets": 41, "roi": 0.124}]}, "nba": {"timing": [{"market": "moneyline favorite", "spot": "back: off a blowout win (20+)", "bets": 145, "open": {"bets": 145, "roi": 0.1628}, "close": {"bets": 145, "roi": 0.1179}, "moved_our_way": 0.524}], "stacking": {"1 spot": {"bets": 360, "roi": 0.0886}}, "bands": [{"market": "moneyline favorite", "spot": "back: off a blowout win (20+)", "odds": "-115 to -101", "bets": 73, "roi": 0.1844}, {"market": "moneyline favorite", "spot": "back: off a blowout win (20+)", "odds": "-130 to -116", "bets": 85, "roi": 0.0002}, {"market": "moneyline favorite", "spot": "back: off a blowout win (20+)", "odds": "-150 to -131", "bets": 101, "roi": 0.1494}]}, "mlb": {"timing": [{"market": "moneyline dog", "spot": "back: dome team playing outside", "bets": 1173, "open": {"bets": 1173, "roi": 0.04}, "close": {"bets": 1173, "roi": 0.0633}, "moved_our_way": 0.188}], "stacking": {"1 spot": {"bets": 1474, "roi": 0.0486}}, "bands": [{"market": "moneyline dog", "spot": "back: dome team playing outside", "odds": "+100 to +149", "bets": 1041, "roi": 0.0574}, {"market": "moneyline dog", "spot": "back: dome team playing outside", "odds": "+150 to +199", "bets": 307, "roi": 0.0632}, {"market": "moneyline dog", "spot": "back: dome team playing outside", "odds": "+200 to +300", "bets": 126, "roi": -0.0595}]}}
+{
+ "ncaaf": {
+  "timing": [
+   {
+    "market": "moneyline dog",
+    "spot": "fade: off an upset win as a dog",
+    "bets": 130,
+    "open": {
+     "bets": 130,
+     "roi": 0.2475
+    },
+    "close": {
+     "bets": 130,
+     "roi": 0.2355
+    },
+    "moved_our_way": 0.423
+   },
+   {
+    "market": "moneyline favorite",
+    "spot": "fade: on a 3+ game losing streak",
+    "bets": 83,
+    "open": {
+     "bets": 83,
+     "roi": 0.1442
+    },
+    "close": {
+     "bets": 83,
+     "roi": 0.0641
+    },
+    "moved_our_way": 0.542
+   }
+  ],
+  "stacking": {
+   "1 spot": {
+    "bets": 433,
+    "roi": 0.0983
+   }
+  },
+  "bands": [
+   {
+    "market": "moneyline dog",
+    "spot": "fade: off an upset win as a dog",
+    "odds": "+100 to +149",
+    "bets": 106,
+    "roi": 0.1923
+   },
+   {
+    "market": "moneyline dog",
+    "spot": "fade: off an upset win as a dog",
+    "odds": "+150 to +199",
+    "bets": 72,
+    "roi": -0.1013
+   },
+   {
+    "market": "moneyline dog",
+    "spot": "fade: off an upset win as a dog",
+    "odds": "+200 to +300",
+    "bets": 99,
+    "roi": 0.1984
+   },
+   {
+    "market": "moneyline favorite",
+    "spot": "fade: on a 3+ game losing streak",
+    "odds": "-115 to -101",
+    "bets": 35,
+    "roi": -0.1213
+   },
+   {
+    "market": "moneyline favorite",
+    "spot": "fade: on a 3+ game losing streak",
+    "odds": "-130 to -116",
+    "bets": 38,
+    "roi": 0.1899
+   },
+   {
+    "market": "moneyline favorite",
+    "spot": "fade: on a 3+ game losing streak",
+    "odds": "-150 to -131",
+    "bets": 41,
+    "roi": 0.124
+   }
+  ]
+ },
+ "nba": {
+  "timing": [
+   {
+    "market": "moneyline favorite",
+    "spot": "back: off a blowout win (20+)",
+    "bets": 145,
+    "open": {
+     "bets": 145,
+     "roi": 0.1628
+    },
+    "close": {
+     "bets": 145,
+     "roi": 0.1179
+    },
+    "moved_our_way": 0.524
+   }
+  ],
+  "stacking": {
+   "1 spot": {
+    "bets": 360,
+    "roi": 0.0886
+   }
+  },
+  "bands": [
+   {
+    "market": "moneyline favorite",
+    "spot": "back: off a blowout win (20+)",
+    "odds": "-115 to -101",
+    "bets": 73,
+    "roi": 0.1844
+   },
+   {
+    "market": "moneyline favorite",
+    "spot": "back: off a blowout win (20+)",
+    "odds": "-130 to -116",
+    "bets": 85,
+    "roi": 0.0002
+   },
+   {
+    "market": "moneyline favorite",
+    "spot": "back: off a blowout win (20+)",
+    "odds": "-150 to -131",
+    "bets": 101,
+    "roi": 0.1494
+   }
+  ]
+ },
+ "mlb": {
+  "timing": [
+   {
+    "market": "moneyline dog",
+    "spot": "back: dome team playing outside",
+    "bets": 1173,
+    "open": {
+     "bets": 1173,
+     "roi": 0.04
+    },
+    "close": {
+     "bets": 1173,
+     "roi": 0.0633
+    },
+    "moved_our_way": 0.188
+   }
+  ],
+  "stacking": {
+   "1 spot": {
+    "bets": 1474,
+    "roi": 0.0486
+   }
+  },
+  "bands": [
+   {
+    "market": "moneyline dog",
+    "spot": "back: dome team playing outside",
+    "odds": "+100 to +149",
+    "bets": 1041,
+    "roi": 0.0574
+   },
+   {
+    "market": "moneyline dog",
+    "spot": "back: dome team playing outside",
+    "odds": "+150 to +199",
+    "bets": 307,
+    "roi": 0.0632
+   },
+   {
+    "market": "moneyline dog",
+    "spot": "back: dome team playing outside",
+    "odds": "+200 to +300",
+    "bets": 126,
+    "roi": -0.0595
+   }
+  ]
+ }
+}
