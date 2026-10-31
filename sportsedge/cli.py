@@ -825,6 +825,14 @@ def cmd_nba_study(args) -> int:
         (data_dir / "eff_study.json").write_text(json.dumps(eff, separators=(",", ":")))
     except Exception as exc:
         print(f"efficiency study failed: {exc}")
+    from . import keystudy
+
+    try:  # Owner, Oct 31: NFL key numbers (3, 7, 10) at the closing spread, tested blind
+        ks = keystudy.run(data_dir)
+        print(keystudy.report(ks))
+        (data_dir / "key_study.json").write_text(json.dumps(ks, indent=1))
+    except Exception as exc:
+        print(f"key number study failed: {exc}")
     from . import spotstudy
 
     try:  # Owner, Oct 31: how to bet the proven spots better (timing, stacking, price range)
