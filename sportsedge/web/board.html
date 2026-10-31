@@ -640,14 +640,16 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
   function renderHero() {
     // Owner, Oct 29: the banner names a pick on a later game a Future Lock, never the Lock of the day.
-    const open = bestToday();
+    // Owner, Oct 31: "#1" read as "the best one" when it was only the soonest game. The banner now shows the
+    // strongest open money play for today (most units, then rating), and the list below stays soonest first.
+    const open = bestToday().filter((x) => !x.settled).sort((a, b) => (b.units - a.units) || (score(b) - score(a)));
     const e = open.find((x) => !isFuture(x)) || DATA.entries.filter((x) => x.tier === "lock" && x.units > 0 && onBoard(x) && !x.settled && !isFuture(x)).sort((a, b) => b.units - a.units)[0]
       || open[0];
     if (!e) {
       $("hero").innerHTML = `<div class="ticket-empty"><b>No it’s not rigged</b></div>`;
       return;
     }
-    const kind = isFuture(e) ? `${tierOf(e) === "dog" ? "Early Dog" : "Future Lock"} · ${fmt(e.commence_time, { weekday: "long" })}` : e.best_rank ? "Today's #1 best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
+    const kind = isFuture(e) ? `${tierOf(e) === "dog" ? "Early Dog" : "Future Lock"} · ${fmt(e.commence_time, { weekday: "long" })}` : e.best_rank ? "Today's best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
     $("hero").innerHTML = `<div class="ticket">${stamp(e)}
       <div class="t-head"><span class="t-kind">${kind}</span><span class="t-sport">${esc(e.sport_name)} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)} · ${timeOf(e)}</span></div>
       <h2>${esc(e.selection)}</h2>
@@ -676,7 +678,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const sharpBets = items.filter((e) => e.tier === "sharp");
     const rest = items.filter((e) => !isLive(e) && !["early", "lean", "sharp"].includes(tierOf(e)) && !e.player && !e.best_rank);
     const leans = items.filter((e) => tierOf(e) === "lean" && !isLive(e));
-    const topNote = best.length ? `${best.length} money plays for today's games · soonest first` : "Today's games";
+    const topNote = best.length ? `${best.length} money plays for today's games · in order of game time (not best to worst)` : "Today's games";
     const byDay = {};
     later.forEach((e) => (byDay[dayOf(e.commence_time)] = byDay[dayOf(e.commence_time)] || []).push(e));
     const laterHtml = Object.keys(byDay).sort().map((d) => `<h3 class="day-head">${esc(fmt(byDay[d][0].commence_time, { weekday: "long", month: "short", day: "numeric" }))}</h3>`
