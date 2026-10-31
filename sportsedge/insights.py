@@ -181,7 +181,7 @@ def reasons(pick: Pick, scan: SportScan) -> tuple[str, list[str]]:
 
 
 FORM_GAMES = 5
-UNIT = {"nfl": "points", "nba": "points", "mlb": "runs", "nhl": "goals"}
+UNIT = {"nfl": "points", "ncaaf": "points", "nba": "points", "ncaab": "points", "mlb": "runs", "nhl": "goals"}
 MAX_FACTS = 10
 
 
