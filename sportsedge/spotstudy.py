@@ -12,6 +12,8 @@ Three questions about the money spots we already have (the game-factor spots tha
    for the team sits from the market's (the closing spread, or the moneyline's no-vig chance turned into
    points). Do the spots lose when our ratings think the team is much worse than the price says?
    Tuned 2018-2021, checked blind 2022 on.
+5. Line movement (Oct 31): do the spots win more when the price has moved toward our team since it opened
+   (the market agrees) than when it moved away? Opening prices exist from 2023, so it is all blind years.
 Every number is a flat 1-unit bet. Sample sizes are printed: a split with few bets is a hint, not proof.
 """
 
@@ -63,6 +65,7 @@ def run_sport(lines_dir: Path, sport: str, spots: dict) -> dict:
     half = defaultdict(lambda: {"in_sample": Record(), "blind": Record()})
     nd = NormalDist()
     stack = defaultdict(Record)
+    move = defaultdict(lambda: {"in_sample": Record(), "blind": Record()})
     bands = defaultdict(Record)
     for g in games:
         tr._new_season(g.season)
@@ -117,6 +120,9 @@ def run_sport(lines_dir: Path, sport: str, spots: dict) -> dict:
                             t["close"].add(price, res)
                             t["n"] += 1
                             t["moved_our_way"] += op > price  # the price shortened after the open: we beat the close
+                            mv = ("line moved our way" if op > price else "line moved against us" if op < price
+                                  else "line didn't move")
+                            move[mv]["blind" if g.season > TUNE_LAST else "in_sample"].add(price, res)
         tr.add(g)
         if rt is not None and g.stype != "3":
             rt.add(g)
@@ -129,6 +135,7 @@ def run_sport(lines_dir: Path, sport: str, spots: dict) -> dict:
         "bands": [{"market": k[0], "spot": k[1], "odds": k[2], **rec(r)} for k, r in sorted(bands.items())],
         "first_half": [{"market": k[0], "spot": k[1], "in_sample": rec(v["in_sample"]), "blind": rec(v["blind"])}
                        for k, v in sorted(half.items())],
+        "movement": {k: {"in_sample": rec(v["in_sample"]), "blind": rec(v["blind"])} for k, v in sorted(move.items())},
         "ratings": {k: {"in_sample": rec(v["in_sample"]), "blind": rec(v["blind"])} for k, v in sorted(agree.items())},
     }
 
@@ -153,6 +160,8 @@ def report(res: dict) -> str:
             lines.append(f"  stack   {k:<45} {v['bets']:>4} bets  {pct(v)}")
         for h in r.get("first_half", []):
             lines.append(f"  1st half spread {h['spot']:<37} tune {h['in_sample']['bets']:>4} {pct(h['in_sample'])}  blind {h['blind']['bets']:>4} {pct(h['blind'])}")
+        for k, v in r.get("movement", {}).items():
+            lines.append(f"  move    {k:<45} tune {v['in_sample']['bets']:>4} {pct(v['in_sample'])}  blind {v['blind']['bets']:>4} {pct(v['blind'])}")
         for k, v in r.get("ratings", {}).items():
             lines.append(f"  ratings {k:<45} tune {v['in_sample']['bets']:>4} {pct(v['in_sample'])}  blind {v['blind']['bets']:>4} {pct(v['blind'])}")
         for b in r["bands"]:

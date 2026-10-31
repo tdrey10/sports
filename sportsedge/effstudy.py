@@ -32,15 +32,15 @@ from pathlib import Path
 from .linestudies import TUNE_LAST, G, load, verdict
 from .nflhist import Record
 
-SPORTS = ("ncaab", "nba")
-NAME = {"ncaab": "College hoops", "nba": "NBA"}
+SPORTS = ("ncaab", "nba", "ncaaf", "nfl")
+NAME = {"ncaab": "College hoops", "nba": "NBA", "ncaaf": "College football", "nfl": "NFL"}
 SPREAD_PRICE = -110.0
 FIRST_BET_SEASON = 2018  # closing lines start 2018
 MIN_GAMES = {"ncaab": 6, "nba": 8, "ncaaf": 3, "nfl": 3, "nhl": 8, "mlb": 10}  # games this season before a bet
 REGRESS = {"ncaab": 0.6, "nba": 0.7, "ncaaf": 0.6, "nfl": 0.7, "nhl": 0.7, "mlb": 0.7}  # last season's rating kept
 STEPS = (0.02, 0.04, 0.06, 0.09, 0.12)  # update size, chosen on the tuning seasons by error
-SPREAD_T = {"ncaab": (2, 4, 6, 8), "nba": (1.5, 3, 4.5, 6)}
-TOTAL_T = {"ncaab": (3, 5, 8, 11), "nba": (2, 4, 6, 8)}
+SPREAD_T = {"ncaab": (2, 4, 6, 8), "nba": (1.5, 3, 4.5, 6), "ncaaf": (3, 6, 10, 14), "nfl": (2, 3.5, 5, 7)}
+TOTAL_T = {"ncaab": (3, 5, 8, 11), "nba": (2, 4, 6, 8), "ncaaf": (3, 6, 10, 14), "nfl": (2, 4, 6, 8)}
 PACE_TUNE_LAST = 2024  # box scores start with the 2024 season
 
 
