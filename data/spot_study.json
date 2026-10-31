@@ -4,36 +4,36 @@
    {
     "market": "moneyline dog",
     "spot": "fade: off an upset win as a dog",
-    "bets": 130,
+    "bets": 136,
     "open": {
-     "bets": 130,
-     "roi": 0.2475
+     "bets": 136,
+     "roi": 0.1924
     },
     "close": {
-     "bets": 130,
-     "roi": 0.2355
+     "bets": 136,
+     "roi": 0.181
     },
-    "moved_our_way": 0.423
+    "moved_our_way": 0.419
    },
    {
     "market": "moneyline favorite",
     "spot": "fade: on a 3+ game losing streak",
-    "bets": 83,
+    "bets": 84,
     "open": {
-     "bets": 83,
-     "roi": 0.1442
+     "bets": 84,
+     "roi": 0.1515
     },
     "close": {
-     "bets": 83,
-     "roi": 0.0641
+     "bets": 84,
+     "roi": 0.0722
     },
-    "moved_our_way": 0.542
+    "moved_our_way": 0.548
    }
   ],
   "stacking": {
    "1 spot": {
-    "bets": 433,
-    "roi": 0.0983
+    "bets": 440,
+    "roi": 0.0848
    }
   },
   "bands": [
@@ -41,22 +41,22 @@
     "market": "moneyline dog",
     "spot": "fade: off an upset win as a dog",
     "odds": "+100 to +149",
-    "bets": 106,
-    "roi": 0.1923
+    "bets": 109,
+    "roi": 0.1594
    },
    {
     "market": "moneyline dog",
     "spot": "fade: off an upset win as a dog",
     "odds": "+150 to +199",
-    "bets": 72,
-    "roi": -0.1013
+    "bets": 73,
+    "roi": -0.1136
    },
    {
     "market": "moneyline dog",
     "spot": "fade: off an upset win as a dog",
     "odds": "+200 to +300",
-    "bets": 99,
-    "roi": 0.1984
+    "bets": 101,
+    "roi": 0.1747
    },
    {
     "market": "moneyline favorite",
@@ -76,8 +76,8 @@
     "market": "moneyline favorite",
     "spot": "fade: on a 3+ game losing streak",
     "odds": "-150 to -131",
-    "bets": 41,
-    "roi": 0.124
+    "bets": 42,
+    "roi": 0.1387
    }
   ],
   "first_half": [
@@ -89,8 +89,8 @@
      "roi": 0.0548
     },
     "blind": {
-     "bets": 145,
-     "roi": 0.0548
+     "bets": 148,
+     "roi": 0.046
     }
    },
    {
@@ -101,11 +101,43 @@
      "roi": 0.0645
     },
     "blind": {
-     "bets": 83,
-     "roi": -0.0599
+     "bets": 84,
+     "roi": -0.0711
     }
    }
   ],
+  "movement": {
+   "line didn't move": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 12,
+     "roi": 0.7302
+    }
+   },
+   "line moved against us": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 105,
+     "roi": 0.1188
+    }
+   },
+   "line moved our way": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 103,
+     "roi": 0.0918
+    }
+   }
+  },
   "ratings": {
    "ratings close to the price": {
     "in_sample": {
@@ -113,8 +145,8 @@
      "roi": 0.0207
     },
     "blind": {
-     "bets": 218,
-     "roi": 0.0988
+     "bets": 225,
+     "roi": 0.0724
     }
    },
    "ratings much better than the price": {
@@ -199,6 +231,38 @@
     }
    }
   ],
+  "movement": {
+   "line didn't move": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 6,
+     "roi": -0.4091
+    }
+   },
+   "line moved against us": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 63,
+     "roi": 0.0679
+    }
+   },
+   "line moved our way": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 76,
+     "roi": 0.201
+    }
+   }
+  },
   "ratings": {
    "ratings close to the price": {
     "in_sample": {
@@ -292,6 +356,38 @@
     }
    }
   ],
+  "movement": {
+   "line didn't move": {
+    "in_sample": {
+     "bets": 373,
+     "roi": 0.0154
+    },
+    "blind": {
+     "bets": 35,
+     "roi": 0.0297
+    }
+   },
+   "line moved against us": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 544,
+     "roi": 0.0941
+    }
+   },
+   "line moved our way": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 221,
+     "roi": 0.0736
+    }
+   }
+  },
   "ratings": {
    "ratings close to the price": {
     "in_sample": {
