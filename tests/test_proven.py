@@ -40,12 +40,12 @@ def test_only_spots_that_passed_are_looked_for(tmp_path):
     import json
 
     (tmp_path / "factor_study.json").write_text(json.dumps({"nba": {"rows": [
-        {"market": "spread", "variant": "fade: this team struggles on short rest (its own history)", "verdict": "PROVEN"},
-        {"market": "moneyline favorite", "variant": "back: off a blowout win (20+)", "verdict": "STRONG"},
+        {"market": "spread", "variant": "fade: this team struggles on short rest (its own history)", "verdict": "PROVEN", "blind": {"bets": 200, "flat_roi": 0.2, "se": 0.07}},
+        {"market": "moneyline favorite", "variant": "back: off a blowout win (20+)", "verdict": "STRONG", "blind": {"bets": 200, "flat_roi": 0.2, "se": 0.07}},
         {"market": "spread", "variant": "back: on a back-to-back", "verdict": ""}]}}))
     (tmp_path / "line_studies.json").write_text(json.dumps({"rows": [
-        {"study": "06 weather totals", "variant": "under, wind 15+ mph", "sport": "nfl", "verdict": "STRONG"},
-        {"study": "07 altitude", "variant": "home dog at altitude", "sport": "nfl", "verdict": "PROVEN"}]}))
+        {"study": "06 weather totals", "variant": "under, wind 15+ mph", "sport": "nfl", "verdict": "STRONG", "blind": {"bets": 200, "flat_roi": 0.2, "se": 0.07}},
+        {"study": "07 altitude", "variant": "home dog at altitude", "sport": "nfl", "verdict": "PROVEN", "blind": {"bets": 200, "flat_roi": 0.2, "se": 0.07}}]}))
     got = {(r["sport"], r["variant"]) for r in proven.passed(tmp_path)}
     assert got == {("nba", "back: off a blowout win (20+)"), ("nfl", "under, wind 15+ mph")}
 
@@ -81,7 +81,7 @@ def test_a_spot_that_paid_more_at_the_open_says_bet_it_early(tmp_path):
     import json
 
     (tmp_path / "factor_study.json").write_text(json.dumps({"nba": {"rows": [
-        {"market": "moneyline favorite", "variant": "back: off a blowout win (20+)", "verdict": "STRONG"}]}}))
+        {"market": "moneyline favorite", "variant": "back: off a blowout win (20+)", "verdict": "STRONG", "blind": {"bets": 200, "flat_roi": 0.2, "se": 0.07}}]}}))
     (tmp_path / "spot_study.json").write_text(json.dumps({"nba": {"timing": [
         {"market": "moneyline favorite", "spot": "back: off a blowout win (20+)", "bets": 145,
          "open": {"bets": 145, "roi": 0.163}, "close": {"bets": 145, "roi": 0.118}, "moved_our_way": 0.52}]}}))
@@ -90,3 +90,13 @@ def test_a_spot_that_paid_more_at_the_open_says_bet_it_early(tmp_path):
     row = {**row, "blind": {"bets": 196, "flat_roi": 0.09, "se": 0.06}, "in_sample": {"bets": 164, "flat_roi": 0.086}, "study": "x"}
     c = proven._card("NBA", SimpleNamespace(home="h", away="a"), make_pick(market="h2h", point=None, american=-120), row, "x")
     assert any(r.startswith("⏰ Bet it early") for r in c.reasons)
+
+
+def test_a_spot_luck_could_explain_gets_no_money(tmp_path):
+    """Owner, Oct 31 (1-5 on college football dogs): blind profit under 1.65 standard errors is not proven."""
+    import json
+
+    (tmp_path / "factor_study.json").write_text(json.dumps({"ncaaf": {"rows": [
+        {"market": "moneyline dog", "variant": "fade: off an upset win as a dog", "verdict": "PROVEN",
+         "blind": {"bets": 167, "flat_roi": 0.15, "se": 0.108}}]}}))
+    assert proven.passed(tmp_path) == []

@@ -488,3 +488,15 @@ def test_a_proven_money_pick_is_never_pulled_and_one_pulled_by_mistake_goes_back
     e.reasons = ["Pulled: we only had them winning 32%. Dog of the Day is for dogs we think can actually win."] + e.reasons
     L.withdraw(settings, NOW)
     assert e.status == "pending" and not e.reasons[0].startswith("Pulled")
+
+
+def test_a_proven_pick_luck_could_explain_comes_down():
+    """Owner, Oct 31: only spots that clearly beat luck keep their money."""
+    from types import SimpleNamespace
+
+    from sportsedge.ledger import _beats_luck
+
+    card = lambda v: SimpleNamespace(scorecard={"validation": v})  # noqa: E731
+    assert not _beats_luck(card("CFB factors: fade. Blind 94 bets +10.6% (standard error 8.7%); tuning 61 bets +1.5%."))
+    assert _beats_luck(card("NFL wind. Blind 146 bets +14.6% (standard error 7.7%); tuning 120 bets +5.0%."))
+    assert _beats_luck(card(""))

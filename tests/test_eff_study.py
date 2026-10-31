@@ -47,7 +47,7 @@ def test_a_passed_efficiency_spot_posts_on_todays_game(monkeypatch, tmp_path):
 
     row = {"market": "under", "variant": "ratings: total 8+ pts under the line", "verdict": "PROVEN",
            "study": "College hoops efficiency and tempo",
-           "blind": {"bets": 62, "flat_roi": 0.14, "se": 0.12}, "in_sample": {"bets": 57, "flat_roi": 0.12}}
+           "blind": {"bets": 62, "flat_roi": 0.24, "se": 0.12}, "in_sample": {"bets": 57, "flat_roi": 0.12}}
     (tmp_path / "eff_study.json").write_text(json.dumps({"ncaab": {"rows": [row]}}))
     rt = effstudy.Ratings("ncaab", 0.1)
     rt.mu, rt.games = 70.0, {"h": 10, "a": 10}
