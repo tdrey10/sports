@@ -40,14 +40,29 @@ def _load(path: Path) -> dict:
         return {}
 
 
+def _timing(root) -> dict:
+    """(sport, market, spot) -> a 'bet it early' line, where the spot paid more at the opening price than at the
+    close (spotstudy.py; owner, Oct 31: "be better, more efficient")."""
+    out = {}
+    for sport, res in _load(Path(root) / "spot_study.json").items():
+        for t in res.get("timing", []):
+            o, c = (t.get("open") or {}).get("roi"), (t.get("close") or {}).get("roi")
+            if t.get("bets", 0) >= 80 and o is not None and c is not None and o - c >= 0.03:
+                out[(sport, t["market"], t["spot"])] = (
+                    f"⏰ Bet it early: in {t['bets']} past games this spot made about ${o * 100:.0f} per $100 at the "
+                    f"opening odds vs ${c * 100:.0f} at the final odds. The price usually gets worse closer to game time.")
+    return out
+
+
 def passed(root="data") -> list[dict]:
     """Every STRONG / PROVEN row from the studies the live board can spot."""
     root = Path(root)
     out = []
+    early = _timing(root)
     for sport, res in _load(root / "factor_study.json").items():
         for r in res.get("rows", []):
             if r.get("verdict") and "its own history" not in r["variant"]:
-                out.append({**r, "kind": "factor", "sport": sport})
+                out.append({**r, "kind": "factor", "sport": sport, "bet_early": early.get((sport, r["market"], r["variant"]))})
     for sport, res in _load(root / "due_study.json").items():
         for r in res.get("rows", []):
             if r.get("verdict"):
@@ -111,7 +126,7 @@ def _card(sport_name: str, ctx, pick: Pick, row: dict, label: str) -> Card:
         f"✅ Money play · {units:g}u: {label}.",
         _track_record(b, t, word),
         "We only put money on spots that already made money in the past. This one did.",
-    ]
+    ] + ([row["bet_early"]] if row.get("bet_early") else [])
     n, roi = full_record(b, t)
     head = f"{pick.selection} at {pick.american:+.0f}: {label}. {_cents(roi)} for every $1 bet in this spot since 2018 ({n} bets)."
     return Card(tier="value", units=units, headline=head, reasons=reasons, sport=pick.sport, sport_name=sport_name,

@@ -825,6 +825,14 @@ def cmd_nba_study(args) -> int:
         (data_dir / "eff_study.json").write_text(json.dumps(eff, separators=(",", ":")))
     except Exception as exc:
         print(f"efficiency study failed: {exc}")
+    from . import spotstudy
+
+    try:  # Owner, Oct 31: how to bet the proven spots better (timing, stacking, price range)
+        ss = spotstudy.run_all(data_dir)
+        print(spotstudy.report(ss))
+        (data_dir / "spot_study.json").write_text(json.dumps(ss, indent=1))
+    except Exception as exc:
+        print(f"spot study failed: {exc}")
     from . import propusage
 
     try:
