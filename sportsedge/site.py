@@ -61,6 +61,9 @@ def build_data(
         d["settled"] = e.settled
         entries.append(d)
     entries = [_scrub(d) for d in entries]
+    for d in entries:  # college picks posted before the fix said "goals" (insights.UNIT had no college keys)
+        if d.get("sport") in ("ncaaf", "ncaab"):
+            d["reasons"] = [r.replace(" goals a game", " points a game") for r in d.get("reasons") or []]
     in_ledger = {e["sport"] for e in entries}
     shown = [c for c in sports if c.key in in_ledger] or sports
     return {
