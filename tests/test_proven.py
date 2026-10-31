@@ -74,3 +74,19 @@ def test_a_proven_over_posts_when_the_road_team_is_at_altitude(monkeypatch, tmp_
     scan = SimpleNamespace(sport=SimpleNamespace(key="ncaab", name="College Basketball"), picks=[over], contexts={"g1": ctx})
     got = proven.find([scan], now, tmp_path)
     assert [(c.pick.side, c.units, c.proven.split(":")[0]) for c in got] == [("over", 1.0, "STRONG")]
+
+
+def test_a_spot_that_paid_more_at_the_open_says_bet_it_early(tmp_path):
+    """Owner, Oct 31: 'be better, more efficient' - if a spot's price usually moves against us, bet it early."""
+    import json
+
+    (tmp_path / "factor_study.json").write_text(json.dumps({"nba": {"rows": [
+        {"market": "moneyline favorite", "variant": "back: off a blowout win (20+)", "verdict": "STRONG"}]}}))
+    (tmp_path / "spot_study.json").write_text(json.dumps({"nba": {"timing": [
+        {"market": "moneyline favorite", "spot": "back: off a blowout win (20+)", "bets": 145,
+         "open": {"bets": 145, "roi": 0.163}, "close": {"bets": 145, "roi": 0.118}, "moved_our_way": 0.52}]}}))
+    [row] = proven.passed(tmp_path)
+    assert row["bet_early"].startswith("⏰ Bet it early: in 145 past games")
+    row = {**row, "blind": {"bets": 196, "flat_roi": 0.09, "se": 0.06}, "in_sample": {"bets": 164, "flat_roi": 0.086}, "study": "x"}
+    c = proven._card("NBA", SimpleNamespace(home="h", away="a"), make_pick(market="h2h", point=None, american=-120), row, "x")
+    assert any(r.startswith("⏰ Bet it early") for r in c.reasons)
