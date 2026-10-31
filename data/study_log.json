@@ -1,351 +1,361 @@
 [
-  {
-    "date": "2026-10-11",
-    "idea": "Line studies: 15 study families (price bands, spread vs ML, line moves, openers, totals, weather, altitude, travel, rest, bounce-back, streaks, starters, first half, season stage, spreads)",
-    "sports": "nfl, ncaaf, nba, ncaab, mlb, nhl",
-    "data": "ESPN closing lines 2018+",
-    "tuning": "2018-2021",
-    "blind": "2022+",
-    "luck_control": "4 of 600 random spots proven, 2 strong",
-    "verdict": "266 variants: NFL windy under STRONG, NCAAB favorite where spread implies 4%+ more PROVEN; the rest dropped"
-  },
-  {
-    "date": "2026-10-11",
-    "idea": "NFL 6-point teaser legs by kind",
-    "sports": "nfl",
-    "data": "NFL lines 2006+",
-    "tuning": "through 2021",
-    "blind": "2022+",
-    "luck_control": "n/a (fixed leg kinds)",
-    "verdict": "Wong dogs +1.5 to +2.5 PROVEN (77% blind vs 73.9% needed); Wong favorites failed"
-  },
-  {
-    "date": "2026-10-12",
-    "idea": "Prediction blend: Vegas vs our ratings for totals, margins, winners",
-    "sports": "mlb, nhl, nba, nfl, ncaaf, ncaab",
-    "data": "ESPN archive 2018+ with closing lines",
-    "tuning": "through 2021",
-    "blind": "2022+",
-    "luck_control": "n/a (weights, not bets)",
-    "verdict": "Vegas beat ratings alone everywhere; ratings earn 0-30% weight (MLB/NHL totals). Wired into predictions."
-  },
-  {
-    "date": "2026-10-12",
-    "idea": "Tennis fatigue, form, qualifiers, lucky losers, rising players",
-    "sports": "atp, wta",
-    "data": "35,586 closing-odds matches joined to ESPN start times 2016+",
-    "tuning": "2016-2019",
-    "blind": "2021+",
-    "luck_control": "0/100 random spots",
-    "verdict": "nothing beats the close; rested vs tired lost 10% blind. Dropped (reruns daily)."
-  },
-  {
-    "date": "2026-10-12",
-    "idea": "Tennis book price vs Pinnacle no-vig",
-    "sports": "atp, wta",
-    "data": "tennis-data 2012+",
-    "tuning": "2013-2019",
-    "blind": "2021+",
-    "luck_control": "1 of 200",
-    "verdict": "best of ~40 books STRONG (+6.8% blind) but stale prices; one real book (Bet365) not proven. No units."
-  },
-  {
-    "date": "2026-10-14",
-    "idea": "Price shopping: best of 10-25 books vs the others' consensus (moneylines, 1/6/24h before, 2-4% edge)",
-    "sports": "nfl, ncaaf",
-    "data": "odds_history 2020+ (public archive), results from games/*.csv",
-    "tuning": "2020-2022",
-    "blind": "2023+",
-    "luck_control": "0/96 random spots",
-    "verdict": "promising, not proven: 24h at 2%+ made +40% blind in both sports but on 28 and 58 bets; NCAAF 6h 2%+ blind 61 bets +20.7% (±20.5) but lost in tuning. Reruns daily (shopstudy)."
-  },
-  {
-    "date": "2026-10-14",
-    "idea": "Price shopping on spreads (same line across books)",
-    "sports": "nfl, ncaaf",
-    "data": "odds_history spreads 2020+",
-    "tuning": "2020-2022",
-    "blind": "2023+",
-    "luck_control": "n/a (too few bets)",
-    "verdict": "books agree on spread prices: 4-15 blind bets. Dropped for now."
-  },
-  {
-    "date": "2026-10-14",
-    "idea": "Our own lean picks' record by kind",
-    "sports": "all",
-    "data": "the ledger",
-    "tuning": "n/a",
-    "blind": "live",
-    "luck_control": "n/a",
-    "verdict": "unit plays 5-1; no-unit leans ~16-25; injury-unknown soccer leans 3-5 -> those games now post nothing"
-  },
-  {
-    "date": "2026-10-15",
-    "idea": "Soccer spots: 3+ win streaks vs winless, fading 4+ streaks, 6+ point form gaps, 6+ unbeaten, attacking pairs over 2.5, tight pairs under, draw-heavy pairs, head to head (won last 2+), rest (5+ days vs 3 or fewer), strong home form, weak road teams",
-    "sports": "epl, laliga, seriea, bundesliga, ligue1, mls, ucl",
-    "data": "engine ESPN archive: 4,827 results since Oct 2024, 1,927 with closing 3-way and 2.5 prices (2025-26 on)",
-    "tuning": "Aug 2025 - Feb 2026",
-    "blind": "Mar 2026 on",
-    "luck_control": "0/200 random spots",
-    "verdict": "none proven; the market prices form, streaks and head to head (weak road team: home -16.6% blind on 215; home won last 2 meetings -14% on 131). Closest: away unbeaten 6+ +10% blind on 75 but lost in tuning. Reruns daily (soccerstudy). Weather and style-of-play stats (shots, possession) not in the archive yet."
-  },
-  {
-    "date": "2026-10-15",
-    "idea": "Owner's call: soccer has no injury feed, so unknown injuries no longer block soccer picks; US leagues keep the rule (a missing report there means a broken feed)",
-    "sports": "soccer",
-    "data": "n/a",
-    "tuning": "n/a",
-    "blind": "n/a",
-    "luck_control": "n/a",
-    "verdict": "rule change; soccer picks carry no units until a soccer bet type proves out"
-  },
-  {
-    "date": "2026-10-16",
-    "idea": "Totals after hot or cold scoring: both teams' last game ran over/under its posted total (top/bottom 15%), and last 3 games' points vs the current total; bet over or under at the closing price",
-    "sports": [
-      "nfl",
-      "ncaaf",
-      "nba",
-      "ncaab",
-      "mlb",
-      "nhl"
-    ],
-    "data": "data/lines/espn/<sport> closing totals and prices 2018+",
-    "tuning": "2018-2021 set the 15% cut points and the tuning record",
-    "blind": "2022 on, 48 variants (6 sports x 8)",
-    "luck_control": "100 random tenths of all games betting over or under through the same bar: 0 of 100 passed",
-    "verdict": "none proven: the market already prices recent scoring. Best looks (under-streaks then over) were +4-6% blind with ±5-8% error and lost or barely made money in tuning (NFL -6.5%, NCAAF -6.9%). Dropped. Code: sportsedge/scoringstudy.py (rerunnable, not in the daily run)."
-  },
-  {
-    "date": "2026-10-16",
-    "idea": "Dogs (+100 to +220 closing) in rematches, low-total games and form flips: lost the last meeting (revenge), won the last meeting, total in the bottom quarter, last-4 margin better than the favorite's",
-    "sports": [
-      "nfl",
-      "ncaaf",
-      "nba",
-      "ncaab",
-      "mlb",
-      "nhl"
-    ],
-    "data": "data/lines/espn/<sport> closing prices 2018+",
-    "tuning": "2018-2021 set the low-total cut and the tuning record",
-    "blind": "2022 on, 24 variants (6 sports x 4)",
-    "luck_control": "100 random tenths of all +100..+220 dogs through the same bar: 0 of 100 passed",
-    "verdict": "none proven: all 24 variants either lost blind or had errors bigger than the gain. Best look: NCAAF better-form dog +13.1% blind on 323 bets (+/-6.7%) but -1.9% in tuning on 212; NFL dogs that looked good in tuning (+11% to +28%) lost blind (-4% to -12%). Dropped. Code: sportsedge/dogstudy.py (rerunnable, not in the daily run)."
-  },
-  {
-    "date": "2026-10-16",
-    "idea": "Price shopping pooled across NFL and college football: the best of 10-25 books beating the others' no-vig consensus by 2%+, 3%+, 4%+ at 1h, 6h, 24h before kickoff",
-    "sports": [
-      "nfl",
-      "ncaaf"
-    ],
-    "data": "D503therapper archive odds_history (multi-book moneylines 2020+) and games results",
-    "tuning": "2020-2022 seasons",
-    "blind": "2023 on",
-    "luck_control": "96 random-side spots at the best price: 0 passed",
-    "verdict": "PROVEN at a 2%+ edge at all three timings (24h: tuning 192 bets +5.2%, blind 86 bets +40.0% +/-18.3%); the 4%+ slice lost in tuning every time (-20% to -36%)",
-    "action": "sharp value caps football edges at 4% (2% to 4% only)"
-  },
-  {
-    "date": "2026-10-17",
-    "idea": "Dogs (+100 to +220 closing) by home vs road and rest edge (dog rested 2+ days more / 2+ less), per sport and pooled, at the closing moneyline",
-    "sports": [
-      "mlb",
-      "nba",
-      "nhl",
-      "ncaab",
-      "ncaaf",
-      "nfl"
-    ],
-    "data": "data/lines/espn closing moneylines and rest days, 2016-2026, neutral sites and ties dropped",
-    "tuning": "2016-2021 seasons",
-    "blind": "2022 on",
-    "luck_control": "300 random dog pools of 60-400 bets: 8 passed (2.7%) the same bar",
-    "verdict": "none proven (63 variants): dogs lose about 3.7% blind overall (25,282 bets, +/-0.7%); road dogs -3.7%, home dogs -3.6%. Best looks were tiny samples (NCAAF road dog resting less +10.4% on 87, NBA home dog rested more +10.7% on 65, errors +/-13-15%). Dropped."
-  },
-  {
-    "date": "2026-10-17",
-    "idea": "Follow early steam: bet the side the multi-book consensus moved toward (1%, 2%, 3%+) between 48h->24h, 24h->6h, 12h->3h and 6h->1h before kickoff, at the best price at the later time",
-    "sports": [
-      "nfl",
-      "ncaaf"
-    ],
-    "data": "D503therapper archive odds_history (10-25 books, 2020+) and games results",
-    "tuning": "2020-2022 seasons",
-    "blind": "2023 on, 24 variants",
-    "luck_control": "random sides at the best price on the same games: 8/300 and 16/300 passed for the two NFL variants that passed",
-    "verdict": "none proven: college football nothing; NFL 24h->6h 1%+ (blind 96 bets +19%) and 12h->3h 1%+ (blind 107 bets +12%) pass the bar but at the rate luck alone would give across 24 variants",
-    "action": "none; rerun when the archive grows"
-  },
-  {
-    "date": "2026-10-18",
-    "idea": "Our own graded picks vs the market's closing fair odds, by tier and sport: is the model's win chance calibrated, and do leans/Locks beat the close?",
-    "sports": [
-      "all in ledger"
-    ],
-    "data": "data/ledger.json, 100 graded won/lost picks with a close_fair price (void picks dropped)",
-    "tuning": "none (no parameters fitted; a calibration check)",
-    "blind": "all picks are live, so every graded pick was unseen when posted",
-    "luck_control": "20,000 simulated seasons where each pick wins at the market's closing fair chance: leans (26 wins vs 32.8 expected) land that low or lower 5.7% of the time; Locks (2 of 7 vs 3.7) 17%; early picks (11 of 17 vs 8.5) high 17%",
-    "verdict": "nothing proven, nothing to wire. Leans run 41% wins with the model saying 59% (market 51%), -23% ROI on 64 no-unit picks; the model's Brier score (0.272) is worse than the close's (0.257), so it is overconfident on leans and not better than the market. Early picks 11-6 (+25%) and the 5 dogs 4-1 are too few to trust. Units are only on proven types and the Lock's 0.5u, so little money rides on this. Watch: if leans stay below the close past ~150 graded, shrink lean win chances toward the market.",
-    "action": "none; rerun weekly as the ledger grows"
-  },
-  {
-    "date": "2026-10-19",
-    "idea": "Closing-line moves from the opener: dogs (+100 to +220) whose win chance rose 1/2/3+ points (steam toward the dog) or fell 1/2+ (drifting out), and favorites (-170 to -110) whose chance rose 2/3+ points",
-    "sports": [
-      "nfl",
-      "ncaaf",
-      "nba",
-      "ncaab",
-      "mlb",
-      "nhl"
-    ],
-    "data": "data/lines/espn/<sport> opening and closing moneylines (open lines 2023+, MLB 2019+)",
-    "tuning": "seasons through 2023",
-    "blind": "2024 on, 42 variants (6 sports x 5-7 moves)",
-    "luck_control": "100 random tenths of all +100..+220 dogs through the same bar: 0 of 100 passed; across 42 variants luck alone gives about 0.3 passes (1 in 150 each)",
-    "verdict": "one variant passed the bar: NHL dog moved toward by 1%+ (tuning 223 bets +1.3%, blind 638 bets +8.5% +/-4.6%); 2% and 3%+ NHL dogs run +9% and +11% blind but lost in tuning (-5%, -15%) on 125 and 62 bets. Everything else lost or was flat: favorites that shortened lose in all six sports (MLB -7%, NCAAF -13% blind), dogs that drifted out lose, other sports' steam dogs flat. Not wired: the pass is one sport of 42, tuning is a single NHL season at +1.3%, and the live steam check uses first-seen price, not the true opener the study used.",
-    "action": "none; keep watching NHL steam dogs. Code: sportsedge/movestudy.py (rerunnable, not in the daily run)"
-  },
-  {
-    "date": "2026-10-20",
-    "idea": "Lock-type moneyline favorites (-170 to -120 closing) by spot: home/road, off a loss, off a blowout win (letdown), vs a team off a blowout loss, win/losing streaks, rested vs back-to-back, 3rd game in 4 days, opponent backup starter",
-    "sports": [
-      "nfl",
-      "ncaaf",
-      "nba",
-      "ncaab",
-      "mlb",
-      "nhl"
-    ],
-    "data": "data/lines/espn/<sport> closing moneylines 2018+",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on, 68 variants (6 sports x 7-13 spots)",
-    "luck_control": "100 random tenths of all -170..-120 favorites through the same bar: 0 of 100 passed; across 68 variants luck alone gives about 0.5 passes by the 1-in-150 rule (more with this loose 1-SE bar on big variant counts)",
-    "verdict": "3 variants cleared the bar, all barely: NBA favorite off a blowout win (blind 150 bets +8.7% +/-6.7%, tuning +5.6%), NCAAF favorite vs a team on a 3+ losing streak (72 bets +11.2% +/-9.7%, tuning +3.2% +/-12.9%), NHL rested favorite vs a back-to-back (323 bets +6.1% +/-4.6%, tuning +1.4%). Each is under 1.5 SEs, one sport of six, and the same spot flips sign in neighbours (NBA rested vs back-to-back -4.6%, MLB -16.5%). Overall lock-price favorites lose in every sport (MLB -5.3%, NHL -5.3%, NCAAB -4.6%, NBA -3.1%, NCAAF -6.8%, NFL -0.7% blind): the price is already fair-to-shaded, so the Lock stays a 0.5u small stake. Not wired.",
-    "action": "none; watch NHL rested favorite vs back-to-back next to NHL steam dogs. Code: sportsedge/favstudy.py (rerunnable, not in the daily run)"
-  },
-  {
-    "date": "2026-10-21",
-    "idea": "Kickoff slot: dogs (+100 to +220) and lock-price favorites (-170 to -120) by weekday, day vs night start (Eastern), NFL Sunday early/late/night, weekend, matinee",
-    "sports": [
-      "nfl",
-      "ncaaf",
-      "nba",
-      "ncaab",
-      "mlb",
-      "nhl"
-    ],
-    "data": "data/lines/espn/<sport> closing moneylines 2018+",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on, 275 variants",
-    "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 of 100 passed; 275 variants at 1 in 150 each give about 1.8 passes from luck alone",
-    "verdict": "3 variants cleared the bar, about what luck gives: NBA lock favorite on Tuesday (blind 170 bets +7.0% +/-6.4%, tuning +4.4% +/-6.4%), same on Tuesday night, and NCAAB dog on Friday day (blind 174 bets +19.3% +/-9.7%, tuning +5.1% +/-8.8%). Tuning ROIs are under 1 SE, there is no reason a Tuesday would matter, and neighbouring days do not agree. Not wired.",
-    "action": "none; watch NCAAB Friday-day dogs. Code: sportsedge/slotstudy.py (rerunnable, not in the daily run)"
-  },
-  {
-    "date": "2026-10-22",
-    "idea": "Season timing: dogs (+100 to +220 closing) and lock-price favorites (-170 to -120) by games played this season (early, middle, late phases per sport) and by calendar month",
-    "sports": [
-      "nfl",
-      "ncaaf",
-      "nba",
-      "ncaab",
-      "mlb",
-      "nhl"
-    ],
-    "data": "data/lines/espn/<sport> closing moneylines 2018+",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on, 144 variants",
-    "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 of 100 passed; 144 variants at 1 in 150 each give about 1 pass from luck alone",
-    "verdict": "none proven: 0 of 144 variants cleared the bar, so the market prices early-season and late-season games fine. Dropped.",
-    "action": "none. Code: sportsedge/seasonstudy.py (rerunnable, not in the daily run)"
-  },
-  {
-    "date": "2026-10-23",
-    "idea": "Road trips and homestands: dogs (+100 to +220 closing) and lock-price favorites (-170 to -120) by how many games in a row the bet side has played at its venue kind (road trip, homestand, first game back), and the same for the opponent being on a long trip or homestand",
-    "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
-    "data": "data/lines/espn closing lines 2018+ (sportsedge/tripstudy.py)",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on",
-    "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong",
-    "verdict": "none proven: 0 of 72 variants cleared the bar (luck alone gave 0 of 100). Best blind looks were tiny or lost in tuning: NCAAB dog homestand 3+ (+20% on 71, tuning -19%), NBA lock favorite on a road trip 3+ (tuning +13%, blind -14%). Long road-trip dogs lose in NBA (-17.5% blind on 228) and NHL; the market prices travel fine. Dropped.",
-    "action": "logged; no change to bet rules"
-  },
-  {
-    "date": "2026-10-24",
-    "idea": "Teams beating or missing their prices: each team's average (result minus no-vig win chance) over its earlier games this season; dogs (+100 to +220 closing) and lock-price favorites (-170 to -120) when the bet side or the opponent is hot/cold against the price, and when the gap between them is 2x the cutoff",
-    "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
-    "data": "data/lines/espn closing lines 2018+ (sportsedge/beatstudy.py)",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on",
-    "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong",
-    "verdict": "none wired: 2 of 72 variants cleared the bar, neither STRONG, about what luck gives across 72 tries (~0.5 expected at 1 in 150 per try, though the 100-spot control gave 0). NFL dog facing a team missing its prices (blind +17.3% on 110, tuning +4.9%) is contradicted by NFL dog that is itself missing its prices losing blind (-9.9% on 173). NCAAF dog missing its prices (blind +10.0% on 206, tuning +7.7%) is the one to watch but is not STRONG and has no mirror support (NCAAF lock favorites missing prices lose -21%). Dropped; recheck when more seasons are in.",
-    "action": "logged; no change to bet rules"
-  },
-  {
-    "date": "2026-10-25",
-    "idea": "Divisional games (NFL): dogs (+100 to +220) and lock-price favorites (-170 to -120) on the moneyline, favorite/dog/short-favorite/big-dog spread sides, and overs/unders, divisional vs non-divisional as a mirror (16 variants)",
-    "sports": "nfl",
-    "data": "data/lines/nfl 2006-2025 regular season (sportsedge/divstudy.py; ESPN archive has no division flag)",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on",
-    "luck_control": "100 random tenths of the same bets through the same bar: 0 passed, 0 strong",
-    "verdict": "none wired: 1 of 16 variants cleared the bar (about what luck gives, ~0.1 expected at 1 in 150), and it is not STRONG. Divisional dog spread: blind +4.7% on 412, tuning only +0.9% on 1,536, and it is just the flip side of divisional favorites on the spread losing (-12.5% blind). Divisional dog moneyline lost blind (-5.4% on 250), divisional overs lose in both arms (-6%) but a bet that loses at -110 is not a signal to take the under (under -1.9% blind). Dropped; recheck when more seasons are in.",
-    "action": "logged; no change to bet rules"
-  },
-  {
-    "date": "2026-10-26",
-    "idea": "Cover streaks: spread bets on the side whose own (or opponent's) last game covered or missed the spread by a big margin (NFL/NBA/NCAAB 10+ pts, NCAAF 14+), 16 variants",
-    "sports": "nfl, ncaaf, nba, ncaab",
-    "data": "data/lines/espn closing lines 2018+ (sportsedge/atsstudy.py)",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on",
-    "luck_control": "100 random tenths of all spread bets through the same bar: 0 passed, 0 strong",
-    "verdict": "none proven: 0 of 16 variants cleared the bar and every one lost blind (-0.2% to -8.8%; biggest samples NBA/NCAAB ~2,300-4,800 bets each at -1.5% to -7%). The spread does not overreact to a big cover or miss; the -110 vig is the only thing showing. Dropped.",
-    "action": "logged; no change to bet rules"
-  },
-  {
-    "date": "2026-10-27",
-    "idea": "Bounce-back and letdown: dogs (+100 to +220 closing) and lock-price favorites (-170 to -120) off a blowout loss or win in their last game (NFL 17+, NCAAF 21+, NBA/NCAAB 20+, NHL 4+, MLB 7+), and facing a team off one, 48 variants",
-    "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
-    "data": "data/lines/espn closing lines 2018+ (sportsedge/bouncestudy.py)",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on",
-    "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 48 tries)",
-    "verdict": "none wired: 2 of 48 variants technically cleared the bar, neither STRONG, about what luck gives. NBA lock favorite off a blowout win (blind +8.3% on 152, tuning +5.6% on 140) has no mirror: NCAAB/NCAAF/NHL/MLB lock favorites off a blowout win all lose blind (-1% to -12%) and it is a letdown spot that should hurt, not help. NCAAF dog off a blowout loss (blind +14.5% on 201) was flat in tuning (+0.9% on 129, under 1 SE) and the same spot loses in NCAAB (-16.5% on 621) and is flat elsewhere. The NHL lock favorite bounce-back passed tuning (+8.7%) but lost blind (-10.5%). Dropped; recheck NBA letdown and NCAAF bounce-back when more seasons are in.",
-    "action": "logged; no change to bet rules"
-  },
-  {
-    "date": "2026-10-28",
-    "idea": "Totals by rest and fatigue: unders and overs when a team is on a back-to-back or its 3rd game in 4 days, both on a back-to-back, both rested 3+ days (daily sports), a short week or both off a bye (NFL/NCAAF), 44 variants",
-    "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
-    "data": "data/lines/espn closing totals 2018+ (sportsedge/reststudy.py)",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on",
-    "luck_control": "100 random tenths of all totals (random over/under) through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 44 tries)",
-    "verdict": "none wired: 1 of 44 variants technically cleared the bar, not STRONG, about what luck gives (p~0.25 of at least one). NFL under when both teams are off a bye/long break: blind +12.6% on 163, tuning +4.7% on 136 (under 1 SE), and the NCAAF twin is flat (-1.1% blind, +0.1% tuning). Everything else loses about the vig: back-to-back and 3rd-in-4 unders/overs both lose in every daily sport (-1% to -11%), NBA both-back-to-back under +2.4% blind but -7.1% tuning. The totals market already prices fatigue. Dropped; recheck NFL bye unders when more seasons are in."
-  },
-  {
-    "date": "2026-10-29",
-    "idea": "Totals by game script: unders and overs when the posted total is high or low for its sport (tuning-season quartiles) and when the spread is big (blowout expected) or pick'em",
-    "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
-    "data": "data/lines/espn closing totals 2018+ (sportsedge/scriptstudy.py)",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on",
-    "luck_control": "100 random tenths of all totals (random over/under) through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 40 tries)",
-    "verdict": "none wired: 0 of 40 variants cleared the bar. Four passed one arm only: NFL under on big spreads (tuning +9.3% on 164, blind -12.3% on 119), NFL under pick'em (blind +12.7% on 158, tuning -3.0%), NCAAF over pick'em (blind +6.8% on 240, tuning -2.5%), NBA over big spread (tuning +5.7%, blind -0.7% on 1,139) - each flips between arms, so noise. High/low total levels lose about the vig everywhere (NCAAB over high totals -4.2% blind on 6,946; NBA over high -4.7% on 2,709). The totals market prices game shape fine. Dropped."
-  },
-  {
-    "date": "2026-10-30",
-    "idea": "Season over rates and rematch totals: over/under when both teams' games so far this season ran over (60%+) or under (40%-) their posted totals, and when the last meeting this season went over or under",
-    "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
-    "data": "data/lines/espn closing totals 2018+ (sportsedge/overratestudy.py)",
-    "tuning": "seasons through 2021",
-    "blind": "2022 on",
-    "luck_control": "100 random tenths of all totals (random over/under) through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 48 tries)",
-    "verdict": "none wired: 2 of 48 variants technically cleared the bar, neither STRONG, about what luck gives: NFL over after the last meeting went under (tuning +4.8% on 114, blind +8.7% on 122) and NCAAF over when both teams' games run under (tuning +1.5% on 92, blind +13.0% on 101). Both sit on ~100 bets with a tiny tuning edge, and their mirror spots (NFL under after a meeting that went over, NCAAF under when both run over) point the other way or flip, so noise. Everything else loses about the vig (MLB/NHL/NBA/NCAAB rematch totals -2% to -9%). The totals market already prices a team's over habit and the last meeting. Dropped."
-  }
+ {
+  "date": "2026-10-11",
+  "idea": "Line studies: 15 study families (price bands, spread vs ML, line moves, openers, totals, weather, altitude, travel, rest, bounce-back, streaks, starters, first half, season stage, spreads)",
+  "sports": "nfl, ncaaf, nba, ncaab, mlb, nhl",
+  "data": "ESPN closing lines 2018+",
+  "tuning": "2018-2021",
+  "blind": "2022+",
+  "luck_control": "4 of 600 random spots proven, 2 strong",
+  "verdict": "266 variants: NFL windy under STRONG, NCAAB favorite where spread implies 4%+ more PROVEN; the rest dropped"
+ },
+ {
+  "date": "2026-10-11",
+  "idea": "NFL 6-point teaser legs by kind",
+  "sports": "nfl",
+  "data": "NFL lines 2006+",
+  "tuning": "through 2021",
+  "blind": "2022+",
+  "luck_control": "n/a (fixed leg kinds)",
+  "verdict": "Wong dogs +1.5 to +2.5 PROVEN (77% blind vs 73.9% needed); Wong favorites failed"
+ },
+ {
+  "date": "2026-10-12",
+  "idea": "Prediction blend: Vegas vs our ratings for totals, margins, winners",
+  "sports": "mlb, nhl, nba, nfl, ncaaf, ncaab",
+  "data": "ESPN archive 2018+ with closing lines",
+  "tuning": "through 2021",
+  "blind": "2022+",
+  "luck_control": "n/a (weights, not bets)",
+  "verdict": "Vegas beat ratings alone everywhere; ratings earn 0-30% weight (MLB/NHL totals). Wired into predictions."
+ },
+ {
+  "date": "2026-10-12",
+  "idea": "Tennis fatigue, form, qualifiers, lucky losers, rising players",
+  "sports": "atp, wta",
+  "data": "35,586 closing-odds matches joined to ESPN start times 2016+",
+  "tuning": "2016-2019",
+  "blind": "2021+",
+  "luck_control": "0/100 random spots",
+  "verdict": "nothing beats the close; rested vs tired lost 10% blind. Dropped (reruns daily)."
+ },
+ {
+  "date": "2026-10-12",
+  "idea": "Tennis book price vs Pinnacle no-vig",
+  "sports": "atp, wta",
+  "data": "tennis-data 2012+",
+  "tuning": "2013-2019",
+  "blind": "2021+",
+  "luck_control": "1 of 200",
+  "verdict": "best of ~40 books STRONG (+6.8% blind) but stale prices; one real book (Bet365) not proven. No units."
+ },
+ {
+  "date": "2026-10-14",
+  "idea": "Price shopping: best of 10-25 books vs the others' consensus (moneylines, 1/6/24h before, 2-4% edge)",
+  "sports": "nfl, ncaaf",
+  "data": "odds_history 2020+ (public archive), results from games/*.csv",
+  "tuning": "2020-2022",
+  "blind": "2023+",
+  "luck_control": "0/96 random spots",
+  "verdict": "promising, not proven: 24h at 2%+ made +40% blind in both sports but on 28 and 58 bets; NCAAF 6h 2%+ blind 61 bets +20.7% (\u00b120.5) but lost in tuning. Reruns daily (shopstudy)."
+ },
+ {
+  "date": "2026-10-14",
+  "idea": "Price shopping on spreads (same line across books)",
+  "sports": "nfl, ncaaf",
+  "data": "odds_history spreads 2020+",
+  "tuning": "2020-2022",
+  "blind": "2023+",
+  "luck_control": "n/a (too few bets)",
+  "verdict": "books agree on spread prices: 4-15 blind bets. Dropped for now."
+ },
+ {
+  "date": "2026-10-14",
+  "idea": "Our own lean picks' record by kind",
+  "sports": "all",
+  "data": "the ledger",
+  "tuning": "n/a",
+  "blind": "live",
+  "luck_control": "n/a",
+  "verdict": "unit plays 5-1; no-unit leans ~16-25; injury-unknown soccer leans 3-5 -> those games now post nothing"
+ },
+ {
+  "date": "2026-10-15",
+  "idea": "Soccer spots: 3+ win streaks vs winless, fading 4+ streaks, 6+ point form gaps, 6+ unbeaten, attacking pairs over 2.5, tight pairs under, draw-heavy pairs, head to head (won last 2+), rest (5+ days vs 3 or fewer), strong home form, weak road teams",
+  "sports": "epl, laliga, seriea, bundesliga, ligue1, mls, ucl",
+  "data": "engine ESPN archive: 4,827 results since Oct 2024, 1,927 with closing 3-way and 2.5 prices (2025-26 on)",
+  "tuning": "Aug 2025 - Feb 2026",
+  "blind": "Mar 2026 on",
+  "luck_control": "0/200 random spots",
+  "verdict": "none proven; the market prices form, streaks and head to head (weak road team: home -16.6% blind on 215; home won last 2 meetings -14% on 131). Closest: away unbeaten 6+ +10% blind on 75 but lost in tuning. Reruns daily (soccerstudy). Weather and style-of-play stats (shots, possession) not in the archive yet."
+ },
+ {
+  "date": "2026-10-15",
+  "idea": "Owner's call: soccer has no injury feed, so unknown injuries no longer block soccer picks; US leagues keep the rule (a missing report there means a broken feed)",
+  "sports": "soccer",
+  "data": "n/a",
+  "tuning": "n/a",
+  "blind": "n/a",
+  "luck_control": "n/a",
+  "verdict": "rule change; soccer picks carry no units until a soccer bet type proves out"
+ },
+ {
+  "date": "2026-10-16",
+  "idea": "Totals after hot or cold scoring: both teams' last game ran over/under its posted total (top/bottom 15%), and last 3 games' points vs the current total; bet over or under at the closing price",
+  "sports": [
+   "nfl",
+   "ncaaf",
+   "nba",
+   "ncaab",
+   "mlb",
+   "nhl"
+  ],
+  "data": "data/lines/espn/<sport> closing totals and prices 2018+",
+  "tuning": "2018-2021 set the 15% cut points and the tuning record",
+  "blind": "2022 on, 48 variants (6 sports x 8)",
+  "luck_control": "100 random tenths of all games betting over or under through the same bar: 0 of 100 passed",
+  "verdict": "none proven: the market already prices recent scoring. Best looks (under-streaks then over) were +4-6% blind with \u00b15-8% error and lost or barely made money in tuning (NFL -6.5%, NCAAF -6.9%). Dropped. Code: sportsedge/scoringstudy.py (rerunnable, not in the daily run)."
+ },
+ {
+  "date": "2026-10-16",
+  "idea": "Dogs (+100 to +220 closing) in rematches, low-total games and form flips: lost the last meeting (revenge), won the last meeting, total in the bottom quarter, last-4 margin better than the favorite's",
+  "sports": [
+   "nfl",
+   "ncaaf",
+   "nba",
+   "ncaab",
+   "mlb",
+   "nhl"
+  ],
+  "data": "data/lines/espn/<sport> closing prices 2018+",
+  "tuning": "2018-2021 set the low-total cut and the tuning record",
+  "blind": "2022 on, 24 variants (6 sports x 4)",
+  "luck_control": "100 random tenths of all +100..+220 dogs through the same bar: 0 of 100 passed",
+  "verdict": "none proven: all 24 variants either lost blind or had errors bigger than the gain. Best look: NCAAF better-form dog +13.1% blind on 323 bets (+/-6.7%) but -1.9% in tuning on 212; NFL dogs that looked good in tuning (+11% to +28%) lost blind (-4% to -12%). Dropped. Code: sportsedge/dogstudy.py (rerunnable, not in the daily run)."
+ },
+ {
+  "date": "2026-10-16",
+  "idea": "Price shopping pooled across NFL and college football: the best of 10-25 books beating the others' no-vig consensus by 2%+, 3%+, 4%+ at 1h, 6h, 24h before kickoff",
+  "sports": [
+   "nfl",
+   "ncaaf"
+  ],
+  "data": "D503therapper archive odds_history (multi-book moneylines 2020+) and games results",
+  "tuning": "2020-2022 seasons",
+  "blind": "2023 on",
+  "luck_control": "96 random-side spots at the best price: 0 passed",
+  "verdict": "PROVEN at a 2%+ edge at all three timings (24h: tuning 192 bets +5.2%, blind 86 bets +40.0% +/-18.3%); the 4%+ slice lost in tuning every time (-20% to -36%)",
+  "action": "sharp value caps football edges at 4% (2% to 4% only)"
+ },
+ {
+  "date": "2026-10-17",
+  "idea": "Dogs (+100 to +220 closing) by home vs road and rest edge (dog rested 2+ days more / 2+ less), per sport and pooled, at the closing moneyline",
+  "sports": [
+   "mlb",
+   "nba",
+   "nhl",
+   "ncaab",
+   "ncaaf",
+   "nfl"
+  ],
+  "data": "data/lines/espn closing moneylines and rest days, 2016-2026, neutral sites and ties dropped",
+  "tuning": "2016-2021 seasons",
+  "blind": "2022 on",
+  "luck_control": "300 random dog pools of 60-400 bets: 8 passed (2.7%) the same bar",
+  "verdict": "none proven (63 variants): dogs lose about 3.7% blind overall (25,282 bets, +/-0.7%); road dogs -3.7%, home dogs -3.6%. Best looks were tiny samples (NCAAF road dog resting less +10.4% on 87, NBA home dog rested more +10.7% on 65, errors +/-13-15%). Dropped."
+ },
+ {
+  "date": "2026-10-17",
+  "idea": "Follow early steam: bet the side the multi-book consensus moved toward (1%, 2%, 3%+) between 48h->24h, 24h->6h, 12h->3h and 6h->1h before kickoff, at the best price at the later time",
+  "sports": [
+   "nfl",
+   "ncaaf"
+  ],
+  "data": "D503therapper archive odds_history (10-25 books, 2020+) and games results",
+  "tuning": "2020-2022 seasons",
+  "blind": "2023 on, 24 variants",
+  "luck_control": "random sides at the best price on the same games: 8/300 and 16/300 passed for the two NFL variants that passed",
+  "verdict": "none proven: college football nothing; NFL 24h->6h 1%+ (blind 96 bets +19%) and 12h->3h 1%+ (blind 107 bets +12%) pass the bar but at the rate luck alone would give across 24 variants",
+  "action": "none; rerun when the archive grows"
+ },
+ {
+  "date": "2026-10-18",
+  "idea": "Our own graded picks vs the market's closing fair odds, by tier and sport: is the model's win chance calibrated, and do leans/Locks beat the close?",
+  "sports": [
+   "all in ledger"
+  ],
+  "data": "data/ledger.json, 100 graded won/lost picks with a close_fair price (void picks dropped)",
+  "tuning": "none (no parameters fitted; a calibration check)",
+  "blind": "all picks are live, so every graded pick was unseen when posted",
+  "luck_control": "20,000 simulated seasons where each pick wins at the market's closing fair chance: leans (26 wins vs 32.8 expected) land that low or lower 5.7% of the time; Locks (2 of 7 vs 3.7) 17%; early picks (11 of 17 vs 8.5) high 17%",
+  "verdict": "nothing proven, nothing to wire. Leans run 41% wins with the model saying 59% (market 51%), -23% ROI on 64 no-unit picks; the model's Brier score (0.272) is worse than the close's (0.257), so it is overconfident on leans and not better than the market. Early picks 11-6 (+25%) and the 5 dogs 4-1 are too few to trust. Units are only on proven types and the Lock's 0.5u, so little money rides on this. Watch: if leans stay below the close past ~150 graded, shrink lean win chances toward the market.",
+  "action": "none; rerun weekly as the ledger grows"
+ },
+ {
+  "date": "2026-10-19",
+  "idea": "Closing-line moves from the opener: dogs (+100 to +220) whose win chance rose 1/2/3+ points (steam toward the dog) or fell 1/2+ (drifting out), and favorites (-170 to -110) whose chance rose 2/3+ points",
+  "sports": [
+   "nfl",
+   "ncaaf",
+   "nba",
+   "ncaab",
+   "mlb",
+   "nhl"
+  ],
+  "data": "data/lines/espn/<sport> opening and closing moneylines (open lines 2023+, MLB 2019+)",
+  "tuning": "seasons through 2023",
+  "blind": "2024 on, 42 variants (6 sports x 5-7 moves)",
+  "luck_control": "100 random tenths of all +100..+220 dogs through the same bar: 0 of 100 passed; across 42 variants luck alone gives about 0.3 passes (1 in 150 each)",
+  "verdict": "one variant passed the bar: NHL dog moved toward by 1%+ (tuning 223 bets +1.3%, blind 638 bets +8.5% +/-4.6%); 2% and 3%+ NHL dogs run +9% and +11% blind but lost in tuning (-5%, -15%) on 125 and 62 bets. Everything else lost or was flat: favorites that shortened lose in all six sports (MLB -7%, NCAAF -13% blind), dogs that drifted out lose, other sports' steam dogs flat. Not wired: the pass is one sport of 42, tuning is a single NHL season at +1.3%, and the live steam check uses first-seen price, not the true opener the study used.",
+  "action": "none; keep watching NHL steam dogs. Code: sportsedge/movestudy.py (rerunnable, not in the daily run)"
+ },
+ {
+  "date": "2026-10-20",
+  "idea": "Lock-type moneyline favorites (-170 to -120 closing) by spot: home/road, off a loss, off a blowout win (letdown), vs a team off a blowout loss, win/losing streaks, rested vs back-to-back, 3rd game in 4 days, opponent backup starter",
+  "sports": [
+   "nfl",
+   "ncaaf",
+   "nba",
+   "ncaab",
+   "mlb",
+   "nhl"
+  ],
+  "data": "data/lines/espn/<sport> closing moneylines 2018+",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on, 68 variants (6 sports x 7-13 spots)",
+  "luck_control": "100 random tenths of all -170..-120 favorites through the same bar: 0 of 100 passed; across 68 variants luck alone gives about 0.5 passes by the 1-in-150 rule (more with this loose 1-SE bar on big variant counts)",
+  "verdict": "3 variants cleared the bar, all barely: NBA favorite off a blowout win (blind 150 bets +8.7% +/-6.7%, tuning +5.6%), NCAAF favorite vs a team on a 3+ losing streak (72 bets +11.2% +/-9.7%, tuning +3.2% +/-12.9%), NHL rested favorite vs a back-to-back (323 bets +6.1% +/-4.6%, tuning +1.4%). Each is under 1.5 SEs, one sport of six, and the same spot flips sign in neighbours (NBA rested vs back-to-back -4.6%, MLB -16.5%). Overall lock-price favorites lose in every sport (MLB -5.3%, NHL -5.3%, NCAAB -4.6%, NBA -3.1%, NCAAF -6.8%, NFL -0.7% blind): the price is already fair-to-shaded, so the Lock stays a 0.5u small stake. Not wired.",
+  "action": "none; watch NHL rested favorite vs back-to-back next to NHL steam dogs. Code: sportsedge/favstudy.py (rerunnable, not in the daily run)"
+ },
+ {
+  "date": "2026-10-21",
+  "idea": "Kickoff slot: dogs (+100 to +220) and lock-price favorites (-170 to -120) by weekday, day vs night start (Eastern), NFL Sunday early/late/night, weekend, matinee",
+  "sports": [
+   "nfl",
+   "ncaaf",
+   "nba",
+   "ncaab",
+   "mlb",
+   "nhl"
+  ],
+  "data": "data/lines/espn/<sport> closing moneylines 2018+",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on, 275 variants",
+  "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 of 100 passed; 275 variants at 1 in 150 each give about 1.8 passes from luck alone",
+  "verdict": "3 variants cleared the bar, about what luck gives: NBA lock favorite on Tuesday (blind 170 bets +7.0% +/-6.4%, tuning +4.4% +/-6.4%), same on Tuesday night, and NCAAB dog on Friday day (blind 174 bets +19.3% +/-9.7%, tuning +5.1% +/-8.8%). Tuning ROIs are under 1 SE, there is no reason a Tuesday would matter, and neighbouring days do not agree. Not wired.",
+  "action": "none; watch NCAAB Friday-day dogs. Code: sportsedge/slotstudy.py (rerunnable, not in the daily run)"
+ },
+ {
+  "date": "2026-10-22",
+  "idea": "Season timing: dogs (+100 to +220 closing) and lock-price favorites (-170 to -120) by games played this season (early, middle, late phases per sport) and by calendar month",
+  "sports": [
+   "nfl",
+   "ncaaf",
+   "nba",
+   "ncaab",
+   "mlb",
+   "nhl"
+  ],
+  "data": "data/lines/espn/<sport> closing moneylines 2018+",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on, 144 variants",
+  "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 of 100 passed; 144 variants at 1 in 150 each give about 1 pass from luck alone",
+  "verdict": "none proven: 0 of 144 variants cleared the bar, so the market prices early-season and late-season games fine. Dropped.",
+  "action": "none. Code: sportsedge/seasonstudy.py (rerunnable, not in the daily run)"
+ },
+ {
+  "date": "2026-10-23",
+  "idea": "Road trips and homestands: dogs (+100 to +220 closing) and lock-price favorites (-170 to -120) by how many games in a row the bet side has played at its venue kind (road trip, homestand, first game back), and the same for the opponent being on a long trip or homestand",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing lines 2018+ (sportsedge/tripstudy.py)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong",
+  "verdict": "none proven: 0 of 72 variants cleared the bar (luck alone gave 0 of 100). Best blind looks were tiny or lost in tuning: NCAAB dog homestand 3+ (+20% on 71, tuning -19%), NBA lock favorite on a road trip 3+ (tuning +13%, blind -14%). Long road-trip dogs lose in NBA (-17.5% blind on 228) and NHL; the market prices travel fine. Dropped.",
+  "action": "logged; no change to bet rules"
+ },
+ {
+  "date": "2026-10-24",
+  "idea": "Teams beating or missing their prices: each team's average (result minus no-vig win chance) over its earlier games this season; dogs (+100 to +220 closing) and lock-price favorites (-170 to -120) when the bet side or the opponent is hot/cold against the price, and when the gap between them is 2x the cutoff",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing lines 2018+ (sportsedge/beatstudy.py)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong",
+  "verdict": "none wired: 2 of 72 variants cleared the bar, neither STRONG, about what luck gives across 72 tries (~0.5 expected at 1 in 150 per try, though the 100-spot control gave 0). NFL dog facing a team missing its prices (blind +17.3% on 110, tuning +4.9%) is contradicted by NFL dog that is itself missing its prices losing blind (-9.9% on 173). NCAAF dog missing its prices (blind +10.0% on 206, tuning +7.7%) is the one to watch but is not STRONG and has no mirror support (NCAAF lock favorites missing prices lose -21%). Dropped; recheck when more seasons are in.",
+  "action": "logged; no change to bet rules"
+ },
+ {
+  "date": "2026-10-25",
+  "idea": "Divisional games (NFL): dogs (+100 to +220) and lock-price favorites (-170 to -120) on the moneyline, favorite/dog/short-favorite/big-dog spread sides, and overs/unders, divisional vs non-divisional as a mirror (16 variants)",
+  "sports": "nfl",
+  "data": "data/lines/nfl 2006-2025 regular season (sportsedge/divstudy.py; ESPN archive has no division flag)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of the same bets through the same bar: 0 passed, 0 strong",
+  "verdict": "none wired: 1 of 16 variants cleared the bar (about what luck gives, ~0.1 expected at 1 in 150), and it is not STRONG. Divisional dog spread: blind +4.7% on 412, tuning only +0.9% on 1,536, and it is just the flip side of divisional favorites on the spread losing (-12.5% blind). Divisional dog moneyline lost blind (-5.4% on 250), divisional overs lose in both arms (-6%) but a bet that loses at -110 is not a signal to take the under (under -1.9% blind). Dropped; recheck when more seasons are in.",
+  "action": "logged; no change to bet rules"
+ },
+ {
+  "date": "2026-10-26",
+  "idea": "Cover streaks: spread bets on the side whose own (or opponent's) last game covered or missed the spread by a big margin (NFL/NBA/NCAAB 10+ pts, NCAAF 14+), 16 variants",
+  "sports": "nfl, ncaaf, nba, ncaab",
+  "data": "data/lines/espn closing lines 2018+ (sportsedge/atsstudy.py)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all spread bets through the same bar: 0 passed, 0 strong",
+  "verdict": "none proven: 0 of 16 variants cleared the bar and every one lost blind (-0.2% to -8.8%; biggest samples NBA/NCAAB ~2,300-4,800 bets each at -1.5% to -7%). The spread does not overreact to a big cover or miss; the -110 vig is the only thing showing. Dropped.",
+  "action": "logged; no change to bet rules"
+ },
+ {
+  "date": "2026-10-27",
+  "idea": "Bounce-back and letdown: dogs (+100 to +220 closing) and lock-price favorites (-170 to -120) off a blowout loss or win in their last game (NFL 17+, NCAAF 21+, NBA/NCAAB 20+, NHL 4+, MLB 7+), and facing a team off one, 48 variants",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing lines 2018+ (sportsedge/bouncestudy.py)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dogs and lock favorites through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 48 tries)",
+  "verdict": "none wired: 2 of 48 variants technically cleared the bar, neither STRONG, about what luck gives. NBA lock favorite off a blowout win (blind +8.3% on 152, tuning +5.6% on 140) has no mirror: NCAAB/NCAAF/NHL/MLB lock favorites off a blowout win all lose blind (-1% to -12%) and it is a letdown spot that should hurt, not help. NCAAF dog off a blowout loss (blind +14.5% on 201) was flat in tuning (+0.9% on 129, under 1 SE) and the same spot loses in NCAAB (-16.5% on 621) and is flat elsewhere. The NHL lock favorite bounce-back passed tuning (+8.7%) but lost blind (-10.5%). Dropped; recheck NBA letdown and NCAAF bounce-back when more seasons are in.",
+  "action": "logged; no change to bet rules"
+ },
+ {
+  "date": "2026-10-28",
+  "idea": "Totals by rest and fatigue: unders and overs when a team is on a back-to-back or its 3rd game in 4 days, both on a back-to-back, both rested 3+ days (daily sports), a short week or both off a bye (NFL/NCAAF), 44 variants",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing totals 2018+ (sportsedge/reststudy.py)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all totals (random over/under) through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 44 tries)",
+  "verdict": "none wired: 1 of 44 variants technically cleared the bar, not STRONG, about what luck gives (p~0.25 of at least one). NFL under when both teams are off a bye/long break: blind +12.6% on 163, tuning +4.7% on 136 (under 1 SE), and the NCAAF twin is flat (-1.1% blind, +0.1% tuning). Everything else loses about the vig: back-to-back and 3rd-in-4 unders/overs both lose in every daily sport (-1% to -11%), NBA both-back-to-back under +2.4% blind but -7.1% tuning. The totals market already prices fatigue. Dropped; recheck NFL bye unders when more seasons are in."
+ },
+ {
+  "date": "2026-10-29",
+  "idea": "Totals by game script: unders and overs when the posted total is high or low for its sport (tuning-season quartiles) and when the spread is big (blowout expected) or pick'em",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing totals 2018+ (sportsedge/scriptstudy.py)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all totals (random over/under) through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 40 tries)",
+  "verdict": "none wired: 0 of 40 variants cleared the bar. Four passed one arm only: NFL under on big spreads (tuning +9.3% on 164, blind -12.3% on 119), NFL under pick'em (blind +12.7% on 158, tuning -3.0%), NCAAF over pick'em (blind +6.8% on 240, tuning -2.5%), NBA over big spread (tuning +5.7%, blind -0.7% on 1,139) - each flips between arms, so noise. High/low total levels lose about the vig everywhere (NCAAB over high totals -4.2% blind on 6,946; NBA over high -4.7% on 2,709). The totals market prices game shape fine. Dropped."
+ },
+ {
+  "date": "2026-10-30",
+  "idea": "Season over rates and rematch totals: over/under when both teams' games so far this season ran over (60%+) or under (40%-) their posted totals, and when the last meeting this season went over or under",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing totals 2018+ (sportsedge/overratestudy.py)",
+  "tuning": "seasons through 2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all totals (random over/under) through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 48 tries)",
+  "verdict": "none wired: 2 of 48 variants technically cleared the bar, neither STRONG, about what luck gives: NFL over after the last meeting went under (tuning +4.8% on 114, blind +8.7% on 122) and NCAAF over when both teams' games run under (tuning +1.5% on 92, blind +13.0% on 101). Both sit on ~100 bets with a tiny tuning edge, and their mirror spots (NFL under after a meeting that went over, NCAAF under when both run over) point the other way or flip, so noise. Everything else loses about the vig (MLB/NHL/NBA/NCAAB rematch totals -2% to -9%). The totals market already prices a team's over habit and the last meeting. Dropped."
+ },
+ {
+  "date": "2026-10-31",
+  "idea": "Favorite line moves from the opener: lock-price favorites (-170 to -120 closing) and dogs (+100 to +220) whose no-vig win chance rose or fell 1/2/3+ points between the opening and closing moneyline",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn opening+closing moneylines 2023+ (sportsedge/favmovestudy.py)",
+  "tuning": "2023",
+  "blind": "2024 on",
+  "luck_control": "100 random tenths of all lock-price/dog sides through the same bar: 0 passed, 0 strong (luck alone gives ~0.5 passes across 72 tries)",
+  "verdict": "none wired: 1 of 72 variants technically cleared the bar and it is not STRONG: NHL dog whose win chance rose 1+ pt since open (blind +7.7% on 660, tuning only +3.3% on 221, under 1 SE). The 2+ and 3+ versions have the same blind (+7.3%, +11.2%) but LOSE in tuning (-4.6%, -17.6%), so it flips between arms. Lock-price favorites that steamed up or faded lose about the vig or worse in every sport (MLB rose -6.7% on 1,990, NHL fell -10.7% on 493). The close already holds the move. Dropped; recheck NHL dogs that steam up when more seasons are in."
+ }
 ]
