@@ -232,7 +232,9 @@ def find(scans, now: datetime, root="data") -> list[Card]:
                         side = team_side if x["bet"] == "back" else ("away" if team_side == "home" else "home")
                         row = next(f for f in facts if (f["market"], f["variant"]) == (x["market"], f"{x['bet']}: {r['factor']}"))
                         who = g[side]
-                        label = (f"{who}: {r['team']} {r['factor']}" if x["bet"] == "fade"
+                        # Owner, Oct 31 ("UL Monroe is trash, how is this the best bet?"): say plainly it's a bet AGAINST
+                        # the team in the spot, not a bet that our team is good.
+                        label = (f"{who}: betting against {r['team']}, who are {r['factor']}" if x["bet"] == "fade"
                                  else f"{who} {r['factor']}")
                         add(eid, x["market"], side, row, label)
                 # Over/unders: the game's spots, by home or road team (as factorstudy tested them).
