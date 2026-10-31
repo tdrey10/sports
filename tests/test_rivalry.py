@@ -83,3 +83,22 @@ def test_a_changed_pick_is_taken_back_before_its_game(tmp_path):
     assert picks == {"Los Angeles Lakers -3.5": "void", "Boston Celtics +3.5": "pending"}
     rivalry._file_inbox(tmp_path)  # filing again changes nothing
     assert {e.selection: e.status for e in Ledger.load(rivalry.path(tmp_path)).entries.values()} == picks
+
+
+def test_grim_posts_the_money_plays_and_one_best_pick_on_a_day_without_one():
+    """Owner, Oct 31: 'Have Grim post only the money plays but there has to be picks every day.'"""
+    from tests.test_ledger import card, make_pick
+
+    L = Ledger()
+    day1 = datetime(2026, 11, 2, 18, tzinfo=timezone.utc)
+    day2 = day1 + timedelta(days=1)
+    money = make_pick(market="h2h", point=None, american=120, event_id="m1", win_prob=0.5, market_prob=0.45)
+    lean_a = make_pick(market="h2h", point=None, american=-110, event_id="l1", win_prob=0.52, market_prob=0.51)
+    lean_b = make_pick(market="h2h", point=None, american=-110, event_id="l2", win_prob=0.55, market_prob=0.50)
+    lean_c = make_pick(market="h2h", point=None, american=-110, event_id="l3", win_prob=0.6, market_prob=0.6)
+    import dataclasses
+    picks = [dataclasses.replace(money, commence_time=day1), dataclasses.replace(lean_a, commence_time=day1),
+             dataclasses.replace(lean_b, commence_time=day2), dataclasses.replace(lean_c, commence_time=day2)]
+    L.publish([card(picks[0], units=0.5)] + [card(p, tier="lean", units=0.0) for p in picks[1:]], day1 - timedelta(days=1))
+    got = sorted(e.event_id for e in rivalry.grim_picks(L))
+    assert got == ["l2", "m1"]  # day 1: the money play only; day 2: the lean that beats the market by the most

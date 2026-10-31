@@ -294,22 +294,58 @@ def _record(entries) -> dict:
             "pending": sum(not e.settled for e in entries)}
 
 
+def grim_picks(ours: Ledger) -> list:
+    """Grim's side (owner, Oct 31: "Have Grim post only the money plays but there has to be picks every day"):
+    every money play from the contest start, and on a day with no money play on that day's games, Grim's
+    one best lean (where our number beats the market's by the most), so Grim always has a pick."""
+    from collections import defaultdict
+
+    games = [e for e in ours.entries.values() if e.start >= START and e.status != "void" and not e.player
+             and (e.units > 0 or e.tier in LEAN_TIERS)]
+    by_day = defaultdict(list)
+    for e in games:
+        by_day[ours.day_of(e.start)].append(e)
+    out = []
+    for day, es in by_day.items():
+        money = [e for e in es if e.units > 0]
+        if money:
+            out += money
+        else:
+            out.append(max(es, key=lambda e: ((e.win_prob - (e.market_prob or e.win_prob)), e.win_prob)))
+    return out
+
+
+def _flat(entries) -> dict:
+    """Record at one unit flat on every pick (a money play's own stake is set aside for the contest)."""
+    from .odds import american_to_decimal
+
+    won = sum(e.status in ("won", "half_won") for e in entries)
+    lost = sum(e.status in ("lost", "half_lost") for e in entries)
+    push = sum(e.status == "push" for e in entries)
+    units = sum((american_to_decimal(e.odds) - 1) if e.status == "won" else -1.0 if e.status == "lost"
+                else (american_to_decimal(e.odds) - 1) / 2 if e.status == "half_won" else -0.5 if e.status == "half_lost"
+                else 0.0 for e in entries if e.settled)
+    return {"won": won, "lost": lost, "push": push, "units": round(units, 2), "pending": sum(not e.settled for e in entries)}
+
+
 def scoreboard(ours: Ledger, root) -> dict | None:
     """Both records since the contest started, one unit flat each."""
     p = path(root)
     mine = Ledger.load(p) if p.exists() else None
-    leans = [e for e in ours.entries.values() if e.units == 0 and e.tier in LEAN_TIERS and e.start >= START
-             and e.status != "void" and not e.player]
+    grim = grim_picks(ours)
     yours = [e for e in (mine.entries.values() if mine else []) if e.status != "void"]
     recent = sorted(yours, key=lambda e: e.start, reverse=True)[:10]
     legs = Ledger.load(Path(root) / LEGS)
     you_p, your_parlays = _parlay_record(legs.parlays, legs.entries)
     grim_p, _ = _parlay_record([p for p in ours.parlays if p.created_at >= START.isoformat()], ours.entries)
     return {"since": START.isoformat(), "names": {"you": "The Doctor", "us": "Grim"},
-            "leans": _record(leans), "you": _record(yours),
+            "leans": _flat(grim), "you": _record(yours),
+            "grim_picks": [{"selection": e.selection, "matchup": e.matchup, "odds": e.odds, "start": e.start.isoformat(),
+                            "status": e.status, "final": e.final, "money": e.units > 0}
+                           for e in sorted(grim, key=lambda e: e.start, reverse=True)[:10]],
             "your_picks": [{"selection": e.selection, "matchup": e.matchup, "odds": e.odds, "start": e.start.isoformat(),
                             "status": e.status, "final": e.final} for e in recent],
             "parlays": {"you": you_p, "us": grim_p}, "your_parlays": your_parlays}
 
 
-__all__ = ["add", "cancel", "parse_leg", "refresh", "scoreboard", "send", "send_parlay"]
+__all__ = ["add", "cancel", "grim_picks", "parse_leg", "refresh", "scoreboard", "send", "send_parlay"]
