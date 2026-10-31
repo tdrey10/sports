@@ -145,6 +145,16 @@ def entry_id(pick: Pick, live: bool = False) -> str:
     return hashlib.sha1(raw.encode()).hexdigest()[:16]
 
 
+def _beats_luck(e) -> bool:
+    """The blind test on a proven pick's scorecard clears proven.MIN_Z (no numbers to read: leave it up)."""
+    import re
+
+    from .proven import MIN_Z
+
+    m = re.search(r"Blind \d+ bets ([+-][\d.]+)% \(standard error ([\d.]+)%\)", (e.scorecard or {}).get("validation") or "")
+    return not m or float(m[2]) == 0 or float(m[1]) / float(m[2]) >= MIN_Z
+
+
 class Ledger:
     def __init__(self, entries: Iterable[Entry] = (), tz: str = "America/Los_Angeles", start_bankroll: float = BANKROLL_START):
         self.entries: dict[str, Entry] = {e.id: e for e in entries}
@@ -372,6 +382,13 @@ class Ledger:
                 continue  # live and sharp-value bets have their own checks (and their own CLV record)
             if is_formula_pick(e.reasons):
                 continue  # the D503 formula: a posted pick never changes
+            if _proven(e) and not _beats_luck(e):
+                # Owner, Oct 31: a spot luck alone could explain no longer gets money (proven.MIN_Z).
+                e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
+                e.reasons = ["Pulled: this spot's profit could be luck. We only put money on spots that clearly "
+                             "beat luck now."] + list(e.reasons)
+                pulled.append(e)
+                continue
             if _proven(e):
                 continue  # a proven money pick passed its own test at this price (it posts once, like the above)
             if e.tier == "dog" and e.win_prob < DOG_FLOOR_WIN:

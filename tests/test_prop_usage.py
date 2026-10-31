@@ -55,7 +55,7 @@ def test_a_study_with_few_graded_lines_says_collecting(tmp_path):
 def test_once_it_passes_a_props_card_posts_with_units(monkeypatch, tmp_path):
     passed = {"market": "over", "variant": "usage: a rotation teammate out, points 1.5+ over the line", "verdict": "PROVEN",
               "study": "NBA usage (points props)", "sport": "nba",
-              "blind": {"bets": 90, "flat_roi": 0.1, "se": 0.08}, "in_sample": {"bets": 90, "flat_roi": 0.05}}
+              "blind": {"bets": 90, "flat_roi": 0.2, "se": 0.08}, "in_sample": {"bets": 90, "flat_roi": 0.05}}
     (tmp_path / "prop_usage.json").write_text(json.dumps({"rows": [passed]}))
     book = propusage.Book()
     for _, _, teams in sorted(propusage._games_from(store(10))):

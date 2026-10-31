@@ -78,7 +78,20 @@ def passed(root="data") -> list[dict]:
         key = (r.get("study"), r.get("variant"))
         if r.get("verdict") and key in LINE_SPOTS:
             out.append({**r, "kind": "line", "market": LINE_SPOTS[key]})
-    return out
+    return [r for r in out if beats_luck(r)]
+
+
+# Owner, Oct 31 (1-5 on college football dogs: "these picks are terrible, it needs to be better"). Each sport
+# tests a few hundred spots and a random one passes about 1 time in 100, so college football's 2 "proven" spots
+# out of 269 were what luck alone would give. A spot now gets money only when its blind profit is big enough
+# that luck would hand it out less than 1 time in 20 (profit at least 1.65 standard errors above zero).
+MIN_Z = 1.65
+
+
+def beats_luck(row: dict) -> bool:
+    b = row.get("blind") or {}
+    roi, se = b.get("flat_roi"), b.get("se")
+    return bool(roi is not None and se and roi / se >= MIN_Z)
 
 
 LINE_SPOTS = {
