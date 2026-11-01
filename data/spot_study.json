@@ -3,60 +3,60 @@
   "timing": [
    {
     "market": "moneyline dog",
-    "spot": "fade: off an upset win as a dog",
-    "bets": 136,
+    "spot": "fade: 2+ time zones from home",
+    "bets": 91,
     "open": {
-     "bets": 136,
-     "roi": 0.1924
+     "bets": 91,
+     "roi": 0.1137
     },
     "close": {
-     "bets": 136,
-     "roi": 0.181
+     "bets": 91,
+     "roi": 0.1403
     },
-    "moved_our_way": 0.419
+    "moved_our_way": 0.462
    },
    {
     "market": "moneyline favorite",
     "spot": "fade: on a 3+ game losing streak",
-    "bets": 84,
+    "bets": 87,
     "open": {
-     "bets": 84,
-     "roi": 0.1515
+     "bets": 87,
+     "roi": 0.172
     },
     "close": {
-     "bets": 84,
-     "roi": 0.0722
+     "bets": 87,
+     "roi": 0.0944
     },
-    "moved_our_way": 0.548
+    "moved_our_way": 0.54
    }
   ],
   "stacking": {
    "1 spot": {
-    "bets": 440,
-    "roi": 0.0848
+    "bets": 312,
+    "roi": 0.1272
    }
   },
   "bands": [
    {
     "market": "moneyline dog",
-    "spot": "fade: off an upset win as a dog",
+    "spot": "fade: 2+ time zones from home",
     "odds": "+100 to +149",
-    "bets": 109,
-    "roi": 0.1594
+    "bets": 61,
+    "roi": 0.2074
    },
    {
     "market": "moneyline dog",
-    "spot": "fade: off an upset win as a dog",
+    "spot": "fade: 2+ time zones from home",
     "odds": "+150 to +199",
-    "bets": 73,
-    "roi": -0.1136
+    "bets": 39,
+    "roi": 0.1795
    },
    {
     "market": "moneyline dog",
-    "spot": "fade: off an upset win as a dog",
+    "spot": "fade: 2+ time zones from home",
     "odds": "+200 to +300",
-    "bets": 101,
-    "roi": 0.1747
+    "bets": 52,
+    "roi": 0.1408
    },
    {
     "market": "moneyline favorite",
@@ -69,28 +69,28 @@
     "market": "moneyline favorite",
     "spot": "fade: on a 3+ game losing streak",
     "odds": "-130 to -116",
-    "bets": 38,
-    "roi": 0.1899
+    "bets": 39,
+    "roi": 0.2047
    },
    {
     "market": "moneyline favorite",
     "spot": "fade: on a 3+ game losing streak",
     "odds": "-150 to -131",
-    "bets": 42,
-    "roi": 0.1387
+    "bets": 44,
+    "roi": 0.1637
    }
   ],
   "first_half": [
    {
     "market": "moneyline dog",
-    "spot": "fade: off an upset win as a dog",
+    "spot": "fade: 2+ time zones from home",
     "in_sample": {
-     "bets": 109,
-     "roi": 0.0548
+     "bets": 50,
+     "roi": 0.1421
     },
     "blind": {
-     "bets": 148,
-     "roi": 0.046
+     "bets": 94,
+     "roi": 0.0425
     }
    },
    {
@@ -101,8 +101,8 @@
      "roi": 0.0645
     },
     "blind": {
-     "bets": 84,
-     "roi": -0.0711
+     "bets": 85,
+     "roi": -0.059
     }
    }
   ],
@@ -113,8 +113,8 @@
      "roi": null
     },
     "blind": {
-     "bets": 12,
-     "roi": 0.7302
+     "bets": 8,
+     "roi": 0.3126
     }
    },
    "line moved against us": {
@@ -123,8 +123,8 @@
      "roi": null
     },
     "blind": {
-     "bets": 105,
-     "roi": 0.1188
+     "bets": 81,
+     "roi": 0.2073
     }
    },
    "line moved our way": {
@@ -133,40 +133,40 @@
      "roi": null
     },
     "blind": {
-     "bets": 103,
-     "roi": 0.0918
+     "bets": 89,
+     "roi": 0.019
     }
    }
   },
   "ratings": {
    "ratings close to the price": {
     "in_sample": {
-     "bets": 133,
-     "roi": 0.0207
+     "bets": 87,
+     "roi": 0.082
     },
     "blind": {
-     "bets": 225,
-     "roi": 0.0724
+     "bets": 146,
+     "roi": 0.0966
     }
    },
    "ratings much better than the price": {
     "in_sample": {
-     "bets": 8,
-     "roi": -0.1653
+     "bets": 7,
+     "roi": 0.9939
     },
     "blind": {
-     "bets": 12,
-     "roi": 0.3204
+     "bets": 19,
+     "roi": 0.4603
     }
    },
    "ratings much worse than the price": {
     "in_sample": {
-     "bets": 9,
-     "roi": 0.6846
+     "bets": 2,
+     "roi": 0.8159
     },
     "blind": {
-     "bets": 19,
-     "roi": 0.035
+     "bets": 8,
+     "roi": 0.3194
     }
    }
   }
