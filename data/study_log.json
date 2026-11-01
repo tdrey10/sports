@@ -357,5 +357,15 @@
   "blind": "2024 on",
   "luck_control": "100 random tenths of all lock-price/dog sides through the same bar: 0 passed, 0 strong (luck alone gives ~0.5 passes across 72 tries)",
   "verdict": "none wired: 1 of 72 variants technically cleared the bar and it is not STRONG: NHL dog whose win chance rose 1+ pt since open (blind +7.7% on 660, tuning only +3.3% on 221, under 1 SE). The 2+ and 3+ versions have the same blind (+7.3%, +11.2%) but LOSE in tuning (-4.6%, -17.6%), so it flips between arms. Lock-price favorites that steamed up or faded lose about the vig or worse in every sport (MLB rose -6.7% on 1,990, NHL fell -10.7% on 493). The close already holds the move. Dropped; recheck NHL dogs that steam up when more seasons are in."
+ },
+ {
+  "date": "2026-11-01",
+  "idea": "Form trend: team's last-5 average margin minus its season-to-date average margin; bet hot and cold sides (and hot-vs-cold matchups) on lock-price favorites (-170 to -120), dogs (+100 to +220) and the spread (NFL/NCAAF/NBA/NCAAB)",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing moneylines and spreads 2018+ (sportsedge/formtrendstudy.py)",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all lock-price/dog sides through the same bar: 0 passed, 0 strong (luck alone gives ~0.4 passes across 64 tries)",
+  "verdict": "none proven: 0 of 64 variants cleared the bar. Best blind: NFL lock fav on a hot side +9.6% on 70 (tuning only +3.3%, under 1 SE), NBA lock fav hot-vs-cold +4.2% on 157, NHL dog cold-vs-hot +4.2% on 483 but -0.7% in tuning. Worst: NCAAF lock fav on a hot side -14.2%, NBA dog cold-vs-hot -15.0%. Recent form is already in the price. Dropped."
  }
 ]
