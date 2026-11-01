@@ -1,14 +1,14 @@
 {
- "ran_at": "2026-10-31T23:41:33.093852+00:00",
- "fights": 4351,
- "called": 3656,
- "accuracy": 0.5817833698030634,
- "log_loss": 0.6803120041048557,
+ "ran_at": "2026-11-01T00:12:43.890487+00:00",
+ "fights": 4352,
+ "called": 3657,
+ "accuracy": 0.5816242821985234,
+ "log_loss": 0.6803493280107081,
  "calibration": [
   [
-   0.5316582634906015,
-   0.5638969873663752,
-   4116
+   0.5316674485549784,
+   0.563760019431625,
+   4117
   ],
   [
    0.6214149860309529,
@@ -17,96 +17,16 @@
   ]
  ],
  "market": {
-  "bets": 22,
-  "won": 5,
+  "bets": 23,
+  "won": 6,
   "lost": 17,
-  "units": -0.8,
-  "roi": -0.036363636363636355,
-  "se": 0.39538985389158543,
+  "units": 1.2,
+  "roi": 0.05217391304347827,
+  "se": 0.3880436166561239,
   "proven": false
  },
  "lines_saved": 64,
  "upcoming": [
-  {
-   "fight_id": "401921310",
-   "card": "UFC Fight Night: Moicano vs. Nolan",
-   "date": "2026-11-01T00:00Z",
-   "weight": "Lightweight",
-   "a": "Renato Moicano",
-   "a_record": "21-7-1",
-   "b": "Tom Nolan",
-   "b_record": "11-1-0",
-   "model_a": 0.454,
-   "a_fights": 14,
-   "b_fights": 7,
-   "a_ml": -122.0,
-   "b_ml": 102.0,
-   "market_a": 0.526
-  },
-  {
-   "fight_id": "401928104",
-   "card": "UFC Fight Night: Moicano vs. Nolan",
-   "date": "2026-11-01T00:00Z",
-   "weight": "W Bantamweight",
-   "a": "Yana Santos",
-   "a_record": "17-8-0",
-   "b": "Luana Santos",
-   "b_record": "11-2-0",
-   "model_a": 0.433,
-   "a_fights": 10,
-   "b_fights": 7,
-   "a_ml": 270.0,
-   "b_ml": -340.0,
-   "market_a": 0.259
-  },
-  {
-   "fight_id": "401928107",
-   "card": "UFC Fight Night: Moicano vs. Nolan",
-   "date": "2026-11-01T00:00Z",
-   "weight": "Welterweight",
-   "a": "Jean-Paul Lebosnoyani",
-   "a_record": "11-2-0",
-   "b": "Farman Hasanov",
-   "b_record": "5-0-0",
-   "model_a": 0.56,
-   "a_fights": 3,
-   "b_fights": 1,
-   "a_ml": -278.0,
-   "b_ml": 225.0,
-   "market_a": 0.705
-  },
-  {
-   "fight_id": "401931555",
-   "card": "UFC Fight Night: Moicano vs. Nolan",
-   "date": "2026-11-01T00:00Z",
-   "weight": "Flyweight",
-   "a": "Ode' Osbourne",
-   "a_record": "13-9-0",
-   "b": "Cody Durden",
-   "b_record": "18-11-1",
-   "model_a": 0.5,
-   "a_fights": 14,
-   "b_fights": 16,
-   "a_ml": 100.0,
-   "b_ml": -120.0,
-   "market_a": 0.478
-  },
-  {
-   "fight_id": "401931616",
-   "card": "UFC Fight Night: Moicano vs. Nolan",
-   "date": "2026-11-01T00:00Z",
-   "weight": "Welterweight",
-   "a": "Randy Brown",
-   "a_record": "20-8-0",
-   "b": "Jacobe Smith",
-   "b_record": "13-0-0",
-   "model_a": 0.478,
-   "a_fights": 15,
-   "b_fights": 5,
-   "a_ml": 225.0,
-   "b_ml": -278.0,
-   "market_a": 0.295
-  },
   {
    "fight_id": "401911642",
    "card": "UFC Fight Night: Cortes Acosta vs. Walker",
@@ -164,9 +84,9 @@
    "model_a": 0.417,
    "a_fights": 13,
    "b_fights": 1,
-   "a_ml": 350.0,
-   "b_ml": -455.0,
-   "market_a": 0.213
+   "a_ml": 340.0,
+   "b_ml": -440.0,
+   "market_a": 0.218
   },
   {
    "fight_id": "401928118",
@@ -244,9 +164,9 @@
    "model_a": 0.49,
    "a_fights": 6,
    "b_fights": 13,
-   "a_ml": -185.0,
-   "b_ml": 154.0,
-   "market_a": 0.622
+   "a_ml": -175.0,
+   "b_ml": 145.0,
+   "market_a": 0.609
   },
   {
    "fight_id": "401928113",
