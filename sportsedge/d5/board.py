@@ -81,6 +81,19 @@ PROVEN_EVIDENCE = {
                          "text": "Early college football dogs, 2023-26: 200 picks, made about $6 for every $100; the odds moved our way 60% of the time.",
                          "risk": "Lost money in 2025 (-10.5%)."},
 }
+# Owner, Nov 1 ("skip bears"): a tier gets money only when its record beats luck like every other spot:
+# 100+ past picks and a profit at least 1.65 standard errors above zero. NHL Locks pass (107, +14.7%,
+# 1.9 SE); the early dogs don't (NFL 39 picks, college 200 at 0.6 SE): they post as leans.
+MONEY_MIN_BETS = 100
+MONEY_MIN_Z = 1.65
+
+
+def tier_beats_luck(ev: dict) -> bool:
+    n, roi, se = ev.get("blind_bets") or 0, ev.get("blind_roi"), ev.get("blind_se")
+    return bool(n >= MONEY_MIN_BETS and roi is not None and se and roi / se >= MONEY_MIN_Z)
+
+
+MONEY_TIERS = {k for k, ev in PROVEN_EVIDENCE.items() if tier_beats_luck(ev)}
 UNTESTED_SPOTS = {"hammered"}  # needs midweek prices we don't hold
 PROVEN_UNITS = 0.5
 
@@ -769,7 +782,7 @@ def build(scans, now: datetime, models: dict[str, SportModel], taken: set[str] |
     print(f"D503 board: {len(sides)} sides, " + ", ".join(f"{t} {s.team} {s.odds:+.0f} {u:g}u" for t, u, s, _ in chosen))
     cards = [_card(t, u, s, label, names.get(s.sport, s.sport)) for t, u, s, label in chosen]
     for c, (t, _, sd, _) in zip(cards, chosen):
-        tag = PROVEN_TIERS.get((c.sport, c.tier))
+        tag = PROVEN_TIERS.get((c.sport, c.tier)) if (c.sport, c.tier) in MONEY_TIERS else None
         if t == "early" and not set(early_spots(sd)[0]) - UNTESTED_SPOTS:
             tag = None  # only the spot we couldn't test: a lean
         if tag and c.units > 0:
