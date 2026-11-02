@@ -151,8 +151,13 @@ def _beats_luck(e) -> bool:
 
     from .proven import MIN_Z
 
-    m = re.search(r"Blind \d+ bets ([+-][\d.]+)% \(standard error ([\d.]+)%\)", (e.scorecard or {}).get("validation") or "")
-    return not m or float(m[2]) == 0 or float(m[1]) / float(m[2]) >= MIN_Z
+    proof = (e.scorecard or {}).get("validation") or ""
+    m = re.search(r"Blind \d+ bets ([+-][\d.]+)% \(standard error ([\d.]+)%\)", proof)
+    if not m:
+        from .d5.board import MONEY_TIERS, PROVEN_EVIDENCE  # a formula tier's record (the early dogs, the NHL Lock)
+
+        return not any(ev.get("text") == proof and k not in MONEY_TIERS for k, ev in PROVEN_EVIDENCE.items())
+    return float(m[2]) == 0 or float(m[1]) / float(m[2]) >= MIN_Z
 
 
 class Ledger:
@@ -380,8 +385,6 @@ class Ledger:
         for e in sorted(self.entries.values(), key=lambda e: (not e.event_id.isdigit(), e.created_at)):
             if e.status != "pending" or e.start <= now or e.tier in LIVE_TIERS or e.tier == "sharp":
                 continue  # live and sharp-value bets have their own checks (and their own CLV record)
-            if is_formula_pick(e.reasons):
-                continue  # the D503 formula: a posted pick never changes
             if _proven(e) and not _beats_luck(e):
                 # Owner, Oct 31: a spot luck alone could explain no longer gets money (proven.MIN_Z).
                 e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
@@ -389,6 +392,8 @@ class Ledger:
                              "beat luck now."] + list(e.reasons)
                 pulled.append(e)
                 continue
+            if is_formula_pick(e.reasons):
+                continue  # the D503 formula: a posted pick never changes
             if _proven(e):
                 continue  # a proven money pick passed its own test at this price (it posts once, like the above)
             if e.tier == "dog" and e.win_prob < DOG_FLOOR_WIN:

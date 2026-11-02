@@ -52,6 +52,9 @@ def test_only_spots_that_passed_are_looked_for(tmp_path):
 
 def test_only_his_nhl_lock_and_early_football_dogs_carry_units():
     assert set(PROVEN_TIERS) == {("nhl", "lock"), ("nfl", "early"), ("ncaaf", "early")}
+    from sportsedge.d5.board import MONEY_TIERS
+
+    assert MONEY_TIERS == {("nhl", "lock")}  # Owner, Nov 1: the early dogs don't beat luck yet
 
 
 def test_a_proven_over_posts_when_the_road_team_is_at_altitude(monkeypatch, tmp_path):
