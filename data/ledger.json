@@ -21735,6 +21735,7 @@
    "selection": "Chicago Bears ML",
    "headline": "Chicago Bears at +150: we think they win 40% of the time, and this price only needs 42% to pay off.",
    "reasons": [
+    "Pulled: this spot's profit could be luck. We only put money on spots that clearly beat luck now.",
     "\u2705 Proven: Early NFL dog: the odds moved our way 64% of the time (39 past picks).",
     "\ud83d\udcb8 Best price: BetMGM +150 (DraftKings only had +140). We checked 7 sportsbooks, so bet it at BetMGM.",
     "\u23f0 Early value play \u00b7 0.5u",
@@ -21794,12 +21795,12 @@
    ],
    "close_odds": 145.0,
    "close_fair": 0.38340675570371907,
-   "status": "pending",
+   "status": "void",
    "live": null,
    "final": null,
    "result_value": null,
-   "profit": null,
-   "graded_at": null,
+   "profit": 0.0,
+   "graded_at": "2026-11-02T06:11:47.373791+00:00",
    "grade": "B",
    "scorecard": {
     "grade": "B",
@@ -22798,206 +22799,6 @@
   }
  ],
  "forecasts": [
-  {
-   "id": "tennis_atp:adrian mannarino|aleksandar vukic|2026-10-19",
-   "sport": "tennis_atp",
-   "sport_name": "Tennis \u00b7 ATP",
-   "event_id": "atp:184992",
-   "commence_time": "2026-10-19T06:00:00+00:00",
-   "home": "Aleksandar Vukic",
-   "away": "Adrian Mannarino",
-   "home_score": 1.0,
-   "away_score": 2.0,
-   "p_home": 0.3998,
-   "p_away": 0.6002,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.3998,
-   "market_home": 0.3428,
-   "facts": [],
-   "updated_at": "2026-10-19T05:43:24.817789+00:00",
-   "status": "final",
-   "final_home": 1,
-   "final_away": 2,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-10-19T11:44:47.429273+00:00"
-  },
-  {
-   "id": "tennis_atp:fabian marozsan|timofey skatov|2026-10-19",
-   "sport": "tennis_atp",
-   "sport_name": "Tennis \u00b7 ATP",
-   "event_id": "atp:185013",
-   "commence_time": "2026-10-19T06:00:00+00:00",
-   "home": "Timofey Skatov",
-   "away": "Fabian Marozsan",
-   "home_score": 1.0,
-   "away_score": 2.0,
-   "p_home": 0.3646,
-   "p_away": 0.6354,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.3646,
-   "market_home": 0.1956,
-   "facts": [],
-   "updated_at": "2026-10-19T05:43:24.817789+00:00",
-   "status": "final",
-   "final_home": 0,
-   "final_away": 2,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-10-20T13:52:22.251301+00:00"
-  },
-  {
-   "id": "tennis_atp:mattia bellucci|tomas martin etcheverry|2026-10-19",
-   "sport": "tennis_atp",
-   "sport_name": "Tennis \u00b7 ATP",
-   "event_id": "atp:185009",
-   "commence_time": "2026-10-19T06:00:00+00:00",
-   "home": "Tomas Martin Etcheverry",
-   "away": "Mattia Bellucci",
-   "home_score": 2.0,
-   "away_score": 1.0,
-   "p_home": 0.571,
-   "p_away": 0.429,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.571,
-   "market_home": 0.5,
-   "facts": [],
-   "updated_at": "2026-10-19T05:43:24.817789+00:00",
-   "status": "final",
-   "final_home": 1,
-   "final_away": 2,
-   "live": null,
-   "correct": false,
-   "graded_at": "2026-10-21T10:45:45.747214+00:00"
-  },
-  {
-   "id": "tennis_atp:miomir kecmanovic|james duckworth|2026-10-19",
-   "sport": "tennis_atp",
-   "sport_name": "Tennis \u00b7 ATP",
-   "event_id": "atp:185010",
-   "commence_time": "2026-10-19T06:00:00+00:00",
-   "home": "James Duckworth",
-   "away": "Miomir Kecmanovic",
-   "home_score": 1.0,
-   "away_score": 2.0,
-   "p_home": 0.4804,
-   "p_away": 0.5196,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.4804,
-   "market_home": 0.3991,
-   "facts": [],
-   "updated_at": "2026-10-19T05:43:24.817789+00:00",
-   "status": "final",
-   "final_home": 2,
-   "final_away": 0,
-   "live": null,
-   "correct": false,
-   "graded_at": "2026-10-19T08:51:32.220639+00:00"
-  },
-  {
-   "id": "tennis_atp:stefanos tsitsipas|aleksandar kovacevic|2026-10-19",
-   "sport": "tennis_atp",
-   "sport_name": "Tennis \u00b7 ATP",
-   "event_id": "atp:184997",
-   "commence_time": "2026-10-19T06:00:00+00:00",
-   "home": "Aleksandar Kovacevic",
-   "away": "Stefanos Tsitsipas",
-   "home_score": 0.0,
-   "away_score": 2.0,
-   "p_home": 0.2137,
-   "p_away": 0.7863,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.2137,
-   "market_home": 0.2385,
-   "facts": [],
-   "updated_at": "2026-10-19T05:43:24.817789+00:00",
-   "status": "final",
-   "final_home": 1,
-   "final_away": 2,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-10-20T11:44:01.784839+00:00"
-  },
-  {
-   "id": "tennis_atp:terence atmane|rinky hijikata|2026-10-19",
-   "sport": "tennis_atp",
-   "sport_name": "Tennis \u00b7 ATP",
-   "event_id": "atp:185007",
-   "commence_time": "2026-10-19T06:00:00+00:00",
-   "home": "Rinky Hijikata",
-   "away": "Terence Atmane",
-   "home_score": 2.0,
-   "away_score": 1.0,
-   "p_home": 0.5122,
-   "p_away": 0.4878,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.5122,
-   "market_home": 0.5,
-   "facts": [],
-   "updated_at": "2026-10-19T05:43:24.817789+00:00",
-   "status": "final",
-   "final_home": 0,
-   "final_away": 2,
-   "live": null,
-   "correct": false,
-   "graded_at": "2026-10-20T09:43:48.162134+00:00"
-  },
-  {
-   "id": "tennis_atp:thiago agustin tirante|facundo diaz acosta|2026-10-19",
-   "sport": "tennis_atp",
-   "sport_name": "Tennis \u00b7 ATP",
-   "event_id": "atp:185003",
-   "commence_time": "2026-10-19T06:00:00+00:00",
-   "home": "Facundo Diaz Acosta",
-   "away": "Thiago Agustin Tirante",
-   "home_score": 0.0,
-   "away_score": 2.0,
-   "p_home": 0.2869,
-   "p_away": 0.7131,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.2869,
-   "market_home": 0.2385,
-   "facts": [],
-   "updated_at": "2026-10-19T05:43:24.817789+00:00",
-   "status": "final",
-   "final_home": 2,
-   "final_away": 1,
-   "live": null,
-   "correct": false,
-   "graded_at": "2026-10-19T09:48:49.377616+00:00"
-  },
-  {
-   "id": "tennis_atp:zangar nurlanuly|tomas machac|2026-10-19",
-   "sport": "tennis_atp",
-   "sport_name": "Tennis \u00b7 ATP",
-   "event_id": "atp:184999",
-   "commence_time": "2026-10-19T06:00:00+00:00",
-   "home": "Tomas Machac",
-   "away": "Zangar Nurlanuly",
-   "home_score": 2.0,
-   "away_score": 0.0,
-   "p_home": 0.9595,
-   "p_away": 0.0405,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.9595,
-   "market_home": 0.9595,
-   "facts": [],
-   "updated_at": "2026-10-19T05:43:24.817789+00:00",
-   "status": "final",
-   "final_home": 2,
-   "final_away": 0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-10-21T10:45:45.747214+00:00"
-  },
   {
    "id": "tennis_atp:lorenzo sonego|moise kouame|2026-10-19",
    "sport": "tennis_atp",
@@ -42632,7 +42433,7 @@
     "Best number: -345 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -42648,8 +42449,8 @@
    "commence_time": "2026-11-02T11:00:00+00:00",
    "home": "App State Mountaineers",
    "away": "Merrimack Warriors",
-   "home_score": 66.0,
-   "away_score": 69.5,
+   "home_score": 65.6,
+   "away_score": 69.1,
    "p_home": 0.3895,
    "p_away": 0.6105,
    "p_draw": 0.0,
@@ -42657,7 +42458,7 @@
    "model_home": 0.4722,
    "market_home": 0.3895,
    "facts": [
-    "Vegas: Merrimack Warriors -3.5 \u00b7 O/U 134.5 (our ratings have App State Mountaineers 2.7 better than the spread; our ratings have 7.2 more points than the total).",
+    "Vegas: Merrimack Warriors -3.5 \u00b7 O/U 133.5 (our ratings have App State Mountaineers 2.7 better than the spread; our ratings have 8.2 more points than the total).",
     "Market win chance: Merrimack Warriors 61% \u00b7 App State Mountaineers 39%.",
     "Our ratings alone: Merrimack Warriors 71.2 @ App State Mountaineers 70.4, App State Mountaineers 47% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,041 blind-tested games (2022-2025): this method picked 72.6% of winners (Vegas alone 72.6%, our ratings alone 68.4%) and missed the total by 12.98 points on average (ratings alone 13.65).",
@@ -42669,7 +42470,7 @@
     "Best number: -170 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -42706,7 +42507,7 @@
     "Best number: -112 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -42728,7 +42529,7 @@
    "p_away": 0.8439,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.5779,
+   "model_home": 0.5778,
    "market_home": 0.1561,
    "facts": [
     "Vegas: Murray State Racers -10.5 \u00b7 O/U 165.5 (our ratings have Tennessee State Tigers 12.7 better than the spread; our ratings have 16.1 fewer points than the total).",
@@ -42743,7 +42544,7 @@
     "Best number: -600 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -42781,7 +42582,7 @@
     "Upset chance: Fiorentina wins outright 33% of the time on our numbers.",
     "Upset case: better defense (2.3 allowed vs 2.4)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -42818,7 +42619,7 @@
     "Best number: -155 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -42856,7 +42657,7 @@
     "Upset risk: 25% chance Brest wins outright.",
     "Track record: teams we gave a 44% chance to win outright won 57% of the time (23 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -42894,7 +42695,7 @@
     "Upset risk: 19% chance Parma wins outright.",
     "Track record: teams we gave a 35% chance to win outright won 36% of the time (22 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -42912,15 +42713,15 @@
    "away": "Everton",
    "home_score": 1.5,
    "away_score": 1.0,
-   "p_home": 0.4201,
-   "p_away": 0.3124,
-   "p_draw": 0.2675,
+   "p_home": 0.439,
+   "p_away": 0.2975,
+   "p_draw": 0.2635,
    "winner": "home",
    "model_home": 0.4256,
-   "market_home": 0.4199,
+   "market_home": 0.4395,
    "facts": [
     "Vegas: Newcastle United -0.5 \u00b7 O/U 2.5 (our ratings agree).",
-    "Market win chance: Everton 31% \u00b7 Newcastle United 42% \u00b7 draw 27%.",
+    "Market win chance: Everton 30% \u00b7 Newcastle United 44% \u00b7 draw 26%.",
     "Our ratings alone: Everton 1.2 @ Newcastle United 1.5, Newcastle United 43% to win. The prediction gives them 11% of the say on the total and 4% on the winner, the weight they earned in testing.",
     "No history test for this league yet: it uses the average weights of the tested sports.",
     "Everton (2-2-4) @ Newcastle United (3-3-2).",
@@ -42932,7 +42733,7 @@
     "Upset risk: 30% chance Everton wins outright.",
     "Track record: teams we gave a 45% chance to win outright won 33% of the time (24 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -42970,7 +42771,7 @@
     "Upset risk: 21% chance Osasuna wins outright.",
     "Track record: teams we gave a 54% chance to win outright won 44% of the time (16 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -42992,7 +42793,7 @@
    "p_away": 0.2233,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.6153,
+   "model_home": 0.6152,
    "market_home": 0.7767,
    "facts": [
     "Vegas: San Jos\u00e9 State Spartans -8.5 \u00b7 O/U 153.5 (our ratings have UTSA Roadrunners 5.3 better than the spread; our ratings have 3.2 fewer points than the total).",
@@ -43008,7 +42809,7 @@
     "Best number: -380 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43030,7 +42831,7 @@
    "p_away": 0.0474,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.5014,
+   "model_home": 0.5015,
    "market_home": 0.9526,
    "facts": [
     "Vegas: George Mason Patriots -17.5 \u00b7 O/U 146.5 (our ratings have UMBC Retrievers 17.5 better than the spread).",
@@ -43046,7 +42847,7 @@
     "Best number: -2400 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43083,7 +42884,7 @@
     "Best number: -180 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43120,7 +42921,7 @@
     "Best number: -205 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43158,7 +42959,7 @@
     "Best number: -185 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43196,7 +42997,7 @@
     "Best number: -185 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43234,7 +43035,7 @@
     "Best number: -9000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43252,16 +43053,16 @@
    "away": "Army Black Knights",
    "home_score": 77.3,
    "away_score": 69.7,
-   "p_home": 0.7561,
-   "p_away": 0.2439,
+   "p_home": 0.756,
+   "p_away": 0.244,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.7561,
+   "model_home": 0.756,
    "market_home": null,
    "facts": [
     "Vegas: Duke Blue Devils -43.5 \u00b7 O/U 152.5 (our ratings have Army Black Knights 35.9 better than the spread; our ratings have 5.5 fewer points than the total)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43299,7 +43100,7 @@
     "Best number: -50000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43337,7 +43138,7 @@
     "Best number: -9000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43375,7 +43176,7 @@
     "Best number: -2100 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43413,7 +43214,7 @@
     "Upset risk: 48% chance Oklahoma City Thunder wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 60% of the time (25 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43451,7 +43252,7 @@
     "Best number: -6500 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43489,7 +43290,7 @@
     "Best number: -50000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43511,7 +43312,7 @@
    "p_away": 0.0069,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.546,
+   "model_home": 0.5461,
    "market_home": 0.9931,
    "facts": [
     "Vegas: Xavier Musketeers -26.5 \u00b7 O/U 156.5 (our ratings have Mount St. Mary's Mountaineers 25.2 better than the spread; our ratings have 6.7 fewer points than the total).",
@@ -43527,7 +43328,7 @@
     "Best number: -20000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43565,7 +43366,7 @@
     "Best number: -100000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43581,8 +43382,8 @@
    "commence_time": "2026-11-03T00:00:00+00:00",
    "home": "Syracuse Orange",
    "away": "New Haven Chargers",
-   "home_score": 82.8,
-   "away_score": 56.3,
+   "home_score": 83.7,
+   "away_score": 56.2,
    "p_home": 0.9969,
    "p_away": 0.0031,
    "p_draw": 0.0,
@@ -43590,7 +43391,7 @@
    "model_home": 0.5601,
    "market_home": 0.9969,
    "facts": [
-    "Vegas: Syracuse Orange -26.5 \u00b7 O/U 137.5 (our ratings have New Haven Chargers 24.8 better than the spread; our ratings have 10.0 more points than the total).",
+    "Vegas: Syracuse Orange -27.5 \u00b7 O/U 138.5 (our ratings have New Haven Chargers 25.8 better than the spread; our ratings have 9.0 more points than the total).",
     "Market win chance: New Haven Chargers 0% \u00b7 Syracuse Orange 100%.",
     "Our ratings alone: New Haven Chargers 72.9 @ Syracuse Orange 74.6, Syracuse Orange 56% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,041 blind-tested games (2022-2025): this method picked 72.6% of winners (Vegas alone 72.6%, our ratings alone 68.4%) and missed the total by 12.98 points on average (ratings alone 13.65).",
@@ -43603,7 +43404,7 @@
     "Best number: -50000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43640,7 +43441,7 @@
     "Best number: -1650 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43656,17 +43457,17 @@
    "commence_time": "2026-11-03T00:00:00+00:00",
    "home": "Marshall Thundering Herd",
    "away": "Buffalo Bulls",
-   "home_score": 79.1,
-   "away_score": 77.6,
-   "p_home": 0.5278,
-   "p_away": 0.4722,
+   "home_score": 79.6,
+   "away_score": 77.1,
+   "p_home": 0.5547,
+   "p_away": 0.4453,
    "p_draw": 0.0,
    "winner": "home",
    "model_home": 0.6251,
-   "market_home": 0.5278,
+   "market_home": 0.5547,
    "facts": [
-    "Vegas: Marshall Thundering Herd -1.5 \u00b7 O/U 157.5 (our ratings have Marshall Thundering Herd 2.0 better than the spread; our ratings have 5.1 fewer points than the total).",
-    "Market win chance: Buffalo Bulls 47% \u00b7 Marshall Thundering Herd 53%.",
+    "Vegas: Marshall Thundering Herd -2.5 \u00b7 O/U 157.5 (our ratings have 5.1 fewer points than the total).",
+    "Market win chance: Buffalo Bulls 45% \u00b7 Marshall Thundering Herd 55%.",
     "Our ratings alone: Buffalo Bulls 74.4 @ Marshall Thundering Herd 77.9, Marshall Thundering Herd 63% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,041 blind-tested games (2022-2025): this method picked 72.6% of winners (Vegas alone 72.6%, our ratings alone 68.4%) and missed the total by 12.98 points on average (ratings alone 13.65).",
     "Buffalo Bulls (4-13) @ Marshall Thundering Herd (9-8).",
@@ -43675,10 +43476,10 @@
     "Last 5: Buffalo Bulls 1-4 (avg margin -7.6); Marshall Thundering Herd 2-3 (avg margin -3.0).",
     "Splits: Marshall Thundering Herd 5-4 at home; Buffalo Bulls 3-6 on the road.",
     "Upset risk: 37% chance Buffalo Bulls wins outright.",
-    "Best number: -122 at DraftKings (checked 1 books).",
+    "Best number: -135 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43716,7 +43517,7 @@
     "Best number: -125 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43754,7 +43555,7 @@
     "Best number: -115 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43792,7 +43593,7 @@
     "Best number: -162 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43830,7 +43631,7 @@
     "Best number: -110 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43868,7 +43669,7 @@
     "Best number: -125 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43890,7 +43691,7 @@
    "p_away": 0.0162,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.633,
+   "model_home": 0.6329,
    "market_home": 0.9838,
    "facts": [
     "Vegas: Dayton Flyers -22.5 \u00b7 O/U 145.5 (our ratings have NJIT Highlanders 18.8 better than the spread).",
@@ -43906,7 +43707,7 @@
     "Best number: -8000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43944,7 +43745,7 @@
     "Best number: -800 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -43982,7 +43783,7 @@
     "Best number: -625 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44020,7 +43821,7 @@
     "Best number: -470 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44042,7 +43843,7 @@
    "p_away": 0.1462,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.758,
+   "model_home": 0.7579,
    "market_home": 0.8538,
    "facts": [
     "Vegas: Wright State Raiders -10.5 \u00b7 O/U 160.5 (our ratings have Air Force Falcons 2.8 better than the spread; our ratings have 10.3 fewer points than the total).",
@@ -44058,7 +43859,7 @@
     "Best number: -650 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44096,7 +43897,7 @@
     "Best number: -2400 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44112,8 +43913,8 @@
    "commence_time": "2026-11-03T00:00:00+00:00",
    "home": "Cincinnati Bearcats",
    "away": "American University Eagles",
-   "home_score": 87.1,
-   "away_score": 63.6,
+   "home_score": 87.6,
+   "away_score": 63.1,
    "p_home": 0.9857,
    "p_away": 0.0143,
    "p_draw": 0.0,
@@ -44121,7 +43922,7 @@
    "model_home": 0.6094,
    "market_home": 0.9857,
    "facts": [
-    "Vegas: Cincinnati Bearcats -23.5 \u00b7 O/U 151.5 (our ratings have American University Eagles 20.5 better than the spread; our ratings have 5.2 fewer points than the total).",
+    "Vegas: Cincinnati Bearcats -24.5 \u00b7 O/U 151.5 (our ratings have American University Eagles 21.5 better than the spread; our ratings have 5.2 fewer points than the total).",
     "Market win chance: American University Eagles 1% \u00b7 Cincinnati Bearcats 99%.",
     "Our ratings alone: American University Eagles 71.6 @ Cincinnati Bearcats 74.7, Cincinnati Bearcats 61% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,041 blind-tested games (2022-2025): this method picked 72.6% of winners (Vegas alone 72.6%, our ratings alone 68.4%) and missed the total by 12.98 points on average (ratings alone 13.65).",
@@ -44134,7 +43935,7 @@
     "Best number: -9000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44172,7 +43973,7 @@
     "Best number: -8000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44199,7 +44000,7 @@
    "facts": [
     "Vegas: Indiana Hoosiers -34.5 \u00b7 O/U 142.5 (our ratings have Eastern Illinois Panthers 32.3 better than the spread; our ratings have 4.5 more points than the total)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44226,7 +44027,7 @@
    "facts": [
     "Vegas: Maryland Terrapins -31.5 \u00b7 O/U 147.5 (our ratings have Bucknell Bison 29.5 better than the spread)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44264,7 +44065,7 @@
     "Best number: -20000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44302,7 +44103,7 @@
     "Best number: -900 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44340,7 +44141,7 @@
     "Best number: -575 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44378,7 +44179,7 @@
     "Best number: -3200 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44416,7 +44217,7 @@
     "Best number: -278 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44454,7 +44255,7 @@
     "Best number: -115 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44492,7 +44293,7 @@
     "Best number: -115 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44530,7 +44331,7 @@
     "Best number: -162 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44557,7 +44358,7 @@
    "facts": [
     "Vegas: Texas Tech Red Raiders -34.5 \u00b7 O/U 155.5 (our ratings have Jackson State Tigers 30.5 better than the spread; our ratings have 5.5 fewer points than the total)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44584,7 +44385,7 @@
    "facts": [
     "Vegas: Vanderbilt Commodores -32.5 \u00b7 O/U 158.5 (our ratings have Bellarmine Knights 28.8 better than the spread; our ratings have 5.3 fewer points than the total)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44622,7 +44423,7 @@
     "Best number: -175 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44660,7 +44461,7 @@
     "Best number: -6500 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44698,7 +44499,7 @@
     "Best number: -100000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44736,7 +44537,7 @@
     "Upset risk: 45% chance Howard Bison wins outright.",
     "Best number: -265 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44774,7 +44575,7 @@
     "Best number: -100000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44812,7 +44613,7 @@
     "Best number: -192 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44834,7 +44635,7 @@
    "p_away": 0.5046,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.5771,
+   "model_home": 0.577,
    "market_home": 0.4954,
    "facts": [
     "Vegas: Vegas Golden Knights -1.5 \u00b7 O/U 6.5 (our ratings have Boston Bruins 2.0 better than the spread).",
@@ -44850,7 +44651,7 @@
     "Power rank: Vegas Golden Knights #7 vs Boston Bruins #4 (of 32).",
     "Upset chance: Vegas Golden Knights wins outright 42% of the time on our numbers."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44888,7 +44689,7 @@
     "Power rank: Detroit Red Wings #25 vs Florida Panthers #16 (of 32).",
     "Upset risk: 48% chance Detroit Red Wings wins outright."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44926,7 +44727,7 @@
     "Power rank: Detroit Pistons #4 vs Charlotte Hornets #22 (of 30).",
     "Upset risk: 35% chance Charlotte Hornets wins outright."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -44964,7 +44765,7 @@
     "Power rank: Atlanta Hawks #14 vs Indiana Pacers #25 (of 30).",
     "Upset risk: 32% chance Indiana Pacers wins outright."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45002,7 +44803,7 @@
     "Power rank: Brooklyn Nets #27 vs New York Knicks #6 (of 30).",
     "Upset risk: 15% chance Brooklyn Nets wins outright."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45040,7 +44841,7 @@
     "Power rank: Washington Wizards #23 vs Orlando Magic #20 (of 30).",
     "Upset risk: 49% chance Washington Wizards wins outright."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45078,7 +44879,7 @@
     "Upset risk: 24% chance Chicago Bulls wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 62% of the time (16 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45105,7 +44906,7 @@
    "facts": [
     "Vegas: Georgia Bulldogs -37.5 \u00b7 O/U 160.5 (our ratings have North Carolina Central Eagles 34.9 better than the spread; our ratings have 9.1 fewer points than the total)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45143,7 +44944,7 @@
     "Best number: -2800 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45170,7 +44971,7 @@
    "facts": [
     "Vegas: Marquette Golden Eagles -30.5 \u00b7 O/U 147.5 (our ratings have Mercyhurst Lakers 28.2 better than the spread)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45208,7 +45009,7 @@
     "Best number: -155 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45246,7 +45047,7 @@
     "Best number: -250 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45284,7 +45085,7 @@
     "Best number: -1650 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45322,7 +45123,7 @@
     "Best number: -8000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45360,7 +45161,7 @@
     "Best number: -8000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45387,7 +45188,7 @@
    "facts": [
     "Vegas: Nebraska Cornhuskers -33.5 \u00b7 O/U 152.5 (our ratings have Le Moyne Dolphins 29.6 better than the spread; our ratings have 6.1 fewer points than the total)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45425,7 +45226,7 @@
     "Best number: -118 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45463,7 +45264,7 @@
     "Best number: -2400 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45501,7 +45302,7 @@
     "Best number: -5000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45539,7 +45340,7 @@
     "Best number: -8000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45577,7 +45378,7 @@
     "Best number: -2800 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45614,7 +45415,7 @@
     "Best number: -238 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45652,7 +45453,7 @@
     "Upset risk: 21% chance Sacramento Kings wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 62% of the time (16 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45690,7 +45491,7 @@
     "Upset risk: 37% chance New Orleans Pelicans wins outright.",
     "Track record: teams we gave a 65% chance to win outright won 55% of the time (22 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45728,7 +45529,7 @@
     "Upset risk: 14% chance Milwaukee Bucks wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 62% of the time (16 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45766,7 +45567,7 @@
     "Best number: -100000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45804,7 +45605,7 @@
     "Best number: -20000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45842,7 +45643,7 @@
     "Best number: -9000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45869,7 +45670,7 @@
    "facts": [
     "Vegas: Wake Forest Demon Deacons -31.5 \u00b7 O/U 144.5 (our ratings have Maryland Eastern Shore Hawks 28.7 better than the spread; our ratings have 3.8 more points than the total)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45907,7 +45708,7 @@
     "Best number: -8000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45929,7 +45730,7 @@
    "p_away": 0.6925,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.4951,
+   "model_home": 0.4952,
    "market_home": 0.3075,
    "facts": [
     "Vegas: Akron Zips -5.5 \u00b7 O/U 148.5 (our ratings have Louisiana Ragin' Cajuns 5.4 better than the spread).",
@@ -45945,7 +45746,7 @@
     "Best number: -245 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -45983,7 +45784,7 @@
     "Best number: -175 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46005,7 +45806,7 @@
    "p_away": 0.4768,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.6238,
+   "model_home": 0.6237,
    "market_home": 0.5232,
    "facts": [
     "Vegas: South Alabama Jaguars -1.5 \u00b7 O/U 153.5 (our ratings have South Alabama Jaguars 2.0 better than the spread; our ratings have 2.8 fewer points than the total).",
@@ -46021,7 +45822,7 @@
     "Best number: -120 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46059,7 +45860,7 @@
     "Best number: -1650 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46097,7 +45898,7 @@
     "Best number: -9000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46114,7 +45915,7 @@
    "home": "Illinois Fighting Illini",
    "away": "Fairleigh Dickinson Knights",
    "home_score": 76.3,
-   "away_score": 70.4,
+   "away_score": 70.5,
    "p_home": 0.7039,
    "p_away": 0.2961,
    "p_draw": 0.0,
@@ -46124,7 +45925,7 @@
    "facts": [
     "Vegas: Illinois Fighting Illini -37.5 \u00b7 O/U 152.5 (our ratings have Fairleigh Dickinson Knights 31.6 better than the spread; our ratings have 5.7 fewer points than the total)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46146,7 +45947,7 @@
    "p_away": 0.0126,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.5797,
+   "model_home": 0.5798,
    "market_home": 0.9874,
    "facts": [
     "Vegas: SMU Mustangs -25.5 \u00b7 O/U 157.5 (our ratings have Southern Jaguars 23.3 better than the spread; our ratings have 6.2 fewer points than the total).",
@@ -46162,7 +45963,7 @@
     "Best number: -10000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46200,7 +46001,7 @@
     "Best number: -310 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46238,7 +46039,7 @@
     "Best number: -20000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46276,7 +46077,7 @@
     "Best number: -8000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46313,7 +46114,7 @@
     "Best number: -198 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46335,7 +46136,7 @@
    "p_away": 0.5674,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.5203,
+   "model_home": 0.5204,
    "market_home": 0.4326,
    "facts": [
     "Vegas: Siena Saints -2.5 \u00b7 O/U 150.5 (our ratings have Bryant Bulldogs 3.1 better than the spread; our ratings have 4.7 fewer points than the total).",
@@ -46351,7 +46152,7 @@
     "Best number: -142 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46389,7 +46190,7 @@
     "Best number: -440 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46427,7 +46228,7 @@
     "Best number: -3600 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46465,7 +46266,7 @@
     "Power rank: Colorado Avalanche #2 vs Chicago Blackhawks #31 (of 32).",
     "Upset risk: 31% chance Chicago Blackhawks wins outright."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46503,7 +46304,7 @@
     "Splits: Seattle Seahawks 3-1 at home; Chicago Bears 2-1 on the road.",
     "Power rank: Chicago Bears #9 vs Seattle Seahawks #2 (of 32)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46541,7 +46342,7 @@
     "Power rank: Boston Celtics #5 vs Houston Rockets #1 (of 30).",
     "Upset risk: 31% chance Boston Celtics wins outright."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46563,10 +46364,10 @@
    "p_away": 0.0837,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.8298,
+   "model_home": 0.8297,
    "market_home": 0.9208,
    "facts": [
-    "Vegas: San Antonio Spurs -16.5 \u00b7 O/U 230.5 (our ratings have Utah Jazz 3.4 better than the spread; our ratings have 2.8 fewer points than the total).",
+    "Vegas: San Antonio Spurs -16.5 \u00b7 O/U 230.5 (our ratings have Utah Jazz 3.5 better than the spread; our ratings have 2.8 fewer points than the total).",
     "Market win chance: Utah Jazz 8% \u00b7 San Antonio Spurs 92%.",
     "Our ratings alone: Utah Jazz 107.3 @ San Antonio Spurs 120.4, San Antonio Spurs 83% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
     "Backed by 5,377 blind-tested games (2022-2026): this method picked 68.0% of winners (Vegas alone 68.1%, our ratings alone 65.5%) and missed the total by 14.2 points on average (ratings alone 15.03).",
@@ -46579,7 +46380,7 @@
     "Upset risk: 17% chance Utah Jazz wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 62% of the time (16 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46616,7 +46417,7 @@
     "Best number: -9000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46654,7 +46455,7 @@
     "Best number: -425 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46692,7 +46493,7 @@
     "Best number: -100000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46730,7 +46531,7 @@
     "Upset chance: Denver Nuggets wins outright 49% of the time on our numbers.",
     "Track record: teams we gave a 55% chance to win outright won 60% of the time (25 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46757,7 +46558,7 @@
    "facts": [
     "Vegas: Texas Longhorns -39.5 \u00b7 O/U 149.5 (our ratings have Chicago State Cougars 36.0 better than the spread; our ratings have 1.1 fewer points than the total)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46795,7 +46596,7 @@
     "Best number: -3200 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46833,7 +46634,7 @@
     "Best number: -20000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46860,7 +46661,7 @@
    "facts": [
     "Vegas: UConn Huskies -38.5 \u00b7 O/U 147.5 (our ratings have Gardner-Webb Runnin' Bulldogs 31.3 better than the spread)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46898,7 +46699,7 @@
     "Best number: -9000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46935,7 +46736,7 @@
     "Best number: -162 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46973,7 +46774,7 @@
     "Best number: -100000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -46995,7 +46796,7 @@
    "p_away": 0.0069,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.584,
+   "model_home": 0.5841,
    "market_home": 0.9931,
    "facts": [
     "Vegas: Oklahoma State Cowboys -27.5 \u00b7 O/U 159.5 (our ratings have Incarnate Word Cardinals 25.2 better than the spread; our ratings have 7.6 fewer points than the total).",
@@ -47011,7 +46812,7 @@
     "Best number: -20000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47049,7 +46850,7 @@
     "Best number: -4500 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47071,7 +46872,7 @@
    "p_away": 0.0271,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.6718,
+   "model_home": 0.6717,
    "market_home": 0.9729,
    "facts": [
     "Vegas: New Mexico Lobos -21.5 \u00b7 O/U 156.5 (our ratings have Utah Tech Trailblazers 16.6 better than the spread; our ratings have 4.9 fewer points than the total).",
@@ -47087,7 +46888,7 @@
     "Best number: -4500 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47125,7 +46926,7 @@
     "Best number: -148 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47143,16 +46944,16 @@
    "away": "La Salle Explorers",
    "home_score": 76.6,
    "away_score": 69.7,
-   "p_home": 0.7339,
-   "p_away": 0.2661,
+   "p_home": 0.7338,
+   "p_away": 0.2662,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.7339,
+   "model_home": 0.7338,
    "market_home": null,
    "facts": [
     "Vegas: Houston Cougars -29.5 \u00b7 O/U 137.5 (our ratings have La Salle Explorers 22.7 better than the spread; our ratings have 8.8 more points than the total)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47190,7 +46991,7 @@
     "Power rank: Calgary Flames #29 vs San Jose Sharks #28 (of 32).",
     "Upset risk: 49% chance Calgary Flames wins outright."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47228,7 +47029,7 @@
     "Best number: -100000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47266,7 +47067,7 @@
     "Best number: -10000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47304,7 +47105,7 @@
     "Best number: -2400 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47342,7 +47143,7 @@
     "Head to head this season: Golden State Warriors 0-1 (last: Golden State Warriors 122 - Phoenix Suns 131, 10/25).",
     "Power rank: Phoenix Suns #24 vs Golden State Warriors #13 (of 30)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47380,7 +47181,7 @@
     "Upset risk: 41% chance LA Clippers wins outright.",
     "Track record: teams we gave a 45% chance to win outright won 40% of the time (25 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47418,7 +47219,7 @@
     "Power rank: Miami Heat #19 vs Los Angeles Lakers #10 (of 30).",
     "Upset risk: 43% chance Miami Heat wins outright."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47455,7 +47256,7 @@
     "Best number: -198 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47493,7 +47294,7 @@
     "Best number: -1050 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47531,7 +47332,7 @@
     "Best number: -455 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47553,7 +47354,7 @@
    "p_away": 0.2633,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.6485,
+   "model_home": 0.6484,
    "market_home": 0.7367,
    "facts": [
     "Vegas: Saint Mary's Gaels -6.5 \u00b7 O/U 147.5 (our ratings have Illinois State Redbirds 2.3 better than the spread; our ratings have 1.6 fewer points than the total).",
@@ -47569,7 +47370,7 @@
     "Best number: -305 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47591,7 +47392,7 @@
    "p_away": 0.0682,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.6173,
+   "model_home": 0.6172,
    "market_home": 0.9318,
    "facts": [
     "Vegas: Santa Clara Broncos -14.5 \u00b7 O/U 148.5 (our ratings have Towson Tigers 11.2 better than the spread).",
@@ -47607,7 +47408,7 @@
     "Best number: -1600 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47645,7 +47446,7 @@
     "Best number: -1350 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47683,7 +47484,7 @@
     "Best number: -1600 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47721,7 +47522,7 @@
     "Best number: -485 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47743,7 +47544,7 @@
    "p_away": 0.0414,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.5261,
+   "model_home": 0.5262,
    "market_home": 0.9586,
    "facts": [
     "Vegas: Arizona State Sun Devils -17.5 \u00b7 O/U 145.5 (our ratings have East Tennessee State Buccaneers 16.8 better than the spread; our ratings have 3.7 more points than the total).",
@@ -47759,7 +47560,7 @@
     "Best number: -2800 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47797,7 +47598,7 @@
     "Best number: -3600 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47835,7 +47636,7 @@
     "Best number: -700 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47873,7 +47674,7 @@
     "Best number: -20000 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47911,7 +47712,7 @@
     "Best number: -125 at DraftKings (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47949,7 +47750,7 @@
     "Track record: teams we gave a 54% chance to win outright won 47% of the time (19 recent games tested).",
     "Best number: +100 at bet365 (checked 2 books)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -47987,7 +47788,7 @@
     "Best number: +120 at bet365 (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48025,7 +47826,7 @@
     "Best number: -125 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48063,7 +47864,7 @@
     "Best number: +130 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48081,15 +47882,15 @@
    "away": "Paris Saint-Germain",
    "home_score": 1.5,
    "away_score": 2.1,
-   "p_home": 0.1996,
-   "p_away": 0.5989,
-   "p_draw": 0.2015,
+   "p_home": 0.1959,
+   "p_away": 0.6065,
+   "p_draw": 0.1976,
    "winner": "away",
    "model_home": 0.2552,
-   "market_home": 0.1973,
+   "market_home": 0.1934,
    "facts": [
     "Vegas: Paris Saint-Germain -0.5 \u00b7 O/U 3.5 (our ratings agree).",
-    "Market win chance: Paris Saint-Germain 60% \u00b7 Villarreal 20% \u00b7 draw 20%.",
+    "Market win chance: Paris Saint-Germain 61% \u00b7 Villarreal 19% \u00b7 draw 20%.",
     "Our ratings alone: Paris Saint-Germain 2.6 @ Villarreal 1.8, Villarreal 26% to win. The prediction gives them 11% of the say on the total and 4% on the winner, the weight they earned in testing.",
     "No history test for this league yet: it uses the average weights of the tested sports.",
     "Paris Saint-Germain (3-0) @ Villarreal (1-2).",
@@ -48099,9 +47900,9 @@
     "Power rank: Paris Saint-Germain #1 vs Villarreal #19 (of 21).",
     "Upset risk: 26% chance Villarreal wins outright.",
     "Track record: teams we gave a 54% chance to win outright won 47% of the time (19 recent games tested).",
-    "Best number: -160 at DraftKings (checked 2 books)."
+    "Best number: -165 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48139,7 +47940,7 @@
     "Best number: -120 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48177,7 +47978,7 @@
     "Best number: -225 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48215,7 +48016,7 @@
     "Upset case: higher power rank (#3 vs #7).",
     "Track record: teams we gave a 54% chance to win outright won 47% of the time (19 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48253,7 +48054,7 @@
     "Best number: -390 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48275,7 +48076,7 @@
    "p_away": 0.8031,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.4253,
+   "model_home": 0.4254,
    "market_home": 0.1849,
    "facts": [
     "Vegas: Ohio Bobcats -12.5 \u00b7 O/U 50.5 (our ratings have Akron Zips 8.6 better than the spread; our ratings have 2.4 more points than the total).",
@@ -48291,7 +48092,7 @@
     "Upset risk: 43% chance Akron Zips wins outright.",
     "Track record: teams we gave a 54% chance to win outright won 68% of the time (25 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48329,7 +48130,7 @@
     "Upset risk: 30% chance Buffalo Bulls wins outright.",
     "Track record: teams we gave a 66% chance to win outright won 58% of the time (99 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48345,16 +48146,16 @@
    "commence_time": "2026-11-04T17:45:00+00:00",
    "home": "Fenerbahce",
    "away": "Liverpool",
-   "home_score": 1.5,
-   "away_score": 2.0,
+   "home_score": 1.0,
+   "away_score": 2.5,
    "p_home": 0.1795,
    "p_away": 0.6183,
    "p_draw": 0.2021,
    "winner": "away",
-   "model_home": 0.2721,
+   "model_home": 0.2722,
    "market_home": 0.1757,
    "facts": [
-    "Vegas: Liverpool -0.5 \u00b7 O/U 3.5 (our ratings agree).",
+    "Vegas: Liverpool -1.5 \u00b7 O/U 3.5 (our ratings agree).",
     "Market win chance: Liverpool 62% \u00b7 Fenerbahce 18% \u00b7 draw 20%.",
     "Our ratings alone: Liverpool 2.3 @ Fenerbahce 1.7, Fenerbahce 27% to win. The prediction gives them 11% of the say on the total and 4% on the winner, the weight they earned in testing.",
     "No history test for this league yet: it uses the average weights of the tested sports.",
@@ -48367,7 +48168,7 @@
     "Best number: -175 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48405,7 +48206,7 @@
     "Best number: -390 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48443,7 +48244,7 @@
     "Best number: +110 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48481,7 +48282,7 @@
     "Best number: -210 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48519,7 +48320,7 @@
     "Track record: teams we gave a 46% chance to win outright won 53% of the time (19 recent games tested).",
     "Best number: +110 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48557,7 +48358,7 @@
     "Best number: -140 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48595,7 +48396,7 @@
     "Best number: +120 at DraftKings (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48633,7 +48434,7 @@
     "Best number: -175 at bet365 (checked 2 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48671,7 +48472,7 @@
     "Track record: teams we gave a 54% chance to win outright won 47% of the time (19 recent games tested).",
     "Best number: -320 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48709,7 +48510,7 @@
     "Upset risk: 27% chance Ball State Cardinals wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 67% of the time (163 recent games tested)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48731,7 +48532,7 @@
    "p_away": 0.9476,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.3485,
+   "model_home": 0.3486,
    "market_home": 0.0368,
    "facts": [
     "Vegas: Toledo Rockets -25.5 \u00b7 O/U 52.5 (our ratings have Sacramento State Hornets 17.5 better than the spread; our ratings have 4.4 more points than the total).",
@@ -48747,7 +48548,7 @@
     "Power rank: Toledo Rockets #54 vs Sacramento State Hornets #135 (of 138).",
     "Upset risk: 35% chance Sacramento State Hornets wins outright."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -48769,7 +48570,7 @@
    "p_away": 0.4684,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.4753,
+   "model_home": 0.4754,
    "market_home": 0.5346,
    "facts": [
     "Vegas: Eastern Michigan Eagles -1.5 \u00b7 O/U 44.5 (our ratings have Central Michigan Chippewas 2.8 better than the spread; our ratings have 8.7 fewer points than the total).",
@@ -48785,7 +48586,7 @@
     "Track record: teams we gave a 46% chance to win outright won 32% of the time (25 recent games tested).",
     "Best number: -125 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-02T05:16:01.928302+00:00",
+   "updated_at": "2026-11-02T06:11:47.373791+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
