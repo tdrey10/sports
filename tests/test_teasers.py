@@ -6,7 +6,9 @@ from sportsedge.models.ratings import GameResult
 
 NOW = datetime(2026, 10, 11, 12, tzinfo=timezone.utc)
 STUDY = {"teasers": {"wong_dog": {"proven": True, "in_sample": {"rate": 0.764, "legs": 292},
-                                   "blind": {"rate": 0.772, "legs": 381}}}}
+                                   "blind": {"rate": 0.772, "legs": 381}},
+                     "wong_dog_low_total": {"proven": True, "in_sample": {"rate": 0.768, "legs": 254},
+                                            "blind": {"rate": 0.790, "legs": 329, "se": 0.0225}}}}
 
 
 def _leg(i, side="away", point=2.5, low=True, cover=0.8, kind="wong_dog", rate=0.764, proven=True):
@@ -84,3 +86,16 @@ def test_six_team_at_550_only_when_the_legs_records_beat_the_price(monkeypatch):
     monkeypatch.setattr(teasers, "candidate_legs", lambda scans, now, rates=None: [dict(x) for x in six_dogs])
     big = {t.size: t for t in teasers.build([], [], STUDY, NOW, "2026-10-13")}[6]
     assert big.units == 0.25 and big.proven
+
+
+def test_only_low_total_dogs_that_beat_luck_carry_units(monkeypatch):
+    """Owner, Nov 1: Wong dogs in any game could be luck (1.5 SE); in a 49-or-less game they beat it."""
+    monkeypatch.setattr(teasers, "candidate_legs", lambda scans, now, rates=None: [_leg(1, low=False), _leg(2, low=False)])
+    [two] = teasers.build([], [], STUDY, NOW, "2026-10-14")
+    assert two.units == 0.0
+    monkeypatch.setattr(teasers, "candidate_legs", lambda scans, now, rates=None: [_leg(3), _leg(4)])
+    [two] = teasers.build([], [], STUDY, NOW, "2026-10-15")
+    assert two.units == 1.0
+    weak = {"teasers": {**STUDY["teasers"], "wong_dog_low_total": {"proven": True, "blind": {"rate": 0.76, "se": 0.0225}}}}
+    [two] = teasers.build([], [], weak, NOW, "2026-10-16")
+    assert two.units == 0.0
