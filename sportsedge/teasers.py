@@ -28,6 +28,16 @@ REDUCED = {2: -120.0, 3: 160.0, 4: 250.0, 5: 400.0}  # a pushed leg drops a teas
 BIG = 6  # the 6-team teaser: the proven dogs first, the next-best leg kinds by their 20-season record after
 LOOKAHEAD_DAYS = 7
 KIND = "wong_dog"
+KIND_LOW = "wong_dog_low_total"
+# Owner, Nov 1 ("any new studies"): only a teaser leg that beats the price by more than luck gets money.
+# Wong dogs overall hit 77.2% blind (394 legs), 1.5 standard errors over the 73.9% a 2-team needs: luck
+# could explain that. In a game with a total of 49 or less they hit 79.0% (329 legs), 2.3 over: real.
+MIN_Z = 1.65
+
+
+def beats_luck(kind: dict, need: float) -> bool:
+    b = kind.get("blind") or {}
+    return bool(kind.get("proven") and b.get("rate") and b.get("se") and (b["rate"] - need) / b["se"] >= MIN_Z)
 
 
 @dataclass
@@ -137,6 +147,8 @@ def build(scans, stored: list[Teaser], study: dict | None, now: datetime, day: s
             seen.add(leg["event_id"])
             unique.append(leg)
     dogs = [leg for leg in unique if leg["kind"] == KIND]
+    dogs.sort(key=lambda leg: not leg["low_total"])  # low totals first: they're the legs that earn money
+    low = ((study or {}).get("teasers") or {}).get(KIND_LOW) or {}
     out = []
     for size in (2, 3):
         if size in have or len(dogs) < size:
@@ -144,9 +156,10 @@ def build(scans, stored: list[Teaser], study: dict | None, now: datetime, day: s
         if rate is not None and rate <= TEASER_BREAK_EVEN[size]:
             continue  # the price needs more than this kind of leg has been hitting
         pick = [dict(leg) for leg in dogs[:size]]
+        money = proven and all(leg["low_total"] for leg in pick) and beats_luck(low, TEASER_BREAK_EVEN[size])
         out.append(Teaser(
             id=f"teaser:{day}:{size}", day=day, size=size, odds=PRICES[size],
-            units=UNITS[size] if proven else 0.0, legs=pick, created_at=now.isoformat(),
+            units=UNITS[size] if money else 0.0, legs=pick, created_at=now.isoformat(),
             leg_rate=rate, proven=proven, hit=rate ** size if rate else None,
         ))
     if BIG not in have and len(unique) >= BIG:
@@ -157,9 +170,11 @@ def build(scans, stored: list[Teaser], study: dict | None, now: datetime, day: s
                 hit *= leg["rate"]
             if hit * american_to_decimal(PRICES[BIG]) > 1:  # the legs' records beat the +550 price
                 all_proven = all(leg["proven"] for leg in pick)
+                money = all_proven and all(leg["kind"] == KIND and leg["low_total"] for leg in pick) \
+                    and beats_luck(low, 1 / american_to_decimal(PRICES[BIG]) ** (1 / BIG))
                 out.append(Teaser(
                     id=f"teaser:{day}:{BIG}", day=day, size=BIG, odds=PRICES[BIG],
-                    units=UNITS[BIG] if all_proven else 0.0, legs=pick, created_at=now.isoformat(),
+                    units=UNITS[BIG] if money else 0.0, legs=pick, created_at=now.isoformat(),
                     leg_rate=round(sum(leg["rate"] for leg in pick) / BIG, 4), proven=all_proven, hit=round(hit, 4),
                 ))
     return out
