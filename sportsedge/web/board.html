@@ -398,7 +398,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     return SCORES[e.event_id] || SCORES[gameKey(e.away, e.home)] || null;
   }
   const SOCCER = new Set(["epl", "laliga", "bundesliga", "seriea", "ligue1", "mls", "ucl"]);
-  const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"], ["tennis", "Tennis"]];
+  const SPORTS = [["all", "All"], ["nfl", "NFL"], ["ncaaf", "CFB"], ["nba", "NBA"], ["ncaab", "CBB"], ["mlb", "MLB"], ["nhl", "NHL"], ["soccer", "Soccer"], ["tennis", "Tennis"]];
   const MARKETS = [["all", "All bets"], ["spreads", "Spreads"], ["totals", "O/U"], ["props", "Props"], ["moneyline", "ML"]];
   const TABS = [["today", "Today"], ["nba", "Reports"], ["parlays", "Parlays"], ["live", "Live"], ["props", "Props"], ["early", "Early"], ["results", "Results"]];
   const TIER = { lock: "Lock", dog: "Dog", prop: "Prop of the day", value: "Value", early: "Early", lean: "Lean",
