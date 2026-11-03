@@ -377,5 +377,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all lock-price/dog sides through the same bar: 0 passed, 0 strong (luck alone gives ~0.4 passes across 64 tries)",
   "verdict": "none proven: 0 of 64 variants cleared the bar. Blind-year flashes did not hold in tuning (NBA dog on an unlucky side +31.3% on 94 blind but -5.9% in tuning; NBA spread on an unlucky side +12.2% on 383 blind, -4.4% tuning). Big samples were all negative (NCAAB spread -3% to -7%). The market already prices luck-vs-points. Dropped."
+ },
+ {
+  "date": "2026-11-03",
+  "idea": "Venue splits: side's average margin at this venue type (home for the host, road for the visitor) minus its overall average margin, earlier games only; bet strong-at-venue and weak-at-venue sides (and strong-vs-weak matchups) on lock-price favorites (-170 to -120), dogs (+100 to +220) and the spread (NFL/NCAAF/NBA/NCAAB)",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing moneylines and spreads 2018+ (sportsedge/venuesplitstudy.py)",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all lock-price/dog sides through the same bar: 0 passed, 0 strong (luck alone gives ~0.8 passes across 115 tries)",
+  "verdict": "none wired: 1 of 115 variants technically cleared the bar and it is not STRONG: NHL dog, home strong at the venue (+19.8% on 128 blind, but only +3.0% on 236 in tuning, under 1 SE). One pass in 115 is what luck alone gives. Big samples were all negative (NCAAB spread -3% to -7%, NCAAB dogs -7% to -8%); the market already prices home/road splits. Dropped."
  }
 ]
