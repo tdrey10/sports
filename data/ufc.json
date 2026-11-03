@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-11-03T14:23:09.883505+00:00",
+ "ran_at": "2026-11-03T15:26:17.026899+00:00",
  "fights": 4357,
  "called": 3662,
  "accuracy": 0.582195521572911,
@@ -446,6 +446,19 @@
    "market_a": 0.868
   },
   {
+   "fight_id": "401927852",
+   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
+   "date": "2026-11-21T15:00Z",
+   "weight": "Heavyweight",
+   "a": "Shamil Gaziev",
+   "a_record": "15-3-0",
+   "b": "Tallison Teixeira",
+   "b_record": "9-2-0",
+   "model_a": 0.527,
+   "a_fights": 8,
+   "b_fights": 5
+  },
+  {
    "fight_id": "401927853",
    "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
    "date": "2026-11-21T15:00Z",
@@ -548,19 +561,6 @@
    "model_a": 0.412,
    "a_fights": 13,
    "b_fights": 7
-  },
-  {
-   "fight_id": "401927852",
-   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
-   "date": "2026-11-21T18:00Z",
-   "weight": "Heavyweight",
-   "a": "Shamil Gaziev",
-   "a_record": "15-3-0",
-   "b": "Tallison Teixeira",
-   "b_record": "9-2-0",
-   "model_a": 0.527,
-   "a_fights": 8,
-   "b_fights": 5
   }
  ],
  "note": "Not proven: UFC bets post only after the blend beats DraftKings' closing lines over 60+ graded fights. Lines have been saved since this was added; ESPN drops UFC odds after each fight, so there is no older history to test on."
