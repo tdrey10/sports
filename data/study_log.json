@@ -387,5 +387,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all lock-price/dog sides through the same bar: 0 passed, 0 strong (luck alone gives ~0.8 passes across 115 tries)",
   "verdict": "none wired: 1 of 115 variants technically cleared the bar and it is not STRONG: NHL dog, home strong at the venue (+19.8% on 128 blind, but only +3.0% on 236 in tuning, under 1 SE). One pass in 115 is what luck alone gives. Big samples were all negative (NCAAB spread -3% to -7%, NCAAB dogs -7% to -8%); the market already prices home/road splits. Dropped."
+ },
+ {
+  "date": "2026-11-04",
+  "idea": "Strength of schedule: average season-to-date margin of a side's earlier opponents, tougher vs easier than the other side's; bet lock-price favorites (-170 to -120), dogs (+100 to +220) and the spread (NFL/NCAAF/NBA/NCAAB)",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing moneylines and spreads 2018+ (sportsedge/sosstudy.py)",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all lock-price/dog sides through the same bar: 0 passed, 0 strong (luck alone gives ~0.4 passes across 64 tries)",
+  "verdict": "none wired: 1 of 64 variants cleared the bar and was STRONG: NHL road dog with the tougher schedule (+20.9% on 98 blind, +21.0% on 127 in tuning, 48-50 and 60-67). It is the only pass of 64, which is about what luck gives over ~400 variants tested to date, and the mirror spots do not back it up (NHL home dog tougher schedule lost; NHL road dog easier schedule -17.7%). Not wired; logged as a watch item to re-check as new NHL games land. Everything else flat or negative (NCAAF road dog tougher -33.9%). The market already prices schedule strength."
  }
 ]
