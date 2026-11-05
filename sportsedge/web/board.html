@@ -366,6 +366,35 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 .sport-head small { font-size: 15px; color: var(--muted); margin-left: 6px; font-family: var(--body); }
 .sport-badge { font-family: var(--display); font-size: 20px; letter-spacing: .03em; text-transform: uppercase; color: var(--accent-2); margin-bottom: 4px; }
 .game-sport { font-weight: 800; color: var(--accent-2); font-size: 15px; }
+/* Owner, Nov 5: "do that for every pick on the site": every pick card is a light bet slip with a colored edge
+   (green won, red lost, gray open, accent live) and a torn stub line, like The Doctor vs Grim. */
+.row, .bet, .potd { display: block; background: var(--ticket); color: var(--ticket-ink); border: 0; border-left: 6px solid #8e8b85;
+  border-radius: 10px; padding: 10px 12px; margin: 10px 0; position: relative; overflow: hidden; }
+.row + .row { border-top: 0; } .bet:first-child { padding-top: 10px; }
+:is(.row, .bet, .potd):is(.won, .half_won) { border-left-color: #1f9d55; }
+:is(.row, .bet, .potd):is(.lost, .half_lost) { border-left-color: #d64545; }
+:is(.row, .bet, .potd).live { border-left-color: var(--accent); }
+:is(.row, .bet) .s-top { display: flex; justify-content: space-between; gap: 8px; align-items: center; font: 700 11px/1.3 var(--body);
+  letter-spacing: .08em; text-transform: uppercase; color: #45464b; }
+:is(.row, .bet) .s-top .tag { font-size: 10px; }
+.bet .rk-n { font: 900 15px/1 var(--display); color: var(--accent); margin-right: 2px; }
+:is(.row, .bet) .s-pick { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 4px; }
+:is(.row, .bet) .s-pick b { font: 800 18px/1.15 var(--body); overflow-wrap: anywhere; color: var(--ticket-ink); }
+:is(.row, .bet) .s-odds { font: 700 18px/1 var(--mono); white-space: nowrap; color: var(--ticket-ink); }
+:is(.row, .bet) .s-sub { font-size: 13px; color: #45464b; margin-top: 2px; overflow-wrap: anywhere; }
+:is(.row, .bet) .s-line { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 6px; }
+:is(.row, .bet, .potd) :is(.muted, .why, small, .small, .move-bad, p, li, td, th, summary, ul, strong, h3, .sport-badge, span:not([class])) { color: var(--ticket-ink); }
+:is(.row, .bet, .potd) details.more summary, :is(.row, .bet, .potd) details.more li { color: var(--ticket-ink); }
+:is(.row, .bet, .potd) .why { margin: 6px 0 0; font-size: 14px; font-weight: 600; }
+:is(.row, .bet, .potd) .pos { color: #13804a; } :is(.row, .bet, .potd) .neg { color: #c23030; }
+:is(.row, .bet, .potd) .kind { color: var(--accent); }
+:is(.row, .bet, .potd) .stake.lean { color: #45464b; border-color: #b9b6b0; }
+:is(.row, .bet, .potd) .meta { border-top: 1.5px dashed #c9c6c0; margin-top: 8px; padding-top: 6px; display: flex; flex-wrap: wrap; gap: 6px 10px; }
+:is(.row, .bet, .potd) .meta:empty { display: none; }
+:is(.row, .bet, .potd) .sc-table td { border-color: #d8d5cf; }
+/* On a slip the colored edge and the Won / Lost tag show the result, so no stamp across the words. */
+:is(.row, .bet, .potd) .stamp { display: none; }
+:is(.row, .bet, .potd) .grade.g-c { color: var(--ticket-ink); border: 1px solid #8e8b85; }
 </style>
 
 <div class="photo-bg" aria-hidden="true" style="--mascot: url('__MASCOT__'); --thumb: url('__THUMB__')"></div>
@@ -569,27 +598,22 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     if (["lost", "half_lost"].includes(e.status)) return `<span class="stamp loss" aria-label="Lost">L</span>`;
     return ["won", "half_won"].includes(e.status) ? `<span class="stamp">Cashed</span>` : "";
   }
-  function row(e, opts = {}) {
-    return `<div class="row">${stamp(e)}
-      <div class="sel">${gradeBadge(e)}<span class="tag ${tierOf(e)}">${tierName(e)}</span><strong>${esc(e.selection.replace(" (live)", ""))}</strong></div>
-      <div class="odds"><b>${odds(e.odds)}</b><small>${needs(e)}</small>${stake(e)}</div>
-      <p class="why">${esc(e.headline)}</p>
-      <div class="meta">${opts.matchup ? `<span class="muted">${esc(e.matchup)} · ${timeOf(e)}</span>` : ""}${moveText(e)}${statusText(e)}${addBtn(e)}</div>
-      ${pickInj(e)}${scoreDetails(e)}${more(e)}</div>`;
-  }
-  function bet(e) {
-    const kind = e.player ? "Prop" : LABEL[e.market] || e.market_label;
-    return `<article class="bet">${stamp(e)}
-      <div class="rk" aria-label="Rank ${e.rank}">${e.rank}</div>
-      <div class="sport-badge">${esc(sportHead(e.sport))}</div>
-      <div class="sel">${gradeBadge(e)}<strong>${esc(e.selection)}</strong><span class="tag">${esc(kind)}</span>${["lock", "dog", "prop"].includes(e.tier) ? `<span class="tag ${e.tier}">${tierName(e)}</span>` : ""}</div>
-      <div class="price"><b>${odds(e.odds)}</b><small>${e.ev >= 0 ? "+" : "-"}$${Math.abs(e.ev * 100).toFixed(0)} per $100</small>${stake(e)}</div>
-      <div class="sub">${esc(e.sport_name)} · ${esc(e.matchup)} · ${timeOf(e)}</div>
-      <div class="gauge">${meter(e)}<span class="small muted">${needs(e)}</span></div>
+  // Owner, Nov 5: "do that for every pick on the site": every pick card is a bet slip, the same layout as
+  // The Doctor vs Grim (top line, pick and price, matchup, why, a torn stub with the result).
+  function slipCard(tagName, e, top) {
+    return `<${tagName} class="${tagName === "article" ? "bet" : "row"} ${esc(e.status || "")}">${stamp(e)}
+      <div class="s-top"><span>${top}</span><span>${timeOf(e)}</span></div>
+      <div class="s-pick"><b>${esc(e.selection.replace(" (live)", ""))}</b><span class="s-odds">${odds(e.odds)}</span></div>
+      <div class="s-sub">${esc(e.matchup)}</div>
+      <div class="s-line">${gradeBadge(e)}${stake(e)}<span class="small">${needs(e)}</span></div>
+      ${tagName === "article" ? `<div class="gauge">${meter(e)}</div>` : ""}
       <p class="why">${esc(e.headline)}</p>
       <div class="meta">${moveText(e)}${statusText(e)}${addBtn(e)}</div>
-      ${pickInj(e)}${scoreDetails(e)}${more(e)}</article>`;
+      ${pickInj(e)}${scoreDetails(e)}${more(e)}</${tagName}>`;
   }
+  const row = (e) => slipCard("div", e, `<span class="tag ${tierOf(e)}">${tierName(e)}</span> ${esc(sportHead(e.sport))}`);
+  const bet = (e) => slipCard("article", e, `<span class="rk-n">#${e.rank}</span> ${esc(sportHead(e.sport))} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)}`
+    + (["lock", "dog", "prop"].includes(e.tier) ? ` <span class="tag ${e.tier}">${tierName(e)}</span>` : ""));
   // Owner, Oct 25: "a study on every game." Every situation each team is in, tested blind on years of
   // closing lines: the ones that showed an edge (and anyone out sick) up top, the rest folded away.
   function gameStudy(m) {
@@ -699,7 +723,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
         + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
       if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">No it’s not rigged</p></div>`;
-      return `<div class="potd">${stamp(e)}<span class="kind">${label}</span><h3>${gradeBadge(e)} ${esc(e.selection)}</h3>
+      return `<div class="potd ${esc(e.status || "")}">${stamp(e)}<span class="kind">${label}</span><h3>${gradeBadge(e)} ${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${wins(e)}</span></div><p class="small">${needs(e)}</p>${stake(e)}
         <p>${esc(e.matchup)} · ${timeOf(e)}</p>${meter(e)}<p>${esc(e.headline)}</p><div class="meta">${statusText(e)} ${moveText(e)}${addBtn(e)}</div>${scoreDetails(e)}${more(e)}</div>`;
     }).join("");
