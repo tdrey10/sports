@@ -468,3 +468,116 @@ BOOK_NAMES = {
 
 def pretty_book(key: str) -> str:
     return BOOK_NAMES.get(key, key.replace("_", " ").title())
+
+
+# Owner, Nov 5: "what I really want it to say... why else you're picking these teams to win. Whether that be
+# they've won five straight at home following a back-to-back or any sort of stat." Only the stats that back
+# the side we picked, in plain words, most telling first.
+CASE_MARK = "📈 "
+CASE_MAX = 4
+CASE_SPORTS = ("nfl", "ncaaf", "nba", "ncaab", "nhl", "mlb", "wnba")
+
+
+def _won(g: GameResult, team: str) -> bool:
+    mine, theirs = (g.home_score, g.away_score) if g.home == team else (g.away_score, g.home_score)
+    return mine > theirs
+
+
+def case_for(results: list[GameResult], team: str, opp: str, team_home: bool, before: datetime, sport: str,
+             ctx: EventContext | None = None, neutral: bool = False, ratings=None) -> list[str]:
+    """Plain lines on why `team` should win, from this season's results: (score, line) pairs, best first."""
+    unit = _unit(sport)
+    tg, og = season_games(results, team, before), season_games(results, opp, before)
+    found: list[tuple[float, str]] = []
+    s = streak(tg, team)
+    if s and s[0] == "won" and s[1] >= 3:
+        found.append((2 + s[1] / 2, f"{team} have won {s[1]} straight."))
+    os_ = streak(og, opp)
+    if os_ and os_[0] == "lost" and os_[1] >= 3:
+        found.append((1.5 + os_[1] / 2, f"{opp} have lost {os_[1]} straight."))
+    if not neutral:
+        mine = [g for g in tg if (g.home == team) == team_home]
+        where = "at home" if team_home else "on the road"
+        if len(mine) >= 3:
+            w, l, _ = record(mine, team)
+            if w / len(mine) >= 0.65:
+                found.append((2 + w / len(mine), f"{team} are {w}-{l} {where} this season."))
+        theirs = [g for g in og if (g.home == opp) == (not team_home)]
+        owhere = "on the road" if team_home else "at home"
+        if len(theirs) >= 3:
+            w, l, _ = record(theirs, opp)
+            if l / len(theirs) >= 0.65:
+                found.append((1.8 + l / len(theirs), f"{opp} are just {w}-{l} {owhere}."))
+    last = tg[-10:]
+    if len(last) >= 5:
+        w, l, _ = record(last, team)
+        pf, pa = _per_game(last, team)
+        if w / len(last) >= 0.6 and pf > pa:
+            found.append((1.5 + w / len(last), f"{w}-{l} in their last {len(last)}, winning by {pf - pa:.1f} {unit} a game."))
+    if tg and not _won(tg[-1], team):
+        after = [tg[i + 1] for i in range(len(tg) - 1) if not _won(tg[i], team)]
+        if len(after) >= 3:
+            w, l, _ = record(after, team)
+            if w / len(after) >= 0.65:
+                found.append((1.6 + w / len(after), f"Coming off a loss, and they're {w}-{l} after a loss this season."))
+    if ctx is not None:
+        t_b2b, o_b2b = (ctx.home_b2b, ctx.away_b2b) if team_home else (ctx.away_b2b, ctx.home_b2b)
+        if o_b2b and not t_b2b:
+            found.append((2.4, f"{opp} played last night; {team} come in rested."))
+        tr, orr = (ctx.home_rest, ctx.away_rest) if team_home else (ctx.away_rest, ctx.home_rest)
+        if tr and orr and tr - orr >= 3 and tr < 20:
+            found.append((1.7, f"Rest edge: {team} have had {tr:.0f} days off, {opp} {orr:.0f}."))
+        missing = (ctx.injuries or {}).get(opp) or []
+        if missing:
+            more = f" and {len(missing) - 3} more" if len(missing) > 3 else ""
+            found.append((1.9 + min(len(missing), 4) / 4, f"{opp} are missing {', '.join(missing[:3])}{more}."))
+    meet = sorted((g for g in results if g.completed and {g.home, g.away} == {team, opp} and g.date < before),
+                  key=lambda g: g.date)[-5:]
+    if len(meet) >= 2:
+        w = sum(_won(g, team) for g in meet)
+        if w / len(meet) >= 0.6:
+            found.append((1.4 + w / len(meet), f"Won {w} of the last {len(meet)} meetings with {opp}."))
+    tp, op = _per_game(tg, team), _per_game(og, opp)
+    if tp and op and len(tg) >= 3 and len(og) >= 3:
+        mine_net, their_net = tp[0] - tp[1], op[0] - op[1]
+        if mine_net - their_net >= {"nhl": 0.6, "mlb": 0.8}.get(sport, 4.0):
+            found.append((1.3, f"They outscore teams by {mine_net:+.1f} a game; {opp} are at {their_net:+.1f}."))
+    if ratings is not None:
+        ranks = power_ranks(SimpleNamespace(ratings=ratings))
+        if team in ranks and opp in ranks and ranks[opp] - ranks[team] >= 8:
+            found.append((1.2, f"#{ranks[team]} in our power ranks; {opp} are #{ranks[opp]} (of {len(ranks)})."))
+    found.sort(key=lambda x: -x[0])
+    return [line for _, line in found[:CASE_MAX]]
+
+
+def _case_side(pick_or_entry) -> str | None:
+    market = getattr(pick_or_entry, "market", "")
+    side = getattr(pick_or_entry, "side", "")
+    return side if market in ("h2h", "spreads") and side in ("home", "away") else None
+
+
+def add_case(obj, scans: list[SportScan], when: datetime | None = None) -> bool:
+    """Put the 'why this team' lines on a card or ledger entry (once). True when lines were added."""
+    pick = getattr(obj, "pick", obj)
+    reasons = list(obj.reasons or [])
+    if getattr(pick, "player", None) or any(r.startswith(CASE_MARK) for r in reasons):
+        return False
+    sport = getattr(obj, "sport", None) or pick.sport
+    side = _case_side(pick)
+    if sport not in CASE_SPORTS or side is None:
+        return False
+    scan = next((s for s in scans if s.sport.key == sport), None)
+    home, away = getattr(obj, "home", None) or pick.home, getattr(obj, "away", None) or pick.away
+    start = when or getattr(obj, "start", None) or pick.commence_time
+    if scan is None or not home:
+        return False
+    found = find_context(scan, home, away, start)
+    ctx = found[1] if found else None
+    team, opp = (home, away) if side == "home" else (away, home)
+    lines = case_for(scan.results, team, opp, side == "home", start, sport, ctx, ctx.neutral if ctx else False,
+                     scan.ratings)
+    if not lines:
+        return False
+    keep = min(len(reasons), 2)
+    obj.reasons = reasons[:keep] + [CASE_MARK + x for x in lines] + reasons[keep:]
+    return True

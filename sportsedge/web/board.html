@@ -395,6 +395,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 /* On a slip the colored edge and the Won / Lost tag show the result, so no stamp across the words. */
 :is(.row, .bet, .potd) .stamp { display: none; }
 :is(.row, .bet, .potd) .grade.g-c { color: var(--ticket-ink); border: 1px solid #8e8b85; }
+:is(.row, .bet, .potd) .case { margin: 8px 0 0; padding: 8px 10px; background: #e7e4de; border-radius: 8px; }
+:is(.row, .bet, .potd) .case b { font: 800 12px/1.2 var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+:is(.row, .bet, .potd) .case ul { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 2px; font-size: 14px; font-weight: 700; }
 </style>
 
 <div class="photo-bg" aria-hidden="true" style="--mascot: url('__MASCOT__'); --thumb: url('__THUMB__')"></div>
@@ -600,6 +603,14 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   }
   // Owner, Nov 5: "do that for every pick on the site": every pick card is a bet slip, the same layout as
   // The Doctor vs Grim (top line, pick and price, matchup, why, a torn stub with the result).
+  // Owner, Nov 5: "why else you're picking these teams... any sort of stat": the stats behind the side, shown
+  // on the slip (the engine writes them as reason lines starting with 📈).
+  const caseList = (e) => {
+    const lines = (e.reasons || []).filter((r) => r.startsWith("📈")).map((r) => r.replace(/^📈\s*/, ""));
+    if (!lines.length) return "";
+    const team = e.selection.replace(/ ML$| [+-][\d.]+$/, "");
+    return `<div class="case"><b>Why ${esc(team)}</b><ul>${lines.map((l) => `<li>${esc(l)}</li>`).join("")}</ul></div>`;
+  };
   function slipCard(tagName, e, top) {
     return `<${tagName} class="${tagName === "article" ? "bet" : "row"} ${esc(e.status || "")}">${stamp(e)}
       <div class="s-top"><span>${top}</span><span>${timeOf(e)}</span></div>
@@ -607,7 +618,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       <div class="s-sub">${esc(e.matchup)}</div>
       <div class="s-line">${gradeBadge(e)}${stake(e)}<span class="small">${needs(e)}</span></div>
       ${tagName === "article" ? `<div class="gauge">${meter(e)}</div>` : ""}
-      <p class="why">${esc(e.headline)}</p>
+      <p class="why">${esc(e.headline)}</p>${caseList(e)}
       <div class="meta">${moveText(e)}${statusText(e)}${addBtn(e)}</div>
       ${pickInj(e)}${scoreDetails(e)}${more(e)}</${tagName}>`;
   }

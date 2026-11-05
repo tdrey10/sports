@@ -397,6 +397,13 @@ class Workspace:
         filled = backfill(self.ledger.entries.values(), res.scans)
         if filled:
             print(f"added game facts to {filled} open picks")
+        # Owner, Nov 5: every open side pick says why that team, in stats (streaks, splits, rest...).
+        from .insights import add_case
+
+        cased = sum(add_case(e, res.scans) for e in self.ledger.entries.values()
+                    if not e.settled and e.status != "void")
+        if cased:
+            print(f"added the case for the team to {cased} open picks")
         for w in dict.fromkeys(res.warnings):
             print("warning:", w)
         print(f"published {res.published} new picks, graded {res.graded}")
