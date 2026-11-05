@@ -1023,6 +1023,20 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + (earlier.length ? panel("Earlier live bets", "", earlier.map((e) => row(e, { matchup: true })).join("")) : "");
   }
 
+  // Owner, Nov 5: "list the most bet on prop bets". No free source shows bet counts, so this shows the
+  // props whose line moved most today: a book moves the line when money piles on one side.
+  function propMovesPanel() {
+    const M = (DATA.prop_moves || []).filter((m) => state.sport === "all" || m.sport === state.sport);
+    const rows = M.map((m) => `<li><b>${esc(m.player)}</b> ${esc(m.market)}: ${m.open} → <b>${m.now}</b> · money on the <b>${m.side}</b> · <span class="muted">${esc(m.matchup)} · ${timeOf({ commence_time: m.start })}</span></li>`).join("");
+    return panel("Where the money's going", "Props whose line moved the most today. When the line goes up, people are hammering the over. When it drops, the under.",
+      (rows ? `<ul class="small reads">${rows}</ul>` : empty("No prop lines have moved yet today. Check back closer to game time."))
+      + `<details class="more"><summary>What we found testing props</summary><ul>`
+      + `<li>Betting every over lost about 11% (7,000+ props, NBA and NFL). Overs are what everybody bets, so books shade them.</li>`
+      + `<li>Unders came out close to even (about -2%). No under angle has beaten the books yet: none of 40+ splits we tested passed.</li>`
+      + `<li>Following or fading a prop line move didn't make money either.</li>`
+      + `<li>We keep logging every line, and props get money only once something passes the same test as our other plays.</li></ul></details>`);
+  }
+
   function viewList(filter, title, aside, msg) {
     const items = DATA.entries.filter((e) => onBoard(e) && filter(e)).sort((a, b) => score(b) - score(a));
     return panel(title, aside, items.length ? items.map((e) => row(e, { matchup: true })).join("") : empty(msg));
@@ -1187,7 +1201,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     renderHero();
     const views = {
       today: viewToday, parlays: viewParlays, nba: viewReports, live: viewLive, results: viewResults,
-      props: () => viewList((e) => e.player, "Player props", "Best edge first · priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
+      props: () => propMovesPanel() + viewList((e) => e.player, "Player props", "Best edge first · priced at -115 when ESPN shows no price", "No prop edges right now. NFL and NBA props are priced every morning."),
       early: () => viewList((e) => e.tier === "early", "Early value", "More than 24 hours out · bet before the line moves · no units until early bets prove out", "Nothing early yet: an early pick needs a real edge on a realistic winner (45%+ to cash)."),
     };
     $("view").innerHTML = (views[state.tab] || viewToday)();

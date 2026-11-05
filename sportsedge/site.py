@@ -51,6 +51,7 @@ def build_data(
     nba: dict | None = None,
     reports: dict | None = None,
     rivalry: dict | None = None,
+    prop_moves: list | None = None,
 ) -> dict:
     cutoff = now - timedelta(days=KEEP_DAYS)
     entries = []
@@ -88,6 +89,8 @@ def build_data(
         "studies": [s.to_dict() for s in (studies or {}).values()],
         "spot_labels": {k: s.label for k, s in SPOTS.items()},
         "props": props or {},
+        # Owner, Nov 5: where the money is going on props (biggest line moves today).
+        "prop_moves": prop_moves or [],
         "ufc": ufc or {},
         "clv_trust": ledger.clv_trust(now),
         "parlays": [v for v in ledger.parlay_views() if v["created_at"] >= cutoff.isoformat()],
