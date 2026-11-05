@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-11-05T15:37:15.487717+00:00",
+ "ran_at": "2026-11-05T16:44:48.337413+00:00",
  "fights": 4357,
  "called": 3662,
  "accuracy": 0.582195521572911,
@@ -135,9 +135,9 @@
    "model_a": 0.511,
    "a_fights": 1,
    "b_fights": 8,
-   "a_ml": 145.0,
-   "b_ml": -175.0,
-   "market_a": 0.391
+   "a_ml": 150.0,
+   "b_ml": -180.0,
+   "market_a": 0.384
   },
   {
    "fight_id": "401933235",
@@ -247,19 +247,6 @@
    "a_ml": -230.0,
    "b_ml": 190.0,
    "market_a": 0.669
-  },
-  {
-   "fight_id": "401913648",
-   "card": "UFC 334: Gane vs. Hokit",
-   "date": "2026-11-14T22:00Z",
-   "weight": "Lightweight",
-   "a": "Nazim Sadykhov",
-   "a_record": "11-3-1",
-   "b": "Jefferson Nascimento",
-   "b_record": "13-1-0",
-   "model_a": 0.6,
-   "a_fights": 7,
-   "b_fights": 1
   },
   {
    "fight_id": "401922645",
@@ -472,32 +459,6 @@
    "b_fights": 1
   },
   {
-   "fight_id": "401927854",
-   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
-   "date": "2026-11-21T15:00Z",
-   "weight": "Bantamweight",
-   "a": "Aleksandre Topuria",
-   "a_record": "7-1-0",
-   "b": "Santiago Luna",
-   "b_record": "8-1-0",
-   "model_a": 0.53,
-   "a_fights": 2,
-   "b_fights": 3
-  },
-  {
-   "fight_id": "401927855",
-   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
-   "date": "2026-11-21T15:00Z",
-   "weight": "Flyweight",
-   "a": "Asu Almabayev",
-   "a_record": "24-3-0",
-   "b": "Kyoji Horiguchi",
-   "b_record": "36-6-0",
-   "model_a": 0.594,
-   "a_fights": 8,
-   "b_fights": 3
-  },
-  {
    "fight_id": "401927856",
    "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
    "date": "2026-11-21T15:00Z",
@@ -561,6 +522,32 @@
    "model_a": 0.412,
    "a_fights": 13,
    "b_fights": 7
+  },
+  {
+   "fight_id": "401927854",
+   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
+   "date": "2026-11-21T18:00Z",
+   "weight": "Bantamweight",
+   "a": "Aleksandre Topuria",
+   "a_record": "7-1-0",
+   "b": "Santiago Luna",
+   "b_record": "8-1-0",
+   "model_a": 0.53,
+   "a_fights": 2,
+   "b_fights": 3
+  },
+  {
+   "fight_id": "401927855",
+   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
+   "date": "2026-11-21T18:00Z",
+   "weight": "Flyweight",
+   "a": "Kyoji Horiguchi",
+   "a_record": "36-6-0",
+   "b": "Asu Almabayev",
+   "b_record": "24-3-0",
+   "model_a": 0.406,
+   "a_fights": 3,
+   "b_fights": 8
   }
  ],
  "note": "Not proven: UFC bets post only after the blend beats DraftKings' closing lines over 60+ graded fights. Lines have been saved since this was added; ESPN drops UFC odds after each fight, so there is no older history to test on."
