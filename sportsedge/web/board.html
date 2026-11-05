@@ -590,7 +590,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       ["Expected profit", `about ${s.ev_pct >= 0 ? "+" : "-"}$${Math.abs(s.ev_pct).toFixed(0)} for every $100 bet, over the long run`],
       ["Don't bet it worse than", s.min_odds == null ? "n/a" : odds(s.min_odds)],
       ["Track record", esc(s.validation)],
-      ["Why we like it", `<ul>${(s.factors || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`],
+      // Owner, Nov 5: say why that team in plain words with stats, so the team's stats lead this list.
+      ["Why we like it", `<ul>${[...(e.reasons || []).filter((r) => r.startsWith("📈")).map((r) => r.replace(/^📈\s*/, "")), ...(s.factors || [])].map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`],
       ["What could go wrong", `<ul>${(s.risks || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`],
     ];
     return `<details class="more"><summary>📋 Scorecard · grade ${esc(s.grade)}</summary><table class="sc-table">${rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("")}</table></details>`;
