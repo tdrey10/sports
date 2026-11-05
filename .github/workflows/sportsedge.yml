@@ -152,7 +152,16 @@ jobs:
           PROPS_ARGS: >-
             ${{ (inputs.props || github.event.schedule == '47 15 * * *') && '--props --props-sports nfl,nba --props-hours 30
             --prop-markets player_pass_yds,player_rush_yds,player_reception_yds,player_receptions,player_points,player_rebounds,player_assists,player_threes,player_points_rebounds_assists' || '' }}
-        run: sportsedge run nfl,ncaaf,nba,ncaab,mlb,nhl,soccer $PROPS_ARGS ${{ inputs.sharp && '--sharp-now' || '' }}
+        # Owner, Nov 5 ("list the most bet on prop bets"): a second look at prop lines (free, from ESPN)
+        # before NBA tip (22:00 UTC) and Sunday NFL kickoff (16:00 UTC), so the page can show which
+        # lines moved, which is where the money went.
+        run: |
+          ARGS="$PROPS_ARGS"
+          H=$(date -u +%H); M=$(date -u +%M); D=$(date -u +%u)
+          if [ -z "$ARGS" ] && [ "$M" -lt 30 ] && { [ "$H" = "22" ] || { [ "$D" = "7" ] && [ "$H" = "16" ]; }; }; then
+            ARGS="--props --props-sports nfl,nba --props-hours 8 --prop-markets player_pass_yds,player_rush_yds,player_reception_yds,player_receptions,player_points,player_rebounds,player_assists,player_threes,player_points_rebounds_assists"
+          fi
+          sportsedge run nfl,ncaaf,nba,ncaab,mlb,nhl,soccer $ARGS ${{ inputs.sharp && '--sharp-now' || '' }}
 
       # UFC research: fights, DraftKings lines (ESPN drops them after each fight, so they are saved
       # here), fighter ratings. No UFC bets are posted until the blind test is passed.
