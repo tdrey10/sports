@@ -88,6 +88,23 @@ button, select { font: inherit; color: inherit; }
 .ticket .t-stub { border-top: 2px dashed #c9c6c0; margin: 6px -20px 0; padding: 12px 20px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; position: relative; }
 /* perforation notches where the stub tears off */
 .ticket .t-stub::before, .ticket .t-stub::after { content: ""; position: absolute; top: -10px; width: 18px; height: 18px; border-radius: 50%; background: var(--bg); }
+/* Owner, Nov 5: "make it look like a bet ticket" (The Doctor vs Grim lists). */
+.slips { display: grid; gap: 10px; margin: 10px 0 4px; }
+.slip { background: var(--ticket); color: var(--ticket-ink); border-radius: 10px; padding: 10px 12px; border-left: 6px solid #8e8b85; }
+.slip.won { border-left-color: #1f9d55; } .slip.lost { border-left-color: #d64545; } .slip.push { border-left-color: #8e8b85; }
+.slip .s-top { display: flex; justify-content: space-between; gap: 8px; font: 700 11px/1.2 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--ticket-muted); }
+.slip .s-pick { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 4px; }
+.slip .s-pick b { font: 800 17px/1.15 var(--body); overflow-wrap: anywhere; }
+.slip .s-odds { font: 700 17px/1 var(--mono); white-space: nowrap; }
+.slip .s-sub { font-size: 13px; color: #45464b; margin-top: 2px; overflow-wrap: anywhere; }
+.slip .s-foot { border-top: 1.5px dashed #c9c6c0; margin-top: 8px; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; color: #45464b; }
+.slip .s-foot > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.slip .s-res { flex-shrink: 0; }
+.slip .s-res { font: 800 12px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; padding: 4px 7px; border-radius: 6px; background: #e4e1db; color: #45464b; }
+.slip.won .s-res { background: #1f9d55; color: #fff; } .slip.lost .s-res { background: #d64545; color: #fff; }
+.slip .s-leg { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; padding: 3px 0; }
+.slip .s-leg span:first-child { overflow-wrap: anywhere; }
+.slip .s-leg .s-odds { font-size: 14px; }
 .ticket .t-stub::before { left: -9px; } .ticket .t-stub::after { right: -9px; }
 .ticket .t-stub .meter { --track: #d9d6d0; }
 .ticket .muted, .ticket .move-bad { color: var(--ticket-muted); }
@@ -623,21 +640,34 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const N = R.names || { you: "The Doctor", us: "Grim" };
     const line = (name, r) => `<tr><td>${name}</td><td>${r.won}-${r.lost}${r.push ? "-" + r.push : ""}</td><td class="${cls(r.units)}">${signed(r.units, 1)}u</td><td>${r.pending}</td></tr>`;
     const table = (you, us) => `<div class="table-wrap"><table><thead><tr><th></th><th>Record</th><th>Units</th><th>Open</th></tr></thead><tbody>${line("🩺 " + N.you, you)}${line("💀 " + N.us, us)}</tbody></table></div>`;
-    const fold = (title, n, items) => `<details class="more"><summary>${title} · ${n}</summary><ul>${items}</ul></details>`;
+    const fold = (title, n, items) => `<details class="more"><summary>${title} · ${n}</summary><div class="slips">${items}</div></details>`;
     const lead = (you, us) => you.units === us.units ? "Dead even." : you.units > us.units ? `${N.you} is up. 👑` : `${N.us} is up. 😤`;
-    const tag = (st) => `<b class="${st === "won" ? "pos" : st === "lost" ? "neg" : ""}">${esc(SETTLED[st] || st)}</b>`;
-    const picks = (R.your_picks || []).map((p) => `<li><b>${esc(p.selection)}</b> ${odds(p.odds)} · ${p.final ? `${tag(p.status)} ${esc(p.final)}` : esc(p.matchup)}</li>`).join("");
+    const RES = { won: "Won", lost: "Lost", push: "Push", void: "Void" };
+    const res = (st) => `<span class="s-res">${esc(RES[st] || "Open")}</span>`;
+    const when = (iso) => iso ? fmt(iso, { weekday: "short", month: "short", day: "numeric" }) : "";
+    // One bet slip per straight pick, newest first.
+    const slip = (p, money) => `<div class="slip ${esc(p.status || "")}"><div class="s-top"><span>Straight${money ? " · 💰 money play" : ""}</span><span>${esc(when(p.start))}</span></div>`
+      + `<div class="s-pick"><b>${esc(p.selection)}</b><span class="s-odds">${odds(p.odds)}</span></div><div class="s-sub">${esc(p.matchup)}</div>`
+      + `<div class="s-foot"><span>${esc(p.final || "Not graded yet")}</span>${res(p.status)}</div></div>`;
+    // One slip per parlay: each leg with its own result.
+    const LEG = /^(.*) ([+-]\d+)(?: \((\w+)\))?$/;
+    const mark = { won: "✅", lost: "❌", push: "➖" };
+    const pslip = (p) => `<div class="slip ${esc(p.status || "")}"><div class="s-top"><span>${p.legs.length}-leg parlay</span><span class="s-odds">${odds(p.odds)}</span></div>`
+      + p.legs.map((l) => { const m = l.match(LEG) || [l, l, "", ""]; return `<div class="s-leg"><span>${mark[m[3]] || "•"} ${esc(m[1])}</span><span class="s-odds">${esc(m[2])}</span></div>`; }).join("")
+      + `<div class="s-foot"><span>1u pays ${signed(p.odds > 0 ? p.odds / 100 : 100 / -p.odds, 2)}u</span>${res(p.status)}</div></div>`;
     const P = R.parlays || { you: { won: 0, lost: 0, push: 0, units: 0, pending: 0 }, us: { won: 0, lost: 0, push: 0, units: 0, pending: 0 } };
-    const gparlays = (R.grim_parlays || []).map((p) => `<li>${odds(p.odds)} · ${p.legs.map(esc).join(" + ")} · ${tag(p.status)}</li>`).join("");
-    const parlays = (R.your_parlays || []).map((p) => `<li>${odds(p.odds)} · ${p.legs.map(esc).join(" + ")} · ${tag(p.status)}</li>`).join("");
-    const grim = (R.grim_picks || []).map((p) => `<li>${p.money ? "💰 " : ""}<b>${esc(p.selection)}</b> ${odds(p.odds)} · ${p.final ? `${tag(p.status)} ${esc(p.final)}` : esc(p.matchup)}</li>`).join("");
+    const newest = (xs) => [...(xs || [])].reverse();
+    const picks = newest(R.your_picks).map((p) => slip(p)).join("");
+    const parlays = newest(R.your_parlays).map(pslip).join("");
+    const grim = newest(R.grim_picks).map((p) => slip(p, p.money)).join("");
+    const gparlays = newest(R.grim_parlays).map(pslip).join("");
     return panel(`The Doctor vs Grim`, `🩺 ${esc(N.you)} vs 💀 ${esc(N.us)} · 1 unit flat on every pick · tap a list to open it`,
       `<p class="small"><b>Straight picks</b> · ${lead(R.you, R.leans)}</p>` + table(R.you, R.leans)
       + `<p class="small"><b>Parlays</b> · ${lead(P.you, P.us)}</p>` + table(P.you, P.us)
       // Owner, Nov 1: "if you click it pops up... it's just too long and hard to read": each list folds up.
       + (picks ? fold(`${esc(N.you)}'s picks`, R.your_picks.length, picks) : `<p class="small muted">Send your picks in the chat and they show up here.</p>`)
       + (parlays ? fold(`${esc(N.you)}'s parlays`, R.your_parlays.length, parlays) : "")
-      + (grim ? fold(`${esc(N.us)}'s picks (💰 = money play)`, R.grim_picks.length, grim) : "")
+      + (grim ? fold(`${esc(N.us)}'s picks`, R.grim_picks.length, grim) : "")
       + (gparlays ? fold(`${esc(N.us)}'s parlays`, R.grim_parlays.length, gparlays) : ""));
   }
   function renderHero() {
