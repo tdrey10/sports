@@ -773,11 +773,56 @@ def regrade(e: Entry, game: GameResult, now: datetime) -> None:
         e.reasons.append(note)
 
 
+# Owner, Nov 5 ("why can't it do second half bets... yes build it"): a game bet on part of a game has its
+# market written "<market>_<part>", e.g. totals_2h, spreads_1h, h2h_q1, totals_p2.
+PARTS = {"1h": "1st half", "2h": "2nd half", "q1": "1st quarter", "q2": "2nd quarter", "q3": "3rd quarter",
+         "q4": "4th quarter", "p1": "1st period", "p2": "2nd period", "p3": "3rd period"}
+QUARTER_SPORTS = ("nba", "wnba", "nfl", "ncaaf")  # four quarters; college hoops and soccer play two halves
+PERIOD_SPORTS = ("nhl",)
+
+
+def split_market(market: str) -> tuple[str, str | None]:
+    """'totals_2h' -> ('totals', '2h'); 'totals' -> ('totals', None)."""
+    base, _, part = (market or "").rpartition("_")
+    return (base, part) if base and part in PARTS else (market, None)
+
+
+def part_scores(game: GameResult, part: str, sport: str) -> tuple[float, float] | None:
+    """(home, away) points in that part of the game, from ESPN's period scores. The second half takes in
+    overtime (as books grade it); a single quarter or period does not."""
+    h, a = list(game.home_periods or ()), list(game.away_periods or ())
+    if not h or len(h) != len(a):
+        return None
+    quarters = sport in QUARTER_SPORTS
+    if part in ("1h", "2h"):
+        if sport in PERIOD_SPORTS:
+            return None
+        cut = 2 if quarters else 1
+        if len(h) < cut * 2:
+            return None
+        sl = slice(0, cut) if part == "1h" else slice(cut, None)
+        return sum(h[sl]), sum(a[sl])
+    if part.startswith("q") and quarters or part.startswith("p") and sport in PERIOD_SPORTS:
+        i = int(part[1]) - 1
+        return (h[i], a[i]) if i < len(h) else None
+    return None
+
+
 def grade(e: Entry, game: GameResult, box: list[PlayerGame] | None, now: datetime) -> None:
     hs, as_ = game.home_score, game.away_score
     e.final = f"{e.away} {as_:.0f} @ {e.home} {hs:.0f}"
     e.live = None
     e.graded_at = now.isoformat()
+    market, part = split_market(e.market)
+    if part is not None and e.player is None:
+        got = part_scores(game, part, e.sport)
+        if got is None:
+            e.status, e.profit = "void", 0.0  # no score by period for this game: can't be settled
+            return
+        hs, as_ = got
+        e.result_value = hs + as_ if market == "totals" else hs - as_
+        if not any(r.startswith(f"{PARTS[part].capitalize()}:") for r in e.reasons):
+            e.reasons = list(e.reasons) + [f"{PARTS[part].capitalize()}: {e.away} {as_:.0f}, {e.home} {hs:.0f}."]
     if e.player is not None:
         value = _prop_value(e, box or [])
         if value is None:
@@ -785,13 +830,16 @@ def grade(e: Entry, game: GameResult, box: list[PlayerGame] | None, now: datetim
             return
         e.result_value = value
         outcome = _settle(value, -e.point) if e.side == "over" else _settle(-value, e.point)
-    elif e.market == "h2h":
+    elif market == "h2h":
         winner = "home" if hs > as_ else "away" if as_ > hs else "draw"
-        outcome = (1.0, 0.0, 0.0) if winner == e.side else (0.0, 0.0, 1.0)
-    elif e.market == "spreads":
+        if part is not None and winner == "draw":
+            outcome = (0.0, 1.0, 0.0)  # a tied half or quarter on a two-way moneyline is a push
+        else:
+            outcome = (1.0, 0.0, 0.0) if winner == e.side else (0.0, 0.0, 1.0)
+    elif market == "spreads":
         margin = hs - as_ if e.side == "home" else as_ - hs
         outcome = _settle(margin, e.point)
-    elif e.market == "totals":
+    elif market == "totals":
         total = hs + as_
         outcome = _settle(total, -e.point) if e.side == "over" else _settle(-total, e.point)
     else:

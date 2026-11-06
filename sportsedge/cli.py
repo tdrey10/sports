@@ -1018,6 +1018,8 @@ def cmd_my_pick(args) -> int:
         market, point = "spreads", args.spread
     if args.total:
         market, side, point = "totals", args.total[0].lower(), float(args.total[1])
+    if args.part:
+        market = f"{market}_{args.part.lower()}"  # Owner, Nov 5: half / quarter / period bets
     if args.cancel:
         print(rivalry.cancel(args.data_dir, args.sport, args.team, datetime.now(timezone.utc), market))
         return 0
@@ -1293,6 +1295,8 @@ def build_parser() -> argparse.ArgumentParser:
     mp.add_argument("odds", type=float)
     mp.add_argument("--spread", type=float, default=None, help="the team's spread, e.g. -3.5")
     mp.add_argument("--total", nargs=2, metavar=("OVER_UNDER", "POINTS"), default=None)
+    mp.add_argument("--part", choices=["1h", "2h", "q1", "q2", "q3", "q4", "p1", "p2", "p3"], default=None,
+                    help="a bet on part of the game: 1h/2h halves, q1-q4 quarters, p1-p3 hockey periods")
     mp.add_argument("--cancel", action="store_true", help="take this pick back before its game")
     mp.add_argument("--data-dir", default="data")
     mp.set_defaults(func=cmd_my_pick)

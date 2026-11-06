@@ -57,13 +57,21 @@ def _card(root, sport, team, odds, now, market, point, side) -> Card:
     if found is None:
         raise ValueError(f"no upcoming {sport.upper()} game found for {team}")
     eid, start, home, away, name = found
-    if market == "totals":
-        sel_side, selection = side, f"{side.title()} {point:g}"
+    # Owner, Nov 5: bets on part of a game ("2nd half over 108.5"): market "totals_2h" and so on.
+    from .ledger import PARTS, split_market
+
+    base, part = split_market(market)
+    if base not in ("h2h", "spreads", "totals"):
+        raise ValueError(f"unknown market {market}")
+    tag = f"{part.upper()} " if part else ""
+    if base == "totals":
+        sel_side, selection = side, f"{tag}{side.title()} {point:g}"
     else:
         sel_side = "home" if name == home else "away"
-        selection = f"{name} ML" if market == "h2h" else f"{name} {point:+g}"
+        selection = f"{tag}{name} ML" if base == "h2h" else f"{tag}{name} {point:+g}"
+    label = {"h2h": "Moneyline", "spreads": "Spread", "totals": "Total"}[base]
     pick = Pick(sport=sport, event_id=eid, commence_time=start, matchup=f"{away} @ {home}", market=market,
-                market_label={"h2h": "Moneyline", "spreads": "Spread", "totals": "Total"}[market], selection=selection,
+                market_label=f"{PARTS[part].capitalize()} {label.lower()}" if part else label, selection=selection,
                 side=sel_side, point=point, player=None, book="", american=float(odds), model_prob=0.5,
                 market_prob=None, win_prob=0.5, push_prob=0.0, fair_american=0.0, ev=0.0, kelly=0.0, stake=None,
                 projection="", books=0)
@@ -170,17 +178,22 @@ PARLAY_FIELDS = ["added_at", "parlay"] + INBOX_FIELDS[1:]
 
 
 def parse_leg(spec: str) -> tuple:
-    """'nba|Lakers|-120', 'nfl|Bills|-110|spread -3.5', 'nba|Lakers|-110|over 221.5' -> leg fields."""
+    """'nba|Lakers|-120', 'nfl|Bills|-110|spread -3.5', 'nba|Lakers|-110|over 221.5' -> leg fields.
+    A last field '1h', '2h', 'q1'..'q4' or 'p1'..'p3' makes it a bet on that part of the game
+    ('nba|Magic|-110|over 108.5|2h', 'nba|Lakers|-115|ml|1h')."""
+    from .ledger import PARTS
+
     parts = [x.strip() for x in spec.split("|")]
+    part = parts.pop().lower() if len(parts) > 3 and parts[-1].lower() in PARTS else None
     sport, team, odds = parts[0].lower(), parts[1], float(parts[2])
     market, point, side = "h2h", None, None
-    if len(parts) > 3:
+    if len(parts) > 3 and parts[3].lower() not in ("ml", "moneyline"):
         kind, num = parts[3].split()
         if kind.lower() == "spread":
             market, point = "spreads", float(num)
         else:
             market, side, point = "totals", kind.lower(), float(num)
-    return sport, team, odds, market, point, side
+    return sport, team, odds, f"{market}_{part}" if part else market, point, side
 
 
 def send_parlay(root, legs: list[tuple], now: datetime, grim: bool = False) -> str:

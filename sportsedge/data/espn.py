@@ -206,6 +206,16 @@ def _parse_event(ev: dict) -> GameResult | None:
             return None
 
     hs, as_ = score(home), score(away)
+
+    def periods(c: dict) -> tuple:
+        out = []
+        for ls in c.get("linescores") or []:
+            try:
+                out.append(float(ls.get("value", ls.get("displayValue"))))
+            except (TypeError, ValueError, AttributeError):
+                return ()
+        return tuple(out)
+
     hp, hp_era, hp_dec, hp_id = _probable(home)
     ap, ap_era, ap_dec, ap_id = _probable(away)
     final = completed and hs is not None and as_ is not None
@@ -234,6 +244,8 @@ def _parse_event(ev: dict) -> GameResult | None:
         away_pitcher_decisions=ap_dec,
         home_starter_id=hp_id,
         away_starter_id=ap_id,
+        home_periods=periods(home) if final else (),
+        away_periods=periods(away) if final else (),
     )
 
 

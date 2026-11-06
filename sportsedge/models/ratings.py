@@ -45,6 +45,10 @@ class GameResult:
     away_starter_id: str = ""
     period: int = 0  # live: quarter / period / half / inning
     clock: str = ""  # live: game clock as ESPN shows it ("7:42", "67'")
+    # Owner, Nov 5 (second-half bets): each team's score by quarter / half / period / inning, as ESPN
+    # lists it (overtime periods last). Empty when ESPN gave none.
+    home_periods: tuple = ()
+    away_periods: tuple = ()
 
     @property
     def completed(self) -> bool:
