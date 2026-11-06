@@ -397,5 +397,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all lock-price/dog sides through the same bar: 0 passed, 0 strong (luck alone gives ~0.4 passes across 64 tries)",
   "verdict": "none wired: 1 of 64 variants cleared the bar and was STRONG: NHL road dog with the tougher schedule (+20.9% on 98 blind, +21.0% on 127 in tuning, 48-50 and 60-67). It is the only pass of 64, which is about what luck gives over ~400 variants tested to date, and the mirror spots do not back it up (NHL home dog tougher schedule lost; NHL road dog easier schedule -17.7%). Not wired; logged as a watch item to re-check as new NHL games land. Everything else flat or negative (NCAAF road dog tougher -33.9%). The market already prices schedule strength."
+ },
+ {
+  "date": "2026-11-06",
+  "idea": "Projected total from season scoring: (own points scored + opponent points allowed) per game for both sides, minus the posted closing total; bet over when the projection is 3+ (NFL), 5+ (NCAAF), 6+ (NBA/NCAAB), 0.6+ (NHL) or 1+ (MLB) above the line, under when below, plus the mirror fades",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing totals 2018+ (sportsedge/projtotalstudy.py)",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all totals through the same bar: 0 passed, 0 strong (luck alone gives ~0.2 passes across 24 tries)",
+  "verdict": "none wired: 1 of 24 variants technically cleared the bar, not STRONG: NHL under when the projection sits 0.6+ below the posted total (+11.9% on 82 blind, +7.0% on only 37 in tuning). Its mirror (NHL over when projection is below) lost 21%, and the matching high-projection under arm is flat, so it is noise-sized. Everything else negative both ways: the posted total already contains season scoring. Dropped, not tweaked."
  }
 ]
