@@ -398,6 +398,9 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
 :is(.row, .bet, .potd) .case { margin: 8px 0 0; padding: 8px 10px; background: #e7e4de; border-radius: 8px; }
 :is(.row, .bet, .potd) .case b { font: 800 12px/1.2 var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
 :is(.row, .bet, .potd) .case ul { margin: 4px 0 0; padding-left: 18px; display: grid; gap: 2px; font-size: 14px; font-weight: 700; }
+:is(.row, .bet, .potd) .case.watch { background: #f3e3e1; }
+:is(.row, .bet, .potd) .move-good { color: #1d6b3a; font-weight: 700; } :is(.row, .bet, .potd) .move-bad { color: var(--ticket-ink); }
+:is(.row, .bet, .potd) .case.watch b { color: #b23a32; }
 </style>
 
 <div class="photo-bg" aria-hidden="true" style="--mascot: url('__MASCOT__'); --thumb: url('__THUMB__')"></div>
@@ -607,10 +610,12 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   // Owner, Nov 5: "why else you're picking these teams... any sort of stat": the stats behind the side, shown
   // on the slip (the engine writes them as reason lines starting with 📈).
   const caseList = (e) => {
-    const lines = (e.reasons || []).filter((r) => r.startsWith("📈")).map((r) => r.replace(/^📈\s*/, ""));
-    if (!lines.length) return "";
+    const lines = [...(e.reasons || []).filter((r) => r.startsWith("📈")).map((r) => r.replace(/^📈\s*/, "")), ...(e.notes_for || [])];
     const team = e.selection.replace(/ ML$| [+-][\d.]+$/, "");
-    return `<div class="case"><b>Why ${esc(team)}</b><ul>${lines.map((l) => `<li>${esc(l)}</li>`).join("")}</ul></div>`;
+    const why = lines.length ? `<div class="case"><b>Why ${esc(team)}</b><ul>${lines.slice(0, 5).map((l) => `<li>${esc(l)}</li>`).join("")}</ul></div>` : "";
+    // Owner, Nov 7: the hockey card's "the catch" lines: what cuts against the pick.
+    const watch = (e.notes_against || []).length ? `<div class="case watch"><b>Watch out</b><ul>${e.notes_against.map((l) => `<li>${esc(l)}</li>`).join("")}</ul></div>` : "";
+    return why + watch;
   };
   function slipCard(tagName, e, top) {
     return `<${tagName} class="${tagName === "article" ? "bet" : "row"} ${esc(e.status || "")}">${stamp(e)}
@@ -758,10 +763,33 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + panel("Picks of the day", fmt(DATA.generated_at, { weekday: "long", month: "long", day: "numeric" }), `<div class="grid three">${potd}</div>`)
       + panel("The board", "Everything else we're rockin' with today", rest.length ? bySport(rest) : empty("Nothin' else worth your money today, homie. We don't force it."))
       + rivalryPanel()
-      + panel("Leans", "No units on these. Just who we'd ride with in the other games and their fair price (nothing past −300). Only sprinkle it if your book's paying more than that.",
+      + bestLeansPanel(items.filter((e) => ["lean", "early"].includes(tierOf(e)) && !(e.units > 0) && !isLive(e)))
+      + panel("Every other lean", "No units on these. Just who we'd ride with in the other games and their fair price (nothing past −300). Only sprinkle it if your book's paying more than that.",
           (leans.length ? bySport(leans) : "") + (reads().length ? bySport(reads().map((r) => Object.assign({}, r, { sport: r.f.sport, commence_time: r.f.commence_time })),
             (g) => `<ul class="reads">${g.map(readRow).join("")}</ul>`) : (leans.length ? "" : empty("That's every game today, fam."))))
       + noBetPanel();
+  }
+
+  // Owner, Nov 7 ("that's how I want these picks coming out on the board, all sports"): the best 3 leans in
+  // each sport, ranked by how far our number beats the price, each saying why and what could go wrong, then
+  // the favorites too pricey to bother with.
+  function bestLeansPanel(leans) {
+    const edge = (e) => (e.win_prob || 0) - implied(e.odds);
+    const groups = new Map();
+    leans.filter((e) => !e.player && !isFuture(e)).sort((a, b) => edge(b) - edge(a))
+      .forEach((e) => { const k = sportGroup(e.sport); if (!groups.has(k)) groups.set(k, []); if (groups.get(k).length < 3) groups.get(k).push(e); });
+    const offs = (DATA.stay_off || []).filter((x) => pickedSport(x.sport));
+    const offBy = new Map();
+    offs.forEach((x) => { const k = sportGroup(x.sport); if (!offBy.has(k)) offBy.set(k, []); if (offBy.get(k).length < 3) offBy.get(k).push(x); });
+    const keys = [...new Set([...groups.keys(), ...offBy.keys()])];
+    if (!keys.length) return "";
+    const body = keys.map((k) => {
+      const picks = (groups.get(k) || []).map((e) => row(e)).join("");
+      const off = (offBy.get(k) || []).map((x) => `<li><b>${esc(x.team)} ${odds(x.odds)}</b>: too pricey for what it pays · <span class="muted">${esc(x.matchup)}</span></li>`).join("");
+      return `<h3 class="sport-head">${esc(sportHead(k))}</h3>${picks || empty("No lean worth a sweat here today.")}`
+        + (off ? `<p class="small"><b>Stay off</b> · the priciest favorites</p><ul class="small reads">${off}</ul>` : "");
+    }).join("");
+    return panel("Best leans by sport", "No money on these: only proven spots get units. The 3 best in each sport, where our number beats the price the most, with why and what to watch out for.", body);
   }
 
   // Owner, Oct 28 (+EV spec: "prefer NO BET"): every game today we passed on, and why.
