@@ -407,5 +407,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all totals through the same bar: 0 passed, 0 strong (luck alone gives ~0.2 passes across 24 tries)",
   "verdict": "none wired: 1 of 24 variants technically cleared the bar, not STRONG: NHL under when the projection sits 0.6+ below the posted total (+11.9% on 82 blind, +7.0% on only 37 in tuning). Its mirror (NHL over when projection is below) lost 21%, and the matching high-projection under arm is flat, so it is noise-sized. Everything else negative both ways: the posted total already contains season scoring. Dropped, not tweaked."
+ },
+ {
+  "date": "2026-11-07",
+  "idea": "Season cover rate: a side's cover percentage so far this season (60%+ hot, under 40% cold), own and opponent's, plus a 20-point gap between the two; follow and fade on the real spread price",
+  "sports": "nfl, ncaaf, nba, ncaab",
+  "data": "data/lines/espn closing spreads 2018+ (sportsedge/atsratestudy.py)",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all spread bets through the same bar: 0 passed, 0 strong (luck alone gives ~0.1 passes across 20 tries)",
+  "verdict": "none wired: 0 of 20 variants cleared the bar. Every big sample loses about the vig or worse (NBA -4% to -5%, NCAAB -3% to -7% on 1,700-3,600 bets, NCAAF -4% to -9%). The only positive tuning/blind flashes flip between arms (NFL follow hot cover rate +3.8% blind but -11.9% tuning; NFL fade-the-hot -12.2% blind vs +3.4% tuning). The spread already prices a team's cover record. Dropped, not tweaked."
  }
 ]
