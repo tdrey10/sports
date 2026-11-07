@@ -65,6 +65,11 @@ def build_data(
     for d in entries:  # college picks posted before the fix said "goals" (insights.UNIT had no college keys)
         if d.get("sport") in ("ncaaf", "ncaab"):
             d["reasons"] = [r.replace(" goals a game", " points a game") for r in d.get("reasons") or []]
+    # Owner, Nov 7: every lean reads like the hockey card (what backs it, what to watch out for, what to stay off).
+    from .pickcard import annotate, stay_off
+
+    sport_reports = {**(reports or {}), **({"nba": nba} if nba else {})}
+    annotate(entries, sport_reports)
     in_ledger = {e["sport"] for e in entries}
     shown = [c for c in sports if c.key in in_ledger] or sports
     return {
@@ -100,6 +105,7 @@ def build_data(
         "nba": nba,
         # The football reports (fbplayers.py): {"nfl": ..., "ncaaf": ...}. Research, no units.
         "reports": reports or {},
+        "stay_off": stay_off(sport_reports, now),
         # Owner, Oct 29: his picks vs our leans (rivalry.py).
         "rivalry": rivalry,
     }
