@@ -60,19 +60,31 @@ def _card(root, sport, team, odds, now, market, point, side) -> Card:
     # Owner, Nov 5: bets on part of a game ("2nd half over 108.5"): market "totals_2h" and so on.
     from .ledger import PARTS, split_market
 
+    # Owner, Nov 8: player props ride in the market as "player_points@LeBron James" (the inbox has no player
+    # column); touchdown scorer bets are over 0.5.
+    player = None
+    if "@" in market:
+        market, player = market.split("@", 1)
     base, part = split_market(market)
-    if base not in ("h2h", "spreads", "totals"):
+    if player is None and base not in ("h2h", "spreads", "totals"):
         raise ValueError(f"unknown market {market}")
     tag = f"{part.upper()} " if part else ""
-    if base == "totals":
+    if player is not None:
+        label = PROP_LABELS.get(market, market.replace("player_", "").replace("_", " ").title())
+        if market in ("player_anytime_td", "player_first_td"):
+            sel_side, point, selection = "over", 0.5, f"{player} {label}"
+        else:
+            sel_side, selection = side, f"{player} {side.title()} {point:g} {label}"
+    elif base == "totals":
         sel_side, selection = side, f"{tag}{side.title()} {point:g}"
     else:
         sel_side = "home" if name == home else "away"
         selection = f"{tag}{name} ML" if base == "h2h" else f"{tag}{name} {point:+g}"
-    label = {"h2h": "Moneyline", "spreads": "Spread", "totals": "Total"}[base]
+    label = PROP_LABELS.get(market, "Player prop") if player is not None else \
+        {"h2h": "Moneyline", "spreads": "Spread", "totals": "Total"}[base]
     pick = Pick(sport=sport, event_id=eid, commence_time=start, matchup=f"{away} @ {home}", market=market,
                 market_label=f"{PARTS[part].capitalize()} {label.lower()}" if part else label, selection=selection,
-                side=sel_side, point=point, player=None, book="", american=float(odds), model_prob=0.5,
+                side=sel_side, point=point, player=player, book="", american=float(odds), model_prob=0.5,
                 market_prob=None, win_prob=0.5, push_prob=0.0, fair_american=0.0, ev=0.0, kelly=0.0, stake=None,
                 projection="", books=0)
     return Card(tier="lean", units=0.0, headline=f"Your pick: {selection} at {odds:+.0f}.", reasons=["Your pick."],
@@ -177,6 +189,27 @@ PARLAY_INBOX = "my_parlays_inbox.csv"
 PARLAY_FIELDS = ["added_at", "parlay"] + INBOX_FIELDS[1:]
 
 
+PROP_LABELS = {"player_points": "Points", "player_rebounds": "Rebounds", "player_assists": "Assists",
+               "player_threes": "Threes", "player_points_rebounds_assists": "Pts+Reb+Ast", "player_pass_yds": "Pass Yds",
+               "player_pass_tds": "Pass TDs", "player_rush_yds": "Rush Yds", "player_reception_yds": "Rec Yds",
+               "player_receptions": "Catches", "player_goals": "Goals", "player_shots_on_goal": "Shots on Goal",
+               "player_anytime_td": "anytime TD", "player_first_td": "first TD", "batter_hits": "Hits",
+               "batter_home_runs": "Home Runs", "pitcher_strikeouts": "Strikeouts"}
+PROP_ALIASES = {"pts": "points", "reb": "rebounds", "ast": "assists", "3s": "threes", "pra": "points_rebounds_assists",
+                "td": "anytime_td", "anytime": "anytime_td", "first": "first_td", "ftd": "first_td",
+                "passing_yards": "pass_yds", "rushing_yards": "rush_yds", "receiving_yards": "reception_yds",
+                "rec_yds": "reception_yds", "catches": "receptions", "sog": "shots_on_goal", "shots": "shots_on_goal",
+                "hits": "hits", "hr": "home_runs", "ks": "strikeouts", "strikeouts": "strikeouts"}
+
+
+def prop_market(sport: str, name: str) -> str:
+    """'points' -> 'player_points', 'first_td' -> 'player_first_td', 'hits' (MLB) -> 'batter_hits'."""
+    key = PROP_ALIASES.get(name.lower(), name.lower())
+    if sport == "mlb":
+        return f"pitcher_{key}" if key == "strikeouts" else f"batter_{key}"
+    return f"player_{key}"
+
+
 def parse_leg(spec: str) -> tuple:
     """'nba|Lakers|-120', 'nfl|Bills|-110|spread -3.5', 'nba|Lakers|-110|over 221.5' -> leg fields.
     A last field '1h', '2h', 'q1'..'q4' or 'p1'..'p3' makes it a bet on that part of the game
@@ -187,6 +220,17 @@ def parse_leg(spec: str) -> tuple:
     part = parts.pop().lower() if len(parts) > 3 and parts[-1].lower() in PARTS else None
     sport, team, odds = parts[0].lower(), parts[1], float(parts[2])
     market, point, side = "h2h", None, None
+    if len(parts) > 3 and parts[3].lower().startswith("player "):
+        # 'nba|Lakers|-115|player LeBron James points over 25.5', 'nfl|Panthers|1100|player Jalen Coker first_td'
+        import re
+
+        m = re.match(r"^player (.+?) (\w+)(?: (over|under) ([\d.]+))?$", parts[3], re.I)
+        if not m:
+            raise ValueError(f"can't read the prop in {spec!r}")
+        name, stat, ou, num = m.groups()
+        market = prop_market(sport, stat)
+        point = float(num) if num else 0.5
+        return sport, team, odds, f"{market}@{name}", point, (ou or "over").lower()
     if len(parts) > 3 and parts[3].lower() not in ("ml", "moneyline"):
         kind, num = parts[3].split()
         if kind.lower() == "spread":
