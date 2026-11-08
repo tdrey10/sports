@@ -1,14 +1,14 @@
 {
- "ran_at": "2026-11-08T01:26:47.302969+00:00",
- "fights": 4365,
- "called": 3670,
- "accuracy": 0.582016348773842,
- "log_loss": 0.6802666193608513,
+ "ran_at": "2026-11-08T07:59:22.980236+00:00",
+ "fights": 4371,
+ "called": 3676,
+ "accuracy": 0.5816104461371056,
+ "log_loss": 0.6803477208314567,
  "calibration": [
   [
-   0.5316861844886197,
-   0.5640590942116736,
-   4129
+   0.5317131499538855,
+   0.5637243047158403,
+   4135
   ],
   [
    0.6214417643533257,
@@ -17,12 +17,12 @@
   ]
  ],
  "market": {
-  "bets": 33,
-  "won": 8,
-  "lost": 25,
-  "units": -1.45,
-  "roi": -0.04393939393939393,
-  "se": 0.30551091689129745,
+  "bets": 38,
+  "won": 9,
+  "lost": 29,
+  "units": -3.45,
+  "roi": -0.09078947368421052,
+  "se": 0.2749812825852957,
   "proven": false
  },
  "lines_saved": 70,
@@ -143,9 +143,9 @@
    "model_a": 0.562,
    "a_fights": 13,
    "b_fights": 5,
-   "a_ml": -245.0,
-   "b_ml": 200.0,
-   "market_a": 0.681
+   "a_ml": -238.0,
+   "b_ml": 195.0,
+   "market_a": 0.675
   },
   {
    "fight_id": "401922638",
@@ -159,9 +159,9 @@
    "model_a": 0.47,
    "a_fights": 3,
    "b_fights": 7,
-   "a_ml": -192.0,
-   "b_ml": 160.0,
-   "market_a": 0.631
+   "a_ml": -198.0,
+   "b_ml": 164.0,
+   "market_a": 0.637
   },
   {
    "fight_id": "401922639",
@@ -238,6 +238,19 @@
    "b_fights": 1
   },
   {
+   "fight_id": "401927854",
+   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
+   "date": "2026-11-21T15:00Z",
+   "weight": "Bantamweight",
+   "a": "Aleksandre Topuria",
+   "a_record": "7-1-0",
+   "b": "Santiago Luna",
+   "b_record": "8-1-0",
+   "model_a": 0.53,
+   "a_fights": 2,
+   "b_fights": 3
+  },
+  {
    "fight_id": "401927856",
    "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
    "date": "2026-11-21T15:00Z",
@@ -301,19 +314,6 @@
    "model_a": 0.412,
    "a_fights": 13,
    "b_fights": 7
-  },
-  {
-   "fight_id": "401927854",
-   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
-   "date": "2026-11-21T18:00Z",
-   "weight": "Bantamweight",
-   "a": "Aleksandre Topuria",
-   "a_record": "7-1-0",
-   "b": "Santiago Luna",
-   "b_record": "8-1-0",
-   "model_a": 0.53,
-   "a_fights": 2,
-   "b_fights": 3
   },
   {
    "fight_id": "401927855",
