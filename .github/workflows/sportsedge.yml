@@ -12,6 +12,9 @@ on:
     # Hourly the rest of the night: the engine watches lines and injury news, posting any edge it finds.
     - cron: "15 3-12 * * *"
     - cron: "47 15 * * *"      # daily studies + NFL and NBA player props (8:47 AM Pacific)
+    # Owner, Nov 8 (GitHub skipped most runs on Nov 7: 8 of ~30): a backup run every hour at an odd minute,
+    # when GitHub's scheduler is less crowded. A backup that lands right after a normal run just re-checks.
+    - cron: "23 * * * *"
   workflow_dispatch:
     inputs:
       props:
