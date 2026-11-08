@@ -118,7 +118,11 @@ class EspnClient:
 
     def box_score(self, cfg: SportConfig, game: GameResult) -> list[PlayerGame]:
         try:
-            return parse_box_score(self.summary(cfg, game.event_id), game.event_id, game.date)
+            summary = self.summary(cfg, game.event_id)
+            box = parse_box_score(summary, game.event_id, game.date)
+            if cfg.key in ("nfl", "ncaaf"):
+                mark_first_td(box, summary, game.event_id, game.date)
+            return box
         except requests.RequestException as exc:
             log.warning("ESPN summary %s failed: %s", game.event_id, exc)
             return []
@@ -362,6 +366,31 @@ def _parse_stat(raw: str) -> list[float] | None:
     if m:
         return [int(m.group(1)) + int(m.group(2)) / 60]
     return None
+
+
+def first_td_scorer(summary: dict) -> str | None:
+    """The player who scored the game's first touchdown, from ESPN's scoring plays ("Jalen Coker 12 Yd pass
+    from Bryce Young (Eddy Pineiro Kick)")."""
+    for play in summary.get("scoringPlays") or []:
+        kind = ((play.get("type") or {}).get("text") or play.get("scoringType", {}).get("displayName") or "").lower()
+        text = play.get("text") or ""
+        if "touchdown" not in kind and " td" not in f" {text.lower()}":
+            continue
+        m = re.match(r"^(.+?) \d+ (?:Yd|Yard|yd|yard)", text)
+        return m.group(1).strip() if m else None
+    return None
+
+
+def mark_first_td(box: list[PlayerGame], summary: dict, event_id: str, date: datetime) -> None:
+    """Set FIRST_TD = 1 on the first touchdown scorer's box score row (adding a row if he has none)."""
+    who = first_td_scorer(summary)
+    if not who:
+        return
+    for pg in box:
+        if pg.player == who:
+            pg.stats["FIRST_TD"] = 1.0
+            return
+    box.append(PlayerGame(event_id=event_id, date=date, player=who, team="", stats={"FIRST_TD": 1.0}))
 
 
 def innings_to_outs(ip: float) -> float:

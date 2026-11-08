@@ -1020,6 +1020,12 @@ def cmd_my_pick(args) -> int:
         market, side, point = "totals", args.total[0].lower(), float(args.total[1])
     if args.part:
         market = f"{market}_{args.part.lower()}"  # Owner, Nov 5: half / quarter / period bets
+    if args.player:  # Owner, Nov 8: player props and touchdown scorers
+        market = f"{rivalry.prop_market(args.sport, args.prop or 'anytime_td')}@{args.player}"
+        if args.total:
+            side, point = args.total[0].lower(), float(args.total[1])
+        else:
+            side, point = "over", 0.5
     if args.cancel:
         print(rivalry.cancel(args.data_dir, args.sport, args.team, datetime.now(timezone.utc), market))
         return 0
@@ -1297,6 +1303,9 @@ def build_parser() -> argparse.ArgumentParser:
     mp.add_argument("--total", nargs=2, metavar=("OVER_UNDER", "POINTS"), default=None)
     mp.add_argument("--part", choices=["1h", "2h", "q1", "q2", "q3", "q4", "p1", "p2", "p3"], default=None,
                     help="a bet on part of the game: 1h/2h halves, q1-q4 quarters, p1-p3 hockey periods")
+    mp.add_argument("--player", default=None, help="a player prop: the player's name (with --prop, and --total for over/under)")
+    mp.add_argument("--prop", default=None, help="points, rebounds, assists, pra, threes, pass_yds, rush_yds, rec_yds, "
+                    "receptions, anytime_td, first_td, goals, shots, hits, strikeouts...")
     mp.add_argument("--cancel", action="store_true", help="take this pick back before its game")
     mp.add_argument("--data-dir", default="data")
     mp.set_defaults(func=cmd_my_pick)

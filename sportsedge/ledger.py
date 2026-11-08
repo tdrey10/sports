@@ -865,7 +865,28 @@ def _settle(x: float, line: float) -> tuple[float, float, float]:
     return line_probs({0: 1.0}, x + line)
 
 
+# Owner, Nov 8 ("build both"): touchdown scorer bets. Anytime TD counts every rushing, receiving, return or
+# defensive touchdown in the box score; first TD reads the FIRST_TD mark the ESPN box score parser sets from
+# the game's scoring plays. Both are graded as over 0.5.
+TD_MARKETS = ("player_anytime_td", "player_first_td")
+_TD_GROUPS = ("rushing", "receiving", "kickreturns", "puntreturns", "interceptions", "defensive", "fumbles")
+
+
+def td_count(stats: dict) -> float:
+    return sum(v for k, v in stats.items() if "." in k and k.split(".", 1)[0].lower() in _TD_GROUPS
+               and k.split(".", 1)[1] == "TD")
+
+
 def _prop_value(e: Entry, box: list[PlayerGame]) -> float | None:
+    if e.market in TD_MARKETS:
+        if not box:
+            return None
+        players = {pg.player: pg for pg in box}
+        name = NameMatcher(players, threshold=0.88).match(e.player or "")
+        if name is None:
+            return 0.0  # a player with no line in the box score scored no touchdown
+        st = players[name].stats
+        return float(st.get("FIRST_TD", 0.0)) if e.market == "player_first_td" else td_count(st)
     spec = SPORTS[e.sport].props.get(e.market) if e.sport in SPORTS else None
     if spec is None:
         return None
