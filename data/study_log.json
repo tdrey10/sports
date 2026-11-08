@@ -417,5 +417,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all spread bets through the same bar: 0 passed, 0 strong (luck alone gives ~0.1 passes across 20 tries)",
   "verdict": "none wired: 0 of 20 variants cleared the bar. Every big sample loses about the vig or worse (NBA -4% to -5%, NCAAB -3% to -7% on 1,700-3,600 bets, NCAAF -4% to -9%). The only positive tuning/blind flashes flip between arms (NFL follow hot cover rate +3.8% blind but -11.9% tuning; NFL fade-the-hot -12.2% blind vs +3.4% tuning). The spread already prices a team's cover record. Dropped, not tweaked."
+ },
+ {
+  "date": "2026-11-08",
+  "idea": "Second-half finish: last game's second-half margin (final minus first-half margin), top and bottom quarter of tuning seasons, own and opponent's; +100..+220 dog ML, -170..-120 favorite ML and spread bets at the real price",
+  "sports": "nfl, ncaaf, nba, ncaab, mlb",
+  "data": "data/lines/espn closing prices 2018+ with first-half scores (sportsedge/finishstudy.py)",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed, 0 strong (luck alone gives ~0.4 passes across 60 tries)",
+  "verdict": "none proven: 0 of 60 variants cleared the bar. Every big sample (MLB, NBA, NCAAB spreads, 1,700-9,000 bets) loses about the vig in both arms. The few positive blind flashes (NFL dog off opponent's strong finish +7.1% on 207, NFL lock fav +7.9% on 100, NBA dog off a fade +3%) are small samples and flip or vanish in tuning. Dropped, not tweaked."
  }
 ]
