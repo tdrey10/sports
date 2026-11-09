@@ -711,6 +711,14 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + (grim ? fold(`${esc(N.us)}'s picks`, R.grim_picks.length, grim) : "")
       + (gparlays ? fold(`${esc(N.us)}'s parlays`, R.grim_parlays.length, gparlays) : ""));
   }
+  // Owner, Nov 9 ("why is there no picks up"): with no money play today, the top of the page shows our best
+  // lean, the one Grim posts that day: where our number beats the price the most. Always marked no units.
+  function bestLean(ok) {
+    const xs = DATA.entries.filter((x) => onBoard(x) && tierOf(x) === "lean" && !x.settled && !isFuture(x) && !isLive(x) && !x.player
+      && dayOf(x.commence_time) === nowDay() && (x.win_prob || 0) >= implied(x.odds) - 0.005 && (!ok || ok(x)));
+    const gap = (x) => (x.win_prob || 0) - (x.market_prob || x.win_prob || 0);
+    return xs.sort((a, b) => (gap(b) - gap(a)) || ((b.win_prob || 0) - (a.win_prob || 0)))[0] || null;
+  }
   function renderHero() {
     // Owner, Oct 29: the banner names a pick on a later game a Future Lock, never the Lock of the day.
     // Owner, Oct 31: "#1" read as "the best one" when it was only the soonest game. The banner now shows the
@@ -718,11 +726,15 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const open = bestToday().filter((x) => !x.settled).sort((a, b) => (b.units - a.units) || (score(b) - score(a)));
     const e = open.find((x) => !isFuture(x)) || DATA.entries.filter((x) => x.tier === "lock" && x.units > 0 && onBoard(x) && !x.settled && !isFuture(x)).sort((a, b) => b.units - a.units)[0]
       || open[0];
-    if (!e) {
+    const e2 = e || bestLean();
+    if (!e2) {
       $("hero").innerHTML = `<div class="ticket-empty"><b>No it’s not rigged</b></div>`;
       return;
     }
-    const kind = isFuture(e) ? `${tierOf(e) === "dog" ? "Early Dog" : "Future Lock"} · ${fmt(e.commence_time, { weekday: "long" })}` : e.best_rank ? "Today's best bet" : e.units > 0 ? "Lock of the day" : "Lock of the day · no units today";
+    return heroTicket(e2);
+  }
+  function heroTicket(e) {
+    const kind = isFuture(e) ? `${tierOf(e) === "dog" ? "Early Dog" : "Future Lock"} · ${fmt(e.commence_time, { weekday: "long" })}` : e.best_rank ? "Today's best bet" : e.units > 0 ? "Lock of the day" : tierOf(e) === "lean" ? "Best lean today · no units" : "Lock of the day · no units today";
     $("hero").innerHTML = `<div class="ticket">${stamp(e)}
       <div class="t-head"><span class="t-kind">${kind}</span><span class="t-sport">${esc(e.sport_name)} · ${esc(e.player ? "Prop" : LABEL[e.market] || e.market_label)} · ${timeOf(e)}</span></div>
       <h2>${esc(e.selection)}</h2>
@@ -736,9 +748,11 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const items = DATA.entries.filter(onBoard);
     const potd = ["lock", "dog", "prop"].map((t) => {
       // A real (units) pick beats a lean one posted earlier the same day.
-      const e = items.filter((x) => x.tier === t && (x.units > 0 || t === "prop") && !isFuture(x)).sort((a, b) => b.units - a.units)[0];
+      // Owner, Nov 9: on a day with no money play the Lock slot shows our best lean (no units) instead of sitting empty.
+      const e = items.filter((x) => x.tier === t && (x.units > 0 || t === "prop") && !isFuture(x)).sort((a, b) => b.units - a.units)[0]
+        || (t === "lock" ? bestLean() : t === "dog" ? bestLean((x) => x.odds > 0) : null);
       const label = { lock: "Lock of the day", dog: "Dog of the day", prop: "Prop of the day" }[t]
-        + (e && !(e.units > 0) ? (t === "lock" ? " · no units today" : " · lean, no units") : "");
+        + (e && !(e.units > 0) ? (t === "lock" ? " · best lean, no units" : " · lean, no units") : "");
       if (!e) return `<div class="potd"><span class="kind">${label}</span><p class="muted">No it’s not rigged</p></div>`;
       return `<div class="potd ${esc(e.status || "")}">${stamp(e)}<span class="kind">${label}</span><h3>${gradeBadge(e)} ${esc(e.selection)}</h3>
         <div class="price"><b>${odds(e.odds)}</b><span class="muted">${wins(e)}</span></div><p class="small">${needs(e)}</p>${stake(e)}
