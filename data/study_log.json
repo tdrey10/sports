@@ -427,5 +427,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed, 0 strong (luck alone gives ~0.4 passes across 60 tries)",
   "verdict": "none proven: 0 of 60 variants cleared the bar. Every big sample (MLB, NBA, NCAAB spreads, 1,700-9,000 bets) loses about the vig in both arms. The few positive blind flashes (NFL dog off opponent's strong finish +7.1% on 207, NFL lock fav +7.9% on 100, NBA dog off a fade +3%) are small samples and flip or vanish in tuning. Dropped, not tweaked."
+ },
+ {
+  "date": "2026-11-09",
+  "idea": "Close-game hangover: side's (and opponent's) previous game this season decided by one score (3 pts NFL/NCAAF/NBA/NCAAB, 1 run MLB), win or loss; +100..+220 dog ML, -170..-120 favorite ML and spread bets at the real price",
+  "sports": "nfl, ncaaf, nba, ncaab, mlb",
+  "data": "data/lines/espn closing prices 2018+ (sportsedge/closegamestudy.py)",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed, 0 strong (luck alone gives ~0.4 passes across 60 tries)",
+  "verdict": "none wired: 1 of 60 variants technically cleared the bar and it is not STRONG: NBA spread vs a side whose opponent just won a close game (tuning +2.7% on 718, under 1 SE; blind +6.4% on 785). Same signal as its mirror (NBA spread on the team off a close win covers just ~46%: -11% tuning, -15% blind), so it is one result, not two. One pass in 60 is what luck gives; every other big sample (MLB, NCAAB, NCAAF, NFL spreads) loses about the vig. Dropped; watch item: re-check NBA fade-the-close-winner as more seasons land."
  }
 ]
