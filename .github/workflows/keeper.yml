@@ -1,0 +1,46 @@
+name: Keeper
+
+# Owner, Nov 9 ("build it"): GitHub's scheduler skipped most SportsEdge runs (about 10 of 70 on Nov 8-9, gaps of
+# 3-5 hours), so the board went stale. The keeper starts the engine itself: every 30 minutes it checks when
+# SportsEdge last ran and starts it if it has been 25+ minutes. A keeper run lasts about 5.5 hours, then starts the
+# next keeper. The 6-hour schedule below only restarts the chain if a hand-off ever gets lost.
+# Free: the repo is public, so Actions minutes cost nothing. It never touches the Odds API.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "7 */6 * * *"
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: keeper
+  cancel-in-progress: false
+
+jobs:
+  keep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Start SportsEdge every 30 minutes
+        run: |
+          end=$(( $(date +%s) + 300 * 60 ))
+          while [ "$(date +%s)" -lt "$end" ]; do
+            last=$(gh run list --workflow sportsedge.yml --limit 1 --json createdAt --jq '.[0].createdAt' || true)
+            age=999999
+            if [ -n "$last" ]; then age=$(( $(date +%s) - $(date -d "$last" +%s) )); fi
+            if [ "$age" -ge 1500 ]; then
+              gh workflow run sportsedge.yml -f study=false && echo "$(date -u +%H:%M) started SportsEdge (last run ${age}s ago)"
+            else
+              echo "$(date -u +%H:%M) SportsEdge ran ${age}s ago, skipping"
+            fi
+            sleep 1800
+          done
+
+      - name: Hand off to the next keeper
+        if: always()
+        run: gh workflow run keeper.yml
