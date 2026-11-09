@@ -15,6 +15,9 @@ on:
     # Owner, Nov 8 (GitHub skipped most runs on Nov 7: 8 of ~30): a backup run every hour at an odd minute,
     # when GitHub's scheduler is less crowded. A backup that lands right after a normal run just re-checks.
     - cron: "23 * * * *"
+    # Nov 9: it skipped the 3:15, 3:23, 4:15 and 4:23 UTC runs too, so Sunday night's games sat ungraded.
+    # A second backup at :53 every hour.
+    - cron: "53 * * * *"
   workflow_dispatch:
     inputs:
       props:
