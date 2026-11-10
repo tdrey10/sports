@@ -73,7 +73,8 @@ jobs:
       - run: pip install -e .
 
       - name: Live bets, scores and grading
-        if: github.event_name == 'schedule' && github.event.schedule != '47 15 * * *'
+        # Also on the keeper's runs (study=false): GitHub skips most scheduled runs (keeper.yml).
+        if: (github.event_name == 'schedule' && github.event.schedule != '47 15 * * *') || (github.event_name == 'workflow_dispatch' && !inputs.study)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: hambino live nfl,ncaaf,nba,mlb,nhl,soccer --once --notify
