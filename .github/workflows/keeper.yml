@@ -29,7 +29,16 @@ jobs:
       - name: Start SportsEdge every 30 minutes
         run: |
           end=$(( $(date +%s) + 300 * 60 ))
+          daily=""
           while [ "$(date +%s)" -lt "$end" ]; do
+            # The daily studies and the morning prop pricing ride on the 8:47 AM PT schedule, which GitHub
+            # skips too: the keeper check between 15:30 and 15:59 UTC starts them (the checks are 30 minutes apart, so one does).
+            if [ -z "$daily" ] && [ "$(date -u +%H%M)" -ge 1530 ] && [ "$(date -u +%H%M)" -le 1559 ]; then
+              gh workflow run sportsedge.yml -f study=true -f props=true && echo "$(date -u +%H:%M) started the daily studies"
+              daily=1
+              sleep 1800
+              continue
+            fi
             last=$(gh run list --workflow sportsedge.yml --limit 1 --json createdAt --jq '.[0].createdAt' || true)
             age=999999
             if [ -n "$last" ]; then age=$(( $(date +%s) - $(date -d "$last" +%s) )); fi
