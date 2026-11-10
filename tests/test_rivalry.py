@@ -113,3 +113,46 @@ def test_player_props_keep_their_own_record_apart_from_straight_picks(tmp_path):
     assert board["you"]["pending"] == 1 and board["props"]["you"]["pending"] == 1
     assert [p["selection"] for p in board["your_picks"]] == ["Los Angeles Lakers ML"]
     assert len(board["your_props"]) == 1 and "LeBron" in board["your_props"][0]["selection"]
+
+
+def _tennis(root, status="STATUS_SCHEDULED", winner=""):
+    f = root / "_src" / "tennis" / "matches.csv"
+    f.parent.mkdir(parents=True, exist_ok=True)
+    with f.open("w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["id", "tour", "start", "event", "tourney", "round", "surface", "bo", "p1", "p1_name", "p2", "p2_name",
+                    "winner", "sets1", "sets2", "status", "done", "cc1", "cc2", "venue"])
+        w.writerow(["wta:1", "wta", START.strftime("%Y-%m-%dT%H:%MZ"), "e", "Chennai Open", "Final", "hard", 3, 1,
+                    "Magda Linette", 2, "Janice Tjen", winner, "", "", status, "", "", "", ""])
+
+
+def test_a_tennis_moneyline_is_filed_on_its_match_and_graded_on_the_result(tmp_path):
+    """Owner, Nov 10: 'The contest is all sports. Add everything.'"""
+    _tennis(tmp_path)
+    assert rivalry.add(tmp_path, "tennis", "Linette", 165, NOW).startswith("Saved: Magda Linette ML at +165")
+    _tennis(tmp_path, "STATUS_FINAL", "1")
+    from sportsedge import tennis
+
+    L = Ledger.load(rivalry.path(tmp_path))
+    tennis.grade_entries(L, tennis.read_matches(tmp_path / "_src" / "tennis" / "matches.csv"), START + timedelta(hours=3))
+    e = next(iter(L.entries.values()))
+    assert e.sport == "tennis_wta" and e.status == "won" and abs(e.profit - 1.65) < 0.01
+
+
+def test_a_teaser_keeps_its_own_record_at_its_price(tmp_path):
+    snapshots(tmp_path)
+    with (tmp_path / "odds" / "nba" / "2026-10.csv").open("a", newline="") as f:
+        csv.writer(f).writerow([NOW.isoformat(), "g2", START.isoformat(), "Miami Heat", "Atlanta Hawks", "h2h", "home", "",
+                                "draftkings", -150])
+    rivalry.send_parlay(tmp_path, [rivalry.parse_leg("nba|Lakers|-110|spread 2"), rivalry.parse_leg("nba|Heat|-110|spread 3")],
+                        NOW, teaser=-120)
+    assert rivalry._file_parlays(tmp_path) == 0  # not a parlay
+    assert rivalry._file_parlays(tmp_path, legs_file=rivalry.TEASER_LEGS, teasers=True) == 1
+    tl = Ledger.load(tmp_path / rivalry.TEASER_LEGS)
+    finals = {"g1": GameResult("g1", START, "Los Angeles Lakers", "Boston Celtics", 100, 101, state="post"),
+              "g2": GameResult("g2", START, "Miami Heat", "Atlanta Hawks", 99, 100, state="post")}
+    tl.refresh(lambda s, a, b: list(finals.values()), lambda s, g: [], START + timedelta(hours=4))
+    tl.save(tmp_path / rivalry.TEASER_LEGS)
+    board = rivalry.scoreboard(Ledger(), tmp_path)
+    assert board["teasers"]["you"]["won"] == 1 and abs(board["teasers"]["you"]["units"] - 100 / 120) < 0.01
+    assert board["parlays"]["you"]["won"] == 0

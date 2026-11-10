@@ -700,18 +700,22 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const newest = (xs) => [...(xs || [])].reverse();
     const picks = newest(R.your_picks).map((p) => slip(p)).join("");
     const parlays = newest(R.your_parlays).map(pslip).join("");
+    const teasers = newest(R.your_teasers).map((p) => pslip(p).replace("-leg parlay<", "-team teaser<")).join("");
     const props = newest(R.your_props).map((p) => slip(p).replace(">Straight<", ">Prop<")).join("");
     const grim = newest(R.grim_picks).map((p) => slip(p, p.money)).join("");
     const gparlays = newest(R.grim_parlays).map(pslip).join("");
     return panel(`The Doctor vs Grim`, `🩺 ${esc(N.you)} vs 💀 ${esc(N.us)} · 1 unit flat on every pick · tap a list to open it`,
       `<p class="small"><b>Straight picks</b> · ${lead(R.you, R.leans)}</p>` + table(R.you, R.leans)
       + `<p class="small"><b>Parlays</b> · ${lead(P.you, P.us)}</p>` + table(P.you, P.us)
+      // Owner, Nov 10: teasers keep their own record too.
+      + (R.teasers && (R.teasers.you.won + R.teasers.you.lost + R.teasers.you.pending) ? `<p class="small"><b>Teasers</b> · ${lead(R.teasers.you, R.teasers.us)}</p>` + table(R.teasers.you, R.teasers.us) : "")
       // Owner, Nov 10: player props keep their own record, apart from straight picks.
       + (R.props && (R.props.you.won + R.props.you.lost + R.props.you.pending + R.props.us.won + R.props.us.lost) ? `<p class="small"><b>Player props</b> · ${lead(R.props.you, R.props.us)}</p>` + table(R.props.you, R.props.us) : "")
       // Owner, Nov 1: "if you click it pops up... it's just too long and hard to read": each list folds up.
       + (picks ? fold(`${esc(N.you)}'s picks`, R.your_picks.length, picks) : `<p class="small muted">Send your picks in the chat and they show up here.</p>`)
       + (props ? fold(`${esc(N.you)}'s props`, R.your_props.length, props) : "")
       + (parlays ? fold(`${esc(N.you)}'s parlays`, R.your_parlays.length, parlays) : "")
+      + (teasers ? fold(`${esc(N.you)}'s teasers`, R.your_teasers.length, teasers) : "")
       + (grim ? fold(`${esc(N.us)}'s picks`, R.grim_picks.length, grim) : "")
       + (gparlays ? fold(`${esc(N.us)}'s parlays`, R.grim_parlays.length, gparlays) : ""));
   }
