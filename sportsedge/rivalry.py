@@ -24,6 +24,10 @@ FILE = "my_picks.json"
 LEGS = "my_parlay_legs.json"
 GRIM_LEGS = "grim_parlay_legs.json"  # Grim's own contest parlays (owner, Oct 31: "log that as Grim's parlay")
 GRIM_INBOX = "grim_parlays_inbox.csv"
+# Owner, Nov 10: teasers count too, in their own record. Their legs sit at the teased number, so they live in
+# their own file (a teased Spurs -5 is not the Spurs -9 leg of a parlay). The teaser's price rides in its id:
+# "doc-teaser+400-20261109230002".
+TEASER_LEGS = "my_teaser_legs.json"
 
 
 def path(root) -> Path:
@@ -52,11 +56,54 @@ def _game(root, sport: str, team: str, now: datetime):
     return eid, start, home, away, name
 
 
+TENNIS_SRC = ("_src", "tennis", "matches.csv")
+
+
+def _tennis_rows(root) -> list[dict]:
+    """The ATP/WTA match list the tennis board uses (fetched here if this run hasn't yet)."""
+    from . import tennis
+
+    f = Path(root).joinpath(*TENNIS_SRC)
+    if not f.exists():
+        try:
+            tennis.fetch(f.parent)
+        except Exception:  # no tennis list: a tennis pick just waits in the inbox
+            return []
+    return tennis.read_matches(f)
+
+
+def _tennis_match(root, player: str, now: datetime):
+    """(match id, start, player 1, player 2, the player's full name, tour) of this player's next match."""
+    rows = [r for r in _tennis_rows(root) if r.get("start")]
+    near = []
+    for r in rows:
+        start = datetime.fromisoformat(r["start"].replace("Z", "+00:00"))
+        if start > now - timedelta(hours=1):
+            near.append((start, r))
+    m = NameMatcher({n for _, r in near for n in (r["p1_name"], r["p2_name"])})
+    name = m.match(player)
+    hits = sorted(((st, r) for st, r in near if name in (r["p1_name"], r["p2_name"])), key=lambda x: x[0])
+    if not name or not hits:
+        return None
+    start, r = hits[0]
+    return r["id"], start, r["p1_name"], r["p2_name"], name, r["tour"]
+
+
 def _card(root, sport, team, odds, now, market, point, side) -> Card:
-    found = _game(root, sport, team, now)
-    if found is None:
-        raise ValueError(f"no upcoming {sport.upper()} game found for {team}")
-    eid, start, home, away, name = found
+    # Owner, Nov 10 ("the contest is all sports, add everything"): tennis moneylines, graded on the match result.
+    if sport.startswith("tennis"):
+        if market != "h2h":
+            raise ValueError("tennis picks are moneylines for now")
+        found = _tennis_match(root, team, now)
+        if found is None:
+            raise ValueError(f"no upcoming tennis match found for {team}")
+        eid, start, home, away, name, tour = found
+        sport = f"tennis_{tour}"
+    else:
+        found = _game(root, sport, team, now)
+        if found is None:
+            raise ValueError(f"no upcoming {sport.upper()} game found for {team}")
+        eid, start, home, away, name = found
     # Owner, Nov 5: bets on part of a game ("2nd half over 108.5"): market "totals_2h" and so on.
     from .ledger import PARTS, split_market
 
@@ -115,9 +162,7 @@ def send(root, sport: str, team: str, odds: float, now: datetime, market: str = 
     """Put a pick in the inbox (checked against our saved games now, filed on the next run)."""
     import csv
 
-    found = _game(root, sport, team, now)
-    if found is None:
-        raise ValueError(f"no upcoming {sport.upper()} game found for {team}")
+    card = _card(root, sport, team, odds, now, market, point, side)  # raises when there's no game coming up
     f = Path(root) / INBOX
     new = not f.exists()
     with f.open("a", newline="") as fh:
@@ -126,8 +171,7 @@ def send(root, sport: str, team: str, odds: float, now: datetime, market: str = 
             w.writeheader()
         w.writerow({"added_at": now.isoformat(), "sport": sport, "team": team, "odds": odds, "market": market,
                     "point": "" if point is None else point, "side": side or ""})
-    _, start, home, away, name = found
-    return f"In: {name} at {odds:+.0f} ({away} @ {home})."
+    return f"In: {card.pick.selection} at {odds:+.0f} ({card.away} @ {card.home})."
 
 
 def cancel(root, sport: str, team: str, now: datetime, market: str = "h2h") -> str:
@@ -240,19 +284,15 @@ def parse_leg(spec: str) -> tuple:
     return sport, team, odds, f"{market}_{part}" if part else market, point, side
 
 
-def send_parlay(root, legs: list[tuple], now: datetime, grim: bool = False) -> str:
-    """Put a parlay in the inbox: every leg must be on an upcoming game we have."""
+def send_parlay(root, legs: list[tuple], now: datetime, grim: bool = False, teaser: float | None = None) -> str:
+    """Put a parlay in the inbox: every leg must be on an upcoming game we have. With `teaser` (its price),
+    the legs are at the teased numbers and it keeps its own record."""
     import csv
 
     if len(legs) < 2:
         raise ValueError("a parlay needs 2+ legs")
-    names = []
-    for sport, team, odds, *_ in legs:
-        found = _game(root, sport, team, now)
-        if found is None:
-            raise ValueError(f"no upcoming {sport.upper()} game found for {team}")
-        names.append(f"{found[4]} {odds:+.0f}")
-    pid = ("grim-" if grim else "doc-") + now.strftime("%Y%m%d%H%M%S")
+    names = [f"{_card(root, *leg[:3], now, leg[3], leg[4], leg[5]).pick.selection}" for leg in legs]
+    pid = ("grim-" if grim else "doc-") + (f"teaser{teaser:+.0f}-" if teaser is not None else "") + now.strftime("%Y%m%d%H%M%S")
     f = Path(root) / (GRIM_INBOX if grim else PARLAY_INBOX)
     new = not f.exists()
     with f.open("a", newline="") as fh:
@@ -262,10 +302,18 @@ def send_parlay(root, legs: list[tuple], now: datetime, grim: bool = False) -> s
         for sport, team, odds, market, point, side in legs:
             w.writerow({"added_at": now.isoformat(), "parlay": pid, "sport": sport, "team": team, "odds": odds,
                         "market": market, "point": "" if point is None else point, "side": side or ""})
-    return f"In: {len(legs)}-leg parlay: " + " + ".join(names) + "."
+    kind = f"{len(legs)}-team teaser at {teaser:+.0f}" if teaser is not None else f"{len(legs)}-leg parlay"
+    return f"In: {kind}: " + " + ".join(names) + "."
 
 
-def _file_parlays(root, inbox: str = PARLAY_INBOX, legs_file: str = LEGS) -> int:
+def teaser_price(pid: str) -> float | None:
+    import re
+
+    m = re.search(r"teaser([+-]\d+)", pid)
+    return float(m.group(1)) if m else None
+
+
+def _file_parlays(root, inbox: str = PARLAY_INBOX, legs_file: str = LEGS, teasers: bool = False) -> int:
     import csv
     from collections import defaultdict
 
@@ -285,7 +333,7 @@ def _file_parlays(root, inbox: str = PARLAY_INBOX, legs_file: str = LEGS) -> int
     have = {p.id for p in ledger.parlays}
     n = 0
     for pid, rows in groups.items():
-        if pid in have:
+        if pid in have or (teaser_price(pid) is not None) != teasers:
             continue
         now = datetime.fromisoformat(rows[0]["added_at"])
         try:
@@ -297,12 +345,19 @@ def _file_parlays(root, inbox: str = PARLAY_INBOX, legs_file: str = LEGS) -> int
         ids = [entry_id(c.pick) for c in cards]
         if not all(i in ledger.entries for i in ids):
             continue
-        dec = 1.0
-        for c in cards:
-            dec *= american_to_decimal(c.pick.american)
+        if teasers:
+            # Every leg carries an even share of the teaser's price, so a pushed leg drops it like a smaller teaser.
+            dec = american_to_decimal(teaser_price(pid))
+            each = dec ** (1 / len(cards))
+            leg_odds = [round((each - 1) * 100, 2) if each >= 2 else round(-100 / (each - 1), 2)] * len(cards)
+        else:
+            dec = 1.0
+            for c in cards:
+                dec *= american_to_decimal(c.pick.american)
+            leg_odds = [c.pick.american for c in cards]
         ledger.parlays.append(Parlay(id=pid, day=ledger.day_of(now), created_at=now.isoformat(), size=len(cards), legs=ids,
-                                     leg_odds=[c.pick.american for c in cards], units=0.0, decimal=round(dec, 4),
-                                     kind="doctor"))
+                                     leg_odds=leg_odds, units=0.0, decimal=round(dec, 4),
+                                     kind="teaser" if teasers else "doctor"))
         n += 1
     ledger.save(lp)
     return n
@@ -315,11 +370,18 @@ def refresh(provider, root, now: datetime) -> int:
     _file_inbox(root)
     _file_parlays(root)
     _file_parlays(root, GRIM_INBOX, GRIM_LEGS)
+    _file_parlays(root, PARLAY_INBOX, TEASER_LEGS, teasers=True)
     graded = 0
-    for p in (path(root), Path(root) / LEGS, Path(root) / GRIM_LEGS):
+    tennis_rows = None
+    for p in (path(root), Path(root) / LEGS, Path(root) / GRIM_LEGS, Path(root) / TEASER_LEGS):
         if p.exists():
             ledger = Ledger.load(p)
             graded += refresh_scores(provider, ledger, now)
+            if any(e.sport.startswith("tennis_") and not e.settled for e in ledger.entries.values()):
+                from . import tennis
+
+                tennis_rows = _tennis_rows(root) if tennis_rows is None else tennis_rows
+                graded += tennis.grade_entries(ledger, tennis_rows, now)
             ledger.save(p)
     return graded
 
@@ -402,6 +464,8 @@ def scoreboard(ours: Ledger, root) -> dict | None:
     recent_props = sorted(your_props, key=lambda e: e.start, reverse=True)[:10]
     legs = Ledger.load(Path(root) / LEGS)
     you_p, your_parlays = _parlay_record(legs.parlays, legs.entries)
+    tl = Ledger.load(Path(root) / TEASER_LEGS)
+    you_t, your_teasers = _parlay_record(tl.parlays, tl.entries)
     gl = Ledger.load(Path(root) / GRIM_LEGS)
     entries = {**ours.entries, **gl.entries}
     grim_p, grim_parlays = _parlay_record([p for p in ours.parlays if p.created_at >= START.isoformat()] + gl.parlays, entries)
@@ -415,6 +479,7 @@ def scoreboard(ours: Ledger, root) -> dict | None:
             "props": {"you": _record(your_props), "us": _flat(grim_props)},
             "your_props": [{"selection": e.selection, "matchup": e.matchup, "odds": e.odds, "start": e.start.isoformat(),
                             "status": e.status, "final": e.final} for e in recent_props],
+            "teasers": {"you": you_t, "us": _parlay_record([], {})[0]}, "your_teasers": your_teasers,
             "parlays": {"you": you_p, "us": grim_p}, "your_parlays": your_parlays, "grim_parlays": grim_parlays}
 
 

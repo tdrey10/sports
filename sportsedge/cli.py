@@ -1050,7 +1050,7 @@ def cmd_my_parlay(args) -> int:
     from . import rivalry
 
     legs = [rivalry.parse_leg(x) for x in args.legs]
-    print(rivalry.send_parlay(args.data_dir, legs, datetime.now(timezone.utc), grim=args.grim))
+    print(rivalry.send_parlay(args.data_dir, legs, datetime.now(timezone.utc), grim=args.grim, teaser=args.teaser))
     return 0
 
 
@@ -1323,6 +1323,8 @@ def build_parser() -> argparse.ArgumentParser:
     mp.set_defaults(func=cmd_my_pick)
     mx = sub.add_parser("my-parlay", help="record one of your parlays: legs like 'nba|Lakers|-120' or 'nfl|Bills|-110|spread -3.5'")
     mx.add_argument("legs", nargs="+")
+    mx.add_argument("--teaser", type=float, default=None,
+                    help="it's a teaser at this price (e.g. 400): legs at the teased numbers, its own record")
     mx.add_argument("--grim", action="store_true", help="log it as Grim's parlay (Script Leaks' side of the contest)")
     mx.add_argument("--data-dir", default="data")
     mx.set_defaults(func=cmd_my_parlay)
