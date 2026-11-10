@@ -167,10 +167,12 @@ def grade(picks: list[dict], root) -> None:
 def update(scans, now: datetime, root) -> list[dict]:
     """Add today's new rows (first price seen is kept), grade finished games, save."""
     picks = load(root)
+    before = json.dumps(picks)
     have = {p["id"] for p in picks}
     picks += [p for p in find(scans, now, root) if p["id"] not in have]
     grade(picks, root)
-    save(root, picks)
+    if json.dumps(picks) != before:  # write only on a change (a run with nothing new leaves no file)
+        save(root, picks)
     return picks
 
 
