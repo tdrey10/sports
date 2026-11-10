@@ -393,8 +393,13 @@ def scoreboard(ours: Ledger, root) -> dict | None:
     p = path(root)
     mine = Ledger.load(p) if p.exists() else None
     grim = grim_picks(ours)
-    yours = [e for e in (mine.entries.values() if mine else []) if e.status != "void"]
+    every = [e for e in (mine.entries.values() if mine else []) if e.status != "void"]
+    # Owner, Nov 10: "Prop picks shouldn't count against my record. It should have its own like parlays does."
+    yours = [e for e in every if not e.player]
+    your_props = [e for e in every if e.player]
+    grim_props = [e for e in ours.entries.values() if e.player and e.units > 0 and e.start >= START and e.status != "void"]
     recent = sorted(yours, key=lambda e: e.start, reverse=True)[:10]
+    recent_props = sorted(your_props, key=lambda e: e.start, reverse=True)[:10]
     legs = Ledger.load(Path(root) / LEGS)
     you_p, your_parlays = _parlay_record(legs.parlays, legs.entries)
     gl = Ledger.load(Path(root) / GRIM_LEGS)
@@ -407,6 +412,9 @@ def scoreboard(ours: Ledger, root) -> dict | None:
                            for e in sorted(grim, key=lambda e: e.start, reverse=True)[:10]],
             "your_picks": [{"selection": e.selection, "matchup": e.matchup, "odds": e.odds, "start": e.start.isoformat(),
                             "status": e.status, "final": e.final} for e in recent],
+            "props": {"you": _record(your_props), "us": _flat(grim_props)},
+            "your_props": [{"selection": e.selection, "matchup": e.matchup, "odds": e.odds, "start": e.start.isoformat(),
+                            "status": e.status, "final": e.final} for e in recent_props],
             "parlays": {"you": you_p, "us": grim_p}, "your_parlays": your_parlays, "grim_parlays": grim_parlays}
 
 
