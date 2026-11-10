@@ -52,6 +52,7 @@ def build_data(
     reports: dict | None = None,
     rivalry: dict | None = None,
     prop_moves: list | None = None,
+    watch: dict | None = None,
 ) -> dict:
     cutoff = now - timedelta(days=KEEP_DAYS)
     entries = []
@@ -96,6 +97,7 @@ def build_data(
         "props": props or {},
         # Owner, Nov 5: where the money is going on props (biggest line moves today).
         "prop_moves": prop_moves or [],
+        "watch": watch,
         "ufc": ufc or {},
         "clv_trust": ledger.clv_trust(now),
         "parlays": [v for v in ledger.parlay_views() if v["created_at"] >= cutoff.isoformat()],

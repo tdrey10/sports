@@ -164,6 +164,13 @@ def run_cycle(
     if not held:
         ledger.post_parlays(now)
     ledger.update_prices(out.scans, now)
+    if not held:
+        from . import watch
+
+        try:  # Owner, Nov 10: college O/U angles we're watching, no money, own record (watch.py)
+            watch.update(out.scans, now, d5_root)
+        except Exception as exc:  # the watch list never stops the board
+            log.warning("watch list failed: %s", exc)
     from . import forecasts
 
     forecasts.merge(ledger.forecasts, forecasts.build(out.scans, settings, now, forecast_study), now)

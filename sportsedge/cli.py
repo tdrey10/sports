@@ -489,10 +489,21 @@ class Workspace:
                           props=load_props(self.data_dir / ("demo-studies.json" if self.demo else "studies.json")),
                           nba=None if self.demo else _load_json(self.data_dir / "nba_report.json"),
                           reports={} if self.demo else _reports(self.data_dir), rivalry=rivalry,
-                          prop_moves=[] if self.demo else _prop_moves(self.data_dir, now))
+                          prop_moves=[] if self.demo else _prop_moves(self.data_dir, now),
+                          watch=None if self.demo else _watch(self.data_dir, now))
         path = write_site(self.site_dir, data)
         o = data["stats"]["overall"]
         print(f"dashboard: {path}  (record {o['won']}-{o['lost']}, {o['units']:+.1f}u, bankroll ${data['stats']['bankroll']:,.2f})")
+
+
+def _watch(data_dir, now) -> dict | None:
+    try:
+        from . import watch
+
+        return watch.summary(watch.load(data_dir), now)
+    except Exception as exc:  # the page still builds
+        print(f"watch list failed: {exc}")
+        return None
 
 
 def _prop_moves(data_dir, now) -> list:
@@ -637,6 +648,7 @@ def cmd_page(args) -> int:
                       rival=rival.fetch(data_dir / "rival_picks.json"), nba=_load_json(data_dir / "nba_report.json"),
                       reports=_reports(data_dir), rivalry=_rivalry(ledger, data_dir),
                       prop_moves=_prop_moves(data_dir, datetime.now(timezone.utc)),
+                      watch=_watch(data_dir, datetime.now(timezone.utc)),
                       rival_reported=rival.fetch_reported(data_dir / "rival_dashboard.html"))
     Path(args.out).write_text(render_html(data, standalone=args.standalone))
     if args.app_dir:
