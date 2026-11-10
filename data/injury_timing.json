@@ -15,14 +15,14 @@
     "bets": 5,
     "beat_close": 0.0,
     "se": 0.0,
-    "avg_clv": -0.0224
+    "avg_clv": -0.0282
    },
    "verdict": "collecting"
   },
   "all": {
    "n": 24,
    "avg_news_move": -0.0001,
-   "avg_drift": 0.0055,
+   "avg_drift": 0.0067,
    "drift_same_way": 0.25,
    "graded": 23,
    "in_sample": {
@@ -56,7 +56,7 @@
     "bets": 12,
     "beat_close": 0.0,
     "se": 0.0,
-    "avg_clv": -0.0272
+    "avg_clv": -0.0296
    },
    "verdict": "collecting"
   },
@@ -125,10 +125,10 @@
  },
  "nba": {
   "sport": "nba",
-  "news": 21,
+  "news": 26,
   "key_news": 7,
   "questionable": {
-   "n": 10,
+   "n": 11,
    "clv_in_sample": {
     "bets": 5,
     "beat_close": 0.0,
@@ -136,18 +136,18 @@
     "avg_clv": -0.042
    },
    "clv_blind": {
-    "bets": 5,
-    "beat_close": 0.0,
-    "se": 0.0,
-    "avg_clv": -0.0676
+    "bets": 6,
+    "beat_close": 0.167,
+    "se": 0.152,
+    "avg_clv": -0.0421
    },
    "verdict": "collecting"
   },
   "all": {
-   "n": 21,
-   "avg_news_move": -0.0116,
-   "avg_drift": 0.0018,
-   "drift_same_way": 0.286,
+   "n": 26,
+   "avg_news_move": -0.0182,
+   "avg_drift": 0.0012,
+   "drift_same_way": 0.269,
    "graded": 21,
    "in_sample": {
     "bets": 10,
@@ -171,16 +171,16 @@
     "beat_close": 0.048
    },
    "clv_in_sample": {
-    "bets": 10,
-    "beat_close": 0.0,
-    "se": 0.0,
-    "avg_clv": -0.0329
+    "bets": 13,
+    "beat_close": 0.077,
+    "se": 0.074,
+    "avg_clv": -0.025
    },
    "clv_blind": {
-    "bets": 11,
-    "beat_close": 0.091,
-    "se": 0.087,
-    "avg_clv": -0.0186
+    "bets": 13,
+    "beat_close": 0.0,
+    "se": 0.0,
+    "avg_clv": -0.0242
    },
    "verdict": "collecting"
   },
@@ -231,7 +231,7 @@
   "news": 29,
   "key_news": 4,
   "questionable": {
-   "n": 6,
+   "n": 7,
    "clv_in_sample": {
     "bets": 3,
     "beat_close": 0.333,
@@ -239,10 +239,10 @@
     "avg_clv": -0.0139
    },
    "clv_blind": {
-    "bets": 3,
+    "bets": 4,
     "beat_close": 0.0,
     "se": 0.0,
-    "avg_clv": -0.0351
+    "avg_clv": -0.0294
    },
    "verdict": "collecting"
   },
