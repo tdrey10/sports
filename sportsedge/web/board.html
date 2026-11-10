@@ -778,6 +778,7 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       + panel("The board", "Everything else we're rockin' with today", rest.length ? bySport(rest) : empty("Nothin' else worth your money today, homie. We don't force it."))
       + rivalryPanel()
       + bestLeansPanel(items.filter((e) => ["lean", "early"].includes(tierOf(e)) && !(e.units > 0) && !isLive(e)))
+      + watchPanel()
       + panel("Every other lean", "No units on these. Just who we'd ride with in the other games and their fair price (nothing past −300). Only sprinkle it if your book's paying more than that.",
           (leans.length ? bySport(leans) : "") + (reads().length ? bySport(reads().map((r) => Object.assign({}, r, { sport: r.f.sport, commence_time: r.f.commence_time })),
             (g) => `<ul class="reads">${g.map(readRow).join("")}</ul>`) : (leans.length ? "" : empty("That's every game today, fam."))))
@@ -804,6 +805,21 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
         + (off ? `<p class="small"><b>Stay off</b> · the priciest favorites</p><ul class="small reads">${off}</ul>` : "");
     }).join("");
     return panel("Best leans by sport", "No money on these: only proven spots get units. The 3 best in each sport, where our number beats the price the most, with why and what to watch out for.", body);
+  }
+
+  // Owner, Nov 10 ("add them"): college over/under angles we're watching at no money, with their own record.
+  function watchPanel() {
+    const W = DATA.watch;
+    if (!W || !pickedSport("ncaab")) return "";
+    const recs = Object.values(W.records || {}).map((r) => {
+      const n = r.won + r.lost;
+      return `<li><b>${esc(r.name)}</b>: ${n ? `${r.won}-${r.lost} · ${r.units >= 0 ? "+" : ""}${r.units.toFixed(1)}u` : "no games graded yet"}</li>`;
+    }).join("");
+    const mark = { won: "✅", lost: "❌", push: "➖" };
+    const rows = (W.picks || []).map((p) => `<li>${mark[p.status] || "⏳"} <b>${p.side === "over" ? "Over" : "Under"} ${p.total}</b> ${odds(p.odds)} · ${esc(p.away)} @ ${esc(p.home)} · ${timeOf({ commence_time: p.start })}`
+      + ` <span class="muted">· ${p.rule === "neutral" ? "neutral site" : `we project ${p.projection}`}${p.final != null ? ` · final ${p.final}` : ""}</span></li>`).join("");
+    return panel("College O/U we're watching", "No money. These angles were close in last season's tests but haven't beaten luck yet. If they keep hitting through December, they get money.",
+      `<ul class="small reads">${recs}</ul>` + (rows ? `<ul class="small reads">${rows}</ul>` : empty("No college games in these spots today.")));
   }
 
   // Owner, Oct 28 (+EV spec: "prefer NO BET"): every game today we passed on, and why.
