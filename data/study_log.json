@@ -437,5 +437,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed, 0 strong (luck alone gives ~0.4 passes across 60 tries)",
   "verdict": "none wired: 1 of 60 variants technically cleared the bar and it is not STRONG: NBA spread vs a side whose opponent just won a close game (tuning +2.7% on 718, under 1 SE; blind +6.4% on 785). Same signal as its mirror (NBA spread on the team off a close win covers just ~46%: -11% tuning, -15% blind), so it is one result, not two. One pass in 60 is what luck gives; every other big sample (MLB, NCAAB, NCAAF, NFL spreads) loses about the vig. Dropped; watch item: re-check NBA fade-the-close-winner as more seasons land."
+ },
+ {
+  "date": "2026-11-10",
+  "idea": "Better-record dog: the gap between a side's season win % and its opponent's (both with enough earlier games: NFL/NCAAF 3, NBA/NHL 8, NCAAB 6, MLB 15); dogs (+100..+220) with the better record, 20+ pts better or worse, winning vs losing record and the mirrors, on the dog ML, -170..-120 favorite ML and spread at the real price",
+  "sports": "nfl, ncaaf, nba, ncaab, nhl, mlb",
+  "data": "data/lines/espn closing prices 2018+ (sportsedge/recordstudy.py)",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed, 0 strong (luck alone gives ~0.5 passes across 80 tries)",
+  "verdict": "dead, nothing wired: 0 of 80 variants cleared the bar. The market prices records right. Dogs with the better record lost blind in every big sample (NBA -8.2% on 719, NCAAB -6.0% on 1,971, MLB -1.3% on 1,904, NHL -1.1% on 914); NFL better-record dogs were +10% in tuning but -6.1% blind (161). Every big spread sample loses about the vig both ways (NCAAB better-record side -6.2% on 12,753 blind). Dropped."
  }
 ]
