@@ -102,3 +102,14 @@ def test_grim_posts_the_money_plays_and_one_best_pick_on_a_day_without_one():
     L.publish([card(picks[0], units=0.5)] + [card(p, tier="lean", units=0.0) for p in picks[1:]], day1 - timedelta(days=1))
     got = sorted(e.event_id for e in rivalry.grim_picks(L))
     assert got == ["l2", "m1"]  # day 1: the money play only; day 2: the lean that beats the market by the most
+
+
+def test_player_props_keep_their_own_record_apart_from_straight_picks(tmp_path):
+    """Owner, Nov 10: 'Prop picks shouldn't count against my record. It should have its own like parlays does.'"""
+    snapshots(tmp_path)
+    rivalry.add(tmp_path, "nba", "Lakers", -120, NOW)
+    rivalry.add(tmp_path, "nba", "Lakers", 1100, NOW, market="player_points@LeBron James", point=40.5, side="over")
+    board = rivalry.scoreboard(Ledger(), tmp_path)
+    assert board["you"]["pending"] == 1 and board["props"]["you"]["pending"] == 1
+    assert [p["selection"] for p in board["your_picks"]] == ["Los Angeles Lakers ML"]
+    assert len(board["your_props"]) == 1 and "LeBron" in board["your_props"][0]["selection"]
