@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-11-11T02:11:42.532212+00:00",
+ "ran_at": "2026-11-11T02:41:26.878757+00:00",
  "fights": 4371,
  "called": 3676,
  "accuracy": 0.5816104461371056,
@@ -25,7 +25,7 @@
   "se": 0.2749812825852957,
   "proven": false
  },
- "lines_saved": 77,
+ "lines_saved": 78,
  "upcoming": [
   {
    "fight_id": "401922645",
@@ -71,9 +71,25 @@
    "model_a": 0.487,
    "a_fights": 5,
    "b_fights": 1,
-   "a_ml": -102.0,
-   "b_ml": -118.0,
-   "market_a": 0.483
+   "a_ml": 100.0,
+   "b_ml": -120.0,
+   "market_a": 0.478
+  },
+  {
+   "fight_id": "401933936",
+   "card": "UFC 334: Gane vs. Hokit",
+   "date": "2026-11-14T22:00Z",
+   "weight": "Bantamweight",
+   "a": "Juan Diaz",
+   "a_record": "16-1-1",
+   "b": "Alatengheili",
+   "b_record": "18-10-2",
+   "model_a": 0.497,
+   "a_fights": 2,
+   "b_fights": 9,
+   "a_ml": -325.0,
+   "b_ml": 260.0,
+   "market_a": 0.734
   },
   {
    "fight_id": "401913647",
