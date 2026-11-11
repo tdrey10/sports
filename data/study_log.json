@@ -447,5 +447,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed, 0 strong (luck alone gives ~0.5 passes across 80 tries)",
   "verdict": "dead, nothing wired: 0 of 80 variants cleared the bar. The market prices records right. Dogs with the better record lost blind in every big sample (NBA -8.2% on 719, NCAAB -6.0% on 1,971, MLB -1.3% on 1,904, NHL -1.1% on 914); NFL better-record dogs were +10% in tuning but -6.1% blind (161). Every big spread sample loses about the vig both ways (NCAAB better-record side -6.2% on 12,753 blind). Dropped."
+ },
+ {
+  "date": "2026-11-11",
+  "idea": "Starter workload and familiarity (MLB pitchers, NHL goalies): NHL goalie starting on back-to-back days or after 8+ days off, MLB starter on short rest (4 days or less) or back from a 10+ day gap, and a starter who faced this same opponent in the last 14 days; for the side with that starter and against it on +100..+220 dog ML, -170..-120 favorite ML and the run/puck line, plus game overs and unders",
+  "sports": "mlb, nhl",
+  "data": "data/lines/espn closing prices 2018+ with sp_home/sp_away starters (sportsedge/starterstudy.py)",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dog/fav/line/total bets through the same bar: 0 passed, 0 strong (luck alone gives ~0.3 passes across 48 tries)",
+  "verdict": "dead, nothing wired: 0 of 48 variants cleared the bar. The market prices how a starter got here, not just who he is. MLB dogs vs a starter back from a 10+ day gap were +5.5% in tuning but -6.6% blind (629); dogs vs a starter facing the same lineup again were +5.6% tuning, -6.1% blind (609). Overs lost in every big sample (MLB -6.8% on 1,693 blind, NHL -7.5% on 1,189). Best leftover: NHL under with a goalie on back-to-back days, +3.2% tuning (210) and +5.5% blind (124, se 8.5): too thin and inside the noise. MLB short rest is rare (about 100 bets a side). Dropped."
  }
 ]
