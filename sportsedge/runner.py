@@ -157,9 +157,9 @@ def run_cycle(
     # Owner, Oct 23/25: a Lock or Dog always carries units; one the old board would post at 0u
     # ("Lean Dog", "best live dog... no units") is not posted at all. Leans stay leans.
     cards = [c for c in cards if not (c.tier in ("lock", "dog") and c.units <= 0)]
-    if not held:
-        cards += daily_lock_dog(cards, ledger, now)
     out.published = len(ledger.publish(cards, now))
+    if not held:
+        daily_lock_dog(ledger, now)
     if d503 and not held:
         _audit(ledger, now, d5_root)
     ledger.withdraw(settings, now)
@@ -192,33 +192,32 @@ DOG_RANGE = (100, 300)
 CLOSE_EV = -0.01  # our number at the price or within a point of it
 
 
-def daily_lock_dog(cards: list, ledger: Ledger, now: datetime) -> list:
+def daily_lock_dog(ledger: Ledger, now: datetime) -> list:
     """Owner, Nov 12 ("do both": a Lock and Dog every day, no money unless proven). When today has no
-    Lock (or Dog) yet, the best lean moneyline on today's games takes the slot at 0u: a favorite from
+    Lock (or Dog) yet, the best open lean moneyline on today's games becomes it, at 0u: a favorite from
     -101 to -150, or a dog from +100 to +300, where our number beats the market's by the most and is at
-    least about the price. It keeps the Lock / Dog record; units still come only from proven spots."""
-    from dataclasses import replace
-
+    least about the price. It keeps the Lock / Dog record; units still come only from proven spots.
+    Picks from the posted leans (a game is posted once, so a run's new cards miss the morning's leans)."""
     taken = ledger.taken_today(now)
     today = ledger.day_of(now)
-    out = []
+    done = []
     for tier, (lo, hi) in (("lock", LOCK_RANGE), ("dog", DOG_RANGE)):
-        if tier in taken or f"{tier}_lean" in taken or any(c.tier == tier for c in cards):
+        if tier in taken or f"{tier}_lean" in taken:
             continue
-        pool = [c for c in cards if c.units <= 0 and c.tier in ("lean", "early", "value") and not c.pick.player
-                and c.pick.market == "h2h" and lo <= c.pick.american <= hi and c.pick.commence_time > now
-                and ledger.day_of(c.pick.commence_time) == today and (c.pick.ev or 0) >= CLOSE_EV
-                and c.pick.market_prob is not None]
+        pool = [e for e in ledger.entries.values()
+                if e.units <= 0 and e.tier in ("lean", "early", "value") and not e.player and e.market == "h2h"
+                and e.status == "pending" and e.start > now and ledger.day_of(e.start) == today
+                and lo <= e.odds <= hi and (e.ev or 0) >= CLOSE_EV and e.market_prob is not None]
         if not pool:
             continue
-        best = max(pool, key=lambda c: (c.pick.win_prob - c.pick.market_prob, c.pick.win_prob))
+        e = max(pool, key=lambda x: (x.win_prob - x.market_prob, x.win_prob))
         name = "Lock" if tier == "lock" else "Dog"
-        card = replace(best, tier=tier, units=0.0, best_rank=None,
-                       headline=f"{name} of the Day, no money: {best.headline}",
-                       reasons=[f"{name} of the Day with no units: our best {'favorite' if tier == 'lock' else 'underdog'} "
-                                "today, but it isn't in a proven spot, so it's tracked, not bet."] + list(best.reasons))
-        out.append(card)
-    return out
+        e.tier, e.day, e.best_rank = tier, today, None
+        e.headline = f"{name} of the Day, no money: {e.headline}"
+        e.reasons = [f"{name} of the Day with no units: our best {'favorite' if tier == 'lock' else 'underdog'} today, "
+                     "but it isn't in a proven spot, so it's tracked, not bet."] + list(e.reasons or [])
+        done.append(e)
+    return done
 
 
 def _audit(ledger: Ledger, now: datetime, root: str) -> None:
