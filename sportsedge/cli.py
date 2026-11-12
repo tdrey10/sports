@@ -967,6 +967,16 @@ def cmd_espn_history(args) -> int:
     from . import linestudies
 
     studies = linestudies.run(data_dir / "lines" / "espn")
+    # Upset hangover (study of 2026-11-12): re-tested blind every morning with the line studies, so the
+    # live board's money spot (proven.LINE_SPOTS) only stays on while it keeps passing.
+    from . import upsetstudy
+
+    try:
+        upset = upsetstudy.run(data_dir / "lines" / "espn")
+        studies["rows"] += upset["rows"]
+        studies["upset_control"] = upset["control"]
+    except Exception as exc:  # one study failing never stops the others
+        print(f"upset study failed: {exc}")
     print(linestudies.report(studies))
     (data_dir / "line_studies.json").write_text(json.dumps(studies, indent=1, default=str))
     return 0
