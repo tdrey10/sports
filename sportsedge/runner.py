@@ -192,6 +192,17 @@ DOG_RANGE = (100, 300)
 CLOSE_EV = -0.01  # our number at the price or within a point of it
 
 
+def _fits_slot(tier: str, e) -> bool:
+    """The owner's standing rules for the slot: a Dog of the Day is a dog we give a real shot (40%+,
+    tiers.DOG_FLOOR_WIN; withdraw would pull anything less and void the lean with it), and a Lock is never
+    a football favorite only our model likes (tiers.favorite_overreach)."""
+    from .tiers import DOG_FLOOR_WIN, FAVORITE_OVERREACH, FOOTBALL
+
+    if tier == "dog":
+        return (e.win_prob or 0) >= DOG_FLOOR_WIN
+    return not (e.sport in FOOTBALL and e.model_prob - e.market_prob >= FAVORITE_OVERREACH)
+
+
 def daily_lock_dog(ledger: Ledger, now: datetime) -> list:
     """Owner, Nov 12 ("do both": a Lock and Dog every day, no money unless proven). When today has no
     Lock (or Dog) yet, the best open lean moneyline on today's games becomes it, at 0u: a favorite from
@@ -207,7 +218,8 @@ def daily_lock_dog(ledger: Ledger, now: datetime) -> list:
         pool = [e for e in ledger.entries.values()
                 if e.units <= 0 and e.tier in ("lean", "early", "value") and not e.player and e.market == "h2h"
                 and e.status == "pending" and e.start > now and ledger.day_of(e.start) == today
-                and lo <= e.odds <= hi and (e.ev or 0) >= CLOSE_EV and e.market_prob is not None]
+                and lo <= e.odds <= hi and (e.ev or 0) >= CLOSE_EV and e.market_prob is not None
+                and _fits_slot(tier, e)]
         if not pool:
             continue
         e = max(pool, key=lambda x: (x.win_prob - x.market_prob, x.win_prob))

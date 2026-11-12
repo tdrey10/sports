@@ -97,6 +97,8 @@ def beats_luck(row: dict) -> bool:
 LINE_SPOTS = {
     ("06 weather totals", "under, wind 15+ mph"): "under",
     ("02 spread-vs-ML value", "fav, spread says 4%+ more"): "moneyline favorite",
+    # Upset hangover (upsetstudy.py, Nov 12): a +100..+220 dog whose last game was a loss as a big favorite.
+    ("40 upset hangover", "dog ML: own last game was a shock loss"): "moneyline dog",
 }
 
 
@@ -295,6 +297,24 @@ def find(scans, now: datetime, root="data") -> list[Card]:
                         if ps - fair[side] >= 0.04:
                             add(eid, "moneyline favorite", side, r,
                                 f"{g[side]} moneyline is cheaper than the spread says ({ps:.0%} vs {fair[side]:.0%})")
+            if r.get("study") == "40 upset hangover" and r["market"] == "moneyline dog":
+                from . import upsetstudy
+
+                try:
+                    hist, names = factorstudy.history(sport, root)
+                    shock = upsetstudy.current(hist, sport, now) if sport in upsetstudy.BIG else {}
+                except Exception as exc:  # a study failing never stops the board
+                    log.warning("proven upsets %s: %s", sport, exc)
+                    shock = {}
+                for eid, g in (games.items() if shock else ()):
+                    for side in ("home", "away"):
+                        price = g[f"{side}_ml"]
+                        # tested on +100..+220 dogs only (the board's dog range runs to +300)
+                        if shock.get(names.get(g[side])) == "shock loss" and price is not None \
+                                and upsetstudy.SMALL_DOG[0] <= price <= upsetstudy.SMALL_DOG[1]:
+                            add(eid, "moneyline dog", side, r,
+                                f"{g[side]} got upset as a big favorite last game, and dogs coming off a shock loss "
+                                "have been cashing more than their price says")
         # 4. Efficiency and tempo (effstudy.py): the ratings' projection against today's line.
         eff = [r for r in mine if r["kind"] == "eff"]
         if eff:
