@@ -532,6 +532,10 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
       // Owner, Nov 11 ("is this still good at 159.5"): a number that ran 3+ points past where we posted has
       // no edge left (each point is about 2 to 2.5 win-chance points), so say NO BET plainly.
       const gap = Math.abs(e.current_point - e.point);
+      // Owner, Nov 12 ("that was a lock regardless", Air Force over 154.5 closed 161.5 and went 200): a proven
+      // spot was tested against the CLOSING number, so a move doesn't eat its edge. NO BET is for the rest.
+      if (!better && e.units > 0)  // only proven spots carry units
+        return `<span class="move-good">📈 Posted ${pt(e.point)} (${odds(e.odds)}), now ${pt(e.current_point)} (${odds(e.current_odds)}): still a bet. This spot was tested against the closing number, moves and all</span>`;
       if (!better && gap >= 3)
         return `<span class="move-nobet">🚫 NO BET at this number. Posted ${pt(e.point)} (${odds(e.odds)}), now ${pt(e.current_point)} (${odds(e.current_odds)}): the books caught up and the edge is gone. Only worth it at ${pt(e.point)} or within a point of it</span>`;
       return better
