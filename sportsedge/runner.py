@@ -157,6 +157,8 @@ def run_cycle(
     # Owner, Oct 23/25: a Lock or Dog always carries units; one the old board would post at 0u
     # ("Lean Dog", "best live dog... no units") is not posted at all. Leans stay leans.
     cards = [c for c in cards if not (c.tier in ("lock", "dog") and c.units <= 0)]
+    if not held:
+        cards += daily_lock_dog(cards, ledger, now)
     out.published = len(ledger.publish(cards, now))
     if d503 and not held:
         _audit(ledger, now, d5_root)
@@ -182,6 +184,40 @@ def run_cycle(
         ledger.teasers = [t for t in ledger.teasers
                           if t.status in ("pending", "live") or datetime.fromisoformat(t.created_at) >= keep_after]
     out.graded = refresh_scores(provider, ledger, now)
+    return out
+
+
+LOCK_RANGE = (-150, -101)  # owner's -150 cap on favorites
+DOG_RANGE = (100, 300)
+CLOSE_EV = -0.01  # our number at the price or within a point of it
+
+
+def daily_lock_dog(cards: list, ledger: Ledger, now: datetime) -> list:
+    """Owner, Nov 12 ("do both": a Lock and Dog every day, no money unless proven). When today has no
+    Lock (or Dog) yet, the best lean moneyline on today's games takes the slot at 0u: a favorite from
+    -101 to -150, or a dog from +100 to +300, where our number beats the market's by the most and is at
+    least about the price. It keeps the Lock / Dog record; units still come only from proven spots."""
+    from dataclasses import replace
+
+    taken = ledger.taken_today(now)
+    today = ledger.day_of(now)
+    out = []
+    for tier, (lo, hi) in (("lock", LOCK_RANGE), ("dog", DOG_RANGE)):
+        if tier in taken or f"{tier}_lean" in taken or any(c.tier == tier for c in cards):
+            continue
+        pool = [c for c in cards if c.units <= 0 and c.tier in ("lean", "early", "value") and not c.pick.player
+                and c.pick.market == "h2h" and lo <= c.pick.american <= hi and c.pick.commence_time > now
+                and ledger.day_of(c.pick.commence_time) == today and (c.pick.ev or 0) >= CLOSE_EV
+                and c.pick.market_prob is not None]
+        if not pool:
+            continue
+        best = max(pool, key=lambda c: (c.pick.win_prob - c.pick.market_prob, c.pick.win_prob))
+        name = "Lock" if tier == "lock" else "Dog"
+        card = replace(best, tier=tier, units=0.0, best_rank=None,
+                       headline=f"{name} of the Day, no money: {best.headline}",
+                       reasons=[f"{name} of the Day with no units: our best {'favorite' if tier == 'lock' else 'underdog'} "
+                                "today, but it isn't in a proven spot, so it's tracked, not bet."] + list(best.reasons))
+        out.append(card)
     return out
 
 
