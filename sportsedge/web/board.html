@@ -732,7 +732,10 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
   // Owner, Nov 9 ("why is there no picks up"): with no money play today, the top of the page shows our best
   // lean, the one Grim posts that day: where our number beats the price the most. Always marked no units.
   function bestLean(ok) {
+    // Owner, Nov 12 (ULM +310 shown while down 35-14): never a game that has started, and no long shots:
+    // favorites to -150 and dogs to +200, where our numbers hold up best.
     const xs = DATA.entries.filter((x) => onBoard(x) && tierOf(x) === "lean" && !x.settled && !isFuture(x) && !isLive(x) && !x.player
+      && new Date(x.commence_time) > new Date() && x.status === "pending" && x.odds >= -150 && x.odds <= 200
       && dayOf(x.commence_time) === nowDay() && (x.win_prob || 0) >= implied(x.odds) - 0.005 && (!ok || ok(x)));
     const gap = (x) => (x.win_prob || 0) - (x.market_prob || x.win_prob || 0);
     return xs.sort((a, b) => (gap(b) - gap(a)) || ((b.win_prob || 0) - (a.win_prob || 0)))[0] || null;
@@ -744,7 +747,8 @@ footer { color: var(--muted); font-size: 14px; display: grid; gap: 4px; border-t
     const open = bestToday().filter((x) => !x.settled).sort((a, b) => (b.units - a.units) || (score(b) - score(a)));
     const e = open.find((x) => !isFuture(x)) || DATA.entries.filter((x) => x.tier === "lock" && x.units > 0 && onBoard(x) && !x.settled && !isFuture(x)).sort((a, b) => b.units - a.units)[0]
       || open[0];
-    const e2 = e || DATA.entries.find((x) => x.tier === "lock" && onBoard(x) && !x.settled && !isFuture(x)) || bestLean();
+    const e2 = e || DATA.entries.find((x) => x.tier === "lock" && onBoard(x) && !x.settled && !isFuture(x)
+      && new Date(x.commence_time) > new Date()) || bestLean();
     if (!e2) {
       $("hero").innerHTML = `<div class="ticket-empty"><b>No it’s not rigged</b></div>`;
       return;
