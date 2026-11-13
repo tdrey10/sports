@@ -199,3 +199,18 @@ def test_the_nhl_lock_is_picked_on_its_own_board():
     got = nhl_lock(chosen, [nba, nhl], NOW)
     assert [(t, s.sport) for t, _, s, _ in got if t == "lock"] == [("lock", "nhl")]
     assert nhl_lock(chosen, [nba, nhl], NOW, taken={"lock"}) == chosen  # a Lock already posted today
+
+
+def test_early_needs_a_45_percent_winner_that_beats_the_price():
+    # Nov 13: the Steelers posted as an early play at +150 on a 38% read (-5.6% edge).
+    later = NOW + timedelta(days=1)
+    long_shot = side(150, 0.38, 0.38, p_market=0.37, sport="nfl", eid="p", side="away", start=later,
+                     rest=14, rest_opp=7, streak=4)
+    hit, total = early_spots(long_shot)
+    assert hit == ["bye"] and total >= 0.05  # the spot hits...
+    assert choose_early([long_shot], NOW) == []  # ...but a 38% dog is no early value
+    no_edge = side(110, 0.46, 0.46, p_market=0.44, sport="nfl", eid="q", side="away", start=later, rest=14, rest_opp=7)
+    assert early_spots(no_edge)[0] == ["bye"] and early_spots(no_edge)[1] >= 0.05
+    assert choose_early([no_edge], NOW) == []  # 46% at +110 (needs 47.6%): doesn't beat the price
+    real = side(130, 0.46, 0.46, p_market=0.43, sport="nfl", eid="r", side="away", start=later, rest=14, rest_opp=7)
+    assert [t for t, *_ in choose_early([real], NOW)] == ["early"]
