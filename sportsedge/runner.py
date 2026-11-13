@@ -188,7 +188,7 @@ def run_cycle(
 
 
 LOCK_RANGE = (-150, -101)  # owner's -150 cap on favorites
-DOG_RANGE = (100, 300)
+DOG_RANGE = (100, 200)  # owner, Nov 12: no long shots (ULM +310)
 CLOSE_EV = -0.01  # our number at the price or within a point of it
 
 
