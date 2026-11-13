@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 
 from ..edge import Pick
 from ..ledger import ENGINE_MARK
-from ..tiers import Card
+from ..tiers import LEGIT_MIN_WIN, Card
 from .data import Game, load
 from .features import FEATURES, Replay, logit, sigmoid
 from .model import SportModel, dec, fit, no_vig
@@ -688,6 +688,10 @@ def choose_early(sides: list[Side], now: datetime, posted_events: set[str] | fro
     found: dict[str, list[tuple[Side, list[str], float]]] = {}
     for s in sides:
         if _pt_day(s.start) <= today or s.start > now + timedelta(days=8) or s.eid in posted_events:
+            continue
+        if s.read_of < LEGIT_MIN_WIN or not s.beats_price():
+            # Owner's early rule: our number beats the price on a 45%+ winner. Nov 13: Steelers +150 posted
+            # at 38% with a -5.6% edge; early dogs under 45% went 2-5.
             continue
         hit, total = early_spots(s)
         if hit and total >= 0.05:

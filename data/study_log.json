@@ -467,5 +467,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed (the line studies' 600 random spots pass 0.7%, so luck alone gives ~0.5 passes across these 72 tries)",
   "verdict": "2 of 72 passed, both the same story: dogs off their own shock loss. NBA dog ML after losing as a -200+ favorite: +3.8% tuning (170), +23.2% blind (166, se 9.8, z 2.37), blind profit in 4 of 5 seasons and +19% to +23% blind at -180/-220/-250 cutoffs (tuning is thin: -0.4% at -180). Clears PROVEN and proven.MIN_Z: wired in as a 0.5u money spot (proven.LINE_SPOTS, +100..+220 only), re-tested blind every morning in espn-history so it switches off if it fades. NHL same spot +6.6% tuning (112), +10.8% blind (155, se 9.3): passes the bar but z 1.16 is luck-sized, no money. NFL +40% blind on only 31 (thin); NCAAF -15.7% and MLB -3.7% blind: no. Fading the shock winner, lock favorites and spreads: nothing."
+ },
+ {
+  "date": "2026-11-13",
+  "idea": "Margin volatility: the standard deviation of a side's earlier results this season against the market (actual margin minus the closing spread's expected margin in NFL/NCAAF/NBA/NCAAB; raw margin in MLB/NHL), top quarter = volatile, bottom quarter = steady (tuning-season cutoffs); own volatile, own steady, opponent volatile, opponent steady, and volatile vs steady, on +100..+220 dog ML (do swingy dogs win outright more than their price says?), -170..-120 favorite ML and spread/run/puck line at the real price",
+  "sports": "nfl, ncaaf, nba, ncaab, mlb, nhl",
+  "data": "data/lines/espn closing prices 2018+ (sportsedge/volstudy.py)",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed (luck alone gives ~0.6 passes across these 90 tries)",
+  "verdict": "dead, none wired: 0 of 90 passed. The core idea fails: own-volatile dogs lost in tuning and blind in MLB (-7.0%/-5.8% on 1,448/2,074), NBA (-3.0%/-2.0%), college hoops (-4.3%/-10.6%) and NHL tuning (-5.1%; blind +4.6% on 1,177 is luck-sized and lost in tuning). NFL own-volatile dog +11.1% tuning flipped to -5.5% blind; NCAAF +2.1%/+1.1% is nothing. Steady favorites and every spread slice lost too. Dropped."
  }
 ]
