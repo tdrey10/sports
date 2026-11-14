@@ -100,7 +100,9 @@ class Tracker:
         host = home_team if home_team is not None else (team if side == "home" else opp)
         if tzo is None and self.zone[host]:
             tzo = self.zone[host].most_common(1)[0][0]
-        if elev is None and self.elev[host]:
+        # Owner, Nov 14: a neutral-site game isn't at the home team's gym (SDSU vs Northern Colorado was in Rapid City,
+        # SD, not Greeley), so its altitude comes only from the game's own venue, never the home team's usual one.
+        if elev is None and self.elev[host] and not neutral:
             elev = self.elev[host].most_common(1)[0][0]
         if self.sport not in FOOTBALL + ("mlb",):
             indoor = True  # hoops and hockey are always inside

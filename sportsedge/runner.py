@@ -124,6 +124,8 @@ def run_cycle(
         except Exception as exc:  # the proven finder never stops the board
             log.warning("proven spots failed: %s", exc, exc_info=True)
     _hold_questionable(proven_cards + d5_cards, out.scans, d5_root)
+    if not held:
+        _pull_neutral_altitude(ledger, out.scans, now)
     taken = set(ledger.taken_today(now)) | {c.tier for c in d5_cards if c.tier in ("lock", "dog") and c.units > 0}
     # The Lock and Dog come from proven bets only: the best proven favorite and the best proven dog.
     for tier, is_it in (("lock", lambda c: c.pick.market == "h2h" and c.pick.american < 0),
@@ -185,6 +187,22 @@ def run_cycle(
                           if t.status in ("pending", "live") or datetime.fromisoformat(t.created_at) >= keep_after]
     out.graded = refresh_scores(provider, ledger, now)
     return out
+
+
+def _pull_neutral_altitude(ledger: Ledger, scans, now: datetime) -> list:
+    """Owner, Nov 14: an altitude over posted on a game that turns out to be at a neutral site (not the home
+    team's high gym) is pulled before it starts: the spot doesn't apply."""
+    ctxs = {eid: ctx for s in scans for eid, ctx in (s.contexts or {}).items()}
+    pulled = []
+    for e in ledger.entries.values():
+        ctx = ctxs.get(e.event_id)
+        if e.status == "pending" and e.start > now and e.units > 0 and "visiting altitude" in (e.headline or "") \
+                and ctx is not None and ctx.neutral:
+            e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
+            e.reasons = ["Pulled: this game is at a neutral site, not the home team's high-altitude gym, so the "
+                         "altitude spot doesn't apply."] + list(e.reasons or [])
+            pulled.append(e)
+    return pulled
 
 
 LOCK_RANGE = (-150, -101)  # owner's -150 cap on favorites
