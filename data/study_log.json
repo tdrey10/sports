@@ -477,5 +477,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed (luck alone gives ~0.6 passes across these 90 tries)",
   "verdict": "dead, none wired: 0 of 90 passed. The core idea fails: own-volatile dogs lost in tuning and blind in MLB (-7.0%/-5.8% on 1,448/2,074), NBA (-3.0%/-2.0%), college hoops (-4.3%/-10.6%) and NHL tuning (-5.1%; blind +4.6% on 1,177 is luck-sized and lost in tuning). NFL own-volatile dog +11.1% tuning flipped to -5.5% blind; NCAAF +2.1%/+1.1% is nothing. Steady favorites and every spread slice lost too. Dropped."
+ },
+ {
+  "date": "2026-11-14",
+  "idea": "Lookahead, sandwich and letdown spots: a side whose next opponent this season is strong (top quarter of win % from earlier games) while today's opponent is weak (bottom half), sandwiched between two strong opponents, or coming off a strong opponent (lookback/letdown); own spot and the opponent's spot, on +100..+220 dog ML (do dogs facing a team looking ahead or letting down win more than their price says?), -170..-120 favorite ML and spread/run/puck line at the real price; neutral-site games skipped",
+  "sports": "nfl, ncaaf, nba, ncaab, mlb, nhl",
+  "data": "data/lines/espn closing prices 2018+ (sportsedge/lookstudy.py); every record is from games before the bet",
+  "tuning": "2018-2021",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed (luck alone gives ~0.7 passes across these 104 tries at the usual 1 in 150)",
+  "verdict": "dead, none wired: 1 of 104 passed, which is what luck gives. College football dog ML vs a favorite off a game against a strong team (letdown): +14.9% on 106 tuning, +11.7% on 173 blind (SE 9.5%), only 1.2 SE, under the 1.65 money bar (proven.MIN_Z), and the same spot lost or was flat everywhere else (NBA -10.1% blind on 316, MLB -3.8% on 446, NHL -1.5% on 620, college hoops -0.3% on 637, NFL +2.5% on 114). The headline lookahead idea failed: dogs facing a team looking ahead lost blind in college hoops (-8.2% on 615), college football (-12.8% on 170) and NBA (-1.0% on 327); NHL +1.5% and MLB +3.2% are noise and lost in tuning. Fading sandwiched teams on the spread lost in NBA, NHL, college hoops and college football. Dropped."
  }
 ]

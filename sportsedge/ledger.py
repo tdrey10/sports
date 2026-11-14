@@ -392,6 +392,25 @@ class Ledger:
                              "beat luck now."] + list(e.reasons)
                 pulled.append(e)
                 continue
+            if not _proven(e) and e.tier == "early" and is_formula_pick(e.reasons) and (
+                    e.win_prob < LEGIT_MIN_WIN or e.win_prob <= break_even(e.odds)):
+                # Owner's early rule (our number beats the price on a 45%+ winner) holds for every engine,
+                # the D503 formula included. Nov 13: Steelers +150 sat on the board at 38% with a -5.6% edge.
+                e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
+                e.reasons = [f"Pulled: we only had them winning {e.win_prob:.0%}"
+                             + ("" if e.win_prob >= LEGIT_MIN_WIN else " (early plays need 45%+)")
+                             + (f", and that doesn't beat {e.odds:+.0f}." if e.win_prob <= break_even(e.odds) else ".")]\
+                    + list(e.reasons)
+                pulled.append(e)
+                continue
+            if not _proven(e) and e.tier == "dog" and e.win_prob < DOG_FLOOR_WIN and is_formula_pick(e.reasons):
+                # Same Dog of the Day floor as below; formula dogs aren't exempt from it. (Other early picks
+                # and dogs go through the checks below.)
+                e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
+                e.reasons = [f"Pulled: we only had them winning {e.win_prob:.0%}. Dog of the Day is for dogs "
+                             "we think can actually win."] + list(e.reasons)
+                pulled.append(e)
+                continue
             if is_formula_pick(e.reasons):
                 continue  # the D503 formula: a posted pick never changes
             if _proven(e):
