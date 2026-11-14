@@ -45,3 +45,18 @@ def test_the_daily_dog_needs_a_real_shot_and_the_lock_skips_model_only_football_
                   _lean("model", -140, 0.66, 0.55, 0.10, sport="nfl"), _lean("fair", -130, 0.58, 0.59, 0.02, sport="nfl"))
     picks = {e.tier: e.event_id for e in daily_lock_dog(led, NOW)}
     assert picks == {"dog": "real", "lock": "fair"}  # "model": our 0.60 vs the market's 0.55 in the NFL
+
+
+def test_an_altitude_over_at_a_neutral_site_is_pulled():
+    """Owner, Nov 14: SDSU vs Northern Colorado was in Rapid City, SD, not Greeley."""
+    from types import SimpleNamespace
+
+    from sportsedge.runner import _pull_neutral_altitude
+
+    c = card(make_pick(market="totals", side="over", point=152.5, american=-105, event_id="g1"), units=1.0)
+    c.headline = "Over 152.5 at -105: road team visiting altitude."
+    led = Ledger()
+    led.publish([c], NOW - timedelta(hours=6))
+    scan = SimpleNamespace(contexts={"g1": SimpleNamespace(neutral=True)})
+    assert len(_pull_neutral_altitude(led, [scan], NOW)) == 1
+    assert next(iter(led.entries.values())).status == "void"
