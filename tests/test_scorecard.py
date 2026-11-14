@@ -48,3 +48,10 @@ def test_the_100_point_score_reads_the_parts_and_a_no_bet_is_zero():
     s = build(card(evidence=STRONG), NOW)["score"]
     assert s["projection"] == 30 and s["risk"] == 10 and s["total"] == sum(v for k, v in s.items() if k != "total")
     assert build(card(proven="", units=0.0, win=0.50, market=0.53), NOW)["score"]["total"] == 0
+
+
+def test_an_a_play_bets_half_a_unit_and_says_so():
+    """Owner, Nov 14 ("ya do it"): A plays went 1-7 while A+ went 13-3."""
+    a = gate(card(evidence=dict(STRONG, kind="PROVEN"), reasons=("✅ Money play · 1u: a spot.", "why")))
+    assert (a.grade, a.units) == ("A", 0.5) and a.reasons[0].startswith("✅ Money play · 0.5u (an A bets half)")
+    assert gate(card(evidence=STRONG)).units == 1.0  # A+ keeps its unit
