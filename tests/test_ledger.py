@@ -500,3 +500,34 @@ def test_a_proven_pick_luck_could_explain_comes_down():
     assert not _beats_luck(card("CFB factors: fade. Blind 94 bets +10.6% (standard error 8.7%); tuning 61 bets +1.5%."))
     assert _beats_luck(card("NFL wind. Blind 146 bets +14.6% (standard error 7.7%); tuning 120 bets +5.0%."))
     assert _beats_luck(card(""))
+
+
+def test_a_formula_early_lean_under_45_or_without_an_edge_is_pulled():
+    # Nov 13: a D503 formula early lean (Steelers +150 at 38%, -5.6% edge) stayed on the board because
+    # formula picks were never re-checked. The owner's early rule (45%+ and beats the price) covers them too.
+    from sportsedge.ledger import ENGINE_MARK
+
+    s = Settings(proven=set())
+    L = Ledger()
+    long_shot = make_pick(market="h2h", event_id="e1", point=None, american=150, win_prob=0.38, ev=-0.056)
+    real = make_pick(market="h2h", event_id="e2", point=None, american=130, win_prob=0.47, ev=0.08)
+    no_edge = make_pick(market="h2h", event_id="e3", point=None, american=-105, win_prob=0.50, ev=-0.02)
+    for p in (long_shot, real, no_edge):
+        c = card(p, tier="early", units=0.0)
+        c.reasons = ["r", ENGINE_MARK]
+        L.publish([c], NOW)
+    pulled = {e.event_id for e in L.withdraw(s, NOW)}
+    assert pulled == {"e1", "e3"}
+    gone = next(e for e in L.entries.values() if e.event_id == "e1")
+    assert gone.status == "void" and gone.reasons[0].startswith("Pulled: we only had them winning 38%")
+
+
+def test_a_formula_dog_under_the_floor_is_pulled():
+    from sportsedge.ledger import ENGINE_MARK
+
+    L = Ledger()
+    p = make_pick(market="h2h", point=None, american=200, win_prob=0.36, ev=0.08)
+    c = card(p, tier="dog", units=0.0)
+    c.reasons = ["r", ENGINE_MARK]
+    L.publish([c], NOW)
+    assert [e.status for e in L.withdraw(Settings(proven=set()), NOW)] == ["void"]
