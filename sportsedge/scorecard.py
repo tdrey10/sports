@@ -117,9 +117,18 @@ def build(card, now: datetime) -> dict:
     }
 
 
+A_MAX_UNITS = 0.5  # owner, Nov 14 ("ya do it"): A plays went 1-7 while A+ went 13-3, so an A bets half
+
+
 def attach(card, now: datetime):
     card.scorecard = build(card, now)
     card.grade = card.scorecard["grade"]
+    if card.grade == "A" and card.units > A_MAX_UNITS:
+        was = card.units
+        card.units = A_MAX_UNITS
+        card.reasons = [r.replace(f"Money play · {was:g}u:", f"Money play · {A_MAX_UNITS:g}u (an A bets half):")
+                        for r in card.reasons]
+        card.scorecard = build(card, now)
     return card
 
 
