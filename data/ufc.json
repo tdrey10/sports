@@ -1,14 +1,14 @@
 {
- "ran_at": "2026-11-15T01:51:12.102517+00:00",
- "fights": 4378,
- "called": 3683,
- "accuracy": 0.5813195764322563,
- "log_loss": 0.6803647299107333,
+ "ran_at": "2026-11-15T02:21:01.927266+00:00",
+ "fights": 4379,
+ "called": 3684,
+ "accuracy": 0.5811617806731814,
+ "log_loss": 0.6804072546344312,
  "calibration": [
   [
-   0.5317312307548356,
-   0.5634958957025592,
-   4142
+   0.5317427881192759,
+   0.5633598841419262,
+   4143
   ],
   [
    0.6214417643533257,
@@ -17,96 +17,16 @@
   ]
  ],
  "market": {
-  "bets": 42,
+  "bets": 43,
   "won": 9,
-  "lost": 33,
-  "units": -7.45,
-  "roi": -0.17738095238095236,
-  "se": 0.2519448300511938,
+  "lost": 34,
+  "units": -8.45,
+  "roi": -0.19651162790697674,
+  "se": 0.2467585841701876,
   "proven": false
  },
  "lines_saved": 86,
  "upcoming": [
-  {
-   "fight_id": "401913646",
-   "card": "UFC 334: Gane vs. Hokit",
-   "date": "2026-11-15T02:00Z",
-   "weight": "Heavyweight",
-   "a": "Ciryl Gane",
-   "a_record": "14-2-0",
-   "b": "Josh Hokit",
-   "b_record": "10-0-0",
-   "model_a": 0.562,
-   "a_fights": 13,
-   "b_fights": 5,
-   "a_ml": -225.0,
-   "b_ml": 185.0,
-   "market_a": 0.664
-  },
-  {
-   "fight_id": "401922638",
-   "card": "UFC 334: Gane vs. Hokit",
-   "date": "2026-11-15T02:00Z",
-   "weight": "W Bantamweight",
-   "a": "Kayla Harrison",
-   "a_record": "19-1-0",
-   "b": "Amanda Nunes",
-   "b_record": "23-5-0",
-   "model_a": 0.47,
-   "a_fights": 3,
-   "b_fights": 7,
-   "a_ml": -170.0,
-   "b_ml": 142.0,
-   "market_a": 0.604
-  },
-  {
-   "fight_id": "401922639",
-   "card": "UFC 334: Gane vs. Hokit",
-   "date": "2026-11-15T02:00Z",
-   "weight": "Middleweight",
-   "a": "Caio Borralho",
-   "a_record": "18-2-0",
-   "b": "Yousri Belgaroui",
-   "b_record": "11-3-0",
-   "model_a": 0.604,
-   "a_fights": 11,
-   "b_fights": 5,
-   "a_ml": -155.0,
-   "b_ml": 136.0,
-   "market_a": 0.589
-  },
-  {
-   "fight_id": "401922640",
-   "card": "UFC 334: Gane vs. Hokit",
-   "date": "2026-11-15T02:00Z",
-   "weight": "Welterweight",
-   "a": "Uro\u0161 Medi\u0107",
-   "a_record": "14-3-0",
-   "b": "Kevin Holland",
-   "b_record": "29-15-0",
-   "model_a": 0.558,
-   "a_fights": 12,
-   "b_fights": 26,
-   "a_ml": -155.0,
-   "b_ml": 130.0,
-   "market_a": 0.583
-  },
-  {
-   "fight_id": "401922641",
-   "card": "UFC 334: Gane vs. Hokit",
-   "date": "2026-11-15T02:00Z",
-   "weight": "Flyweight",
-   "a": "Bilal Hasan",
-   "a_record": "10-0-0",
-   "b": "Luis Gurule",
-   "b_record": "11-4-0",
-   "model_a": 0.598,
-   "a_fights": 2,
-   "b_fights": 6,
-   "a_ml": -1050.0,
-   "b_ml": 675.0,
-   "market_a": 0.876
-  },
   {
    "fight_id": "401927852",
    "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
@@ -119,9 +39,9 @@
    "model_a": 0.527,
    "a_fights": 8,
    "b_fights": 5,
-   "a_ml": -225.0,
-   "b_ml": 185.0,
-   "market_a": 0.664
+   "a_ml": -205.0,
+   "b_ml": 170.0,
+   "market_a": 0.645
   },
   {
    "fight_id": "401927853",
