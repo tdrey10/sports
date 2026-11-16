@@ -497,5 +497,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed (luck alone gives ~0.4 passes across the ~54 distinct tries here; the 108 rows are each spot seen from both sides)",
   "verdict": "dead, none wired: 0 of 108 passed. The market prices series momentum. MLB has the big samples and nothing holds: dogs facing a sweep -7.4% tuning (707) then +5.9% blind (1,073, SE 3.7%) - flipped sign, not an edge; dogs that just lost to this opponent -2.9% tuning / -1.3% blind (3,695); dogs off a 5+ run loss in the series +1.5% / +0.4% (1,123), break-even at best; lock-price favorites going for a sweep -1.4% / -14.5% blind (658). NHL and NBA rematch samples are small (100-500) and every arm loses or flips. College hoops rematches barely exist in the blind seasons (4-17 bets). Dropped."
+ },
+ {
+  "date": "2026-11-16",
+  "idea": "Climate shock: a dome or warm-weather team (from its EARLIER home games: mostly under a roof, or late-season home games averaging 58F+) visiting an outdoor game at 40F or colder (cold shock) or 32F or colder (freezing shock); a cold-weather team (late-season home games 45F or colder) visiting at 80F+ (heat shock); a dome team visiting in 15+ mph wind (wind shock). Visitor and host on +100..+220 dog ML, -170..-120 favorite ML and spread at the real price, plus the game's under and over; neutral sites and roofed games skipped",
+  "sports": "nfl, ncaaf",
+  "data": "NFL: data/lines/nfl nflverse closing lines 2006+ with kickoff temp/wind/roof; college football: data/lines/espn/ncaaf with weather (sportsedge/climatestudy.py)",
+  "tuning": "NFL 2006-2017; college football 2016-2021",
+  "blind": "NFL 2018 on; college football 2022 on",
+  "luck_control": "100 random tenths of every dog/fav/spread/total bet through the same bar: 0 passed (luck alone gives ~0.4 passes across the 63 variants here)",
+  "verdict": "dead, none wired: 0 of 63 passed. Best story was the NFL host against the spread when a dome/warm visitor plays at 40F or colder: tuning 148 bets +7.7% (SE 7.9%), blind 114 bets +6.2% (SE 8.9%) - same direction both times but well inside the noise, and the visitor dog ML in the cold lost blind (-10.3%, 37 bets). Unders in the cold lost (NFL -5.7% tuning, -10.3% blind on 114), so the market already prices cold weather for totals. Heat shock and wind shock flipped or lost. College football samples are tiny (warm teams rarely travel north late): 2-63 bets per arm, nothing holds. Dropped, not tweaked."
  }
 ]
