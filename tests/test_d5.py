@@ -77,7 +77,20 @@ def test_elo_matches_the_spec_on_our_history():
     from sportsedge.d5.data import load
     from sportsedge.d5.features import tune_elo
 
-    assert tune_elo(load("nfl"), "nfl") == (20, 40)  # his model.json: nfl K 20 HFA 40
+    # The spec's model.json (nfl K 20, HFA 40) was fit on the games before November 2026. Every new
+    # week of results moves the live refit (week 11 of 2026 moved HFA to 20, which broke this check
+    # on Nov 16 and blocked that day's merge), so the spec check reads the history it was fit on.
+    cut = datetime(2026, 11, 1, tzinfo=timezone.utc)
+    assert tune_elo([g for g in load("nfl") if g.start < cut], "nfl") == (20, 40)
+
+
+def test_live_elo_refit_stays_on_the_grid():
+    """The daily refit reads every game we hold; whatever it lands on must be one of the grid's values."""
+    from sportsedge.d5.data import load
+    from sportsedge.d5.features import BASE_K, tune_elo
+
+    k, hfa = tune_elo(load("nfl"), "nfl")
+    assert k in {BASE_K["nfl"] * m for m in (0.5, 0.75, 1, 1.5, 2)} and hfa in (0, 20, 40, 60, 80, 100)
 
 
 def test_qb_key_is_his_adjusted_yards_per_attempt():
