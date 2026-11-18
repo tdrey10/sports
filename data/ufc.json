@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-11-18T03:27:43.556440+00:00",
+ "ran_at": "2026-11-18T03:43:36.380302+00:00",
  "fights": 4383,
  "called": 3688,
  "accuracy": 0.5810737527114967,
@@ -360,19 +360,6 @@
    "b_fights": 5
   },
   {
-   "fight_id": "401930356",
-   "card": "UFC 335: Oliveira vs. Lopes",
-   "date": "2026-12-12T22:00Z",
-   "weight": "Light Heavyweight",
-   "a": "Quentin Pasley",
-   "a_record": "4-0-0",
-   "b": "Junior Tafa",
-   "b_record": "7-6-0",
-   "model_a": 0.58,
-   "a_fights": 1,
-   "b_fights": 9
-  },
-  {
    "fight_id": "401930355",
    "card": "UFC 335: Oliveira vs. Lopes",
    "date": "2026-12-13T00:00Z",
@@ -384,6 +371,19 @@
    "model_a": 0.58,
    "a_fights": 12,
    "b_fights": 6
+  },
+  {
+   "fight_id": "401930356",
+   "card": "UFC 335: Oliveira vs. Lopes",
+   "date": "2026-12-13T00:00Z",
+   "weight": "Light Heavyweight",
+   "a": "Quentin Pasley",
+   "a_record": "4-0-0",
+   "b": "Junior Tafa",
+   "b_record": "7-6-0",
+   "model_a": 0.58,
+   "a_fights": 1,
+   "b_fights": 9
   },
   {
    "fight_id": "401913649",
@@ -416,13 +416,13 @@
    "card": "UFC 335: Oliveira vs. Lopes",
    "date": "2026-12-13T02:00Z",
    "weight": "Heavyweight",
-   "a": "Sergei Pavlovich",
-   "a_record": "21-3-0",
-   "b": "Alex Pereira",
-   "b_record": "13-4-0",
-   "model_a": 0.487,
-   "a_fights": 11,
-   "b_fights": 13
+   "a": "Alex Pereira",
+   "a_record": "13-4-0",
+   "b": "Sergei Pavlovich",
+   "b_record": "21-3-0",
+   "model_a": 0.513,
+   "a_fights": 13,
+   "b_fights": 11
   }
  ],
  "note": "Not proven: UFC bets post only after the blend beats DraftKings' closing lines over 60+ graded fights. Lines have been saved since this was added; ESPN drops UFC odds after each fight, so there is no older history to test on."
