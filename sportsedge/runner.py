@@ -12,7 +12,7 @@ from .edge import Settings
 from .engine import Engine, SportScan
 from .ledger import Ledger
 from .sports import SPORTS, SportConfig
-from .tiers import BEST_BETS, build_cards, gate
+from .tiers import BEST_BETS, DOG_MAX_ODDS, DOG_MIN_ODDS, LOCK_MAX_ODDS, LOCK_MIN_ODDS, build_cards, gate
 
 log = logging.getLogger(__name__)
 
@@ -149,6 +149,7 @@ def run_cycle(
         gate(c) for c in build_cards(
             legacy_scans, settings, now, taken_today=taken, best_taken=best_taken,
             posted_today=ledger.posted_today(now), posted_events=ledger.open_events(now),
+            live_dog=_live_dog_wanted(ledger, now),
         )]
     if not held:
         # Owner, Oct 25: shop every new money moneyline across the US books before it posts.
@@ -205,9 +206,20 @@ def _pull_neutral_altitude(ledger: Ledger, scans, now: datetime) -> list:
     return pulled
 
 
-LOCK_RANGE = (-150, -101)  # owner's -150 cap on favorites
-DOG_RANGE = (100, 200)  # owner, Nov 12: no long shots (ULM +310)
-CLOSE_EV = -0.01  # our number at the price or within a point of it
+# Owner: the Lock is always a moneyline favorite from -170 to -120 (tiers.is_lock_price) and the Dog a
+# +100 to +220 dog. Bug fix, Nov 18: this promoter used -150..-101 and +100..+200, so a -110 favorite
+# could be the Lock.
+LOCK_RANGE = (LOCK_MIN_ODDS, LOCK_MAX_ODDS)
+DOG_RANGE = (DOG_MIN_ODDS, DOG_MAX_ODDS)
+
+
+def _live_dog_wanted(ledger: Ledger, now: datetime):
+    """When today has no Dog yet, ask the board for its best live dog on today's games (tiers.live_dog_pick)."""
+    taken = ledger.taken_today(now)
+    if "dog" in taken or "dog_lean" in taken:
+        return None
+    today = ledger.day_of(now)
+    return lambda p: ledger.day_of(p.commence_time) == today
 
 
 def _fits_slot(tier: str, e) -> bool:
@@ -224,9 +236,13 @@ def _fits_slot(tier: str, e) -> bool:
 def daily_lock_dog(ledger: Ledger, now: datetime) -> list:
     """Owner, Nov 12 ("do both": a Lock and Dog every day, no money unless proven). When today has no
     Lock (or Dog) yet, the best open lean moneyline on today's games becomes it, at 0u: a favorite from
-    -101 to -150, or a dog from +100 to +300, where our number beats the market's by the most and is at
-    least about the price. It keeps the Lock / Dog record; units still come only from proven spots.
+    -120 to -170, or a dog from +100 to +220, where our number beats the market's by the most and still
+    beats the price's break-even (withdraw pulls a Lock / Dog lean that doesn't). The board posts its best
+    live dog as a lean when no posted lean can be the Dog (tiers.live_dog_pick). It keeps the Lock / Dog
+    record; units still come only from proven spots.
     Picks from the posted leans (a game is posted once, so a run's new cards miss the morning's leans)."""
+    from .ledger import break_even
+
     taken = ledger.taken_today(now)
     today = ledger.day_of(now)
     done = []
@@ -236,7 +252,7 @@ def daily_lock_dog(ledger: Ledger, now: datetime) -> list:
         pool = [e for e in ledger.entries.values()
                 if e.units <= 0 and e.tier in ("lean", "early", "value") and not e.player and e.market == "h2h"
                 and e.status == "pending" and e.start > now and ledger.day_of(e.start) == today
-                and lo <= e.odds <= hi and (e.ev or 0) >= CLOSE_EV and e.market_prob is not None
+                and lo <= e.odds <= hi and e.win_prob > break_even(e.odds) and e.market_prob is not None
                 and _fits_slot(tier, e)]
         if not pool:
             continue
