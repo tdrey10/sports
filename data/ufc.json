@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-11-18T03:43:36.380302+00:00",
+ "ran_at": "2026-11-18T03:56:05.310145+00:00",
  "fights": 4383,
  "called": 3688,
  "accuracy": 0.5810737527114967,
@@ -58,6 +58,22 @@
    "a_ml": -250.0,
    "b_ml": 205.0,
    "market_a": 0.685
+  },
+  {
+   "fight_id": "401927854",
+   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
+   "date": "2026-11-21T15:00Z",
+   "weight": "Bantamweight",
+   "a": "Aleksandre Topuria",
+   "a_record": "7-1-0",
+   "b": "Santiago Luna",
+   "b_record": "8-1-0",
+   "model_a": 0.53,
+   "a_fights": 2,
+   "b_fights": 3,
+   "a_ml": -290.0,
+   "b_ml": 235.0,
+   "market_a": 0.714
   },
   {
    "fight_id": "401927856",
@@ -172,22 +188,6 @@
    "market_a": 0.286
   },
   {
-   "fight_id": "401927854",
-   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
-   "date": "2026-11-21T18:00Z",
-   "weight": "Bantamweight",
-   "a": "Aleksandre Topuria",
-   "a_record": "7-1-0",
-   "b": "Santiago Luna",
-   "b_record": "8-1-0",
-   "model_a": 0.53,
-   "a_fights": 2,
-   "b_fights": 3,
-   "a_ml": -290.0,
-   "b_ml": 235.0,
-   "market_a": 0.714
-  },
-  {
    "fight_id": "401927855",
    "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
    "date": "2026-11-21T18:00Z",
@@ -202,45 +202,6 @@
    "a_ml": -198.0,
    "b_ml": 164.0,
    "market_a": 0.637
-  },
-  {
-   "fight_id": "401933598",
-   "card": "UFC Fight Night: Adesanya vs Magomedov",
-   "date": "2026-12-05T15:00Z",
-   "weight": "Welterweight",
-   "a": "Levan Chokheli",
-   "a_record": "15-3-0",
-   "b": "Islam Dulatov",
-   "b_record": "12-1-0",
-   "model_a": 0.471,
-   "a_fights": 1,
-   "b_fights": 2
-  },
-  {
-   "fight_id": "401933599",
-   "card": "UFC Fight Night: Adesanya vs Magomedov",
-   "date": "2026-12-05T15:00Z",
-   "weight": "Lightweight",
-   "a": "Mairon Santos",
-   "a_record": "18-1-0",
-   "b": "Akbar Abdullaev",
-   "b_record": "14-0-0",
-   "model_a": 0.576,
-   "a_fights": 4,
-   "b_fights": 1
-  },
-  {
-   "fight_id": "401933600",
-   "card": "UFC Fight Night: Adesanya vs Magomedov",
-   "date": "2026-12-05T15:00Z",
-   "weight": "Light Heavyweight",
-   "a": "Magomed Tuchalov",
-   "a_record": "7-0-0",
-   "b": "Ion Cutelaba",
-   "b_record": "20-12-1",
-   "model_a": 0.552,
-   "a_fights": 1,
-   "b_fights": 15
   },
   {
    "fight_id": "401933601",
@@ -360,17 +321,43 @@
    "b_fights": 5
   },
   {
-   "fight_id": "401930355",
-   "card": "UFC 335: Oliveira vs. Lopes",
-   "date": "2026-12-13T00:00Z",
-   "weight": "W Flyweight",
-   "a": "Maycee Barber",
+   "fight_id": "401933598",
+   "card": "UFC Fight Night: Adesanya vs Magomedov",
+   "date": "2026-12-05T18:00Z",
+   "weight": "Welterweight",
+   "a": "Levan Chokheli",
    "a_record": "15-3-0",
-   "b": "Carli Judice",
-   "b_record": "7-2-0",
-   "model_a": 0.58,
-   "a_fights": 12,
-   "b_fights": 6
+   "b": "Islam Dulatov",
+   "b_record": "12-1-0",
+   "model_a": 0.471,
+   "a_fights": 1,
+   "b_fights": 2
+  },
+  {
+   "fight_id": "401933599",
+   "card": "UFC Fight Night: Adesanya vs Magomedov",
+   "date": "2026-12-05T18:00Z",
+   "weight": "Lightweight",
+   "a": "Mairon Santos",
+   "a_record": "18-1-0",
+   "b": "Akbar Abdullaev",
+   "b_record": "14-0-0",
+   "model_a": 0.576,
+   "a_fights": 4,
+   "b_fights": 1
+  },
+  {
+   "fight_id": "401933600",
+   "card": "UFC Fight Night: Adesanya vs Magomedov",
+   "date": "2026-12-05T18:00Z",
+   "weight": "Light Heavyweight",
+   "a": "Magomed Tuchalov",
+   "a_record": "7-0-0",
+   "b": "Ion Cutelaba",
+   "b_record": "20-12-1",
+   "model_a": 0.552,
+   "a_fights": 1,
+   "b_fights": 15
   },
   {
    "fight_id": "401930356",
