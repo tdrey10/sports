@@ -268,6 +268,29 @@ def is_lock_price(p: Pick) -> bool:
     return p.market == "h2h" and not p.is_prop and LOCK_MIN_ODDS <= p.american <= LOCK_MAX_ODDS
 
 
+def _beats_price(p: Pick) -> bool:
+    from .ledger import break_even
+
+    return p.win_prob > break_even(p.american)
+
+
+def dog_slot_ok(p: Pick) -> bool:
+    """A side the daily promoter can make the Dog of the Day: a +100..+220 moneyline dog we give a
+    real shot (DOG_FLOOR_WIN) that still beats its price's break-even (withdraw pulls one that doesn't)."""
+    return (p.market == "h2h" and not p.is_prop and DOG_MIN_ODDS <= p.american <= DOG_MAX_ODDS
+            and p.win_prob >= DOG_FLOOR_WIN and _beats_price(p))
+
+
+def live_dog_pick(pool: list[Pick], settings: Settings, now: datetime, soon_cut: datetime) -> Pick | None:
+    """Today's best live dog on the board: the dog most likely to win outright (40%+, beating its price),
+    every bet rule applying (a market price to check, a verified price, no warnings, not a bet kind
+    losing blind; the pool already drops unknown-injury games and overreach). No units."""
+    ok = [p for p in pool
+          if dog_slot_ok(p) and now < p.commence_time <= soon_cut and not p.warnings
+          and p.market_prob is not None and verified(p) and not losing_kind(p, settings)]
+    return max(ok, key=lambda p: (p.win_prob, p.ev)) if ok else None
+
+
 def build_cards(
     scans: list[SportScan],
     settings: Settings,
@@ -281,9 +304,11 @@ def build_cards(
     posted_today: int | None = None,
     daily_min: int = DAILY_MIN,
     posted_events: set[str] | None = None,
+    live_dog=None,
 ) -> list[Card]:
     """``taken_today`` holds day-level tiers (lock/dog/prop) already published
-    today, so a Lock of the Day is never swapped out mid-day."""
+    today, so a Lock of the Day is never swapped out mid-day. ``live_dog`` (a test on a pick, e.g.
+    "plays today"), when given, asks for today's best live dog on the board (see live_dog_pick)."""
     taken = set(taken_today or ())
     by_event: dict[str, SportScan] = {}
     game: list[Pick] = []
@@ -492,6 +517,19 @@ def build_cards(
                  else "ok")] += 1
         print(f"daily card: {have} picks up for the next {EARLY_HOURS}h, {len(best_fill)} games eligible, "
               f"{len(card_ids)} added; sides by rule: " + ", ".join(f"{k[0]} {k[1]} {v}" for k, v in sorted(why.items())))
+
+    # Owner: a Dog of the Day every day. When nothing on the card is a dog that can take the slot,
+    # the most likely dog on the whole board to win outright goes up as a no-unit lean, and the
+    # daily promoter (runner.daily_lock_dog) makes it the Dog. Before Nov 18 the promoter only saw
+    # posted leans, nearly all favorites, so many days (Nov 17, Nov 18) had no Dog.
+    if live_dog is not None and heads:
+        if not any(dog_slot_ok(p) and live_dog(p) for _, p in chosen):
+            near = {p.event_id for _, p in chosen} | set(posted_events or ())
+            dog = live_dog_pick([p for p in every if p.event_id not in near and live_dog(p)], settings, now, soon_cut)
+            if dog is not None:
+                chosen.append(("lean", dog))
+                lean_ids.add(id(dog))
+                live_dog_ids.add(id(dog))
 
     # Best bets: today's unit plays ranked by edge score, only those that clear the bar.
     scores = {id(p): edge_score(p, settings) for _, p in chosen}

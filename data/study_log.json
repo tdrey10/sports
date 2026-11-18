@@ -517,5 +517,15 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all dog/fav/spread bets through the same bar: 0 passed (luck alone gives ~0.5 passes across the ~36 distinct tries here; 72 rows count both sides of the jump)",
   "verdict": "dead, none wired: 0 of 72 passed. The market's jumps are mostly right (news, starters), not overreactions. Fading the jump loses: NHL dogs the market jumped against -10.7% tuning / -8.3% blind (1,309 / 1,619); MLB dogs jumped against after a loss +4.3% tuning then -4.2% blind (1,819), flipped; college hoops lock-price favorites jumped against after a loss -19.5% / -15.2% (306 blind). Following the jump also loses: college hoops spreads jumped toward -5.6% / -7.5% (6,824 blind). NFL flips sign every arm (dogs jumped against +17.5% tuning, -18.1% blind). Nothing beats the vig; logged and dropped."
+ },
+ {
+  "date": "2026-11-18",
+  "idea": "First half vs full game market gap: per sport, the no-vig first-half (MLB: first five) moneyline logit fit as a + b * the full-game moneyline logit on tuning seasons; the gap is the actual first-half price minus that fit. Sides the half market likes clearly more (top quarter of tuning gaps) or less (bottom quarter), on +100..+220 full-game dog ML, -170..-120 favorite ML, full-game spread/run line and the side's own first-half ML (-170..+220, tied half = push) at the real price",
+  "sports": "nfl, ncaaf, nba, ncaab, mlb (NHL archive has almost no first-period lines)",
+  "data": "data/lines/espn closing full-game and first-half prices 2018+ (sportsedge/halfgapstudy.py); closing prices only, no scores in the spot",
+  "tuning": "2018-2021 (also fits a, b and sets the quarter cutoffs)",
+  "blind": "2022 on",
+  "luck_control": "100 random tenths of all dog/fav/spread/first-half bets through the same bar: 0 passed (luck alone gives ~0.3 passes across these 40 tries)",
+  "verdict": "dead, none wired: 0 of 40 passed. When the two markets disagree, the half market is the informed one, not the soft one: sides it likes less lose more on full-game spreads (college hoops -6.3% tuning / -6.7% blind on 8,620; NBA -8.1% / -4.5%; MLB -7.4% / -4.8%), and following it only gets back to about the vig (college hoops spread -2.6% / -2.1%). Dogs the half market likes more looked good in tuning (college hoops +10.8% on 629, NFL +20.2% on 58) and died blind (-2.2% on 745, -2.8% on 73). Betting the first-half moneyline against the full game loses everywhere (college hoops -8.6% / -10.0%). Logged and dropped."
  }
 ]
