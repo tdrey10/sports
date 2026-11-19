@@ -370,7 +370,7 @@ class Ledger:
         that isn't a realistic winner, or the same bet posted twice (two odds sources)."""
         from types import SimpleNamespace
 
-        from .tiers import DOG_FLOOR_WIN, LEGIT_MIN_WIN, backed, losing_kind
+        from .tiers import DOG_FLOOR_WIN, LEGIT_MIN_WIN, backed, losing_kind, past_dog_cap
 
         pulled = []
         seen: dict[tuple, Entry] = {}
@@ -390,6 +390,13 @@ class Ledger:
                 e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
                 e.reasons = ["Pulled: this spot's profit could be luck. We only put money on spots that clearly "
                              "beat luck now."] + list(e.reasons)
+                pulled.append(e)
+                continue
+            if e.player is None and past_dog_cap(e.market, e.odds, e.tier):
+                # The owner's +300 dog cap holds for every engine and every pick, formula and proven alike.
+                e.status, e.profit, e.graded_at = "void", 0.0, now.isoformat()
+                e.reasons = [f"Withdrawn before the game: {e.odds:+.0f} is past our +300 cap on dogs. No long shots."] \
+                    + list(e.reasons)
                 pulled.append(e)
                 continue
             if not _proven(e) and e.tier == "early" and is_formula_pick(e.reasons) and (

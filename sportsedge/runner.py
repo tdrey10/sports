@@ -12,7 +12,7 @@ from .edge import Settings
 from .engine import Engine, SportScan
 from .ledger import Ledger
 from .sports import SPORTS, SportConfig
-from .tiers import BEST_BETS, DOG_MAX_ODDS, DOG_MIN_ODDS, LOCK_MAX_ODDS, LOCK_MIN_ODDS, build_cards, gate
+from .tiers import BEST_BETS, DOG_MAX_ODDS, DOG_MIN_ODDS, LOCK_MAX_ODDS, LOCK_MIN_ODDS, build_cards, gate, past_dog_cap
 
 log = logging.getLogger(__name__)
 
@@ -160,6 +160,8 @@ def run_cycle(
     # Owner, Oct 23/25: a Lock or Dog always carries units; one the old board would post at 0u
     # ("Lean Dog", "best live dog... no units") is not posted at all. Leans stay leans.
     cards = [c for c in cards if not (c.tier in ("lock", "dog") and c.units <= 0)]
+    # Owner's rule on every board: no pregame dog above +300 (the D503 board's own caps run to +350).
+    cards = [c for c in cards if not past_dog_cap(c.pick.market, c.pick.american, c.tier)]
     out.published = len(ledger.publish(cards, now))
     if not held:
         daily_lock_dog(ledger, now)
