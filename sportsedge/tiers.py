@@ -71,6 +71,15 @@ DEFAULT_TRUST = 0.1  # sports and bet types with no prediction study (soccer, te
 # market, and they went 2-10.
 LEAN_MAX_GAP = 0.06
 DAILY_MAX_DOG = 300
+
+
+def past_dog_cap(market: str, american: float | None, tier: str) -> bool:
+    """Owner's rule: no pregame dog above +300, on any board (live plus money has its own +2000 cap).
+    Nov 19: the D503 night-game lean posted Colts +525 (15% to win) because its own dog cap is +350
+    and the lean fallback had no cap at all."""
+    return market == "h2h" and american is not None and american > DAILY_MAX_DOG and tier not in LIVE_TIERS
+
+
 MAX_UNITS = 3.0
 BEST_BETS = 10  # most daily top picks across spreads, totals, moneylines and props
 BEST_MIN_SCORE = 40  # a best bet needs this edge score (and a positive calibrated edge); fewer is fine

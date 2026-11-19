@@ -54,6 +54,7 @@ SHOP_EVIDENCE = {"kind": "PROVEN", "blind_bets": 75, "blind_roi": 0.198, "blind_
                  "the other books' consensus, 1h before kickoff. Blind 75 bets +19.8% (SE 17.7%); tuning 261 bets +2.1%.",
                  "risk": "Built on a public multi-book archive, not yet re-proven on our own saved prices."}
 MAX_FAVORITE = -170
+MAX_DOG = 300  # owner's rule: no pregame dog above +300 (tiers.DAILY_MAX_DOG); Nov 7 posted Rutgers +920
 MAX_UNITS = 1.0  # new method: small until its CLV record is in
 CORE_HOURS_UTC = (19, 0)  # about noon and 5 PM Pacific: tennis checks
 SATURDAY_HOUR_UTC = 15  # on Saturdays the 8 AM check is core: the early college football kickoffs
@@ -188,7 +189,7 @@ def find_value(cfg: SportConfig, ev: dict, now: datetime) -> list[dict]:
                 continue
             for side, (price, point) in mk[(market, line)].items():
                 q = fair.get(side)
-                if q is None or price < MAX_FAVORITE:
+                if q is None or price < MAX_FAVORITE or (market == "h2h" and price > MAX_DOG):
                     continue
                 ev_ = q * american_to_decimal(price) - 1
                 if MIN_EV <= ev_ <= MAX_EV_BY_SPORT.get(cfg.key, MAX_EV):

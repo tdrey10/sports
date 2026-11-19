@@ -18,7 +18,7 @@ from zoneinfo import ZoneInfo
 
 from ..edge import Pick
 from ..ledger import ENGINE_MARK
-from ..tiers import LEGIT_MIN_WIN, Card
+from ..tiers import DAILY_MAX_DOG, LEGIT_MIN_WIN, Card
 from .data import Game, load
 from .features import FEATURES, Replay, logit, sigmoid
 from .model import SportModel, dec, fit, no_vig
@@ -715,7 +715,8 @@ def night_picks(sides: list[Side], now: datetime, chosen: list, posted_events) -
     have = {s.eid for _, _, s, _ in chosen} | set(posted_events)
     games: dict[str, list[Side]] = {}
     for s in sides:
-        if s.sport == "nfl" and _pt_day(s.start) == today and s.eid not in have and s.odds >= MAX_FAV:
+        if s.sport == "nfl" and _pt_day(s.start) == today and s.eid not in have and MAX_FAV <= s.odds <= DAILY_MAX_DOG:
+            # Never a dog past the owner's +300 cap (Nov 19: Colts +525 posted as the night lean).
             games.setdefault(s.eid, []).append(s)
     out = []
     for eid, pair in games.items():

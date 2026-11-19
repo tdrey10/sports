@@ -527,5 +527,16 @@
   "blind": "2022 on",
   "luck_control": "100 random tenths of all dog/fav/spread/first-half bets through the same bar: 0 passed (luck alone gives ~0.3 passes across these 40 tries)",
   "verdict": "dead, none wired: 0 of 40 passed. When the two markets disagree, the half market is the informed one, not the soft one: sides it likes less lose more on full-game spreads (college hoops -6.3% tuning / -6.7% blind on 8,620; NBA -8.1% / -4.5%; MLB -7.4% / -4.8%), and following it only gets back to about the vig (college hoops spread -2.6% / -2.1%). Dogs the half market likes more looked good in tuning (college hoops +10.8% on 629, NFL +20.2% on 58) and died blind (-2.2% on 745, -2.8% on 73). Betting the first-half moneyline against the full game loses everywhere (college hoops -8.6% / -10.0%). Logged and dropped."
+ },
+ {
+  "date": "2026-11-19",
+  "idea": "Slate size: are lines softer on busy days, when books price a pile of games at once (or on quiet days, when one game draws all the money)? Slate = games in the same sport on the same Eastern day; busy = top quarter of tuning slate sizes, quiet = bottom quarter, per sport. Bets at the real closing price: +100..+220 dog ML, -170..-120 favorite ML, spread dog and spread favorite (football/hoops), over, under",
+  "sports": "ncaaf, nba, ncaab, mlb, nhl (NFL slate is fixed by TV windows, covered by the kickoff-slot study)",
+  "data": "data/lines/espn closing lines 2018+ (sportsedge/slatestudy.py)",
+  "tuning": "2018-2021 (also sets the busy/quiet cutoffs)",
+  "blind": "2022 on, 52 variants",
+  "luck_control": "100 random tenths of all bets per sport (500 spots) through the same bar: 0 passed, 0 strong; luck alone gives ~0.35 passes across 52 tries",
+  "verdict": "dead, none wired: 0 of 52 passed. Slate size doesn't make prices soft: every variant loses about the vig or worse blind. Biggest: college hoops unders on busy days -6.3% tuning / -10.3% blind on 4,437 (busy-day overs +1.2% blind but -2.7% tuning, so no edge either way); NBA busy-day unders -9.3% blind; MLB overs lose on both busy and quiet days (-6.0%/-6.9%). Quiet-day NHL dogs +0.7% blind on 1,091 but -1.2% tuning. Logged and dropped.",
+  "action": "none; possible note: busy college hoops days lean over vs under, but neither side beats the vig"
  }
 ]
