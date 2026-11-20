@@ -538,5 +538,16 @@
   "luck_control": "100 random tenths of all bets per sport (500 spots) through the same bar: 0 passed, 0 strong; luck alone gives ~0.35 passes across 52 tries",
   "verdict": "dead, none wired: 0 of 52 passed. Slate size doesn't make prices soft: every variant loses about the vig or worse blind. Biggest: college hoops unders on busy days -6.3% tuning / -10.3% blind on 4,437 (busy-day overs +1.2% blind but -2.7% tuning, so no edge either way); NBA busy-day unders -9.3% blind; MLB overs lose on both busy and quiet days (-6.0%/-6.9%). Quiet-day NHL dogs +0.7% blind on 1,091 but -1.2% tuning. Logged and dropped.",
   "action": "none; possible note: busy college hoops days lean over vs under, but neither side beats the vig"
+ },
+ {
+  "date": "2026-11-20",
+  "idea": "Postseason and neutral-site games: are big-stage prices soft? Playoffs, bowls and March Madness (ESPN season type 3; NFL nflverse game_type not REG) for every bet kind: +100..+220 dog ML, -170..-120 favorite ML, spread dog / spread favorite, over, under; the playoff 'zig-zag' (side that lost / won the previous game of the same postseason series, NBA/NHL/MLB); regular-season neutral-site games (college hoops, college football, NFL international). Playoff dogs and neutral-site dogs overlap the Oct 11 line studies (family 14); favorites, spreads, totals and the zig-zag are new.",
+  "sports": "nfl, ncaaf, nba, ncaab, mlb, nhl",
+  "data": "data/lines/espn closing lines 2018+, data/lines/nfl (nflverse 2006+) (sportsedge/postseasonstudy.py)",
+  "tuning": "2018-2021 (NFL 2006-2017)",
+  "blind": "2022 on (NFL 2018 on), 66 variants",
+  "luck_control": "100 random tenths of all bets per sport (600 spots) through the same bar: 0 passed, 0 strong; luck alone gives ~0.44 passes across 66 tries",
+  "verdict": "nothing to bet, 0 of 66 passed. Zig-zag is dead (NBA spread dog off a series loss +7.1% blind but -10.6% tuning; NHL dog off a loss +13.8% tuning, +2.5% blind). One clear LOSER: lock-price favorites (-170..-120) in the postseason lose in both arms in five of six sports (MLB -10.9/-10.5, NHL -12.6/-10.8, NFL -29/-27, NCAAB -8.8/-18.7, NCAAF +31/-8.8 on 30/49, NBA -13.8/+0.8). Pooled: tuning 557 bets -10.6% (+/-3.6), blind 581 bets -11.0% (+/-3.6), vs -3.8%/-4.6% for the same prices in the regular season (11,745/16,004 bets). Spotted after pooling, so treated as an avoid rule only (tightening), never as a bet on the other side.",
+  "action": "Lock of the Day skips postseason games (tiers.build_cards and d5 board.choose; ESPN season type now on GameResult/EventContext). If every game on the board is a playoff game, the daily Lock still posts but with no units and a card note."
  }
 ]

@@ -31,6 +31,7 @@ class GameResult:
     away_score: float | None
     neutral: bool = False
     state: str = ""  # "pre", "in" or "post" when known
+    postseason: bool = False  # ESPN season type 3: playoffs, bowls, March Madness
     time_tbd: bool = False  # ESPN has the date but no start time yet (shown as midnight Eastern)
     detail: str = ""  # e.g. "1:28 - 3rd" for games in progress
     live_home: float | None = None
