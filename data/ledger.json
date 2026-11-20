@@ -54220,9 +54220,9 @@
    "close_fair": 0.5185754937203745,
    "status": "live",
    "live": {
-    "home": 1.0,
+    "home": 2.0,
     "away": 2.0,
-    "detail": "9:18 - 1st"
+    "detail": "End of 1st"
    },
    "final": null,
    "result_value": null,
@@ -54334,9 +54334,9 @@
    "close_fair": 0.5232290461512686,
    "status": "live",
    "live": {
-    "home": 0.0,
+    "home": 2.0,
     "away": 0.0,
-    "detail": "7:22 - 1st"
+    "detail": "End of 1st"
    },
    "final": null,
    "result_value": null,
@@ -54464,9 +54464,9 @@
    "close_fair": 0.5345862274310904,
    "status": "live",
    "live": {
-    "home": 16.0,
-    "away": 21.0,
-    "detail": "6:58 - 1st"
+    "home": 27.0,
+    "away": 34.0,
+    "detail": "Halftime"
    },
    "final": null,
    "result_value": null,
@@ -54581,9 +54581,9 @@
    "close_fair": 0.5674365390124785,
    "status": "live",
    "live": {
-    "home": 0.0,
-    "away": 1.0,
-    "detail": "10:34 - 1st"
+    "home": 1.0,
+    "away": 4.0,
+    "detail": "End of 1st"
    },
    "final": null,
    "result_value": null,
@@ -54689,7 +54689,7 @@
    "live": {
     "home": 1.0,
     "away": 0.0,
-    "detail": "7:43 - 1st"
+    "detail": "20:00 - 2nd"
    },
    "final": null,
    "result_value": null,
@@ -54804,8 +54804,12 @@
    ],
    "close_odds": -122.0,
    "close_fair": 0.5278394447972194,
-   "status": "pending",
-   "live": null,
+   "status": "live",
+   "live": {
+    "home": 16.0,
+    "away": 18.0,
+    "detail": "7:37 - 1st"
+   },
    "final": null,
    "result_value": null,
    "profit": null,
@@ -54930,8 +54934,12 @@
    ],
    "close_odds": -130.0,
    "close_fair": 0.545402735448801,
-   "status": "pending",
-   "live": null,
+   "status": "live",
+   "live": {
+    "home": 15.0,
+    "away": 20.0,
+    "detail": "6:35 - 1st"
+   },
    "final": null,
    "result_value": null,
    "profit": null,
@@ -55029,8 +55037,12 @@
    ],
    "close_odds": -142.0,
    "close_fair": 0.5674365390124785,
-   "status": "pending",
-   "live": null,
+   "status": "live",
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "7:56 - 1st"
+   },
    "final": null,
    "result_value": null,
    "profit": null,
@@ -55555,7 +55567,7 @@
    "best_rank": null,
    "score": null,
    "spots": [],
-   "current_odds": -120.0,
+   "current_odds": -125.0,
    "current_point": null,
    "current_book": "draftkings",
    "history": [
@@ -55583,10 +55595,15 @@
      "2026-11-20T00:31:52.096270+00:00",
      -120.0,
      null
+    ],
+    [
+     "2026-11-20T01:01:41.522396+00:00",
+     -125.0,
+     null
     ]
    ],
-   "close_odds": -120.0,
-   "close_fair": 0.5232290461512686,
+   "close_odds": -125.0,
+   "close_fair": 0.5345862274310904,
    "status": "pending",
    "live": null,
    "final": null,
@@ -58223,331 +58240,6 @@
   }
  ],
  "forecasts": [
-  {
-   "id": "ncaab:401906770",
-   "sport": "ncaab",
-   "sport_name": "College Basketball",
-   "event_id": "401906770",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Florida Gators",
-   "away": "Jacksonville Dolphins",
-   "home_score": 86.0,
-   "away_score": 70.4,
-   "p_home": 0.7311,
-   "p_away": 0.2689,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.7311,
-   "market_home": null,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 88.0,
-   "final_away": 57.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T02:56:32.945950+00:00"
-  },
-  {
-   "id": "ncaab:401906864",
-   "sport": "ncaab",
-   "sport_name": "College Basketball",
-   "event_id": "401906864",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Texas Longhorns",
-   "away": "Gardner-Webb Runnin' Bulldogs",
-   "home_score": 89.2,
-   "away_score": 63.7,
-   "p_home": 0.8435,
-   "p_away": 0.1565,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.8435,
-   "market_home": null,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 98.0,
-   "final_away": 50.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T03:49:32.550606+00:00"
-  },
-  {
-   "id": "ncaab:401909491",
-   "sport": "ncaab",
-   "sport_name": "College Basketball",
-   "event_id": "401909491",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Creighton Bluejays",
-   "away": "Le Moyne Dolphins",
-   "home_score": 92.7,
-   "away_score": 63.2,
-   "p_home": 0.9931,
-   "p_away": 0.0069,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.7655,
-   "market_home": 0.9931,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 83.0,
-   "final_away": 55.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T03:49:32.550606+00:00"
-  },
-  {
-   "id": "ncaab:401909563",
-   "sport": "ncaab",
-   "sport_name": "College Basketball",
-   "event_id": "401909563",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Duke Blue Devils",
-   "away": "Coastal Carolina Chanticleers",
-   "home_score": 85.2,
-   "away_score": 62.1,
-   "p_home": 0.8199,
-   "p_away": 0.1801,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.8199,
-   "market_home": null,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 113.0,
-   "final_away": 52.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T03:49:32.550606+00:00"
-  },
-  {
-   "id": "ncaab:401911229",
-   "sport": "ncaab",
-   "sport_name": "College Basketball",
-   "event_id": "401911229",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Loyola Chicago Ramblers",
-   "away": "West Georgia Wolves",
-   "home_score": 81.5,
-   "away_score": 64.0,
-   "p_home": 0.9586,
-   "p_away": 0.0414,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.7337,
-   "market_home": 0.9586,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 76.0,
-   "final_away": 53.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T03:49:32.550606+00:00"
-  },
-  {
-   "id": "ncaab:401918968",
-   "sport": "ncaab",
-   "sport_name": "College Basketball",
-   "event_id": "401918968",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "SMU Mustangs",
-   "away": "VMI Keydets",
-   "home_score": 92.5,
-   "away_score": 68.0,
-   "p_home": 0.9805,
-   "p_away": 0.0195,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.7294,
-   "market_home": 0.9805,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 95.0,
-   "final_away": 70.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T03:49:32.550606+00:00"
-  },
-  {
-   "id": "ncaab:401920913",
-   "sport": "ncaab",
-   "sport_name": "College Basketball",
-   "event_id": "401920913",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Tulsa Golden Hurricane",
-   "away": "Northern Illinois Huskies",
-   "home_score": 84.8,
-   "away_score": 70.3,
-   "p_home": 0.9258,
-   "p_away": 0.0742,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.8101,
-   "market_home": 0.9258,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 94.0,
-   "final_away": 75.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T03:49:32.550606+00:00"
-  },
-  {
-   "id": "ncaab:401921094",
-   "sport": "ncaab",
-   "sport_name": "College Basketball",
-   "event_id": "401921094",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Rice Owls",
-   "away": "East Texas A&M Lions",
-   "home_score": 74.6,
-   "away_score": 71.1,
-   "p_home": 0.6105,
-   "p_away": 0.3895,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.7485,
-   "market_home": 0.6105,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 71.0,
-   "final_away": 72.0,
-   "live": null,
-   "correct": false,
-   "graded_at": "2026-11-06T03:49:32.550606+00:00"
-  },
-  {
-   "id": "ncaab:401925754",
-   "sport": "ncaab",
-   "sport_name": "College Basketball",
-   "event_id": "401925754",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Michigan State Spartans",
-   "away": "Toledo Rockets",
-   "home_score": 90.8,
-   "away_score": 64.3,
-   "p_home": 0.9857,
-   "p_away": 0.0143,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.7412,
-   "market_home": 0.9857,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 91.0,
-   "final_away": 61.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T03:49:32.550606+00:00"
-  },
-  {
-   "id": "ncaab:401926780",
-   "sport": "ncaab",
-   "sport_name": "College Basketball",
-   "event_id": "401926780",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "South Alabama Jaguars",
-   "away": "Jacksonville State Gamecocks",
-   "home_score": 73.3,
-   "away_score": 68.8,
-   "p_home": 0.654,
-   "p_away": 0.346,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.5698,
-   "market_home": 0.654,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 83.0,
-   "final_away": 80.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T03:49:32.550606+00:00"
-  },
-  {
-   "id": "ncaaf:401869964",
-   "sport": "ncaaf",
-   "sport_name": "College Football",
-   "event_id": "401869964",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Southern Miss Golden Eagles",
-   "away": "James Madison Dukes",
-   "home_score": 22.5,
-   "away_score": 36.0,
-   "p_home": 0.1642,
-   "p_away": 0.8358,
-   "p_draw": 0.0,
-   "winner": "away",
-   "model_home": 0.3168,
-   "market_home": 0.1561,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 23.0,
-   "final_away": 54.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T05:06:38.353131+00:00"
-  },
-  {
-   "id": "nhl:401892656",
-   "sport": "nhl",
-   "sport_name": "NHL",
-   "event_id": "401892656",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Winnipeg Jets",
-   "away": "Vancouver Canucks",
-   "home_score": 3.8,
-   "away_score": 2.8,
-   "p_home": 0.6677,
-   "p_away": 0.3323,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.5967,
-   "market_home": 0.6677,
-   "facts": [],
-   "updated_at": "2026-11-05T23:25:44.896578+00:00",
-   "status": "final",
-   "final_home": 6.0,
-   "final_away": 2.0,
-   "live": null,
-   "correct": true,
-   "graded_at": "2026-11-06T02:56:32.945950+00:00"
-  },
-  {
-   "id": "nhl:401892657",
-   "sport": "nhl",
-   "sport_name": "NHL",
-   "event_id": "401892657",
-   "commence_time": "2026-11-06T01:00:00+00:00",
-   "home": "Edmonton Oilers",
-   "away": "Anaheim Ducks",
-   "home_score": 3.8,
-   "away_score": 2.9,
-   "p_home": 0.6393,
-   "p_away": 0.3607,
-   "p_draw": 0.0,
-   "winner": "home",
-   "model_home": 0.5987,
-   "market_home": 0.6393,
-   "facts": [],
-   "updated_at": "2026-11-06T00:21:06.309556+00:00",
-   "status": "final",
-   "final_home": 4.0,
-   "final_away": 5.0,
-   "live": null,
-   "correct": false,
-   "graded_at": "2026-11-06T03:49:32.550606+00:00"
-  },
   {
    "id": "nfl:401873037",
    "sport": "nfl",
@@ -84589,9 +84281,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 57.0,
-    "away": 38.0,
-    "detail": "15:10 - 2nd"
+    "home": 87.0,
+    "away": 65.0,
+    "detail": "4:15 - 2nd"
    },
    "correct": null,
    "graded_at": null
@@ -84631,9 +84323,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 27.0,
-    "away": 27.0,
-    "detail": "6:35 - 1st"
+    "home": 42.0,
+    "away": 39.0,
+    "detail": "Halftime"
    },
    "correct": null,
    "graded_at": null
@@ -84673,9 +84365,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 22.0,
-    "away": 19.0,
-    "detail": "7:21 - 1st"
+    "home": 37.0,
+    "away": 27.0,
+    "detail": "Halftime"
    },
    "correct": null,
    "graded_at": null
@@ -84704,9 +84396,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 43.0,
-    "away": 22.0,
-    "detail": "4:33 - 1st"
+    "home": 61.0,
+    "away": 33.0,
+    "detail": "17:35 - 2nd"
    },
    "correct": null,
    "graded_at": null
@@ -84746,9 +84438,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 24.0,
-    "away": 21.0,
-    "detail": "7:08 - 1st"
+    "home": 37.0,
+    "away": 37.0,
+    "detail": "Halftime"
    },
    "correct": null,
    "graded_at": null
@@ -84788,9 +84480,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 16.0,
-    "away": 21.0,
-    "detail": "6:58 - 1st"
+    "home": 27.0,
+    "away": 34.0,
+    "detail": "Halftime"
    },
    "correct": null,
    "graded_at": null
@@ -84830,9 +84522,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 17.0,
-    "away": 27.0,
-    "detail": "4:55 - 1st"
+    "home": 24.0,
+    "away": 35.0,
+    "detail": "17:10 - 2nd"
    },
    "correct": null,
    "graded_at": null
@@ -84872,9 +84564,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 28.0,
-    "away": 14.0,
-    "detail": "5:54 - 1st"
+    "home": 37.0,
+    "away": 31.0,
+    "detail": "18:53 - 2nd"
    },
    "correct": null,
    "graded_at": null
@@ -84914,9 +84606,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 0.0,
+    "home": 2.0,
     "away": 0.0,
-    "detail": "7:22 - 1st"
+    "detail": "End of 1st"
    },
    "correct": null,
    "graded_at": null
@@ -84958,7 +84650,7 @@
    "live": {
     "home": 1.0,
     "away": 1.0,
-    "detail": "6:23 - 1st"
+    "detail": "20:00 - 2nd"
    },
    "correct": null,
    "graded_at": null
@@ -85000,7 +84692,7 @@
    "live": {
     "home": 1.0,
     "away": 0.0,
-    "detail": "7:43 - 1st"
+    "detail": "20:00 - 2nd"
    },
    "correct": null,
    "graded_at": null
@@ -85040,9 +84732,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 0.0,
-    "away": 1.0,
-    "detail": "10:34 - 1st"
+    "home": 1.0,
+    "away": 4.0,
+    "detail": "End of 1st"
    },
    "correct": null,
    "graded_at": null
@@ -85084,7 +84776,7 @@
    "live": {
     "home": 0.0,
     "away": 0.0,
-    "detail": "7:19 - 1st"
+    "detail": "End of 1st"
    },
    "correct": null,
    "graded_at": null
@@ -85124,9 +84816,9 @@
    "final_home": null,
    "final_away": null,
    "live": {
-    "home": 1.0,
+    "home": 2.0,
     "away": 2.0,
-    "detail": "9:18 - 1st"
+    "detail": "End of 1st"
    },
    "correct": null,
    "graded_at": null
@@ -85162,10 +84854,14 @@
     "Upset risk: 31% chance FC Cincinnati wins outright."
    ],
    "updated_at": "2026-11-20T00:01:44.587495+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "21'"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -85200,10 +84896,14 @@
     "Track record: teams we gave a 74% chance to win outright won 72% of the time (40 recent games tested)."
    ],
    "updated_at": "2026-11-20T00:01:44.587495+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 15.0,
+    "away": 20.0,
+    "detail": "6:35 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -85238,10 +84938,14 @@
     "Best number: -122 at DraftKings (checked 1 books)."
    ],
    "updated_at": "2026-11-20T00:01:44.587495+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 16.0,
+    "away": 18.0,
+    "detail": "7:37 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -85276,10 +84980,14 @@
     "Track record: teams we gave a 66% chance to win outright won 44% of the time (88 recent games tested)."
    ],
    "updated_at": "2026-11-20T00:01:44.587495+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 7.0,
+    "away": 0.0,
+    "detail": "0:54 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -85314,10 +85022,14 @@
     "Upset risk: 42% chance Edmonton Oilers wins outright."
    ],
    "updated_at": "2026-11-20T00:01:44.587495+00:00",
-   "status": "pending",
+   "status": "live",
    "final_home": null,
    "final_away": null,
-   "live": null,
+   "live": {
+    "home": 0.0,
+    "away": 0.0,
+    "detail": "7:56 - 1st"
+   },
    "correct": null,
    "graded_at": null
   },
@@ -85747,7 +85459,7 @@
     "Power rank: Indianapolis Colts #25 vs Houston Texans #12 (of 32).",
     "Upset risk: 30% chance Indianapolis Colts wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -85785,7 +85497,7 @@
     "Track record: teams we gave a 54% chance to win outright won 48% of the time (27 recent games tested).",
     "Best number: -148 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -85823,7 +85535,7 @@
     "Track record: teams we gave a 46% chance to win outright won 52% of the time (27 recent games tested).",
     "Best number: -218 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -85841,15 +85553,15 @@
    "away": "UTEP Miners",
    "home_score": 68.6,
    "away_score": 67.1,
-   "p_home": 0.5232,
-   "p_away": 0.4768,
+   "p_home": 0.5346,
+   "p_away": 0.4654,
    "p_draw": 0.0,
    "winner": "home",
    "model_home": 0.7486,
-   "market_home": 0.5232,
+   "market_home": 0.5346,
    "facts": [
     "Vegas: New Mexico State Aggies -1.5 \u00b7 O/U 134.5 (our ratings have New Mexico State Aggies 13.8 better than the spread; our ratings have 7.8 more points than the total).",
-    "Market win chance: UTEP Miners 48% \u00b7 New Mexico State Aggies 52%.",
+    "Market win chance: UTEP Miners 47% \u00b7 New Mexico State Aggies 53%.",
     "Our ratings alone: UTEP Miners 63.5 @ New Mexico State Aggies 78.8, New Mexico State Aggies 75% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,624 blind-tested games (2022-2026): this method picked 72.8% of winners (Vegas alone 72.8%, our ratings alone 68.7%) and missed the total by 12.98 points on average (ratings alone 13.67).",
     "UTEP Miners (3-1) @ New Mexico State Aggies (1-3).",
@@ -85859,9 +85571,9 @@
     "Head to head this season: New Mexico State Aggies 0-1 (last: New Mexico State Aggies 58 - UTEP Miners 60, 11/13).",
     "Power rank: UTEP Miners #319 vs New Mexico State Aggies #318 (of 370).",
     "Upset risk: 25% chance UTEP Miners wins outright.",
-    "Track record: teams we gave a 74% chance to win outright won 71% of the time (41 recent games tested)."
+    "Track record: teams we gave a 74% chance to win outright won 69% of the time (42 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -85899,7 +85611,7 @@
     "Power rank: Utah Tech Trailblazers #239 vs Washington Huskies #180 (of 370).",
     "Upset risk: 23% chance Utah Tech Trailblazers wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -85921,12 +85633,12 @@
    "p_away": 0.5547,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.7845,
+   "model_home": 0.7846,
    "market_home": 0.4453,
    "facts": [
     "Vegas: UC Santa Barbara Gauchos -1.5 \u00b7 O/U 148.5 (our ratings have Pepperdine Waves 19.5 better than the spread; our ratings have 4.0 more points than the total).",
     "Market win chance: UC Santa Barbara Gauchos 55% \u00b7 Pepperdine Waves 45%.",
-    "Our ratings alone: UC Santa Barbara Gauchos 67.2 @ Pepperdine Waves 85.2, Pepperdine Waves 78% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
+    "Our ratings alone: UC Santa Barbara Gauchos 67.2 @ Pepperdine Waves 85.3, Pepperdine Waves 78% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,624 blind-tested games (2022-2026): this method picked 72.8% of winners (Vegas alone 72.8%, our ratings alone 68.7%) and missed the total by 12.98 points on average (ratings alone 13.67).",
     "UC Santa Barbara Gauchos (4-0) @ Pepperdine Waves (2-2).",
     "UC Santa Barbara Gauchos fresh off a 97-47 blowout of UC Merced Bobcats (Sun 11/15).",
@@ -85934,10 +85646,10 @@
     "Last 5: UC Santa Barbara Gauchos 4-0 (avg margin +29.0); Pepperdine Waves 2-2 (avg margin +26.0).",
     "Power rank: UC Santa Barbara Gauchos #93 vs Pepperdine Waves #37 (of 370).",
     "Upset chance: UC Santa Barbara Gauchos wins outright 22% of the time on our numbers.",
-    "Track record: teams we gave a 26% chance to win outright won 29% of the time (41 recent games tested).",
+    "Track record: teams we gave a 26% chance to win outright won 31% of the time (42 recent games tested).",
     "Best number: -135 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -85959,7 +85671,7 @@
    "p_away": 0.5278,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.7314,
+   "model_home": 0.7315,
    "market_home": 0.4722,
    "facts": [
     "Vegas: Southern Miss Golden Eagles -1.5 \u00b7 O/U 144.5 (our ratings have Grambling Tigers 15.6 better than the spread; our ratings have 7.6 more points than the total).",
@@ -85972,10 +85684,10 @@
     "Last 5: Southern Miss Golden Eagles 2-3 (avg margin -1.2); Grambling Tigers 1-2 (avg margin -19.3).",
     "Power rank: Southern Miss Golden Eagles #274 vs Grambling Tigers #300 (of 370).",
     "Upset chance: Southern Miss Golden Eagles wins outright 27% of the time on our numbers.",
-    "Track record: teams we gave a 26% chance to win outright won 29% of the time (41 recent games tested).",
+    "Track record: teams we gave a 26% chance to win outright won 31% of the time (42 recent games tested).",
     "Best number: -122 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86013,7 +85725,7 @@
     "Track record: teams we gave a 46% chance to win outright won 52% of the time (27 recent games tested).",
     "Best number: -122 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86051,7 +85763,7 @@
     "Splits: Colorado Avalanche 7-3 at home; Anaheim Ducks 7-4 on the road.",
     "Power rank: Anaheim Ducks #19 vs Colorado Avalanche #4 (of 32)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86089,7 +85801,7 @@
     "Power rank: Vancouver Canucks #31 vs Seattle Kraken #26 (of 32).",
     "Upset risk: 35% chance Vancouver Canucks wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86127,7 +85839,7 @@
     "Power rank: Real Salt Lake #15 vs Seattle Sounders FC #16 (of 30).",
     "Upset risk: 29% chance Real Salt Lake wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86163,9 +85875,9 @@
     "Splits: California Golden Bears 3-1 at home; East Texas A&M Lions 3-1 on the road.",
     "Power rank: East Texas A&M Lions #210 vs California Golden Bears #304 (of 370).",
     "Upset risk: 31% chance East Texas A&M Lions wins outright.",
-    "Track record: teams we gave a 65% chance to win outright won 90% of the time (288 recent games tested)."
+    "Track record: teams we gave a 65% chance to win outright won 90% of the time (289 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86201,9 +85913,9 @@
     "Last 5: Sacramento State Hornets 1-2 (avg margin -3.0); Stanford Cardinal 4-1 (avg margin +8.2).",
     "Power rank: Sacramento State Hornets #334 vs Stanford Cardinal #245 (of 370).",
     "Upset risk: 20% chance Sacramento State Hornets wins outright.",
-    "Track record: teams we gave a 86% chance to win outright won 67% of the time (89 recent games tested)."
+    "Track record: teams we gave a 74% chance to win outright won 69% of the time (42 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86241,7 +85953,7 @@
     "Head to head this season: Vegas Golden Knights 0-1 (last: Dallas Stars 4 - Vegas Golden Knights 3, 11/18).",
     "Power rank: Dallas Stars #11 vs Vegas Golden Knights #9 (of 32)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86277,9 +85989,9 @@
     "Last 5: VCU Rams 2-1 (avg margin +15.7); Santa Clara Broncos 5-0 (avg margin +11.6).",
     "Power rank: VCU Rams #144 vs Santa Clara Broncos #172 (of 370).",
     "Upset risk: 26% chance VCU Rams wins outright.",
-    "Track record: teams we gave a 74% chance to win outright won 71% of the time (41 recent games tested)."
+    "Track record: teams we gave a 74% chance to win outright won 69% of the time (42 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86295,8 +86007,8 @@
    "commence_time": "2026-11-20T04:00:00+00:00",
    "home": "Kansas Jayhawks",
    "away": "Houston Cougars",
-   "home_score": 73.2,
-   "away_score": 76.7,
+   "home_score": 73.6,
+   "away_score": 77.1,
    "p_home": 0.376,
    "p_away": 0.624,
    "p_draw": 0.0,
@@ -86304,7 +86016,7 @@
    "model_home": 0.4674,
    "market_home": 0.376,
    "facts": [
-    "Vegas: Houston Cougars -3.5 \u00b7 O/U 150.5 (our ratings have Kansas Jayhawks 1.6 better than the spread; our ratings have 4.2 fewer points than the total).",
+    "Vegas: Houston Cougars -3.5 \u00b7 O/U 151.5 (our ratings have Kansas Jayhawks 1.6 better than the spread; our ratings have 5.2 fewer points than the total).",
     "Market win chance: Houston Cougars 62% \u00b7 Kansas Jayhawks 38%.",
     "Our ratings alone: Houston Cougars 74.1 @ Kansas Jayhawks 72.2, Kansas Jayhawks 47% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,624 blind-tested games (2022-2026): this method picked 72.8% of winners (Vegas alone 72.8%, our ratings alone 68.7%) and missed the total by 12.98 points on average (ratings alone 13.67).",
@@ -86317,7 +86029,7 @@
     "Track record: teams we gave a 54% chance to win outright won 48% of the time (27 recent games tested).",
     "Best number: -180 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86344,7 +86056,7 @@
    "facts": [
     "Vegas: USC Trojans -28.5 \u00b7 O/U 158.5 (our ratings have Tarleton State Texans 2.9 better than the spread; our ratings have 1.0 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86374,7 +86086,7 @@
     "Nitto ATP Finals \u00b7 Group Stage \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-11-20T00:32:38.171216+00:00",
+   "updated_at": "2026-11-20T01:02:25.510733+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86390,16 +86102,16 @@
    "commence_time": "2026-11-20T17:00:00+00:00",
    "home": "Florida State Seminoles",
    "away": "Green Bay Phoenix",
-   "home_score": 87.9,
-   "away_score": 65.4,
-   "p_home": 0.9805,
-   "p_away": 0.0195,
+   "home_score": 88.4,
+   "away_score": 64.9,
+   "p_home": 0.9838,
+   "p_away": 0.0162,
    "p_draw": 0.0,
    "winner": "home",
    "model_home": 0.6967,
-   "market_home": 0.9805,
+   "market_home": 0.9838,
    "facts": [
-    "Vegas: Florida State Seminoles -22.5 \u00b7 O/U 153.5 (our ratings have Green Bay Phoenix 10.7 better than the spread; our ratings have 1.1 fewer points than the total).",
+    "Vegas: Florida State Seminoles -23.5 \u00b7 O/U 153.5 (our ratings have Green Bay Phoenix 11.7 better than the spread; our ratings have 1.1 fewer points than the total).",
     "Market win chance: Green Bay Phoenix 2% \u00b7 Florida State Seminoles 98%.",
     "Our ratings alone: Green Bay Phoenix 70.3 @ Florida State Seminoles 82.1, Florida State Seminoles 70% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,624 blind-tested games (2022-2026): this method picked 72.8% of winners (Vegas alone 72.8%, our ratings alone 68.7%) and missed the total by 12.98 points on average (ratings alone 13.67).",
@@ -86410,9 +86122,9 @@
     "Splits: Florida State Seminoles 3-1 at home; Green Bay Phoenix 1-3 on the road.",
     "Power rank: Green Bay Phoenix #62 vs Florida State Seminoles #146 (of 370).",
     "Upset risk: 30% chance Green Bay Phoenix wins outright.",
-    "Track record: teams we gave a 74% chance to win outright won 71% of the time (41 recent games tested)."
+    "Track record: teams we gave a 74% chance to win outright won 69% of the time (42 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86439,7 +86151,7 @@
    "facts": [
     "Vegas: Temple Owls -3.5 \u00b7 O/U 146.5 (our ratings have Middle Tennessee Blue Raiders 5.4 better than the spread; our ratings have 10.1 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86477,7 +86189,7 @@
     "Track record: teams we gave a 54% chance to win outright won 48% of the time (27 recent games tested).",
     "Best number: -118 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86504,7 +86216,7 @@
    "facts": [
     "Vegas: George Washington Revolutionaries -10.5 \u00b7 O/U 150.5 (our ratings have UAB Blazers 3.4 better than the spread; our ratings have 16.1 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86542,7 +86254,7 @@
     "Upset risk: 4% chance FC Cologne wins outright.",
     "Best number: -1408 at bet365 (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86572,7 +86284,7 @@
     "Nitto ATP Finals \u00b7 Group Stage \u00b7 best of 3.",
     "Our tennis ratings trail the market blind (log loss 0.624 vs 0.592): a read, not a bet."
    ],
-   "updated_at": "2026-11-20T00:32:38.171216+00:00",
+   "updated_at": "2026-11-20T01:02:25.510733+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86610,7 +86322,7 @@
     "Upset risk: 28% chance Le Havre AC wins outright.",
     "Best number: +120 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86648,7 +86360,7 @@
     "Upset risk: 24% chance Espanyol wins outright.",
     "Best number: -205 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86686,7 +86398,7 @@
     "Track record: teams we gave a 56% chance to win outright won 75% of the time (172 recent games tested).",
     "Best number: -166 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86724,7 +86436,7 @@
     "Track record: teams we gave a 46% chance to win outright won 52% of the time (27 recent games tested).",
     "Best number: -245 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86759,10 +86471,10 @@
     "Last 5: Northwestern Wildcats 3-2 (avg margin +2.8); Virginia Tech Hokies 5-0 (avg margin +21.0).",
     "Power rank: Northwestern Wildcats #333 vs Virginia Tech Hokies #115 (of 370).",
     "Upset risk: 35% chance Northwestern Wildcats wins outright.",
-    "Track record: teams we gave a 65% chance to win outright won 90% of the time (288 recent games tested).",
+    "Track record: teams we gave a 65% chance to win outright won 90% of the time (289 recent games tested).",
     "Best number: -650 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86797,10 +86509,10 @@
     "Last 5: South Dakota State Jackrabbits 5-0 (avg margin +20.2); Idaho State Bengals 0-4 (avg margin -20.2).",
     "Power rank: South Dakota State Jackrabbits #42 vs Idaho State Bengals #268 (of 370).",
     "Upset chance: South Dakota State Jackrabbits wins outright 39% of the time on our numbers.",
-    "Track record: teams we gave a 35% chance to win outright won 10% of the time (288 recent games tested).",
+    "Track record: teams we gave a 35% chance to win outright won 10% of the time (289 recent games tested).",
     "Best number: -258 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86838,7 +86550,7 @@
     "Track record: teams we gave a 44% chance to win outright won 25% of the time (172 recent games tested).",
     "Best number: -142 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86865,7 +86577,7 @@
    "facts": [
     "Vegas: Miami Hurricanes -39.5 \u00b7 O/U 148.5 (our ratings have Manhattan Jaspers 10.0 better than the spread; our ratings have 4.3 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86903,7 +86615,7 @@
     "Track record: teams we gave a 46% chance to win outright won 52% of the time (27 recent games tested).",
     "Best number: -122 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86941,7 +86653,7 @@
     "Track record: teams we gave a 46% chance to win outright won 52% of the time (27 recent games tested).",
     "Best number: -120 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -86976,10 +86688,10 @@
     "Last 5: Delaware Blue Hens 3-2 (avg margin +18.8); Cal State Northridge Matadors 1-3 (avg margin +0.0).",
     "Power rank: Delaware Blue Hens #122 vs Cal State Northridge Matadors #142 (of 370).",
     "Upset risk: 26% chance Delaware Blue Hens wins outright.",
-    "Track record: teams we gave a 74% chance to win outright won 71% of the time (41 recent games tested).",
+    "Track record: teams we gave a 74% chance to win outright won 69% of the time (42 recent games tested).",
     "Best number: -258 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87017,7 +86729,7 @@
     "Upset risk: 43% chance Iowa State Cyclones wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 40% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87039,7 +86751,7 @@
    "p_away": 0.5278,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.8289,
+   "model_home": 0.829,
    "market_home": 0.4722,
    "facts": [
     "Vegas: North Texas Mean Green -1.5 \u00b7 O/U 127.5 (our ratings have App State Mountaineers 23.2 better than the spread; our ratings have 12.0 more points than the total).",
@@ -87055,7 +86767,7 @@
     "Track record: teams we gave a 14% chance to win outright won 33% of the time (89 recent games tested).",
     "Best number: -122 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87077,7 +86789,7 @@
    "p_away": 0.3361,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.6921,
+   "model_home": 0.6924,
    "market_home": 0.6624,
    "facts": [
     "Vegas: Atlanta Hawks -5.5 \u00b7 O/U 218.5 (our ratings have Atlanta Hawks 1.7 better than the spread).",
@@ -87093,7 +86805,7 @@
     "Power rank: Charlotte Hornets #25 vs Atlanta Hawks #15 (of 30).",
     "Upset risk: 31% chance Charlotte Hornets wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87120,7 +86832,7 @@
    "facts": [
     "Vegas: Tennessee Volunteers -29.5 \u00b7 O/U 143.5 (our ratings have Coastal Carolina Chanticleers 7.2 better than the spread; our ratings have 3.4 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87136,17 +86848,17 @@
    "commence_time": "2026-11-21T00:00:00+00:00",
    "home": "Pittsburgh Panthers",
    "away": "Central Michigan Chippewas",
-   "home_score": 83.7,
-   "away_score": 61.2,
-   "p_home": 0.9874,
-   "p_away": 0.0126,
+   "home_score": 84.1,
+   "away_score": 61.6,
+   "p_home": 0.9838,
+   "p_away": 0.0162,
    "p_draw": 0.0,
    "winner": "home",
    "model_home": 0.7707,
-   "market_home": 0.9874,
+   "market_home": 0.9838,
    "facts": [
-    "Vegas: Pittsburgh Panthers -22.5 \u00b7 O/U 144.5 (our ratings have Central Michigan Chippewas 5.5 better than the spread; our ratings have 2.1 more points than the total).",
-    "Market win chance: Central Michigan Chippewas 1% \u00b7 Pittsburgh Panthers 99%.",
+    "Vegas: Pittsburgh Panthers -22.5 \u00b7 O/U 145.5 (our ratings have Central Michigan Chippewas 5.5 better than the spread; our ratings have 1.1 more points than the total).",
+    "Market win chance: Central Michigan Chippewas 2% \u00b7 Pittsburgh Panthers 98%.",
     "Our ratings alone: Central Michigan Chippewas 64.8 @ Pittsburgh Panthers 81.8, Pittsburgh Panthers 77% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,624 blind-tested games (2022-2026): this method picked 72.8% of winners (Vegas alone 72.8%, our ratings alone 68.7%) and missed the total by 12.98 points on average (ratings alone 13.67).",
     "Central Michigan Chippewas (4-1) @ Pittsburgh Panthers (5-0).",
@@ -87156,9 +86868,9 @@
     "Splits: Pittsburgh Panthers 3-0 at home; Central Michigan Chippewas 2-1 on the road.",
     "Power rank: Central Michigan Chippewas #114 vs Pittsburgh Panthers #71 (of 370).",
     "Upset risk: 23% chance Central Michigan Chippewas wins outright.",
-    "Track record: teams we gave a 74% chance to win outright won 71% of the time (41 recent games tested)."
+    "Track record: teams we gave a 74% chance to win outright won 69% of the time (42 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87180,7 +86892,7 @@
    "p_away": 0.624,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.7135,
+   "model_home": 0.7136,
    "market_home": 0.376,
    "facts": [
     "Vegas: Saint Joseph's Hawks -4.5 \u00b7 O/U 137.5 (our ratings have Drexel Dragons 17.4 better than the spread; our ratings have 9.0 more points than the total).",
@@ -87194,9 +86906,9 @@
     "Last 5: Saint Joseph's Hawks 5-0 (avg margin +9.4); Drexel Dragons 2-2 (avg margin -6.5).",
     "Power rank: Saint Joseph's Hawks #235 vs Drexel Dragons #291 (of 370).",
     "Upset chance: Saint Joseph's Hawks wins outright 29% of the time on our numbers.",
-    "Track record: teams we gave a 26% chance to win outright won 29% of the time (41 recent games tested)."
+    "Track record: teams we gave a 26% chance to win outright won 31% of the time (42 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87218,7 +86930,7 @@
    "p_away": 0.7488,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.4001,
+   "model_home": 0.4002,
    "market_home": 0.2512,
    "facts": [
     "Vegas: Western Michigan Broncos -8.5 \u00b7 O/U 143.5 (our ratings have Mount St. Mary's Mountaineers 2.7 better than the spread).",
@@ -87234,7 +86946,7 @@
     "Upset risk: 40% chance Mount St. Mary's Mountaineers wins outright.",
     "Track record: teams we gave a 54% chance to win outright won 48% of the time (27 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87250,16 +86962,16 @@
    "commence_time": "2026-11-21T00:00:00+00:00",
    "home": "Iona Gaels",
    "away": "Kansas City Roos",
-   "home_score": 73.8,
-   "away_score": 69.3,
+   "home_score": 73.4,
+   "away_score": 68.9,
    "p_home": 0.6304,
    "p_away": 0.3696,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.7924,
+   "model_home": 0.7925,
    "market_home": 0.6304,
    "facts": [
-    "Vegas: Iona Gaels -4.5 \u00b7 O/U 142.5 (our ratings have Iona Gaels 14.2 better than the spread; our ratings have 4.2 more points than the total).",
+    "Vegas: Iona Gaels -4.5 \u00b7 O/U 141.5 (our ratings have Iona Gaels 14.2 better than the spread; our ratings have 5.2 more points than the total).",
     "Market win chance: Kansas City Roos 37% \u00b7 Iona Gaels 63%.",
     "Our ratings alone: Kansas City Roos 64.0 @ Iona Gaels 82.7, Iona Gaels 79% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,624 blind-tested games (2022-2026): this method picked 72.8% of winners (Vegas alone 72.8%, our ratings alone 68.7%) and missed the total by 12.98 points on average (ratings alone 13.67).",
@@ -87270,9 +86982,9 @@
     "Splits: Iona Gaels 2-0 at home; Kansas City Roos 1-3 on the road.",
     "Power rank: Kansas City Roos #301 vs Iona Gaels #230 (of 370).",
     "Upset risk: 21% chance Kansas City Roos wins outright.",
-    "Track record: teams we gave a 74% chance to win outright won 71% of the time (41 recent games tested)."
+    "Track record: teams we gave a 74% chance to win outright won 69% of the time (42 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87288,8 +87000,8 @@
    "commence_time": "2026-11-21T00:00:00+00:00",
    "home": "Princeton Tigers",
    "away": "Monmouth Hawks",
-   "home_score": 71.4,
-   "away_score": 67.9,
+   "home_score": 71.8,
+   "away_score": 68.3,
    "p_home": 0.6166,
    "p_away": 0.3834,
    "p_draw": 0.0,
@@ -87297,7 +87009,7 @@
    "model_home": 0.7171,
    "market_home": 0.6166,
    "facts": [
-    "Vegas: Princeton Tigers -3.5 \u00b7 O/U 138.5 (our ratings have Princeton Tigers 9.6 better than the spread; our ratings have 5.4 more points than the total).",
+    "Vegas: Princeton Tigers -3.5 \u00b7 O/U 139.5 (our ratings have Princeton Tigers 9.6 better than the spread; our ratings have 4.4 more points than the total).",
     "Market win chance: Monmouth Hawks 38% \u00b7 Princeton Tigers 62%.",
     "Our ratings alone: Monmouth Hawks 65.4 @ Princeton Tigers 78.5, Princeton Tigers 72% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,624 blind-tested games (2022-2026): this method picked 72.8% of winners (Vegas alone 72.8%, our ratings alone 68.7%) and missed the total by 12.98 points on average (ratings alone 13.67).",
@@ -87308,9 +87020,9 @@
     "Splits: Princeton Tigers 3-0 at home; Monmouth Hawks 1-3 on the road.",
     "Power rank: Monmouth Hawks #147 vs Princeton Tigers #227 (of 370).",
     "Upset risk: 28% chance Monmouth Hawks wins outright.",
-    "Track record: teams we gave a 74% chance to win outright won 71% of the time (41 recent games tested)."
+    "Track record: teams we gave a 74% chance to win outright won 69% of the time (42 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87337,7 +87049,7 @@
    "facts": [
     "Vegas: Purdue Boilermakers -25.5 \u00b7 O/U 147.5 (our ratings have Oakland Golden Grizzlies 6.2 better than the spread; our ratings have 7.6 more points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87373,9 +87085,9 @@
     "Splits: Jacksonville State Gamecocks 2-0 at home; Georgia State Panthers 0-2 on the road.",
     "Power rank: Georgia State Panthers #154 vs Jacksonville State Gamecocks #157 (of 370).",
     "Upset risk: 25% chance Georgia State Panthers wins outright.",
-    "Track record: teams we gave a 74% chance to win outright won 71% of the time (41 recent games tested)."
+    "Track record: teams we gave a 74% chance to win outright won 69% of the time (42 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87413,7 +87125,7 @@
     "Track record: teams we gave a 54% chance to win outright won 48% of the time (27 recent games tested).",
     "Best number: -120 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87451,7 +87163,7 @@
     "Upset risk: 40% chance Brooklyn Nets wins outright.",
     "Track record: teams we gave a 64% chance to win outright won 76% of the time (29 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87473,12 +87185,12 @@
    "p_away": 0.307,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.6661,
+   "model_home": 0.6668,
    "market_home": 0.6944,
    "facts": [
     "Vegas: Cleveland Cavaliers -7.5 \u00b7 O/U 234.5 (our ratings have Indiana Pacers 1.3 better than the spread; our ratings have 3.0 fewer points than the total).",
     "Market win chance: Indiana Pacers 31% \u00b7 Cleveland Cavaliers 69%.",
-    "Our ratings alone: Indiana Pacers 112.7 @ Cleveland Cavaliers 118.8, Cleveland Cavaliers 67% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
+    "Our ratings alone: Indiana Pacers 112.6 @ Cleveland Cavaliers 118.8, Cleveland Cavaliers 67% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
     "Backed by 5,507 blind-tested games (2022-2026): this method picked 68.1% of winners (Vegas alone 68.2%, our ratings alone 65.6%) and missed the total by 14.18 points on average (ratings alone 15.0).",
     "Indiana Pacers (5-10) @ Cleveland Cavaliers (8-8).",
     "Cleveland Cavaliers coming off a 121-124 loss to Memphis Grizzlies (Thu 11/19).",
@@ -87487,9 +87199,9 @@
     "Splits: Cleveland Cavaliers 6-3 at home; Indiana Pacers 3-4 on the road.",
     "Power rank: Indiana Pacers #21 vs Cleveland Cavaliers #11 (of 30).",
     "Upset risk: 33% chance Indiana Pacers wins outright.",
-    "Track record: teams we gave a 65% chance to win outright won 67% of the time (48 recent games tested)."
+    "Track record: teams we gave a 65% chance to win outright won 65% of the time (49 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87511,7 +87223,7 @@
    "p_away": 0.2755,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.6509,
+   "model_home": 0.6511,
    "market_home": 0.7284,
    "facts": [
     "Vegas: Detroit Pistons -8.5 \u00b7 O/U 215.5 (our ratings have Toronto Raptors 2.9 better than the spread; our ratings have 6.9 more points than the total).",
@@ -87525,9 +87237,9 @@
     "Splits: Detroit Pistons 3-2 at home; Toronto Raptors 3-4 on the road.",
     "Power rank: Toronto Raptors #17 vs Detroit Pistons #8 (of 30).",
     "Upset risk: 35% chance Toronto Raptors wins outright.",
-    "Track record: teams we gave a 65% chance to win outright won 67% of the time (48 recent games tested)."
+    "Track record: teams we gave a 65% chance to win outright won 65% of the time (49 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87554,7 +87266,7 @@
    "facts": [
     "Vegas: Xavier Musketeers -3.5 \u00b7 O/U 145.5 (our ratings have Xavier Musketeers 14.3 better than the spread; our ratings have 5.3 more points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87572,15 +87284,15 @@
    "away": "Tulsa Golden Hurricane",
    "home_score": 78.6,
    "away_score": 73.1,
-   "p_home": 0.7034,
-   "p_away": 0.2966,
+   "p_home": 0.6925,
+   "p_away": 0.3075,
    "p_draw": 0.0,
    "winner": "home",
    "model_home": 0.5341,
-   "market_home": 0.7034,
+   "market_home": 0.6925,
    "facts": [
     "Vegas: Mississippi State Bulldogs -5.5 \u00b7 O/U 153.5 (our ratings have Tulsa Golden Hurricane 3.5 better than the spread; our ratings have 11.4 fewer points than the total).",
-    "Market win chance: Tulsa Golden Hurricane 30% \u00b7 Mississippi State Bulldogs 70%.",
+    "Market win chance: Tulsa Golden Hurricane 31% \u00b7 Mississippi State Bulldogs 69%.",
     "Our ratings alone: Tulsa Golden Hurricane 70.1 @ Mississippi State Bulldogs 72.0, Mississippi State Bulldogs 53% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,624 blind-tested games (2022-2026): this method picked 72.8% of winners (Vegas alone 72.8%, our ratings alone 68.7%) and missed the total by 12.98 points on average (ratings alone 13.67).",
     "Tulsa Golden Hurricane (4-0) @ Mississippi State Bulldogs (4-1).",
@@ -87590,9 +87302,9 @@
     "Power rank: Tulsa Golden Hurricane #140 vs Mississippi State Bulldogs #88 (of 370).",
     "Upset risk: 47% chance Tulsa Golden Hurricane wins outright.",
     "Track record: teams we gave a 56% chance to win outright won 75% of the time (172 recent games tested).",
-    "Best number: -258 at DraftKings (checked 1 books)."
+    "Best number: -245 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87619,7 +87331,7 @@
    "facts": [
     "Vegas: Duke Blue Devils -13.5 \u00b7 O/U 40.5 (our ratings have Duke Blue Devils 5.4 better than the spread).",
     "Market win chance: Clemson Tigers 16% \u00b7 Duke Blue Devils 84%.",
-    "Our ratings alone: Clemson Tigers 11.3 @ Duke Blue Devils 30.1, Duke Blue Devils 85% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
+    "Our ratings alone: Clemson Tigers 11.3 @ Duke Blue Devils 30.2, Duke Blue Devils 85% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
     "Backed by 3,530 blind-tested games (2022-2026): this method picked 74.3% of winners (Vegas alone 74.4%, our ratings alone 68.6%) and missed the total by 12.41 points on average (ratings alone 12.83).",
     "Clemson Tigers (6-4) @ Duke Blue Devils (7-3).",
     "Duke Blue Devils coming off a 25-36 loss to Miami Hurricanes (Sat 11/14).",
@@ -87630,7 +87342,7 @@
     "Upset risk: 15% chance Clemson Tigers wins outright.",
     "Track record: teams we gave a 85% chance to win outright won 82% of the time (129 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87668,7 +87380,45 @@
     "Upset risk: 14% chance Bowling Green Falcons wins outright.",
     "Track record: teams we gave a 85% chance to win outright won 82% of the time (129 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
+   "status": "pending",
+   "final_home": null,
+   "final_away": null,
+   "live": null,
+   "correct": null,
+   "graded_at": null
+  },
+  {
+   "id": "nba:401909309",
+   "sport": "nba",
+   "sport_name": "NBA",
+   "event_id": "401909309",
+   "commence_time": "2026-11-21T01:00:00+00:00",
+   "home": "Chicago Bulls",
+   "away": "Washington Wizards",
+   "home_score": 121.5,
+   "away_score": 119.0,
+   "p_home": 0.5627,
+   "p_away": 0.4373,
+   "p_draw": 0.0,
+   "winner": "home",
+   "model_home": 0.6021,
+   "market_home": 0.5607,
+   "facts": [
+    "Vegas: Chicago Bulls -2.5 \u00b7 O/U 240.5 (our ratings have Chicago Bulls 1.2 better than the spread).",
+    "Market win chance: Washington Wizards 44% \u00b7 Chicago Bulls 56%.",
+    "Our ratings alone: Washington Wizards 118.4 @ Chicago Bulls 122.2, Chicago Bulls 60% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
+    "Backed by 5,507 blind-tested games (2022-2026): this method picked 68.1% of winners (Vegas alone 68.2%, our ratings alone 65.6%) and missed the total by 14.18 points on average (ratings alone 15.0).",
+    "Washington Wizards (5-11) @ Chicago Bulls (4-10).",
+    "Chicago Bulls fresh off a 137-107 win over Brooklyn Nets (Thu 11/19).",
+    "Season points per game: Washington Wizards 110.8 scored / 117.9 allowed; Chicago Bulls 116.2 scored / 124.6 allowed.",
+    "Last 5: Washington Wizards 1-4 (avg margin -11.4); Chicago Bulls 3-2 (avg margin +6.6).",
+    "Splits: Chicago Bulls 1-4 at home; Washington Wizards 3-6 on the road.",
+    "Head to head this season: Chicago Bulls 0-1 (last: Washington Wizards 124 - Chicago Bulls 120, 10/25).",
+    "Power rank: Washington Wizards #27 vs Chicago Bulls #24 (of 30).",
+    "Upset risk: 40% chance Washington Wizards wins outright."
+   ],
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87690,7 +87440,7 @@
    "p_away": 0.7488,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.6299,
+   "model_home": 0.63,
    "market_home": 0.2512,
    "facts": [
     "Vegas: Georgia Bulldogs -8.5 \u00b7 O/U 167.5 (our ratings have Georgia Tech Yellow Jackets 16.1 better than the spread; our ratings have 9.6 fewer points than the total).",
@@ -87703,10 +87453,10 @@
     "Last 5: Georgia Bulldogs 5-0 (avg margin +18.2); Georgia Tech Yellow Jackets 5-0 (avg margin +12.2).",
     "Power rank: Georgia Bulldogs #97 vs Georgia Tech Yellow Jackets #307 (of 370).",
     "Upset chance: Georgia Bulldogs wins outright 37% of the time on our numbers.",
-    "Track record: teams we gave a 35% chance to win outright won 10% of the time (288 recent games tested).",
+    "Track record: teams we gave a 35% chance to win outright won 10% of the time (289 recent games tested).",
     "Best number: -325 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87724,16 +87474,16 @@
    "away": "Campbell Fighting Camels",
    "home_score": 85.6,
    "away_score": 70.0,
-   "p_home": 0.7524,
-   "p_away": 0.2476,
+   "p_home": 0.7525,
+   "p_away": 0.2475,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.7524,
+   "model_home": 0.7525,
    "market_home": null,
    "facts": [
-    "Vegas: Kansas State Wildcats -15.5 \u00b7 O/U 156.5 (our ratings agree)."
+    "Vegas: Kansas State Wildcats -15.5 \u00b7 O/U 155.5 (our ratings agree)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87771,7 +87521,7 @@
     "Track record: teams we gave a 54% chance to win outright won 48% of the time (27 recent games tested).",
     "Best number: -185 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87809,7 +87559,7 @@
     "Track record: teams we gave a 56% chance to win outright won 75% of the time (172 recent games tested).",
     "Best number: -142 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87836,7 +87586,7 @@
    "facts": [
     "Vegas: Vanderbilt Commodores -17.5 \u00b7 O/U 157.5 (our ratings have Vanderbilt Commodores 10.0 better than the spread; our ratings have 1.2 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87854,16 +87604,16 @@
    "away": "South Alabama Jaguars",
    "home_score": 87.6,
    "away_score": 72.6,
-   "p_home": 0.7446,
-   "p_away": 0.2554,
+   "p_home": 0.7447,
+   "p_away": 0.2553,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.7446,
+   "model_home": 0.7447,
    "market_home": null,
    "facts": [
     "Vegas: SMU Mustangs -16.5 \u00b7 O/U 149.5 (our ratings have South Alabama Jaguars 1.4 better than the spread; our ratings have 10.7 more points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87901,7 +87651,7 @@
     "Upset risk: 35% chance Michigan State Spartans wins outright.",
     "Track record: teams we gave a 65% chance to win outright won 86% of the time (22 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87939,7 +87689,7 @@
     "Upset risk: 10% chance UTEP Miners wins outright.",
     "Track record: teams we gave a 94% chance to win outright won 82% of the time (56 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87957,16 +87707,16 @@
    "away": "Marshall Thundering Herd",
    "home_score": 83.3,
    "away_score": 68.2,
-   "p_home": 0.7444,
-   "p_away": 0.2556,
+   "p_home": 0.7445,
+   "p_away": 0.2555,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.7444,
+   "model_home": 0.7445,
    "market_home": null,
    "facts": [
-    "Vegas: North Carolina Tar Heels -21.5 \u00b7 O/U 154.5 (our ratings have Marshall Thundering Herd 6.5 better than the spread; our ratings have 3.0 fewer points than the total)."
+    "Vegas: North Carolina Tar Heels -20.5 \u00b7 O/U 154.5 (our ratings have Marshall Thundering Herd 5.5 better than the spread; our ratings have 3.0 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -87991,9 +87741,9 @@
    "model_home": 0.9457,
    "market_home": null,
    "facts": [
-    "Vegas: Illinois Fighting Illini -51.5 \u00b7 O/U 163.5 (our ratings have Eastern Illinois Panthers 14.8 better than the spread; our ratings have 2.3 fewer points than the total)."
+    "Vegas: Illinois Fighting Illini -51.5 \u00b7 O/U 164.5 (our ratings have Eastern Illinois Panthers 14.8 better than the spread; our ratings have 3.3 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88009,17 +87759,17 @@
    "commence_time": "2026-11-21T02:00:00+00:00",
    "home": "Idaho Vandals",
    "away": "Cal State Bakersfield Roadrunners",
-   "home_score": 77.9,
-   "away_score": 77.4,
-   "p_home": 0.5116,
-   "p_away": 0.4884,
+   "home_score": 78.4,
+   "away_score": 76.9,
+   "p_home": 0.5,
+   "p_away": 0.5,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.6893,
-   "market_home": 0.5116,
+   "model_home": 0.6894,
+   "market_home": 0.5,
    "facts": [
-    "Vegas: Cal State Bakersfield Roadrunners -1.5 \u00b7 O/U 154.5 (our ratings have Idaho Vandals 12.8 better than the spread; our ratings have 4.7 more points than the total).",
-    "Market win chance: Cal State Bakersfield Roadrunners 49% \u00b7 Idaho Vandals 51%.",
+    "Vegas: Idaho Vandals -1.5 \u00b7 O/U 154.5 (our ratings have Idaho Vandals 9.8 better than the spread; our ratings have 4.7 more points than the total).",
+    "Market win chance: Cal State Bakersfield Roadrunners 50% \u00b7 Idaho Vandals 50%.",
     "Our ratings alone: Cal State Bakersfield Roadrunners 74.0 @ Idaho Vandals 85.3, Idaho Vandals 69% to win. The prediction gives them 15% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 16,624 blind-tested games (2022-2026): this method picked 72.8% of winners (Vegas alone 72.8%, our ratings alone 68.7%) and missed the total by 12.98 points on average (ratings alone 13.67).",
     "Cal State Bakersfield Roadrunners (4-0) @ Idaho Vandals (2-3).",
@@ -88031,7 +87781,7 @@
     "Power rank: Cal State Bakersfield Roadrunners #101 vs Idaho Vandals #228 (of 370).",
     "Upset risk: 31% chance Cal State Bakersfield Roadrunners wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88058,7 +87808,7 @@
    "facts": [
     "Vegas: Boise State Broncos -11.5 \u00b7 O/U 167.5 (our ratings have Boise State Broncos 4.6 better than the spread; our ratings have 4.5 more points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88096,7 +87846,7 @@
     "Upset risk: 40% chance Wyoming Cowboys wins outright.",
     "Track record: teams we gave a 65% chance to win outright won 86% of the time (22 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88118,7 +87868,7 @@
    "p_away": 0.4546,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.7281,
+   "model_home": 0.7282,
    "market_home": 0.5454,
    "facts": [
     "Vegas: Saint Mary's Gaels -1.5 \u00b7 O/U 158.5 (our ratings have Saint Mary's Gaels 12.4 better than the spread; our ratings have 10.1 more points than the total).",
@@ -88131,10 +87881,10 @@
     "Last 5: Saint Louis Billikens 3-1 (avg margin +20.8); Saint Mary's Gaels 4-1 (avg margin +16.8).",
     "Power rank: Saint Louis Billikens #86 vs Saint Mary's Gaels #126 (of 370).",
     "Upset risk: 27% chance Saint Louis Billikens wins outright.",
-    "Track record: teams we gave a 74% chance to win outright won 71% of the time (41 recent games tested).",
+    "Track record: teams we gave a 74% chance to win outright won 69% of the time (42 recent games tested).",
     "Best number: -130 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88172,7 +87922,7 @@
     "Upset risk: 15% chance Fulham wins outright.",
     "Track record: teams we gave a 45% chance to win outright won 42% of the time (19 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88210,7 +87960,7 @@
     "Upset risk: 30% chance Deportivo wins outright.",
     "Best number: +125 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88248,7 +87998,7 @@
     "Upset risk: 15% chance Lecce wins outright.",
     "Track record: teams we gave a 25% chance to win outright won 18% of the time (17 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88286,7 +88036,7 @@
     "Upset risk: 15% chance Cagliari wins outright.",
     "Track record: teams we gave a 25% chance to win outright won 18% of the time (17 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88324,7 +88074,7 @@
     "Upset chance: SC Freiburg wins outright 31% of the time on our numbers.",
     "Best number: -105 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88362,7 +88112,7 @@
     "Upset risk: 22% chance Borussia M\u00f6nchengladbach wins outright.",
     "Best number: -175 at bet365 (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88400,7 +88150,7 @@
     "Upset risk: 24% chance 1. FC Union Berlin wins outright.",
     "Best number: -200 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88438,7 +88188,7 @@
     "Upset risk: 33% chance TSG Hoffenheim wins outright.",
     "Best number: +130 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88476,7 +88226,7 @@
     "Upset risk: 18% chance SC Paderborn 07 wins outright.",
     "Best number: -350 at bet365 (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88514,7 +88264,7 @@
     "Upset risk: 28% chance Ipswich Town wins outright.",
     "Track record: teams we gave a 45% chance to win outright won 42% of the time (19 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88552,7 +88302,7 @@
     "Upset risk: 21% chance Sunderland wins outright.",
     "Track record: teams we gave a 45% chance to win outright won 42% of the time (19 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88590,7 +88340,7 @@
     "Upset risk: 26% chance Crystal Palace wins outright.",
     "Track record: teams we gave a 45% chance to win outright won 42% of the time (19 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88628,7 +88378,7 @@
     "Upset risk: 27% chance Leeds United wins outright.",
     "Track record: teams we gave a 45% chance to win outright won 42% of the time (19 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88666,7 +88416,7 @@
     "Upset risk: 24% chance Nottingham Forest wins outright.",
     "Track record: teams we gave a 45% chance to win outright won 42% of the time (19 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88704,7 +88454,7 @@
     "Upset risk: 23% chance Valencia wins outright.",
     "Best number: -105 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88742,7 +88492,7 @@
     "Upset risk: 20% chance Nice wins outright.",
     "Best number: -220 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88780,7 +88530,7 @@
     "Upset risk: 22% chance Vanderbilt Commodores wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 53% of the time (116 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88807,7 +88557,7 @@
    "facts": [
     "Vegas: Ole Miss Rebels -49.5 \u00b7 O/U 60.5 (our ratings have Wofford Terriers 26.1 better than the spread; our ratings have 2.4 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88829,7 +88579,7 @@
    "p_away": 0.6652,
    "p_draw": 0.0,
    "winner": "away",
-   "model_home": 0.5099,
+   "model_home": 0.51,
    "market_home": 0.3256,
    "facts": [
     "Vegas: BYU Cougars -5.5 \u00b7 O/U 46.5 (our ratings have Kansas Jayhawks 6.0 better than the spread; our ratings have 1.1 more points than the total).",
@@ -88845,7 +88595,7 @@
     "Upset chance: BYU Cougars wins outright 49% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88883,7 +88633,7 @@
     "Upset risk: 28% chance Colorado Buffaloes wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 53% of the time (116 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88921,7 +88671,7 @@
     "Upset chance: Syracuse Orange wins outright 48% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88959,7 +88709,7 @@
     "Upset risk: 19% chance Georgia Tech Yellow Jackets wins outright.",
     "Track record: teams we gave a 65% chance to win outright won 86% of the time (22 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -88997,7 +88747,7 @@
     "Upset risk: 48% chance Minnesota Golden Gophers wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 68% of the time (31 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89035,7 +88785,7 @@
     "Upset chance: Ohio State Buckeyes wins outright 42% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89073,7 +88823,7 @@
     "Upset chance: Wisconsin Badgers wins outright 46% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89111,7 +88861,7 @@
     "Power rank: East Carolina Pirates #81 vs Army Black Knights #61 (of 138).",
     "Upset risk: 28% chance East Carolina Pirates wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89149,7 +88899,7 @@
     "Power rank: Memphis Tigers #31 vs Navy Midshipmen #76 (of 138).",
     "Upset risk: 50% chance Navy Midshipmen wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89187,7 +88937,7 @@
     "Upset risk: 39% chance Tulane Green Wave wins outright.",
     "Track record: teams we gave a 65% chance to win outright won 86% of the time (22 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89225,7 +88975,7 @@
     "Upset risk: 13% chance Parma wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 82% of the time (17 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89263,7 +89013,7 @@
     "Upset risk: 31% chance Schalke 04 wins outright.",
     "Best number: -125 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89301,7 +89051,7 @@
     "Upset risk: 21% chance Newcastle United wins outright.",
     "Track record: teams we gave a 64% chance to win outright won 50% of the time (16 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89339,7 +89089,7 @@
     "Upset risk: 35% chance Sevilla wins outright.",
     "Best number: +140 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89377,7 +89127,7 @@
     "Upset risk: 38% chance North Carolina Tar Heels wins outright.",
     "Track record: teams we gave a 66% chance to win outright won 44% of the time (88 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89404,7 +89154,7 @@
    "facts": [
     "Vegas: Mississippi State Bulldogs -35.5 \u00b7 O/U 59.5 (our ratings have Tennessee Tech Golden Eagles 28.0 better than the spread; our ratings have 4.2 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89442,7 +89192,7 @@
     "Upset risk: 44% chance West Virginia Mountaineers wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 68% of the time (31 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89480,7 +89230,7 @@
     "Upset risk: 13% chance Western Kentucky Hilltoppers wins outright.",
     "Track record: teams we gave a 85% chance to win outright won 82% of the time (129 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89502,7 +89252,7 @@
    "p_away": 0.4339,
    "p_draw": 0.2538,
    "winner": "away",
-   "model_home": 0.371,
+   "model_home": 0.3711,
    "market_home": 0.3099,
    "facts": [
     "Vegas: Philadelphia Union -0.5 \u00b7 O/U 2.5 (our ratings agree).",
@@ -89518,7 +89268,7 @@
     "Power rank: Philadelphia Union #4 vs New England Revolution #12 (of 30).",
     "Upset risk: 37% chance New England Revolution wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89545,7 +89295,7 @@
    "facts": [
     "Vegas: Alabama Crimson Tide -49.5 \u00b7 O/U 58.5 (our ratings have Chattanooga Mocs 24.0 better than the spread; our ratings have 4.7 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89583,7 +89333,7 @@
     "Upset risk: 8% chance Charlotte 49ers wins outright.",
     "Track record: teams we gave a 94% chance to win outright won 82% of the time (56 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89621,7 +89371,7 @@
     "Upset risk: 19% chance Missouri State Bears wins outright.",
     "Track record: teams we gave a 85% chance to win outright won 82% of the time (129 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89659,7 +89409,7 @@
     "Upset chance: Middle Tennessee Blue Raiders wins outright 48% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89697,7 +89447,7 @@
     "Upset chance: Iowa Hawkeyes wins outright 45% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89735,7 +89485,7 @@
     "Upset chance: South Florida Bulls wins outright 44% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89773,7 +89523,7 @@
     "Upset risk: 18% chance UL Monroe Warhawks wins outright.",
     "Track record: teams we gave a 85% chance to win outright won 82% of the time (129 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89811,7 +89561,7 @@
     "Upset risk: 30% chance Brest wins outright.",
     "Best number: +125 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89849,7 +89599,7 @@
     "Upset risk: 18% chance AJ Auxerre wins outright.",
     "Best number: -240 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89887,7 +89637,7 @@
     "Upset risk: 26% chance Lyon wins outright.",
     "Best number: +130 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89925,7 +89675,7 @@
     "Upset risk: 22% chance Toulouse wins outright.",
     "Best number: -115 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -89963,7 +89713,7 @@
     "Upset risk: 20% chance Torino wins outright.",
     "Track record: teams we gave a 25% chance to win outright won 18% of the time (17 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90001,7 +89751,7 @@
     "Upset risk: 11% chance Celta Vigo wins outright.",
     "Best number: -575 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90039,7 +89789,7 @@
     "Upset risk: 23% chance Coastal Carolina Chanticleers wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 53% of the time (116 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90077,7 +89827,7 @@
     "Upset chance: Delaware Blue Hens wins outright 46% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90115,7 +89865,7 @@
     "Upset risk: 31% chance Florida International Panthers wins outright.",
     "Track record: teams we gave a 66% chance to win outright won 44% of the time (88 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90142,7 +89892,7 @@
    "facts": [
     "Vegas: Auburn Tigers -48.5 \u00b7 O/U 59.5 (our ratings have Samford Bulldogs 31.1 better than the spread; our ratings have 8.2 fewer points than the total)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90180,7 +89930,7 @@
     "Upset chance: LSU Tigers wins outright 32% of the time on our numbers.",
     "Track record: teams we gave a 34% chance to win outright won 56% of the time (88 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90218,7 +89968,7 @@
     "Upset risk: 17% chance Arkansas Razorbacks wins outright.",
     "Track record: teams we gave a 85% chance to win outright won 82% of the time (129 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90256,7 +90006,7 @@
     "Upset chance: Texas Tech Red Raiders wins outright 43% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90294,7 +90044,7 @@
     "Upset risk: 24% chance NC State Wolfpack wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 53% of the time (116 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90332,7 +90082,7 @@
     "Upset risk: 50% chance Michigan Wolverines wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 68% of the time (31 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90370,7 +90120,7 @@
     "Upset risk: 10% chance Rutgers Scarlet Knights wins outright.",
     "Track record: teams we gave a 94% chance to win outright won 82% of the time (56 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90408,7 +90158,7 @@
     "Upset risk: 44% chance Washington Huskies wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 68% of the time (31 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90446,7 +90196,7 @@
     "Power rank: Old Dominion Monarchs #113 vs UConn Huskies #63 (of 138).",
     "Upset risk: 20% chance Old Dominion Monarchs wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90484,7 +90234,7 @@
     "Upset risk: 36% chance Texas A&M Aggies wins outright.",
     "Track record: teams we gave a 66% chance to win outright won 44% of the time (88 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90522,7 +90272,7 @@
     "Power rank: Portland Timbers #14 vs FC Dallas #10 (of 30).",
     "Upset risk: 26% chance Portland Timbers wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90560,7 +90310,7 @@
     "Upset risk: 5% chance Northern Illinois Huskies wins outright.",
     "Track record: teams we gave a 94% chance to win outright won 82% of the time (56 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90598,7 +90348,7 @@
     "Upset risk: 46% chance Troy Trojans wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 68% of the time (31 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90616,15 +90366,15 @@
    "away": "Georgia State Panthers",
    "home_score": 29.0,
    "away_score": 26.5,
-   "p_home": 0.545,
-   "p_away": 0.455,
+   "p_home": 0.566,
+   "p_away": 0.434,
    "p_draw": 0.0,
    "winner": "home",
    "model_home": 0.5377,
-   "market_home": 0.5454,
+   "market_home": 0.5674,
    "facts": [
     "Vegas: Marshall Thundering Herd -2.5 \u00b7 O/U 55.5 (our ratings have 2.8 more points than the total).",
-    "Market win chance: Georgia State Panthers 45% \u00b7 Marshall Thundering Herd 55%.",
+    "Market win chance: Georgia State Panthers 43% \u00b7 Marshall Thundering Herd 57%.",
     "Our ratings alone: Georgia State Panthers 28.3 @ Marshall Thundering Herd 30.0, Marshall Thundering Herd 54% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
     "Backed by 3,530 blind-tested games (2022-2026): this method picked 74.3% of winners (Vegas alone 74.4%, our ratings alone 68.6%) and missed the total by 12.41 points on average (ratings alone 12.83).",
     "Georgia State Panthers (5-5) @ Marshall Thundering Herd (5-5).",
@@ -90636,7 +90386,7 @@
     "Upset risk: 46% chance Georgia State Panthers wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 40% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90674,7 +90424,7 @@
     "Upset risk: 50% chance Southern Miss Golden Eagles wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 68% of the time (31 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90712,7 +90462,7 @@
     "Power rank: Columbus Crew #7 vs Inter Miami CF #3 (of 30).",
     "Upset risk: 24% chance Columbus Crew wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90750,7 +90500,7 @@
     "Upset risk: 26% chance Washington State Cougars wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 53% of the time (116 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90788,7 +90538,7 @@
     "Upset risk: 17% chance Maryland Terrapins wins outright.",
     "Track record: teams we gave a 85% chance to win outright won 82% of the time (129 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90815,7 +90565,7 @@
    "facts": [
     "Vegas: Arizona Wildcats -7 \u00b7 O/U 52.5 (our ratings have Kansas State Wildcats 3.1 better than the spread; our ratings have 3.0 more points than the total).",
     "Market win chance: Arizona Wildcats 73% \u00b7 Kansas State Wildcats 27%.",
-    "Our ratings alone: Arizona Wildcats 29.7 @ Kansas State Wildcats 25.8, Kansas State Wildcats 41% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
+    "Our ratings alone: Arizona Wildcats 29.7 @ Kansas State Wildcats 25.8, Kansas State Wildcats 42% to win. The prediction gives them 0% of the say on the total and 5% on the winner, the weight they earned in testing.",
     "Backed by 3,530 blind-tested games (2022-2026): this method picked 74.3% of winners (Vegas alone 74.4%, our ratings alone 68.6%) and missed the total by 12.41 points on average (ratings alone 12.83).",
     "Arizona Wildcats (7-3) @ Kansas State Wildcats (4-6).",
     "Arizona Wildcats coming off a 39-40 loss to Utah Utes (Sun 11/15).",
@@ -90823,10 +90573,10 @@
     "Last 5: Arizona Wildcats 3-2 (avg margin +9.8); Kansas State Wildcats 1-4 (avg margin -10.2).",
     "Splits: Kansas State Wildcats 4-2 at home; Arizona Wildcats 2-2 on the road.",
     "Power rank: Arizona Wildcats #19 vs Kansas State Wildcats #77 (of 138).",
-    "Upset risk: 41% chance Kansas State Wildcats wins outright.",
+    "Upset risk: 42% chance Kansas State Wildcats wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 68% of the time (31 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90864,7 +90614,7 @@
     "Upset risk: 7% chance Virginia Tech Hokies wins outright.",
     "Track record: teams we gave a 94% chance to win outright won 82% of the time (56 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90902,7 +90652,7 @@
     "Upset chance: UNLV Rebels wins outright 47% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90940,7 +90690,7 @@
     "Upset risk: 16% chance Arkansas State Red Wolves wins outright.",
     "Track record: teams we gave a 85% chance to win outright won 82% of the time (129 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -90978,7 +90728,7 @@
     "Upset risk: 28% chance Kentucky Wildcats wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 53% of the time (116 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91016,7 +90766,7 @@
     "Upset risk: 35% chance South Carolina Gamecocks wins outright.",
     "Track record: teams we gave a 65% chance to win outright won 86% of the time (22 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91054,7 +90804,7 @@
     "Upset risk: 24% chance Pittsburgh Panthers wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 53% of the time (116 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91092,7 +90842,7 @@
     "Upset risk: 14% chance SMU Mustangs wins outright.",
     "Track record: teams we gave a 85% chance to win outright won 82% of the time (129 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91130,7 +90880,7 @@
     "Upset chance: Stanford Cardinal wins outright 40% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91168,7 +90918,7 @@
     "Upset risk: 9% chance Colorado State Rams wins outright.",
     "Track record: teams we gave a 94% chance to win outright won 82% of the time (56 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91206,7 +90956,7 @@
     "Upset chance: UTSA Roadrunners wins outright 45% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91244,7 +90994,7 @@
     "Upset risk: 45% chance TCU Horned Frogs wins outright.",
     "Track record: teams we gave a 55% chance to win outright won 68% of the time (31 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91282,7 +91032,7 @@
     "Upset risk: 13% chance San Diego State Aztecs wins outright.",
     "Track record: teams we gave a 85% chance to win outright won 82% of the time (129 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91320,7 +91070,7 @@
     "Upset chance: Oklahoma State Cowboys wins outright 46% of the time on our numbers.",
     "Track record: teams we gave a 45% chance to win outright won 60% of the time (52 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91358,7 +91108,7 @@
     "Upset risk: 22% chance Utah State Aggies wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 53% of the time (116 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91396,7 +91146,7 @@
     "Upset risk: 30% chance Hawai'i Rainbow Warriors wins outright.",
     "Track record: teams we gave a 66% chance to win outright won 44% of the time (88 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91434,7 +91184,7 @@
     "Upset risk: 16% chance Venezia wins outright.",
     "Track record: teams we gave a 25% chance to win outright won 18% of the time (17 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91472,7 +91222,7 @@
     "Upset risk: 10% chance Villarreal wins outright.",
     "Best number: -475 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91494,7 +91244,7 @@
    "p_away": 0.641,
    "p_draw": 0.2055,
    "winner": "away",
-   "model_home": 0.2717,
+   "model_home": 0.2718,
    "market_home": 0.1486,
    "facts": [
     "Vegas: Brighton & Hove Albion -1.5 \u00b7 O/U 2.5 (our ratings have Hull City 1.2 better than the spread).",
@@ -91510,7 +91260,7 @@
     "Upset risk: 27% chance Hull City wins outright.",
     "Track record: teams we gave a 64% chance to win outright won 50% of the time (16 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91548,7 +91298,7 @@
     "Upset risk: 13% chance Angers wins outright.",
     "Best number: -300 at bet365 (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91586,7 +91336,7 @@
     "Upset risk: 35% chance Sassuolo wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 82% of the time (17 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91624,7 +91374,7 @@
     "Upset risk: 24% chance Udinese wins outright.",
     "Track record: teams we gave a 25% chance to win outright won 18% of the time (17 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91662,7 +91412,7 @@
     "Upset chance: Mainz wins outright 28% of the time on our numbers.",
     "Upset case: hotter lately (1-4 vs 0-3-2 in the last 5); better defense (2.1 allowed vs 2.2); higher power rank (#9 vs #10)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91700,7 +91450,7 @@
     "Upset risk: 34% chance Racing Santander wins outright.",
     "Best number: +100 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91738,7 +91488,7 @@
     "Upset chance: Stade Rennais wins outright 32% of the time on our numbers.",
     "Upset case: higher power rank (#8 vs #12)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91773,7 +91523,7 @@
     "Best number: -150 at bet365 (checked 1 books).",
     "No injury report is published for this league, so this one rides on form, scoring, head to head and the number."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91811,7 +91561,7 @@
     "Upset risk: 26% chance Manchester United wins outright.",
     "Track record: teams we gave a 45% chance to win outright won 42% of the time (19 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91849,7 +91599,7 @@
     "Upset risk: 33% chance Frosinone wins outright.",
     "Track record: teams we gave a 25% chance to win outright won 18% of the time (17 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91887,7 +91637,7 @@
     "Upset risk: 21% chance M\u00e1laga wins outright.",
     "Best number: -120 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91914,7 +91664,7 @@
    "facts": [
     "Vegas: Kansas City Chiefs -16.5 \u00b7 O/U 40.5 (our ratings have Arizona Cardinals 1.9 better than the spread; our ratings have 1.3 more points than the total).",
     "Market win chance: Arizona Cardinals 8% \u00b7 Kansas City Chiefs 92%.",
-    "Wind forecast 16 mph at an outdoor stadium: windy games score less (the NFL windy under is proven over 20 seasons).",
+    "Wind forecast 15 mph at an outdoor stadium: windy games score less (the NFL windy under is proven over 20 seasons).",
     "Our ratings alone: Arizona Cardinals 13.6 @ Kansas City Chiefs 28.2, Kansas City Chiefs 87% to win. The prediction gives them 0% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 1,288 blind-tested games (2022-2026): this method picked 67.6% of winners (Vegas alone 67.6%, our ratings alone 64.2%) and missed the total by 10.2 points on average (ratings alone 10.63).",
     "Arizona Cardinals (3-7) @ Kansas City Chiefs (7-2).",
@@ -91925,7 +91675,7 @@
     "Power rank: Arizona Cardinals #31 vs Kansas City Chiefs #7 (of 32).",
     "Upset risk: 13% chance Arizona Cardinals wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91952,7 +91702,7 @@
    "facts": [
     "Vegas: Carolina Panthers -3 \u00b7 O/U 43.5 (our ratings agree).",
     "Market win chance: Baltimore Ravens 43% \u00b7 Carolina Panthers 57%.",
-    "Wind forecast 4 mph at an outdoor stadium.",
+    "Wind forecast 10 mph at an outdoor stadium.",
     "Our ratings alone: Baltimore Ravens 20.4 @ Carolina Panthers 23.9, Carolina Panthers 61% to win. The prediction gives them 0% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 1,288 blind-tested games (2022-2026): this method picked 67.6% of winners (Vegas alone 67.6%, our ratings alone 64.2%) and missed the total by 10.2 points on average (ratings alone 10.63).",
     "Baltimore Ravens (4-6) @ Carolina Panthers (4-5).",
@@ -91963,7 +91713,7 @@
     "Power rank: Baltimore Ravens #23 vs Carolina Panthers #19 (of 32).",
     "Upset risk: 39% chance Baltimore Ravens wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -91990,7 +91740,7 @@
    "facts": [
     "Vegas: Buffalo Bills -16.5 \u00b7 O/U 44.5 (our ratings have Miami Dolphins 1.8 better than the spread).",
     "Market win chance: Miami Dolphins 7% \u00b7 Buffalo Bills 93%.",
-    "Wind forecast 10 mph at an outdoor stadium.",
+    "Wind forecast 11 mph at an outdoor stadium.",
     "Our ratings alone: Miami Dolphins 15.3 @ Buffalo Bills 30.1, Buffalo Bills 87% to win. The prediction gives them 0% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 1,288 blind-tested games (2022-2026): this method picked 67.6% of winners (Vegas alone 67.6%, our ratings alone 64.2%) and missed the total by 10.2 points on average (ratings alone 10.63).",
     "Miami Dolphins (1-8) @ Buffalo Bills (8-1).",
@@ -92001,7 +91751,7 @@
     "Power rank: Miami Dolphins #28 vs Buffalo Bills #2 (of 32).",
     "Upset risk: 13% chance Miami Dolphins wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92023,12 +91773,12 @@
    "p_away": 0.1554,
    "p_draw": 0.0,
    "winner": "home",
-   "model_home": 0.6991,
+   "model_home": 0.699,
    "market_home": 0.8446,
    "facts": [
     "Vegas: Chicago Bears -11.5 \u00b7 O/U 48.5 (our ratings have New Orleans Saints 4.7 better than the spread).",
     "Market win chance: New Orleans Saints 16% \u00b7 Chicago Bears 84%.",
-    "Wind forecast 9 mph at an outdoor stadium.",
+    "Wind forecast 8 mph at an outdoor stadium.",
     "Our ratings alone: New Orleans Saints 21.1 @ Chicago Bears 27.9, Chicago Bears 70% to win. The prediction gives them 0% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 1,288 blind-tested games (2022-2026): this method picked 67.6% of winners (Vegas alone 67.6%, our ratings alone 64.2%) and missed the total by 10.2 points on average (ratings alone 10.63).",
     "New Orleans Saints (3-6) @ Chicago Bears (7-2).",
@@ -92039,7 +91789,7 @@
     "Splits: Chicago Bears 4-1 at home; New Orleans Saints 2-1 on the road.",
     "Power rank: New Orleans Saints #24 vs Chicago Bears #9 (of 32)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92077,7 +91827,7 @@
     "Power rank: Tampa Bay Buccaneers #13 vs Detroit Lions #8 (of 32).",
     "Upset risk: 39% chance Tampa Bay Buccaneers wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92115,7 +91865,7 @@
     "Upset risk: 30% chance Tennessee Titans wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 88% of the time (17 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92142,7 +91892,7 @@
    "facts": [
     "Vegas: Pittsburgh Steelers -4.5 \u00b7 O/U 38.5 (our ratings have 2.9 fewer points than the total).",
     "Market win chance: Pittsburgh Steelers 65% \u00b7 Philadelphia Eagles 35%.",
-    "Wind forecast 13 mph at an outdoor stadium.",
+    "Wind forecast 8 mph at an outdoor stadium.",
     "Our ratings alone: Pittsburgh Steelers 19.8 @ Philadelphia Eagles 15.8, Philadelphia Eagles 38% to win. The prediction gives them 0% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 1,288 blind-tested games (2022-2026): this method picked 67.6% of winners (Vegas alone 67.6%, our ratings alone 64.2%) and missed the total by 10.2 points on average (ratings alone 10.63).",
     "Pittsburgh Steelers (6-3) @ Philadelphia Eagles (2-7).",
@@ -92153,7 +91903,7 @@
     "Splits: Philadelphia Eagles 1-4 at home; Pittsburgh Steelers 2-3 on the road.",
     "Power rank: Pittsburgh Steelers #15 vs Philadelphia Eagles #27 (of 32)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92191,7 +91941,7 @@
     "Upset risk: 16% chance Le Mans wins outright.",
     "Best number: -210 at DraftKings (checked 2 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92229,7 +91979,7 @@
     "Upset risk: 21% chance Atalanta wins outright.",
     "Track record: teams we gave a 75% chance to win outright won 82% of the time (17 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92267,7 +92017,7 @@
     "Upset risk: 24% chance Getafe wins outright.",
     "Best number: -175 at DraftKings (checked 1 books)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92305,7 +92055,7 @@
     "Upset risk: 49% chance New York Jets wins outright.",
     "Track record: teams we gave a 56% chance to win outright won 48% of the time (27 recent games tested)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92343,7 +92093,7 @@
     "Power rank: Jacksonville Jaguars #1 vs New York Giants #18 (of 32).",
     "Upset risk: 20% chance New York Giants wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92359,17 +92109,17 @@
    "commence_time": "2026-11-22T21:25:00+00:00",
    "home": "Denver Broncos",
    "away": "Las Vegas Raiders",
-   "home_score": 25.0,
-   "away_score": 15.5,
-   "p_home": 0.8409,
-   "p_away": 0.1591,
+   "home_score": 25.2,
+   "away_score": 15.3,
+   "p_home": 0.8483,
+   "p_away": 0.1517,
    "p_draw": 0.0,
    "winner": "home",
    "model_home": 0.7055,
-   "market_home": 0.8409,
+   "market_home": 0.8483,
    "facts": [
-    "Vegas: Denver Broncos -10 \u00b7 O/U 40.5 (our ratings have Las Vegas Raiders 3.0 better than the spread; our ratings have 7.6 more points than the total).",
-    "Market win chance: Las Vegas Raiders 16% \u00b7 Denver Broncos 84%.",
+    "Vegas: Denver Broncos -10.5 \u00b7 O/U 40.5 (our ratings have Las Vegas Raiders 3.5 better than the spread; our ratings have 7.6 more points than the total).",
+    "Market win chance: Las Vegas Raiders 15% \u00b7 Denver Broncos 85%.",
     "Wind forecast 2 mph at an outdoor stadium.",
     "Our ratings alone: Las Vegas Raiders 20.5 @ Denver Broncos 27.5, Denver Broncos 71% to win. The prediction gives them 0% of the say on the total and 0% on the winner, the weight they earned in testing.",
     "Backed by 1,288 blind-tested games (2022-2026): this method picked 67.6% of winners (Vegas alone 67.6%, our ratings alone 64.2%) and missed the total by 10.2 points on average (ratings alone 10.63).",
@@ -92381,7 +92131,7 @@
     "Splits: Denver Broncos 4-0 at home; Las Vegas Raiders 3-2 on the road.",
     "Power rank: Las Vegas Raiders #26 vs Denver Broncos #11 (of 32)."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
@@ -92419,7 +92169,7 @@
     "Power rank: Charlotte FC #5 vs Chicago Fire FC #9 (of 30).",
     "Upset risk: 34% chance Charlotte FC wins outright."
    ],
-   "updated_at": "2026-11-20T00:31:52.096270+00:00",
+   "updated_at": "2026-11-20T01:01:41.522396+00:00",
    "status": "pending",
    "final_home": null,
    "final_away": null,
