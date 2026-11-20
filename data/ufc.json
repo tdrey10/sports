@@ -1,5 +1,5 @@
 {
- "ran_at": "2026-11-20T23:04:53.579958+00:00",
+ "ran_at": "2026-11-20T23:34:32.308062+00:00",
  "fights": 4383,
  "called": 3688,
  "accuracy": 0.5810737527114967,
@@ -104,8 +104,8 @@
    "a_fights": 7,
    "b_fights": 2,
    "a_ml": 145.0,
-   "b_ml": -170.0,
-   "market_a": 0.393
+   "b_ml": -175.0,
+   "market_a": 0.391
   },
   {
    "fight_id": "401934356",
@@ -376,6 +376,19 @@
    "b_fights": 15
   },
   {
+   "fight_id": "401936140",
+   "card": "UFC 335: Oliveira vs. Lopes",
+   "date": "2026-12-12T22:00Z",
+   "weight": "",
+   "a": "TBA",
+   "a_record": "",
+   "b": "Opponent TBA",
+   "b_record": "",
+   "model_a": 0.5,
+   "a_fights": 0,
+   "b_fights": 0
+  },
+  {
    "fight_id": "401930356",
    "card": "UFC 335: Oliveira vs. Lopes",
    "date": "2026-12-13T00:00Z",
@@ -426,6 +439,32 @@
    "model_a": 0.513,
    "a_fights": 13,
    "b_fights": 11
+  },
+  {
+   "fight_id": "401936138",
+   "card": "UFC 335: Oliveira vs. Lopes",
+   "date": "2026-12-13T02:00Z",
+   "weight": "Bantamweight",
+   "a": "Kyler Phillips",
+   "a_record": "12-5-0",
+   "b": "Ethyn Ewing",
+   "b_record": "10-2-0",
+   "model_a": 0.479,
+   "a_fights": 10,
+   "b_fights": 2
+  },
+  {
+   "fight_id": "401936139",
+   "card": "UFC 335: Oliveira vs. Lopes",
+   "date": "2026-12-13T02:00Z",
+   "weight": "Middleweight",
+   "a": "Damian Pinas",
+   "a_record": "11-1-0",
+   "b": "Baisangur Susurkaev",
+   "b_record": "12-0-0",
+   "model_a": 0.502,
+   "a_fights": 4,
+   "b_fights": 4
   }
  ],
  "note": "Not proven: UFC bets post only after the blend beats DraftKings' closing lines over 60+ graded fights. Lines have been saved since this was added; ESPN drops UFC odds after each fight, so there is no older history to test on."
