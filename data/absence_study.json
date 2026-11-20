@@ -1,7 +1,7 @@
 {
  "nba": {
-  "games": 1544,
-  "tune_games": 926,
+  "games": 1548,
+  "tune_games": 928,
   "rows": [
    {
     "study": "NBA absences",
@@ -68,14 +68,14 @@
     "variant": "back: team missing 25%+ of its production",
     "verdict": "",
     "in_sample": {
-     "bets": 170,
+     "bets": 171,
      "won": 64,
-     "lost": 106,
+     "lost": 107,
      "push": 0,
-     "units": 3.51,
-     "roi": 0.020647058823529404,
-     "flat_roi": 0.020647058823529414,
-     "se": 0.10479064850806924,
+     "units": 2.51,
+     "roi": 0.014678362573099409,
+     "flat_roi": 0.014678362573099417,
+     "se": 0.10434688143537721,
      "proven": false
     },
     "blind": {
@@ -84,7 +84,7 @@
      "lost": 76,
      "push": 0,
      "units": -8.61,
-     "roi": -0.07552631578947365,
+     "roi": -0.07552631578947362,
      "flat_roi": -0.0755263157894737,
      "se": 0.1265232045403093,
      "proven": false
@@ -126,25 +126,25 @@
     "variant": "fade: team missing 2+ of its top 3 (bet the opponent)",
     "verdict": "",
     "in_sample": {
-     "bets": 29,
+     "bets": 30,
      "won": 11,
-     "lost": 18,
+     "lost": 19,
      "push": 0,
-     "units": -3.06,
-     "roi": -0.10551724137931032,
-     "flat_roi": -0.10551724137931032,
-     "se": 0.21766709011682328,
+     "units": -4.06,
+     "roi": -0.13533333333333328,
+     "flat_roi": -0.13533333333333328,
+     "se": 0.21238965131256826,
      "proven": false
     },
     "blind": {
-     "bets": 31,
+     "bets": 30,
      "won": 9,
-     "lost": 22,
+     "lost": 21,
      "push": 0,
-     "units": -8.08,
-     "roi": -0.2606451612903226,
-     "flat_roi": -0.26064516129032256,
-     "se": 0.21675115084903437,
+     "units": -7.08,
+     "roi": -0.23600000000000004,
+     "flat_roi": -0.23600000000000002,
+     "se": 0.2226473940313821,
      "proven": false
     }
    },
@@ -155,25 +155,25 @@
     "variant": "fade: team missing 25%+ of its production (bet the opponent)",
     "verdict": "",
     "in_sample": {
-     "bets": 92,
+     "bets": 93,
      "won": 35,
-     "lost": 57,
+     "lost": 58,
      "push": 0,
-     "units": -2.47,
-     "roi": -0.02684782608695651,
-     "flat_roi": -0.026847826086956513,
-     "se": 0.13474143359089877,
+     "units": -3.47,
+     "roi": -0.03731182795698924,
+     "flat_roi": -0.03731182795698924,
+     "se": 0.13369485290377767,
      "proven": false
     },
     "blind": {
-     "bets": 80,
+     "bets": 79,
      "won": 25,
-     "lost": 55,
+     "lost": 54,
      "push": 0,
-     "units": -18.41,
-     "roi": -0.23012499999999997,
-     "flat_roi": -0.230125,
-     "se": 0.13068992844573715,
+     "units": -17.41,
+     "roi": -0.2203797468354431,
+     "flat_roi": -0.22037974683544304,
+     "se": 0.13198635297717712,
      "proven": false
     }
    },
@@ -445,25 +445,25 @@
     "variant": "back: team missing 2+ of its top 3",
     "verdict": "",
     "in_sample": {
-     "bets": 127,
+     "bets": 128,
      "won": 58,
-     "lost": 69,
+     "lost": 70,
      "push": 0,
-     "units": -16.27,
-     "roi": -0.12814936609031005,
-     "flat_roi": -0.12814936609031002,
-     "se": 0.08476815373365557,
+     "units": -17.27,
+     "roi": -0.13496069916772951,
+     "flat_roi": -0.1349606991677295,
+     "se": 0.08437866153514992,
      "proven": false
     },
     "blind": {
-     "bets": 181,
+     "bets": 180,
      "won": 88,
-     "lost": 93,
+     "lost": 92,
      "push": 0,
-     "units": -12.86,
-     "roi": -0.07105832112492647,
-     "flat_roi": -0.07105832112492652,
-     "se": 0.07120657227229274,
+     "units": -11.86,
+     "roi": -0.06589753402006494,
+     "flat_roi": -0.065897534020065,
+     "se": 0.07141496252750894,
      "proven": false
     }
    },
@@ -474,25 +474,25 @@
     "variant": "back: team missing 25%+ of its production",
     "verdict": "",
     "in_sample": {
-     "bets": 388,
-     "won": 193,
-     "lost": 195,
+     "bets": 390,
+     "won": 194,
+     "lost": 196,
      "push": 0,
-     "units": -19.64,
-     "roi": -0.05060770591831188,
-     "flat_roi": -0.05060770591831196,
-     "se": 0.04853242985889398,
+     "units": -19.79,
+     "roi": -0.050739313510734275,
+     "flat_roi": -0.050739313510734345,
+     "se": 0.04839966203408397,
      "proven": false
     },
     "blind": {
-     "bets": 381,
+     "bets": 382,
      "won": 193,
-     "lost": 188,
+     "lost": 189,
      "push": 0,
-     "units": -12.04,
-     "roi": -0.031605278463663074,
-     "flat_roi": -0.03160527846366313,
-     "se": 0.04904963534458227,
+     "units": -12.96,
+     "roi": -0.03393492878494334,
+     "flat_roi": -0.03393492878494338,
+     "se": 0.04899683595617824,
      "proven": false
     }
    },
@@ -514,14 +514,14 @@
      "proven": false
     },
     "blind": {
-     "bets": 188,
-     "won": 101,
+     "bets": 189,
+     "won": 102,
      "lost": 87,
      "push": 0,
-     "units": 4.8,
-     "roi": 0.025544695739099687,
-     "flat_roi": 0.02554469573909968,
-     "se": 0.06963342537889376,
+     "units": 5.73,
+     "roi": 0.030308617591940035,
+     "flat_roi": 0.030308617591940035,
+     "se": 0.06942765069552978,
      "proven": false
     }
    },
@@ -532,25 +532,25 @@
     "variant": "fade: team missing 2+ of its top 3 (bet the opponent)",
     "verdict": "",
     "in_sample": {
-     "bets": 127,
-     "won": 69,
+     "bets": 128,
+     "won": 70,
      "lost": 58,
      "push": 0,
-     "units": 4.56,
-     "roi": 0.03590088201571322,
-     "flat_roi": 0.03590088201571322,
-     "se": 0.08465345085426759,
+     "units": 5.41,
+     "roi": 0.04224116908682986,
+     "flat_roi": 0.04224116908682986,
+     "se": 0.08422846313060431,
      "proven": false
     },
     "blind": {
-     "bets": 181,
-     "won": 93,
+     "bets": 180,
+     "won": 92,
      "lost": 88,
      "push": 0,
-     "units": -3.52,
-     "roi": -0.0194695540757379,
-     "flat_roi": -0.0194695540757379,
-     "se": 0.07111650896900686,
+     "units": -4.37,
+     "roi": -0.024285816193484463,
+     "flat_roi": -0.024285816193484463,
+     "se": 0.07134852006837272,
      "proven": false
     }
    },
@@ -561,25 +561,25 @@
     "variant": "fade: team missing 25%+ of its production (bet the opponent)",
     "verdict": "",
     "in_sample": {
-     "bets": 388,
-     "won": 195,
-     "lost": 193,
+     "bets": 390,
+     "won": 196,
+     "lost": 194,
      "push": 0,
-     "units": -15.54,
-     "roi": -0.04006108162458628,
-     "flat_roi": -0.0400610816245863,
-     "se": 0.04856858926322722,
+     "units": -15.7,
+     "roi": -0.040246774469797006,
+     "flat_roi": -0.04024677446979703,
+     "se": 0.04843563763857485,
      "proven": false
     },
     "blind": {
-     "bets": 381,
-     "won": 188,
+     "bets": 382,
+     "won": 189,
      "lost": 193,
      "push": 0,
-     "units": -21.59,
-     "roi": -0.05667266755581653,
-     "flat_roi": -0.05667266755581654,
-     "se": 0.04904879260752635,
+     "units": -20.59,
+     "roi": -0.0538950055341175,
+     "flat_roi": -0.053895005534117524,
+     "se": 0.04899815428029996,
      "proven": false
     }
    },
@@ -601,14 +601,14 @@
      "proven": false
     },
     "blind": {
-     "bets": 188,
+     "bets": 189,
      "won": 87,
-     "lost": 101,
+     "lost": 102,
      "push": 0,
-     "units": -22.05,
-     "roi": -0.11728975056361947,
-     "flat_roi": -0.11728975056361945,
-     "se": 0.0695701632969046,
+     "units": -23.05,
+     "roi": -0.12196017516381195,
+     "flat_roi": -0.12196017516381194,
+     "se": 0.06935851407895031,
      "proven": false
     }
    }
@@ -620,8 +620,8 @@
   }
  },
  "nhl": {
-  "games": 346,
-  "tune_games": 207,
+  "games": 358,
+  "tune_games": 214,
   "rows": [
    {
     "study": "NHL absences",
@@ -699,14 +699,43 @@
      "proven": false
     },
     "blind": {
-     "bets": 3,
-     "won": 2,
+     "bets": 5,
+     "won": 3,
+     "lost": 2,
+     "push": 0,
+     "units": 1.6,
+     "roi": 0.32,
+     "flat_roi": 0.32,
+     "se": 0.5416641025580337,
+     "proven": false
+    }
+   },
+   {
+    "study": "NHL absences",
+    "sport": "nhl",
+    "market": "moneyline dog",
+    "variant": "fade: team missing 2+ of its top 3 (bet the opponent)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 0,
+     "won": 0,
+     "lost": 0,
+     "push": 0,
+     "units": 0.0,
+     "roi": null,
+     "flat_roi": null,
+     "se": null,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1,
+     "won": 0,
      "lost": 1,
      "push": 0,
-     "units": 1.5,
-     "roi": 0.5,
-     "flat_roi": 0.5,
-     "se": 0.7549834435270749,
+     "units": -1.0,
+     "roi": -1.0,
+     "flat_roi": -1.0,
+     "se": null,
      "proven": false
     }
    },
@@ -757,14 +786,14 @@
      "proven": false
     },
     "blind": {
-     "bets": 1,
+     "bets": 2,
      "won": 1,
-     "lost": 0,
+     "lost": 1,
      "push": 0,
-     "units": 1.45,
-     "roi": 1.4500000000000002,
-     "flat_roi": 1.4500000000000002,
-     "se": null,
+     "units": 0.45,
+     "roi": 0.2250000000000001,
+     "flat_roi": 0.2250000000000001,
+     "se": 1.225,
      "proven": false
     }
    },
@@ -786,14 +815,14 @@
      "proven": false
     },
     "blind": {
-     "bets": 1,
-     "won": 0,
+     "bets": 2,
+     "won": 1,
      "lost": 1,
      "push": 0,
-     "units": -1.0,
-     "roi": -1.0,
-     "flat_roi": -1.0,
-     "se": null,
+     "units": -0.23,
+     "roi": -0.11538461538461542,
+     "flat_roi": -0.11538461538461542,
+     "se": 0.8846153846153846,
      "proven": false
     }
    },
@@ -844,14 +873,14 @@
      "proven": false
     },
     "blind": {
-     "bets": 1,
-     "won": 0,
+     "bets": 2,
+     "won": 1,
      "lost": 1,
      "push": 0,
-     "units": -1.0,
-     "roi": -1.0,
-     "flat_roi": -1.0,
-     "se": null,
+     "units": -0.23,
+     "roi": -0.11538461538461542,
+     "flat_roi": -0.11538461538461542,
+     "se": 0.8846153846153846,
      "proven": false
     }
    },
@@ -931,14 +960,14 @@
      "proven": false
     },
     "blind": {
-     "bets": 3,
-     "won": 1,
-     "lost": 2,
+     "bets": 5,
+     "won": 2,
+     "lost": 3,
      "push": 0,
-     "units": -1.09,
-     "roi": -0.3636363636363636,
-     "flat_roi": -0.3636363636363636,
-     "se": 0.6363636363636364,
+     "units": -1.47,
+     "roi": -0.29472502805836137,
+     "flat_roi": -0.29472502805836137,
+     "se": 0.43434845146848444,
      "proven": false
     }
    }
