@@ -142,6 +142,7 @@ class Side:
     venue_tz: float | None = None
     team_tz: float | None = None
     qb_out: bool = False
+    postseason: bool = False  # playoffs / bowls / March Madness: never the Lock (study 47)
 
     @property
     def dec(self) -> float:
@@ -306,7 +307,8 @@ def build_sides(scan, model: SportModel, now: datetime, root="data") -> list[Sid
                       # model's rest input is capped at 10 and never saw one)
                       rest=info["days_h"] if s == 1 else info["days_a"], rest_opp=info["days_a"] if s == 1 else info["days_h"],
                       last_margin=ts.last_margin, streak=ts.streak, record=(ts.season_w, ts.season_l),
-                      venue_tz=hs.home_tz, team_tz=ts.home_tz, qb_out=qb_h if s == 1 else qb_a)
+                      venue_tz=hs.home_tz, team_tz=ts.home_tz, qb_out=qb_h if s == 1 else qb_a,
+                      postseason=bool(getattr(ctx, "postseason", False)))
             _reasons(sd, model, move)
             _hurt(sd, ctx)
             sd.fighting = sd.own < 1 / sd.dec - 0.03 or (sd.drift >= 0.03 and sport not in ("nfl", "ncaaf"))
@@ -579,9 +581,10 @@ def choose(sides: list[Side], now: datetime, taken: set[str] | frozenset = froze
     if "lock" not in taken:
         locks = [s for s in pool if good(s) and MAX_FAV <= s.odds <= 125 and lock_ok(s)
                  and not -119 <= s.odds <= -101 and s.own_agrees() and s.real_value() and not nhl_pricey(s)
-                 and not s.hurt and not s.waiting]
+                 and not s.hurt and not s.waiting and not s.postseason]
         if not locks:  # backup Lock
             locks = [s for s in pool if s.reasons and MAX_FAV <= s.odds <= 125 and not s.fighting and not s.hurt
+                     and not s.postseason
                      and not s.waiting and not nhl_pricey(s) and not (s.sport == "nba" and s.team_games < 5)
                      and s.own >= 0.56 and s.edge_own > 0 and s.real_value()]
         if locks:

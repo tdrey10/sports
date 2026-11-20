@@ -232,6 +232,7 @@ def _parse_event(ev: dict) -> GameResult | None:
         home_score=hs if final else None,
         away_score=as_ if final else None,
         neutral=bool(comp.get("neutralSite", False)),
+        postseason=season.get("type") == 3 or season.get("slug") == "post-season",
         state="post" if completed else state,
         # ESPN marks a game with no start time yet as timeValid false and parks it at midnight Eastern.
         time_tbd=comp.get("timeValid") is False or ev.get("timeValid") is False or _midnight_eastern(ev["date"]),

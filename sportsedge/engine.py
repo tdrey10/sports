@@ -43,6 +43,7 @@ class EventContext:
     injured: dict[str, list[tuple[str, str]]] = field(default_factory=dict)  # team -> (player, position) out
     questionable: dict[str, list[tuple[str, str]]] = field(default_factory=dict)  # team -> (player, position)
     open_prices: dict[str, float] = field(default_factory=dict)  # side -> first moneyline we saw (the open)
+    postseason: bool = False  # playoffs / bowls / March Madness (ESPN season type 3): never the Lock
 
     @property
     def home_b2b(self) -> bool:
@@ -161,6 +162,7 @@ class Engine:
                 _rest_before(results, home, event.commence_time),
                 _rest_before(results, away, event.commence_time),
             )
+            ctx.postseason = bool(sched and sched.postseason)
             if sched:
                 ctx.home_pitcher, ctx.home_pitcher_era = sched.home_pitcher, sched.home_pitcher_era
                 ctx.away_pitcher, ctx.away_pitcher_era = sched.away_pitcher, sched.away_pitcher_era

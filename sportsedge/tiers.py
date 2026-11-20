@@ -415,9 +415,18 @@ def build_cards(
             if tier_pool:
                 return tier_pool
         return []
+
+    def postseason(p: Pick) -> bool:
+        # Study 47 (Nov 20): -170..-120 moneyline favorites in playoff / bowl / March Madness games
+        # lost 10.6% tuning (557 bets) and 11.0% blind (581, +/-3.6%) across six sports, vs about
+        # -4% for the same prices in the regular season. The Lock stays out of those games.
+        scan = by_event.get(p.event_id)
+        ctx = scan.contexts.get(p.event_id) if scan else None
+        return bool(ctx and getattr(ctx, "postseason", False))
+
     heads = settings.fill or settings.daily_heads
     if "lock" not in taken:
-        locks = [p for p in soon if is_lock_price(p) and solid(p)]
+        locks = [p for p in soon if is_lock_price(p) and solid(p) and not postseason(p)]
         if locks:
             # Best edge AND likely to win (the edge score), not just the biggest favorite.
             chosen.append(("lock", max(locks, key=lambda p: (edge_score(p, settings)[0], p.win_prob))))
@@ -432,7 +441,9 @@ def build_cards(
             if near:
                 # Weigh everything (the edge score blends the edge with the chance to win),
                 # not just who is favored.
-                lock = max(near, key=lambda p: (agree(p), edge_score(p, settings)[0], p.win_prob))
+                # A regular-season game first; a postseason one only when nothing else is up
+                # (and then never with units: see small_lock below).
+                lock = max(near, key=lambda p: (not postseason(p), agree(p), edge_score(p, settings)[0], p.win_prob))
                 chosen.append(("lock", lock))
                 lean_ids.add(id(lock))
     if "dog" not in taken:
@@ -596,6 +607,7 @@ def build_cards(
                       and pick.ev > 0 and pick.american >= LOCK_MIN_ODDS and not pick.warnings
                       and pick.market_prob is not None  # a real edge needs a market price to check against
                       and (tier == "lock" or (pick.american > 0 and pick.win_prob >= DOG_MIN_WIN))
+                      and not (tier == "lock" and ctx and getattr(ctx, "postseason", False))  # study 47
                       and not (ctx and ctx.injuries_unknown))
         if small_lock:
             fallback = id(pick) in lean_ids
@@ -646,6 +658,9 @@ def build_cards(
                               f"{pick.market_prob:.0%} both make it a clear favorite and agree, it cashes "
                               f"{cash:.0%} after calibration with a real edge (score {sc:.0f}), injuries are "
                               f"known, -170 or better, and both teams have {LOCK_MIN_GAMES}+ games this season.")
+        if tier == "lock" and ctx and getattr(ctx, "postseason", False):
+            bullets.insert(0, "Playoff game, so no money on this Lock: favorites in this price range have lost "
+                              "about 11 cents per dollar in the postseason since 2018, way worse than the usual vig.")
         ctx = scan.contexts.get(pick.event_id) if scan else None
         stake = (head_units if small_lock
                  else units_for(pick, settings)
