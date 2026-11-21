@@ -1,14 +1,14 @@
 {
- "ran_at": "2026-11-21T17:59:24.229287+00:00",
- "fights": 4389,
- "called": 3693,
- "accuracy": 0.5808285946385053,
- "log_loss": 0.6804891639864787,
+ "ran_at": "2026-11-21T18:36:15.110275+00:00",
+ "fights": 4390,
+ "called": 3694,
+ "accuracy": 0.5806713589604765,
+ "log_loss": 0.680506214779963,
  "calibration": [
   [
-   0.5317581374047348,
-   0.5628612716763006,
-   4152
+   0.53175775022276,
+   0.5627257404286058,
+   4153
   ],
   [
    0.6213668206820527,
@@ -17,96 +17,16 @@
   ]
  ],
  "market": {
-  "bets": 50,
-  "won": 12,
+  "bets": 51,
+  "won": 13,
   "lost": 38,
-  "units": -2.1,
-  "roi": -0.041999999999999996,
-  "se": 0.2615977594611659,
+  "units": 0.1,
+  "roi": 0.0019607843137255006,
+  "se": 0.2601581750544733,
   "proven": false
  },
- "lines_saved": 90,
+ "lines_saved": 92,
  "upcoming": [
-  {
-   "fight_id": "401922277",
-   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
-   "date": "2026-11-21T18:00Z",
-   "weight": "Light Heavyweight",
-   "a": "Ji\u0159\u00ed Proch\u00e1zka",
-   "a_record": "32-6-1",
-   "b": "Navajo Stirling",
-   "b_record": "11-0-0",
-   "model_a": 0.451,
-   "a_fights": 9,
-   "b_fights": 7,
-   "a_ml": 160.0,
-   "b_ml": -192.0,
-   "market_a": 0.369
-  },
-  {
-   "fight_id": "401922278",
-   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
-   "date": "2026-11-21T18:00Z",
-   "weight": "Lightweight",
-   "a": "Dan Hooker",
-   "a_record": "24-15-0",
-   "b": "Brian Ortega",
-   "b_record": "16-5-0",
-   "model_a": 0.562,
-   "a_fights": 14,
-   "b_fights": 6,
-   "a_ml": -205.0,
-   "b_ml": 170.0,
-   "market_a": 0.645
-  },
-  {
-   "fight_id": "401927850",
-   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
-   "date": "2026-11-21T18:00Z",
-   "weight": "Featherweight",
-   "a": "Aljamain Sterling",
-   "a_record": "26-5-0",
-   "b": "Kevin Vallejos",
-   "b_record": "18-1-0",
-   "model_a": 0.574,
-   "a_fights": 12,
-   "b_fights": 6,
-   "a_ml": 100.0,
-   "b_ml": -120.0,
-   "market_a": 0.478
-  },
-  {
-   "fight_id": "401927851",
-   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
-   "date": "2026-11-21T18:00Z",
-   "weight": "Middleweight",
-   "a": "Jared Cannonier",
-   "a_record": "18-10-0",
-   "b": "Ikram Aliskerov",
-   "b_record": "18-2-0",
-   "model_a": 0.412,
-   "a_fights": 13,
-   "b_fights": 7,
-   "a_ml": 280.0,
-   "b_ml": -355.0,
-   "market_a": 0.252
-  },
-  {
-   "fight_id": "401927855",
-   "card": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
-   "date": "2026-11-21T18:00Z",
-   "weight": "Flyweight",
-   "a": "Kyoji Horiguchi",
-   "a_record": "36-6-0",
-   "b": "Asu Almabayev",
-   "b_record": "24-3-0",
-   "model_a": 0.406,
-   "a_fights": 3,
-   "b_fights": 8,
-   "a_ml": -180.0,
-   "b_ml": 150.0,
-   "market_a": 0.616
-  },
   {
    "fight_id": "401933601",
    "card": "UFC Fight Night: Adesanya vs Magomedov",
@@ -196,7 +116,10 @@
    "b_record": "17-1-0",
    "model_a": 0.453,
    "a_fights": 15,
-   "b_fights": 7
+   "b_fights": 7,
+   "a_ml": -170.0,
+   "b_ml": 142.0,
+   "market_a": 0.604
   },
   {
    "fight_id": "401933596",
@@ -209,7 +132,10 @@
    "b_record": "30-1-0",
    "model_a": 0.6,
    "a_fights": 12,
-   "b_fights": 2
+   "b_fights": 2,
+   "a_ml": -175.0,
+   "b_ml": 145.0,
+   "market_a": 0.609
   },
   {
    "fight_id": "401933597",
