@@ -44,6 +44,8 @@ class EventContext:
     questionable: dict[str, list[tuple[str, str]]] = field(default_factory=dict)  # team -> (player, position)
     open_prices: dict[str, float] = field(default_factory=dict)  # side -> first moneyline we saw (the open)
     postseason: bool = False  # playoffs / bowls / March Madness (ESPN season type 3): never the Lock
+    # Soccer: team -> (shots on target for, against, per game, games) over its last few box scores (a card fact only)
+    shot_form: dict[str, tuple[float, float, int]] = field(default_factory=dict)
 
     @property
     def home_b2b(self) -> bool:

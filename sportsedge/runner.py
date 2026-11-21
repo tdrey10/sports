@@ -97,6 +97,12 @@ def run_cycle(
             out.injury_changes = injurytiming.log(Path(injury_dir), out.scans, now, root=d5_root)
         except Exception as exc:  # logging never stops the board
             log.warning("injury log failed: %s", exc)
+    try:  # soccer cards: shots on target from the saved box scores (a fact only, never moves a pick)
+        from .advanced import attach_shot_form
+
+        attach_shot_form(out.scans, Path(d5_root) / "boxscores")
+    except Exception as exc:  # a card fact never stops the board
+        log.warning("soccer shot form failed: %s", exc)
     held = settings.board_hour is not None and now.astimezone(ledger.tz).hour < settings.board_hour
     # Owner, Oct 24: the D503 formula runs the board for its six sports; the old board keeps the rest
     # (soccer, UFC). The D503 Lock / Dog go first, so the old board never posts a second one.
