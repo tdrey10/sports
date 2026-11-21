@@ -549,5 +549,16 @@
   "luck_control": "100 random tenths of all bets per sport (600 spots) through the same bar: 0 passed, 0 strong; luck alone gives ~0.44 passes across 66 tries",
   "verdict": "nothing to bet, 0 of 66 passed. Zig-zag is dead (NBA spread dog off a series loss +7.1% blind but -10.6% tuning; NHL dog off a loss +13.8% tuning, +2.5% blind). One clear LOSER: lock-price favorites (-170..-120) in the postseason lose in both arms in five of six sports (MLB -10.9/-10.5, NHL -12.6/-10.8, NFL -29/-27, NCAAB -8.8/-18.7, NCAAF +31/-8.8 on 30/49, NBA -13.8/+0.8). Pooled: tuning 557 bets -10.6% (+/-3.6), blind 581 bets -11.0% (+/-3.6), vs -3.8%/-4.6% for the same prices in the regular season (11,745/16,004 bets). Spotted after pooling, so treated as an avoid rule only (tightening), never as a bet on the other side.",
   "action": "Lock of the Day skips postseason games (tiers.build_cards and d5 board.choose; ESPN season type now on GameResult/EventContext). If every game on the board is a playoff game, the daily Lock still posts but with no units and a card note."
+ },
+ {
+  "date": "2026-11-21",
+  "idea": "Soccer shot luck and style of play (first use of the ESPN soccer box scores: shots, shots on target, possession). Before each match, from each team's last 8 earlier matches (5+): finishing/keeping luck = (goals for - k*SoT for) - (goals against - k*SoT against), k = goals per shot on target from tuning matches (0.328); SoT share; SoT volume; goals vs shots in their games; possession. Back unlucky sides / fade lucky ones, shot-dominant sides in poor form, shot-dominant and unlucky dogs (+100 to +220), low- vs high-possession sides, overs/unders on shot volume and goal luck, draws when shot shares are even. Top/bottom 20% cutoffs from tuning matches only.",
+  "sports": "epl, laliga, seriea, bundesliga, ligue1, mls, ucl",
+  "data": "data/games/<league> results + closing 3-way moneylines and 2.5 totals, joined to data/boxscores/<league> (4,921 matches, all boxed; 2,268 priced) (sportsedge/shotluckstudy.py)",
+  "tuning": "priced matches before 2026-03-01 (Dec 2025 - Feb 2026)",
+  "blind": "2026-03-01 on, 25 variants",
+  "luck_control": "300 random spots (random side on a random 5-30% slice of priced matches) through the same bar: 1 passed, so luck alone gives ~0.08 passes across 25 tries",
+  "verdict": "dead, none wired: 0 of 25 passed. The market prices shots, not just results. Backing unlucky sides (either side, luck bottom 20%): tuning 210 bets -3.3% (+/-9.7%), blind 528 bets +1.7% (+/-6.1%) - coin flip. Unlucky dogs +1.8% / -1.4% (105/259). Shot-dominant dogs lost in tuning (-27.7% on 48) and blind (-1.2% on 164). Best-looking: over 2.5 when both teams' games ran behind their shots, +24.0% tuning (30) / +10.2% blind (46, SE 14.0%) - under 60 blind bets and inside the noise; it reruns nowhere and is not to be tweaked. Tuning samples are small (prices start Dec 2025).",
+  "action": "No bet type. Side benefit: soccer pick cards now show each team's shots on target for/against per game over its last 8 box scores (advanced.attach_shot_form; a fact only, never moves a price or pick), so soccer picks - which have no injury feed - carry one more real stat behind them."
  }
 ]

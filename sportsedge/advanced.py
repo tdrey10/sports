@@ -238,6 +238,47 @@ class Advanced:
                 "adv_total": (h["total"] + a["total"]) / 2, "adv_known": 1.0}
 
 
+SHOT_FORM_GAMES = 8
+
+
+def shot_form(box: dict[str, dict], results: list[GameResult], team: str, before: datetime,
+              games: int = SHOT_FORM_GAMES) -> tuple[float, float, int] | None:
+    """Soccer: (shots on target for, against) per game over the team's last ``games`` completed
+    matches with a box score, all before ``before``; None under 3 such matches."""
+    rows = []
+    for g in sorted((g for g in results if g.completed and g.date < before and team in (g.home, g.away)),
+                    key=lambda g: g.date):
+        b = box.get(g.event_id) or {}
+        own, opp = ("home", "away") if g.home == team else ("away", "home")
+        if (b.get(own) or {}).get("sot") is None or (b.get(opp) or {}).get("sot") is None:
+            continue
+        rows.append((b[own]["sot"], b[opp]["sot"]))
+    rows = rows[-games:]
+    if len(rows) < 3:
+        return None
+    return sum(r[0] for r in rows) / len(rows), sum(r[1] for r in rows) / len(rows), len(rows)
+
+
+def attach_shot_form(scans, box_dir) -> int:
+    """Fill EventContext.shot_form for soccer scans from the saved box scores (no downloads).
+    Only a fact on the card: it never moves a price or a pick."""
+    store = BoxStore(box_dir)
+    n = 0
+    for scan in scans:
+        if _family(scan.sport) != "soccer":
+            continue
+        box = store.sport(scan.sport.key)
+        if not box:
+            continue
+        for ctx in scan.contexts.values():
+            for team in (ctx.home, ctx.away):
+                f = shot_form(box, scan.results, team, ctx.event.commence_time)
+                if f:
+                    ctx.shot_form[team] = f
+                    n += 1
+    return n
+
+
 def _family(cfg: SportConfig) -> str:
     path = cfg.espn_path.split("/")[0]
     return {"basketball": "basketball", "hockey": "hockey", "football": "football", "soccer": "soccer"}.get(path, path)

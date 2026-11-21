@@ -244,6 +244,10 @@ def matchup_facts(results: list[GameResult], home: str, away: str, before: datet
         if home in ranks and away in ranks:
             out.append(f"Power rank: {away} #{ranks[away]} vs {home} #{ranks[home]} (of {len(ranks)}).")
     if ctx is not None:
+        shots = [f"{t} {f[0]:.1f} for / {f[1]:.1f} against (last {f[2]})" for t in (away, home)
+                 if (f := (getattr(ctx, "shot_form", None) or {}).get(t))]
+        if shots:
+            out.append("Shots on target per game: " + "; ".join(shots) + ".")
         rest = _rest_line(ctx)
         if rest:
             out.append(rest)
