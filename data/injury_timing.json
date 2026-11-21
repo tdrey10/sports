@@ -1,29 +1,29 @@
 {
  "nfl": {
   "sport": "nfl",
-  "news": 41,
-  "key_news": 13,
+  "news": 43,
+  "key_news": 14,
   "questionable": {
-   "n": 23,
+   "n": 24,
    "clv_in_sample": {
-    "bets": 11,
-    "beat_close": 0.091,
-    "se": 0.087,
-    "avg_clv": -0.0245
-   },
-   "clv_blind": {
     "bets": 12,
     "beat_close": 0.167,
     "se": 0.108,
-    "avg_clv": -0.0202
+    "avg_clv": -0.0222
+   },
+   "clv_blind": {
+    "bets": 12,
+    "beat_close": 0.083,
+    "se": 0.08,
+    "avg_clv": -0.0212
    },
    "verdict": "collecting"
   },
   "all": {
-   "n": 41,
+   "n": 43,
    "avg_news_move": 0.0003,
-   "avg_drift": 0.0042,
-   "drift_same_way": 0.293,
+   "avg_drift": 0.004,
+   "drift_same_way": 0.279,
    "graded": 39,
    "in_sample": {
     "bets": 19,
@@ -47,24 +47,24 @@
     "beat_close": 0.051
    },
    "clv_in_sample": {
-    "bets": 20,
+    "bets": 21,
     "beat_close": 0.0,
     "se": 0.0,
-    "avg_clv": -0.0312
+    "avg_clv": -0.0301
    },
    "clv_blind": {
-    "bets": 21,
-    "beat_close": 0.095,
-    "se": 0.064,
-    "avg_clv": -0.0241
+    "bets": 22,
+    "beat_close": 0.091,
+    "se": 0.061,
+    "avg_clv": -0.0247
    },
    "verdict": "collecting"
   },
   "key": {
-   "n": 13,
-   "avg_news_move": 0.003,
+   "n": 14,
+   "avg_news_move": 0.0028,
    "avg_drift": 0.0004,
-   "drift_same_way": 0.385,
+   "drift_same_way": 0.357,
    "graded": 13,
    "in_sample": {
     "bets": 6,
@@ -88,16 +88,16 @@
     "beat_close": 0.077
    },
    "clv_in_sample": {
-    "bets": 6,
+    "bets": 7,
     "beat_close": 0.0,
     "se": 0.0,
-    "avg_clv": -0.0269
+    "avg_clv": -0.0233
    },
    "clv_blind": {
     "bets": 7,
     "beat_close": 0.143,
     "se": 0.132,
-    "avg_clv": -0.0193
+    "avg_clv": -0.0222
    },
    "verdict": "collecting"
   }
@@ -125,103 +125,103 @@
  },
  "nba": {
   "sport": "nba",
-  "news": 50,
-  "key_news": 17,
+  "news": 52,
+  "key_news": 18,
   "questionable": {
-   "n": 23,
+   "n": 24,
    "clv_in_sample": {
-    "bets": 11,
-    "beat_close": 0.091,
-    "se": 0.087,
-    "avg_clv": -0.0432
+    "bets": 12,
+    "beat_close": 0.167,
+    "se": 0.108,
+    "avg_clv": -0.0383
    },
    "clv_blind": {
     "bets": 12,
     "beat_close": 0.333,
     "se": 0.136,
-    "avg_clv": -0.0281
+    "avg_clv": -0.0257
    },
    "verdict": "collecting"
   },
   "all": {
-   "n": 50,
-   "avg_news_move": -0.0124,
-   "avg_drift": 0.0047,
-   "drift_same_way": 0.32,
-   "graded": 50,
+   "n": 52,
+   "avg_news_move": -0.0115,
+   "avg_drift": 0.0043,
+   "drift_same_way": 0.327,
+   "graded": 52,
    "in_sample": {
-    "bets": 25,
+    "bets": 26,
     "wins": 9,
-    "flat_roi": -0.1254,
-    "se": 0.2503,
-    "beat_close": 0.04
+    "flat_roi": -0.1591,
+    "se": 0.2428,
+    "beat_close": 0.038
    },
    "blind": {
-    "bets": 25,
-    "wins": 9,
-    "flat_roi": -0.0906,
-    "se": 0.2608,
-    "beat_close": 0.04
+    "bets": 26,
+    "wins": 10,
+    "flat_roi": -0.0433,
+    "se": 0.255,
+    "beat_close": 0.038
    },
    "all_bets": {
-    "bets": 50,
-    "wins": 18,
-    "flat_roi": -0.108,
-    "se": 0.1789,
-    "beat_close": 0.04
+    "bets": 52,
+    "wins": 19,
+    "flat_roi": -0.1012,
+    "se": 0.1745,
+    "beat_close": 0.038
    },
    "clv_in_sample": {
-    "bets": 25,
-    "beat_close": 0.04,
-    "se": 0.039,
-    "avg_clv": -0.0256
+    "bets": 26,
+    "beat_close": 0.038,
+    "se": 0.038,
+    "avg_clv": -0.0255
    },
    "clv_blind": {
-    "bets": 25,
-    "beat_close": 0.04,
-    "se": 0.039,
-    "avg_clv": -0.0298
+    "bets": 26,
+    "beat_close": 0.038,
+    "se": 0.038,
+    "avg_clv": -0.0292
    },
    "verdict": "collecting"
   },
   "key": {
-   "n": 17,
-   "avg_news_move": -0.0227,
-   "avg_drift": 0.0102,
-   "drift_same_way": 0.353,
-   "graded": 17,
+   "n": 18,
+   "avg_news_move": -0.021,
+   "avg_drift": 0.0091,
+   "drift_same_way": 0.389,
+   "graded": 18,
    "in_sample": {
-    "bets": 8,
-    "wins": 2,
-    "flat_roi": -0.2425,
-    "se": 0.5147,
+    "bets": 9,
+    "wins": 3,
+    "flat_roi": -0.14,
+    "se": 0.4654,
     "beat_close": 0.0
    },
    "blind": {
     "bets": 9,
     "wins": 3,
-    "flat_roi": -0.1844,
-    "se": 0.4243,
+    "flat_roi": -0.1333,
+    "se": 0.4401,
     "beat_close": 0.0
    },
    "all_bets": {
-    "bets": 17,
-    "wins": 5,
-    "flat_roi": -0.2117,
-    "se": 0.3198,
+    "bets": 18,
+    "wins": 6,
+    "flat_roi": -0.1367,
+    "se": 0.3107,
     "beat_close": 0.0
    },
    "clv_in_sample": {
-    "bets": 8,
+    "bets": 9,
     "beat_close": 0.0,
     "se": 0.0,
-    "avg_clv": -0.0248
+    "avg_clv": -0.0242
    },
    "clv_blind": {
     "bets": 9,
     "beat_close": 0.0,
     "se": 0.0,
-    "avg_clv": -0.0408
+    "avg_clv": -0.04
    },
    "verdict": "collecting"
   }
@@ -249,7 +249,7 @@
   "all": {
    "n": 60,
    "avg_news_move": -0.0025,
-   "avg_drift": -0.0027,
+   "avg_drift": -0.0029,
    "drift_same_way": 0.3,
    "graded": 59,
    "in_sample": {
@@ -283,7 +283,7 @@
     "bets": 30,
     "beat_close": 0.133,
     "se": 0.062,
-    "avg_clv": -0.0168
+    "avg_clv": -0.0165
    },
    "verdict": "collecting"
   },
