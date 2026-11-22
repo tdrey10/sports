@@ -16,9 +16,9 @@
  "markets": {
   "ml": {
    "trust": 0.1,
-   "blind_games": 2369,
-   "log_loss_market": 0.6089630329977975,
-   "log_loss_model": 0.6319303794740747,
+   "blind_games": 2375,
+   "log_loss_market": 0.6082624019789761,
+   "log_loss_model": 0.6312131393005933,
    "in_sample": {
     "bets": 41,
     "won": 11,
@@ -42,14 +42,14 @@
     "proven": false
    },
    "blind_model_only": {
-    "bets": 1301,
-    "won": 500,
-    "lost": 801,
+    "bets": 1304,
+    "won": 501,
+    "lost": 803,
     "push": 0,
-    "units": -239.93,
-    "roi": -0.08392253042261194,
-    "flat_roi": -0.07843640149875176,
-    "se": 0.03400738890233221,
+    "units": -240.11,
+    "roi": -0.0839414488649703,
+    "flat_roi": -0.07853202327444482,
+    "se": 0.03396944069899611,
     "proven": false
    },
    "calibration_blind": [
@@ -67,9 +67,9 @@
     },
     {
      "bin": "30%-40%",
-     "games": 234,
-     "said": 0.35633053329594055,
-     "won": 0.2905982905982906
+     "games": 235,
+     "said": 0.35642755403128606,
+     "won": 0.2936170212765957
     },
     {
      "bin": "40%-50%",
@@ -85,35 +85,35 @@
     },
     {
      "bin": "60%-70%",
-     "games": 511,
-     "said": 0.6481392232235282,
-     "won": 0.6046966731898239
+     "games": 512,
+     "said": 0.648144438140329,
+     "won": 0.60546875
     },
     {
      "bin": "70%-80%",
-     "games": 404,
-     "said": 0.748233881164864,
-     "won": 0.7252475247524752
+     "games": 405,
+     "said": 0.7482162909723793,
+     "won": 0.725925925925926
     },
     {
      "bin": "80%-90%",
-     "games": 184,
-     "said": 0.8423763937893376,
-     "won": 0.8532608695652174
+     "games": 186,
+     "said": 0.8425961943818427,
+     "won": 0.8548387096774194
     },
     {
      "bin": "90%-100%",
-     "games": 17,
-     "said": 0.9149067097052027,
-     "won": 0.8823529411764706
+     "games": 18,
+     "said": 0.914717263685202,
+     "won": 0.8888888888888888
     }
    ]
   },
   "spread": {
    "trust": 0.15,
-   "blind_games": 2369,
-   "log_loss_market": 0.6926154303453819,
-   "log_loss_model": 0.7097689697785421,
+   "blind_games": 2375,
+   "log_loss_market": 0.692616308775752,
+   "log_loss_model": 0.7096555241946769,
    "in_sample": {
     "bets": 249,
     "won": 124,
@@ -137,14 +137,14 @@
     "proven": false
    },
    "blind_model_only": {
-    "bets": 1940,
-    "won": 950,
+    "bets": 1942,
+    "won": 952,
     "lost": 944,
     "push": 46,
-    "units": -229.06,
-    "roi": -0.053758195958757964,
-    "flat_roi": -0.027392065060253806,
-    "se": 0.021759641133403694,
+    "units": -228.15,
+    "roi": -0.05353226347571256,
+    "flat_roi": -0.026427535593888222,
+    "se": 0.02174791811917097,
     "proven": false
    },
    "calibration_blind": [
@@ -162,15 +162,15 @@
     },
     {
      "bin": "40%-50%",
-     "games": 687,
-     "said": 0.4582776511502308,
-     "won": 0.4657933042212518
+     "games": 688,
+     "said": 0.4583283575808058,
+     "won": 0.46656976744186046
     },
     {
      "bin": "50%-60%",
-     "games": 1099,
-     "said": 0.5481915692756931,
-     "won": 0.49044585987261147
+     "games": 1104,
+     "said": 0.5480906736390291,
+     "won": 0.49184782608695654
     },
     {
      "bin": "60%-70%",
@@ -226,10 +226,10 @@
     "se": 0.013458083654392801
    },
    "blind": {
-    "legs": 929,
-    "won": 650,
-    "rate": 0.6996770721205597,
-    "se": 0.015039562712269144
+    "legs": 931,
+    "won": 651,
+    "rate": 0.6992481203007519,
+    "se": 0.015029515771118647
    },
    "proven": false
   },
@@ -241,10 +241,10 @@
     "se": 0.011528797638852607
    },
    "blind": {
-    "legs": 1273,
-    "won": 903,
-    "rate": 0.7093479968578161,
-    "se": 0.012726299266391974
+    "legs": 1275,
+    "won": 904,
+    "rate": 0.7090196078431372,
+    "se": 0.01272055010331942
    },
    "proven": false
   },
@@ -256,10 +256,10 @@
     "se": 0.01223061853649042
    },
    "blind": {
-    "legs": 1015,
-    "won": 706,
-    "rate": 0.6955665024630542,
-    "se": 0.014443835275043105
+    "legs": 1017,
+    "won": 707,
+    "rate": 0.6951819075712881,
+    "se": 0.01443474527476424
    },
    "proven": false
   },
@@ -301,10 +301,10 @@
     "se": 0.014396503732596065
    },
    "blind": {
-    "legs": 743,
-    "won": 520,
-    "rate": 0.6998654104979811,
-    "se": 0.016813993790762267
+    "legs": 745,
+    "won": 521,
+    "rate": 0.6993288590604027,
+    "se": 0.016799968278400784
    },
    "proven": false
   },
@@ -316,10 +316,10 @@
     "se": 0.03382118320808457
    },
    "blind": {
-    "legs": 201,
-    "won": 143,
-    "rate": 0.7114427860696517,
-    "se": 0.03195861349017578
+    "legs": 202,
+    "won": 144,
+    "rate": 0.7128712871287128,
+    "se": 0.03183231242678516
    },
    "proven": false
   },
@@ -346,10 +346,10 @@
     "se": 0.017934046130751592
    },
    "blind": {
-    "legs": 555,
-    "won": 377,
-    "rate": 0.6792792792792792,
-    "se": 0.019812587682295633
+    "legs": 559,
+    "won": 379,
+    "rate": 0.6779964221824687,
+    "se": 0.01976232993849474
    },
    "proven": false
   },
@@ -361,10 +361,10 @@
     "se": 0.01928007316225699
    },
    "blind": {
-    "legs": 452,
-    "won": 300,
-    "rate": 0.6637168141592921,
-    "se": 0.022221571515598487
+    "legs": 455,
+    "won": 302,
+    "rate": 0.6637362637362637,
+    "se": 0.022147876436179673
    },
    "proven": false
   },
@@ -406,10 +406,10 @@
     "se": 0.020423959483351357
    },
    "blind": {
-    "legs": 353,
-    "won": 235,
-    "rate": 0.6657223796033994,
-    "se": 0.025108043749016214
+    "legs": 356,
+    "won": 238,
+    "rate": 0.6685393258426966,
+    "se": 0.024949077105968807
    },
    "proven": false
   },
@@ -421,10 +421,10 @@
     "se": 0.02158067014231168
    },
    "blind": {
-    "legs": 297,
-    "won": 203,
-    "rate": 0.6835016835016835,
-    "se": 0.02698840829560217
+    "legs": 300,
+    "won": 206,
+    "rate": 0.6866666666666666,
+    "se": 0.026780313388479703
    },
    "proven": false
   }
@@ -515,16 +515,697 @@
     "proven": false
    },
    "blind": {
-    "bets": 67,
-    "won": 27,
-    "lost": 40,
+    "bets": 69,
+    "won": 28,
+    "lost": 41,
     "push": 0,
-    "units": 2.19,
-    "roi": 0.03268656716417912,
-    "flat_roi": 0.03268656716417912,
-    "se": 0.15699772301994946,
+    "units": 2.83,
+    "roi": 0.041014492753623205,
+    "flat_roi": 0.041014492753623205,
+    "se": 0.1549412265062158,
     "proven": false
    }
+  }
+ },
+ "qb_study": {
+  "rows": [
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "dog ML: opponent QB's first start",
+    "verdict": "",
+    "in_sample": {
+     "bets": 18,
+     "won": 10,
+     "lost": 8,
+     "push": 0,
+     "units": 5.84,
+     "roi": 0.3244444444444444,
+     "flat_roi": 0.3244444444444444,
+     "se": 0.29181897672687945,
+     "proven": false
+    },
+    "blind": {
+     "bets": 12,
+     "won": 3,
+     "lost": 9,
+     "push": 0,
+     "units": -4.55,
+     "roi": -0.37916666666666665,
+     "flat_roi": -0.37916666666666665,
+     "se": 0.3244866769766573,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "dog ML: opponent new QB (not the regular starter)",
+    "verdict": "STRONG",
+    "in_sample": {
+     "bets": 225,
+     "won": 102,
+     "lost": 123,
+     "push": 0,
+     "units": 24.16,
+     "roi": 0.10737777777777772,
+     "flat_roi": 0.10737777777777778,
+     "se": 0.08242653690341875,
+     "proven": true
+    },
+    "blind": {
+     "bets": 235,
+     "won": 105,
+     "lost": 128,
+     "push": 2,
+     "units": 20.86,
+     "roi": 0.08876595744680853,
+     "flat_roi": 0.08876595744680853,
+     "se": 0.0795264606287013,
+     "proven": true
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "dog ML: opponent regular QB back after missing the last game",
+    "verdict": "",
+    "in_sample": {
+     "bets": 42,
+     "won": 20,
+     "lost": 22,
+     "push": 0,
+     "units": 6.2,
+     "roi": 0.14761904761904765,
+     "flat_roi": 0.1476190476190476,
+     "se": 0.19099404054035063,
+     "proven": false
+    },
+    "blind": {
+     "bets": 36,
+     "won": 17,
+     "lost": 19,
+     "push": 0,
+     "units": 7.38,
+     "roi": 0.20499999999999996,
+     "flat_roi": 0.20499999999999996,
+     "se": 0.21944645367776175,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "dog ML: own QB's first start",
+    "verdict": "",
+    "in_sample": {
+     "bets": 31,
+     "won": 12,
+     "lost": 19,
+     "push": 0,
+     "units": 1.71,
+     "roi": 0.055161290322580644,
+     "flat_roi": 0.055161290322580644,
+     "se": 0.24486330220606012,
+     "proven": false
+    },
+    "blind": {
+     "bets": 37,
+     "won": 14,
+     "lost": 22,
+     "push": 1,
+     "units": -0.44,
+     "roi": -0.011891891891891866,
+     "flat_roi": -0.011891891891891866,
+     "se": 0.20683146504003272,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "dog ML: own new QB (not the regular starter)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 379,
+     "won": 153,
+     "lost": 226,
+     "push": 0,
+     "units": 14.5,
+     "roi": 0.03825857519788915,
+     "flat_roi": 0.03825857519788918,
+     "se": 0.06581522980418435,
+     "proven": false
+    },
+    "blind": {
+     "bets": 370,
+     "won": 152,
+     "lost": 213,
+     "push": 5,
+     "units": 17.31,
+     "roi": 0.04678378378378379,
+     "flat_roi": 0.04678378378378378,
+     "se": 0.06512032554069136,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "dog ML: own regular QB back after missing the last game",
+    "verdict": "",
+    "in_sample": {
+     "bets": 46,
+     "won": 18,
+     "lost": 28,
+     "push": 0,
+     "units": -1.23,
+     "roi": -0.026739130434782626,
+     "flat_roi": -0.026739130434782637,
+     "se": 0.18403634758295442,
+     "proven": false
+    },
+    "blind": {
+     "bets": 51,
+     "won": 24,
+     "lost": 27,
+     "push": 0,
+     "units": 7.81,
+     "roi": 0.15313725490196073,
+     "flat_roi": 0.15313725490196078,
+     "se": 0.1749066956186682,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "lock-price fav ML: opponent QB's first start",
+    "verdict": "",
+    "in_sample": {
+     "bets": 7,
+     "won": 5,
+     "lost": 2,
+     "push": 0,
+     "units": 1.3,
+     "roi": 0.18553509180925795,
+     "flat_roi": 0.18553509180925795,
+     "se": 0.3070495112693925,
+     "proven": false
+    },
+    "blind": {
+     "bets": 15,
+     "won": 9,
+     "lost": 5,
+     "push": 1,
+     "units": 1.37,
+     "roi": 0.0910088913636824,
+     "flat_roi": 0.09100889136368243,
+     "se": 0.21172133970112558,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "lock-price fav ML: opponent new QB (not the regular starter)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 147,
+     "won": 88,
+     "lost": 59,
+     "push": 0,
+     "units": 1.53,
+     "roi": 0.01037533982397473,
+     "flat_roi": 0.010375339823974764,
+     "se": 0.06862310852991901,
+     "proven": false
+    },
+    "blind": {
+     "bets": 156,
+     "won": 87,
+     "lost": 67,
+     "push": 2,
+     "units": -7.21,
+     "roi": -0.04620478610482386,
+     "flat_roi": -0.046204786104823835,
+     "se": 0.06689176260939166,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "lock-price fav ML: opponent regular QB back after missing the last game",
+    "verdict": "",
+    "in_sample": {
+     "bets": 22,
+     "won": 13,
+     "lost": 9,
+     "push": 0,
+     "units": 0.17,
+     "roi": 0.007581803821963617,
+     "flat_roi": 0.007581803821963606,
+     "se": 0.18330517065509191,
+     "proven": false
+    },
+    "blind": {
+     "bets": 33,
+     "won": 17,
+     "lost": 16,
+     "push": 0,
+     "units": -4.07,
+     "roi": -0.12336041876036694,
+     "flat_roi": -0.12336041876036691,
+     "se": 0.1506495604043626,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "lock-price fav ML: own QB's first start",
+    "verdict": "",
+    "in_sample": {
+     "bets": 11,
+     "won": 5,
+     "lost": 6,
+     "push": 0,
+     "units": -2.33,
+     "roi": -0.21147682214233876,
+     "flat_roi": -0.21147682214233876,
+     "se": 0.2738020677769943,
+     "proven": false
+    },
+    "blind": {
+     "bets": 4,
+     "won": 3,
+     "lost": 1,
+     "push": 0,
+     "units": 1.12,
+     "roi": 0.28020924149956405,
+     "flat_roi": 0.28020924149956405,
+     "se": 0.4280480729567099,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "lock-price fav ML: own new QB (not the regular starter)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 117,
+     "won": 64,
+     "lost": 53,
+     "push": 0,
+     "units": -7.58,
+     "roi": -0.06482483369951875,
+     "flat_roi": -0.06482483369951872,
+     "se": 0.07920333916503873,
+     "proven": false
+    },
+    "blind": {
+     "bets": 126,
+     "won": 69,
+     "lost": 56,
+     "push": 1,
+     "units": -7.51,
+     "roi": -0.059597694340283607,
+     "flat_roi": -0.05959769434028357,
+     "se": 0.07560710024694862,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "lock-price fav ML: own regular QB back after missing the last game",
+    "verdict": "",
+    "in_sample": {
+     "bets": 21,
+     "won": 7,
+     "lost": 14,
+     "push": 0,
+     "units": -9.2,
+     "roi": -0.43830956251765185,
+     "flat_roi": -0.43830956251765185,
+     "se": 0.17789982805830046,
+     "proven": false
+    },
+    "blind": {
+     "bets": 18,
+     "won": 10,
+     "lost": 8,
+     "push": 0,
+     "units": -1.08,
+     "roi": -0.06022218012475627,
+     "flat_roi": -0.06022218012475627,
+     "se": 0.20417255640752408,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "over: game with a QB's first start",
+    "verdict": "",
+    "in_sample": {
+     "bets": 94,
+     "won": 45,
+     "lost": 49,
+     "push": 0,
+     "units": -6.55,
+     "roi": -0.06971655910160483,
+     "flat_roi": -0.06971655910160486,
+     "se": 0.10069693226100468,
+     "proven": false
+    },
+    "blind": {
+     "bets": 96,
+     "won": 39,
+     "lost": 57,
+     "push": 0,
+     "units": -20.99,
+     "roi": -0.21866794301178613,
+     "flat_roi": -0.21866794301178627,
+     "se": 0.09693992281198241,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "over: game with a new QB (not the regular starter)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 948,
+     "won": 459,
+     "lost": 477,
+     "push": 12,
+     "units": -41.97,
+     "roi": -0.044274060903317425,
+     "flat_roi": -0.044274060903317425,
+     "se": 0.031456637015972934,
+     "proven": false
+    },
+    "blind": {
+     "bets": 916,
+     "won": 445,
+     "lost": 464,
+     "push": 7,
+     "units": -50.07,
+     "roi": -0.05466461104878675,
+     "flat_roi": -0.0546646110487865,
+     "se": 0.031791833401926026,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "over: game with a regular QB back after missing the last game",
+    "verdict": "",
+    "in_sample": {
+     "bets": 156,
+     "won": 77,
+     "lost": 78,
+     "push": 1,
+     "units": -4.55,
+     "roi": -0.029135936781253476,
+     "flat_roi": -0.029135936781253487,
+     "se": 0.07825222127536278,
+     "proven": false
+    },
+    "blind": {
+     "bets": 134,
+     "won": 65,
+     "lost": 67,
+     "push": 2,
+     "units": -6.75,
+     "roi": -0.05040656968694088,
+     "flat_roi": -0.05040656968694087,
+     "se": 0.08293906970704275,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "spread: opponent QB's first start",
+    "verdict": "",
+    "in_sample": {
+     "bets": 95,
+     "won": 52,
+     "lost": 41,
+     "push": 2,
+     "units": 10.47,
+     "roi": 0.11021758012302284,
+     "flat_roi": 0.11021758012302288,
+     "se": 0.1009890925945794,
+     "proven": true
+    },
+    "blind": {
+     "bets": 97,
+     "won": 41,
+     "lost": 52,
+     "push": 4,
+     "units": -14.01,
+     "roi": -0.1444828031325138,
+     "flat_roi": -0.14448280313251383,
+     "se": 0.09571755251486062,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "spread: opponent new QB (not the regular starter)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 1045,
+     "won": 501,
+     "lost": 513,
+     "push": 31,
+     "units": -28.3,
+     "roi": -0.02708132409294893,
+     "flat_roi": -0.02708132409294881,
+     "se": 0.03003232434842963,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1062,
+     "won": 510,
+     "lost": 522,
+     "push": 30,
+     "units": -45.77,
+     "roi": -0.04309712725893867,
+     "flat_roi": -0.043097127258938564,
+     "se": 0.029288392743115385,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "spread: opponent regular QB back after missing the last game",
+    "verdict": "",
+    "in_sample": {
+     "bets": 160,
+     "won": 79,
+     "lost": 78,
+     "push": 3,
+     "units": -1.34,
+     "roi": -0.008345674197368336,
+     "flat_roi": -0.008345674197368352,
+     "se": 0.07754162839741277,
+     "proven": false
+    },
+    "blind": {
+     "bets": 139,
+     "won": 66,
+     "lost": 70,
+     "push": 3,
+     "units": -8.87,
+     "roi": -0.06382713518629153,
+     "flat_roi": -0.06382713518629153,
+     "se": 0.08112798344976709,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "spread: own QB's first start",
+    "verdict": "",
+    "in_sample": {
+     "bets": 95,
+     "won": 41,
+     "lost": 52,
+     "push": 2,
+     "units": -13.3,
+     "roi": -0.13996519969364365,
+     "flat_roi": -0.13996519969364363,
+     "se": 0.09860400822422505,
+     "proven": false
+    },
+    "blind": {
+     "bets": 97,
+     "won": 52,
+     "lost": 41,
+     "push": 4,
+     "units": 7.65,
+     "roi": 0.07890648130089219,
+     "flat_roi": 0.07890648130089219,
+     "se": 0.09613482642668192,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "spread: own new QB (not the regular starter)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 1045,
+     "won": 513,
+     "lost": 501,
+     "push": 31,
+     "units": -12.81,
+     "roi": -0.0122572075311123,
+     "flat_roi": -0.01225720753111231,
+     "se": 0.029791210856659766,
+     "proven": false
+    },
+    "blind": {
+     "bets": 1062,
+     "won": 522,
+     "lost": 510,
+     "push": 30,
+     "units": -23.86,
+     "roi": -0.02246782320205852,
+     "flat_roi": -0.022467823202058545,
+     "se": 0.029245607089345076,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "spread: own regular QB back after missing the last game",
+    "verdict": "",
+    "in_sample": {
+     "bets": 160,
+     "won": 78,
+     "lost": 79,
+     "push": 3,
+     "units": -4.65,
+     "roi": -0.02908182846119763,
+     "flat_roi": -0.02908182846119764,
+     "se": 0.07683977969029576,
+     "proven": false
+    },
+    "blind": {
+     "bets": 139,
+     "won": 70,
+     "lost": 66,
+     "push": 3,
+     "units": -2.02,
+     "roi": -0.014515788493049995,
+     "flat_roi": -0.01451578849304999,
+     "se": 0.08061631680731969,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "under: game with a QB's first start",
+    "verdict": "PROVEN",
+    "in_sample": {
+     "bets": 94,
+     "won": 49,
+     "lost": 45,
+     "push": 0,
+     "units": 2.17,
+     "roi": 0.023062771847266732,
+     "flat_roi": 0.023062771847266707,
+     "se": 0.10171879895027294,
+     "proven": false
+    },
+    "blind": {
+     "bets": 96,
+     "won": 57,
+     "lost": 39,
+     "push": 0,
+     "units": 14.56,
+     "roi": 0.15167214699212564,
+     "flat_roi": 0.15167214699212558,
+     "se": 0.09777888636935664,
+     "proven": true
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "under: game with a new QB (not the regular starter)",
+    "verdict": "",
+    "in_sample": {
+     "bets": 948,
+     "won": 477,
+     "lost": 459,
+     "push": 12,
+     "units": -1.9,
+     "roi": -0.002008704501714002,
+     "flat_roi": -0.002008704501713925,
+     "se": 0.03162630133089573,
+     "proven": false
+    },
+    "blind": {
+     "bets": 916,
+     "won": 464,
+     "lost": 445,
+     "push": 7,
+     "units": -11.64,
+     "roi": -0.012701989431876797,
+     "flat_roi": -0.012701989431876835,
+     "se": 0.0318551801625457,
+     "proven": false
+    }
+   },
+   {
+    "study": "51 NFL QB changes",
+    "sport": "nfl",
+    "variant": "under: game with a regular QB back after missing the last game",
+    "verdict": "",
+    "in_sample": {
+     "bets": 156,
+     "won": 78,
+     "lost": 77,
+     "push": 1,
+     "units": -2.55,
+     "roi": -0.01637181407571683,
+     "flat_roi": -0.016371814075716876,
+     "se": 0.07827777074586151,
+     "proven": false
+    },
+    "blind": {
+     "bets": 134,
+     "won": 67,
+     "lost": 65,
+     "push": 2,
+     "units": -2.27,
+     "roi": -0.016914939217228805,
+     "flat_roi": -0.016914939217228826,
+     "se": 0.08335419648351354,
+     "proven": false
+    }
+   }
+  ],
+  "control": {
+   "spots": 100,
+   "proven": 0,
+   "strong": 0
   }
  }
 }
