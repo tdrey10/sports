@@ -560,5 +560,16 @@
   "luck_control": "300 random spots (random side on a random 5-30% slice of priced matches) through the same bar: 1 passed, so luck alone gives ~0.08 passes across 25 tries",
   "verdict": "dead, none wired: 0 of 25 passed. The market prices shots, not just results. Backing unlucky sides (either side, luck bottom 20%): tuning 210 bets -3.3% (+/-9.7%), blind 528 bets +1.7% (+/-6.1%) - coin flip. Unlucky dogs +1.8% / -1.4% (105/259). Shot-dominant dogs lost in tuning (-27.7% on 48) and blind (-1.2% on 164). Best-looking: over 2.5 when both teams' games ran behind their shots, +24.0% tuning (30) / +10.2% blind (46, SE 14.0%) - under 60 blind bets and inside the noise; it reruns nowhere and is not to be tweaked. Tuning samples are small (prices start Dec 2025).",
   "action": "No bet type. Side benefit: soccer pick cards now show each team's shots on target for/against per game over its last 8 box scores (advanced.attach_shot_form; a fact only, never moves a price or pick), so soccer picks - which have no injury feed - carry one more real stat behind them."
+ },
+ {
+  "date": "2026-11-22",
+  "idea": "NFL quarterback changes as betting spots: the market's price when a team starts someone other than its regular QB (most frequent of its last 8 starts), when the regular QB returns after missing the last game, and on a QB's first start (debuts from 2008 on). For the side and against it on +100..+220 dog ML, -170..-120 favorite ML and the spread at the real closing price, plus overs/unders when any of these is in the game. Earlier games only.",
+  "sports": "nfl",
+  "data": "data/lines/nfl nflverse closing lines 2006-2026 with starting QB ids (sportsedge/qbstudy.py); 2006 only warms the QB history",
+  "tuning": "2007-2017",
+  "blind": "2018-2026, 24 variants",
+  "luck_control": "100 random tenths of all dog/fav/spread/total bets through the same bar: 0 passed, 0 strong (luck alone gives ~0.16 passes across 24 tries at the ~1-in-150 base rate)",
+  "verdict": "2 of 24 passed the bar, neither gets money. (1) Dog (+100..+220) against a team starting a new QB: STRONG on the bar - tuning 225 bets +10.7% (se 8.2), blind 235 bets +8.9% (se 8.0) - and the mirror backs it (lock-price favorites starting a new QB lost -6.5% tuning, -6.0% blind). But blind z is only 1.11, under the engine's luck guard (proven.MIN_Z 1.65), and the blind profit leans on 2022 (+48% on 36): without 2022 the blind seasons are +1.8% on 199. Profitable in 11 of 20 seasons. (2) Under in a game with a QB's first start: PROVEN but thin - tuning +2.3% (94, se 10.2), blind +15.2% (96, se 9.8), z 1.55. Everything else flat or losing: overs in new-QB games lose in both arms (-4.4%/-5.4% on ~900 each), spreads either way flat to -4%.",
+  "action": "Not wired (no units). Re-tested blind every morning in `hambino nfl-history` (nfl_history.json -> qb_study) so the dog-vs-a-new-QB spot is watched; if its blind z clears 1.65 with profit spread over several seasons it becomes a candidate money spot. Not to be tweaked."
  }
 ]
