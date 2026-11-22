@@ -930,6 +930,17 @@ def cmd_nfl_history(args) -> int:
         print(f"{nflhist.fetch(folder)} NFL games saved from nflverse")
     res = nflhist.run(nflhist.load(folder))
     print(nflhist.report(res))
+    # NFL QB changes (study of 2026-11-22): re-tested blind every morning so the dog-vs-a-new-QB spot is
+    # watched as new games land. Research only: it is not a money spot (blind z under proven.MIN_Z).
+    from . import qbstudy
+
+    try:
+        res["qb_study"] = qbstudy.run(folder)
+        hits = [r for r in res["qb_study"]["rows"] if r["verdict"]]
+        print(f"QB change study: {len(hits)} of {len(res['qb_study']['rows'])} variants pass "
+              f"(luck control {res['qb_study']['control']})")
+    except Exception as exc:  # one study failing never stops the others
+        print(f"QB change study failed: {exc}")
     out = Path(args.data_dir) / "nfl_history.json"
     out.write_text(json.dumps(res, indent=1, default=str))
     return 0
