@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
+from zoneinfo import ZoneInfo
 
 from .edge import Pick
 from .engine import EventContext, SportScan
@@ -11,6 +12,15 @@ from .models.ratings import GameResult
 from .odds import implied_prob
 
 SEASON_GAP_DAYS = 60
+EASTERN = ZoneInfo("America/New_York")
+
+
+def game_day(d: datetime) -> datetime:
+    """A game's start in US Eastern time, for the dates on the cards. Starts are kept in UTC, so a
+    Sunday night game (02:45 UTC Monday) would otherwise print as Monday. Naive times are UTC."""
+    if not isinstance(d, datetime):
+        return d  # a plain date has no time zone to fix
+    return (d if d.tzinfo else d.replace(tzinfo=timezone.utc)).astimezone(EASTERN)
 
 
 def season_games(results: list[GameResult], team: str, before: datetime) -> list[GameResult]:
@@ -51,7 +61,7 @@ def last_game_line(games: list[GameResult], team: str, short: str) -> str | None
     home = g.home == team
     mine, theirs = (g.home_score, g.away_score) if home else (g.away_score, g.home_score)
     opp = g.away if home else g.home
-    when = g.date.strftime("%a %-m/%-d")
+    when = game_day(g.date).strftime("%a %-m/%-d")
     score = f"{mine:.0f}-{theirs:.0f}"
     if mine > theirs:
         verb = "blowout of" if _blowout(mine, theirs) else "win over"
@@ -238,7 +248,7 @@ def matchup_facts(results: list[GameResult], home: str, away: str, before: datet
     if h2h:
         g = h2h[-1]
         out.append(f"Head to head this season: {home} {fmt_record(record(h2h, home))} "
-                   f"(last: {g.away} {g.away_score:.0f} - {g.home} {g.home_score:.0f}, {g.date:%-m/%-d}).")
+                   f"(last: {g.away} {g.away_score:.0f} - {g.home} {g.home_score:.0f}, {game_day(g.date):%-m/%-d}).")
     if ratings is not None:
         ranks = power_ranks(SimpleNamespace(ratings=ratings))
         if home in ranks and away in ranks:
@@ -394,7 +404,7 @@ def stat_lines(pick: Pick, scan: SportScan, ctx: EventContext, pred) -> list[str
         g = h2h[-1]
         out.append(
             f"Head to head this season: {ctx.home} {fmt_record(record(h2h, ctx.home))}"
-            f" (last: {g.away} {g.away_score:.0f} - {g.home} {g.home_score:.0f}, {g.date:%-m/%-d})."
+            f" (last: {g.away} {g.away_score:.0f} - {g.home} {g.home_score:.0f}, {game_day(g.date):%-m/%-d})."
         )
 
     ranks = power_ranks(scan)
