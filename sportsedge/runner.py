@@ -218,6 +218,7 @@ def _pull_neutral_altitude(ledger: Ledger, scans, now: datetime) -> list:
 # +100 to +220 dog. Bug fix, Nov 18: this promoter used -150..-101 and +100..+200, so a -110 favorite
 # could be the Lock.
 LOCK_RANGE = (LOCK_MIN_ODDS, LOCK_MAX_ODDS)
+MIN_GAP = 0.03  # owner, Nov 24 ("wins, not guesses"): our number 3+ points over the book's, or no Lock / Dog
 DOG_RANGE = (DOG_MIN_ODDS, DOG_MAX_ODDS)
 
 
@@ -261,7 +262,7 @@ def daily_lock_dog(ledger: Ledger, now: datetime) -> list:
                 if e.units <= 0 and e.tier in ("lean", "early", "value") and not e.player and e.market == "h2h"
                 and e.status == "pending" and e.start > now and ledger.day_of(e.start) == today
                 and lo <= e.odds <= hi and e.win_prob > break_even(e.odds) and e.market_prob is not None
-                and _fits_slot(tier, e)]
+                and e.win_prob - e.market_prob >= MIN_GAP and _fits_slot(tier, e)]
         if not pool:
             continue
         e = max(pool, key=lambda x: (x.win_prob - x.market_prob, x.win_prob))
