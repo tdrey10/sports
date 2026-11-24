@@ -35,6 +35,40 @@ def break_even(american: float) -> float:
     """The win chance a price needs just to break even (-142 needs 58.7%, +150 needs 40%)."""
     return 1 / american_to_decimal(american)
 CLV_PRIOR = 30  # picks of "no edge" the CLV average is shrunk toward
+CLV_MAX_SHIFT = 4.0  # points: a bigger line move than this is not trusted to re-price our number
+
+
+def fair_at_point(sport: str, market: str, side: str, our_point: float | None, new_point: float | None,
+                  new_fair: float | None) -> float | None:
+    """The market's no-vig chance for OUR spread/total number, read off the number it now hangs.
+
+    Bug fixed Nov 24: once a spread or total moved (Under 48.5 -> 47.5), the closing check never saw
+    our number again, so the "close" stayed frozen at the posting price and those picks showed the vig
+    as their CLV whatever the line did (college hoops totals: 0 of 19 beat the close). Football and
+    hoops margins and totals are close to normal, so a move of d points in our favor is worth
+    d / sd standard deviations. Count sports (hockey, baseball, soccer) and moves over CLV_MAX_SHIFT
+    points can't be re-priced this way: None (CLV unknown, not faked).
+    """
+    cfg = SPORTS.get(sport)
+    if cfg is None or cfg.scoring != "normal" or None in (our_point, new_point, new_fair):
+        return None
+    sd = cfg.margin_sd if market == "spreads" else cfg.total_sd if market == "totals" else 0.0
+    if sd <= 0 or not 0 < new_fair < 1:
+        return None
+    if market == "spreads":
+        gain = our_point - new_point  # our handicap: the bigger number is the better one
+    elif side == "over":
+        gain = new_point - our_point
+    elif side == "under":
+        gain = our_point - new_point
+    else:
+        return None
+    if abs(gain) > CLV_MAX_SHIFT:
+        return None
+    from statistics import NormalDist
+
+    n = NormalDist()
+    return min(max(n.cdf(n.inv_cdf(new_fair) + gain / sd), 0.01), 0.99)
 GRADE_AFTER = timedelta(hours=2)  # earliest a game can be final
 RECHECK = timedelta(days=5)  # graded picks this recent are re-checked against their own game's final
 
@@ -105,6 +139,7 @@ class Entry:
     history: list[list] = field(default_factory=list)  # [iso time, best odds, point]
     close_odds: float | None = None
     close_fair: float | None = None  # consensus no-vig prob of our side at last look before start
+    close_point: float | None = None  # the number close_fair was last read at (None: never re-priced)
     status: str = "pending"  # pending, live, won, lost, push, half_won, half_lost, void
     live: dict | None = None
     final: str | None = None
@@ -131,6 +166,9 @@ class Entry:
         """Expected value of our price against the closing no-vig line."""
         if self.close_fair is None:
             return None
+        if (self.market in ("spreads", "totals") and self.current_point is not None and self.point is not None
+                and self.current_point != self.point and self.close_point != self.current_point):
+            return None  # the line moved and the close at our number is unknown: no fake CLV
         return self.close_fair * american_to_decimal(self.odds) - 1
 
     def to_dict(self) -> dict:
@@ -518,7 +556,9 @@ class Ledger:
             pick = same[0] if same else min(matches, key=lambda p: abs((p.point or 0) - (e.point or 0)))
             e.current_odds, e.current_point, e.current_book = pick.american, pick.point, pick.book
             if same:
-                e.close_odds, e.close_fair = pick.american, pick.market_prob
+                e.close_odds, e.close_fair, e.close_point = pick.american, pick.market_prob, pick.point
+            elif (shifted := fair_at_point(e.sport, e.market, e.side, e.point, pick.point, pick.market_prob)) is not None:
+                e.close_fair, e.close_point = shifted, pick.point  # our number re-priced off the new line
             last = e.history[-1] if e.history else None
             if not last or last[1] != pick.american or last[2] != pick.point:
                 e.history.append([now.isoformat(), pick.american, pick.point])

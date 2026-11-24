@@ -94,6 +94,45 @@ def test_line_tracking_and_clv():
     assert len(e.history) == 2
 
 
+def test_clv_reprices_our_number_when_the_line_moves():
+    # Bug (Nov 24): once a spread/total moved, the close stayed frozen at the posting price.
+    from sportsedge.ledger import fair_at_point
+
+    L = Ledger()
+    (e,) = L.publish([card(make_pick("totals", "under", 48.5, american=-110, market_prob=0.5))], NOW)
+
+    class Scan:
+        picks = [make_pick("totals", "under", 47.5, american=-110, market_prob=0.5)]
+    L.update_prices([Scan()], NOW + timedelta(hours=1))
+    # The market now hangs 47.5 at a coin flip: our Under 48.5 is better than a coin flip.
+    assert e.current_point == 47.5 and e.close_point == 47.5
+    assert e.close_fair == pytest.approx(fair_at_point("nfl", "totals", "under", 48.5, 47.5, 0.5))
+    assert e.close_fair > 0.52 and e.clv > 0
+    # Moving against us is worse than the post, not frozen at it.
+    assert fair_at_point("nfl", "totals", "under", 48.5, 49.5, 0.5) < 0.5
+    assert fair_at_point("nfl", "totals", "over", 48.5, 49.5, 0.5) > 0.5
+    assert fair_at_point("nfl", "spreads", "away", 8.5, 9.5, 0.5) < 0.5  # +8.5 when +9.5 is out: worse
+    assert fair_at_point("ncaaf", "spreads", "away", 35.5, 34.5, 0.5) > 0.5
+
+
+def test_clv_unknown_when_a_moved_line_cannot_be_repriced():
+    from sportsedge.ledger import fair_at_point
+
+    assert fair_at_point("nhl", "totals", "under", 6.5, 5.5, 0.5) is None  # count sport
+    assert fair_at_point("nfl", "totals", "under", 48.5, 40.5, 0.5) is None  # too big a move
+    L = Ledger()
+    (e,) = L.publish([card(make_pick("totals", "under", 6.5, american=-130, market_prob=0.55, sport="nhl", win_prob=0.6))], NOW)
+
+    class Scan:
+        picks = [make_pick("totals", "under", 5.5, american=114, market_prob=0.45, sport="nhl")]
+    L.update_prices([Scan()], NOW + timedelta(hours=1))
+    assert e.current_point == 5.5 and e.clv is None  # not the posting price passed off as the close
+    # Old ledger rows (no close_point) whose line moved: unknown too; same line: as before.
+    e.close_point = None
+    e.current_point = 6.5
+    assert e.clv == pytest.approx(0.55 * (1 + 100 / 130) - 1)
+
+
 def test_refresh_grades_and_tracks_live():
     L = Ledger()
     (e,) = L.publish([card(make_pick())], NOW)

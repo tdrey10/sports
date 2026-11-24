@@ -582,5 +582,16 @@
   "luck_control": "100 random tenths of all bets per sport (600 spots) through the same bar: 0 passed, 0 strong; luck alone gives ~0.37 passes across 56 tries at the ~1-in-150 base rate",
   "verdict": "dead: 1 of 56 passed, about what luck gives, and it does not hold up. College hoops spread side at plus money: tuning +8.7% on 113, blind +14.1% on 147 (se 8.3, z 1.70), PROVEN not STRONG, but the money is all 2024-25 (+27%/+33%) and 2026 is -17.5% on 42. Its mirror (NCAAB juiced spread side) losing -32% on 321 bets in 2024-25 is too extreme for a real market and looks like ESPN pairing spread juice with the wrong line in those seasons, so the pass is likely a data artifact. Everything else loses about the vig or more: MLB juiced overs -11% and unders -16% blind, NHL juiced unders -8.5%, NFL juiced spread side -8% blind / -11% tuning (shaded juice is just extra vig, the side doesn't win more), plus-money sides flat. Market hold: high-hold dogs lose everywhere (NHL -17.7% tuning, NFL -13.3%), low-hold splits flip between arms. Note: books' hold grew over the years, so the tuning cutoffs put most blind games in 'high hold'.",
   "action": "Not wired (no units). Takeaway that is already the engine's habit: don't pay -120+ juice on a spread or total just because the line hasn't moved. Watch item: NCAAB spread juice in the ESPN 2024-25 archive may be mismatched to the line; check before any study leans on ESPN spread prices."
+ },
+ {
+  "date": "2026-11-24",
+  "idea": "Spotlight hangover: the game after a primetime or late-night game. Football: the team's previous game this season kicked off 7:30pm Eastern or later (night game). NBA/NHL/college hoops: previous game started 10pm Eastern or later and today's game is within 48h of it. MLB: day game (before 5pm ET) the day after a 6pm+ ET night game. For the spot side and against it (opponent of a spot side not itself in the spot): +100..+220 dog ML, -170..-120 favorite ML, spread side (football, hoops), plus over/under when either team is in the spot. All at the real closing price.",
+  "sports": "nfl, ncaaf, nba, ncaab, mlb, nhl",
+  "data": "data/lines/espn closing lines 2016+ for all six sports (sportsedge/spotlightstudy.py)",
+  "tuning": "2016-2021",
+  "blind": "2022 on, 44 variants",
+  "luck_control": "100 random tenths of all bets per sport (600 spots) through the same bar: 0 passed, 0 strong; luck alone gives ~0.29 passes across 44 tries at the ~1-in-150 base rate",
+  "verdict": "dead: 0 of 44 passed. Nothing survives both arms. Flip-flops: NFL dogs off a night game +18.7% tuning (97) then -22.7% blind (128); NBA dogs vs a team off a late tip +15.6% tuning then -13.1% blind; college hoops lock favorites off a late tip +15.9% then -9.0%. The big samples are about the vig: MLB day-after-night dogs -3.5% blind on 2,358, favorites -4.3% on 1,693; NHL/NBA/college hoops spread and ML sides -1% to -5%. Totals: overs when a team is in the spot lose 7-9% in MLB/NHL (overs lose that much in those archives anyway), unders flat. The market already prices the late-night/getaway-day spot.",
+  "action": "Not wired (no units). Logged so it isn't retested."
  }
 ]
