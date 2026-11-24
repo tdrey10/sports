@@ -21,6 +21,8 @@ from .tiers import Card
 START = datetime(2026, 10, 29, 7, tzinfo=timezone.utc)  # midnight Pacific, Oct 29
 LEAN_TIERS = ("lean", "early", "value", "lock", "dog")
 BEST_PICK_RANGE_FROM = "2026-11-13"  # Grim's daily no-money pick skips long shots from this day on
+BEST_PICK_EDGE_FROM = "2026-11-24"  # ...and needs a real edge (BEST_PICK_EDGE) from this day on
+BEST_PICK_EDGE = 0.03
 FILE = "my_picks.json"
 LEGS = "my_parlay_legs.json"
 GRIM_LEGS = "grim_parlay_legs.json"  # Grim's own contest parlays (owner, Oct 31: "log that as Grim's parlay")
@@ -438,7 +440,14 @@ def grim_picks(ours: Ledger) -> list:
             # a favorite to -150 or a dog to +200 when there is one; long shots show the biggest paper gaps.
             if day >= BEST_PICK_RANGE_FROM:
                 es = [e for e in es if -150 <= e.odds <= 200] or es
-            out.append(max(es, key=lambda e: ((e.win_prob - (e.market_prob or e.win_prob)), e.win_prob)))
+            gap = lambda e: e.win_prob - (e.market_prob or e.win_prob)  # noqa: E731
+            if day >= BEST_PICK_EDGE_FROM:
+                # Owner, Nov 24 ("we need wins, not guesses"): no coin flips. Grim's no-money pick needs our number
+                # 3+ points over the book's; a day with none gets no pick.
+                es = [e for e in es if gap(e) >= BEST_PICK_EDGE]
+                if not es:
+                    continue
+            out.append(max(es, key=lambda e: (gap(e), e.win_prob)))
     return out
 
 

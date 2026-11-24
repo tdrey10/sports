@@ -44,7 +44,8 @@ def test_the_daily_dog_needs_a_real_shot_and_the_lock_skips_model_only_football_
     led = _ledger(_lean("long", 280, 0.33, 0.25, 0.25), _lean("real", 140, 0.45, 0.42, 0.08),
                   _lean("model", -140, 0.66, 0.55, 0.10, sport="nfl"), _lean("fair", -130, 0.58, 0.59, 0.02, sport="nfl"))
     picks = {e.tier: e.event_id for e in daily_lock_dog(led, NOW)}
-    assert picks == {"dog": "real", "lock": "fair"}  # "model": our 0.60 vs the market's 0.55 in the NFL
+    # Owner, Nov 24 ("wins, not guesses"): "fair" (ours 0.58 vs the market's 0.59) has no edge, so no Lock that day.
+    assert picks == {"dog": "real"}  # "model": our 0.60 vs the market's 0.55 in the NFL
 
 
 def test_an_altitude_over_at_a_neutral_site_is_pulled():

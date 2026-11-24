@@ -156,3 +156,16 @@ def test_a_teaser_keeps_its_own_record_at_its_price(tmp_path):
     board = rivalry.scoreboard(Ledger(), tmp_path)
     assert board["teasers"]["you"]["won"] == 1 and abs(board["teasers"]["you"]["units"] - 100 / 120) < 0.01
     assert board["parlays"]["you"]["won"] == 0
+
+
+def test_grims_daily_pick_needs_a_real_edge_or_there_is_none():
+    """Owner, Nov 24: 'We need wins, not guesses.'"""
+    from types import SimpleNamespace as N
+
+    day = datetime(2026, 11, 25, 20, tzinfo=timezone.utc)
+    flip = N(start=day, status="pending", player=None, units=0.0, tier="lean", odds=-110, win_prob=0.53, market_prob=0.52)
+    led = N(entries={"a": flip}, day_of=lambda when: "2026-11-25")
+    assert rivalry.grim_picks(led) == []
+    real = N(start=day, status="pending", player=None, units=0.0, tier="lean", odds=120, win_prob=0.50, market_prob=0.45)
+    led.entries["b"] = real
+    assert rivalry.grim_picks(led) == [real]
