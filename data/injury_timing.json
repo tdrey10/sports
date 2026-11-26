@@ -15,7 +15,7 @@
     "bets": 14,
     "beat_close": 0.214,
     "se": 0.11,
-    "avg_clv": -0.0204
+    "avg_clv": -0.02
    },
    "verdict": "collecting"
   },
@@ -63,7 +63,7 @@
   "key": {
    "n": 15,
    "avg_news_move": 0.0052,
-   "avg_drift": 0.0009,
+   "avg_drift": 0.0008,
    "drift_same_way": 0.4,
    "graded": 14,
    "in_sample": {
@@ -97,7 +97,7 @@
     "bets": 8,
     "beat_close": 0.125,
     "se": 0.117,
-    "avg_clv": -0.0233
+    "avg_clv": -0.0232
    },
    "verdict": "collecting"
   }
@@ -128,26 +128,26 @@
   "news": 62,
   "key_news": 27,
   "questionable": {
-   "n": 31,
+   "n": 32,
    "clv_in_sample": {
-    "bets": 15,
-    "beat_close": 0.2,
-    "se": 0.103,
-    "avg_clv": -0.0418
+    "bets": 16,
+    "beat_close": 0.188,
+    "se": 0.098,
+    "avg_clv": -0.0398
    },
    "clv_blind": {
     "bets": 16,
-    "beat_close": 0.312,
-    "se": 0.116,
-    "avg_clv": -0.0185
+    "beat_close": 0.375,
+    "se": 0.121,
+    "avg_clv": -0.015
    },
    "verdict": "collecting"
   },
   "all": {
    "n": 62,
    "avg_news_move": -0.014,
-   "avg_drift": 0.0004,
-   "drift_same_way": 0.339,
+   "avg_drift": 0.002,
+   "drift_same_way": 0.323,
    "graded": 61,
    "in_sample": {
     "bets": 30,
@@ -178,17 +178,17 @@
    },
    "clv_blind": {
     "bets": 31,
-    "beat_close": 0.129,
-    "se": 0.06,
-    "avg_clv": -0.0231
+    "beat_close": 0.097,
+    "se": 0.053,
+    "avg_clv": -0.0262
    },
    "verdict": "collecting"
   },
   "key": {
    "n": 27,
    "avg_news_move": -0.0235,
-   "avg_drift": -0.0009,
-   "drift_same_way": 0.37,
+   "avg_drift": 0.0027,
+   "drift_same_way": 0.333,
    "graded": 26,
    "in_sample": {
     "bets": 13,
@@ -219,9 +219,9 @@
    },
    "clv_blind": {
     "bets": 14,
-    "beat_close": 0.214,
-    "se": 0.11,
-    "avg_clv": -0.0214
+    "beat_close": 0.143,
+    "se": 0.094,
+    "avg_clv": -0.0283
    },
    "verdict": "collecting"
   }
@@ -242,7 +242,7 @@
     "bets": 11,
     "beat_close": 0.091,
     "se": 0.087,
-    "avg_clv": -0.0307
+    "avg_clv": -0.0336
    },
    "verdict": "collecting"
   },
@@ -250,7 +250,7 @@
    "n": 73,
    "avg_news_move": -0.0028,
    "avg_drift": -0.004,
-   "drift_same_way": 0.315,
+   "drift_same_way": 0.329,
    "graded": 69,
    "in_sample": {
     "bets": 34,
@@ -281,8 +281,8 @@
    },
    "clv_blind": {
     "bets": 37,
-    "beat_close": 0.162,
-    "se": 0.061,
+    "beat_close": 0.189,
+    "se": 0.064,
     "avg_clv": -0.0144
    },
    "verdict": "collecting"
