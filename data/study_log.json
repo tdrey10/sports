@@ -604,5 +604,16 @@
   "luck_control": "100 random tenths of all bets per sport (200 spots) through the same bar: 0 passed, 0 strong; luck alone gives ~0.15 passes across 22 tries at the ~1-in-150 base rate",
   "verdict": "dead: 0 of 22 passed. Flip-flops everywhere: NBA dog on an unlucky shooting side +8.8% tuning (137) then -12.1% blind (159); NBA unlucky-vs-lucky dog +38.7% on 24 then -28.9% on 46; college hoops unlucky dog -9.1% tuning then +8.2% blind. The big samples lose about the vig: college hoops spread on a lucky side -7.3% tuning / -5.5% blind (1,545), unlucky side -1.2% / -0.5%; NBA spread lucky side -11.1% / -3.1%. Fading hot shooters ATS is not enough to beat -110. Totals: NBA under in hot-shooting matchups +0.6% / +5.0% blind (235, SE 6.2%), college hoops under -5.3% / +0.5%: nothing. The market already discounts three-point streaks.",
   "action": "Not wired (no units). Logged so it isn't retested. Only two seasons of box scores so far; recheck once 2026-27 finishes only if the NBA hot-matchup under keeps its blind gain (no tweaking)."
+ },
+ {
+  "date": "2026-11-26",
+  "idea": "Football turnover and finishing luck (first use of the ESPN NFL/college football box scores): per game, turnover luck = opponent turnovers - own turnovers, finishing luck = (own points - r*own yards) - (opponent points - r*opponent yards) with r the league points per yard from tuning games; a side's luck = its average over its last 6 earlier games this season (3+). Bet on/against lucky (top 20% of tuning) and unlucky (bottom 20%) sides and unlucky-vs-lucky matchups on +100..+220 dog ML, -170..-120 favorite ML and the spread side; unders when the matchup's combined points over yards ran hot, overs when cold. All at the real closing price.",
+  "sports": "nfl, ncaaf",
+  "data": "data/boxscores/nfl, ncaaf (2024 season on: 736 NFL and 2,698 college football games with box scores and closing lines) joined by ESPN game id to data/lines/espn (sportsedge/footluckstudy.py)",
+  "tuning": "2024 season (points per yard and 20% cutoffs from tuning games only)",
+  "blind": "2025 and 2026 so far, 40 variants",
+  "luck_control": "100 random tenths of all bets per sport (200 spots) through the same bar: 0 passed, 0 strong; luck alone gives ~0.27 passes across 40 tries at the ~1-in-150 base rate",
+  "verdict": "dead: 0 of 40 passed. The big samples lose about the vig whichever way you bet: college football spread on a turnover-lucky side -6.5% tuning / -7.4% blind (405), unlucky side -3.7% / -4.2% (437); finishing-lucky -8.1% / -6.2% (500), unlucky -8.6% / -4.1% (380). NFL spread on an unlucky finishing side -20.8% / -11.5% (121), turnover-unlucky -20.4% / -0.7%. Flip-flops: NFL dog on a turnover-unlucky side -33.4% tuning then +6.0% blind; college football under in hot points-per-yard matchups +6.2% / +1.5% blind (214, SE 6.5%), over in cold ones +4.7% / -7.1%. The market already discounts turnover margin and points-per-yard luck.",
+  "action": "Not wired (no units). Logged so it isn't retested. Only three seasons of football box scores; no recheck planned (no tweaking)."
  }
 ]
