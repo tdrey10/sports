@@ -133,6 +133,24 @@ def test_clv_unknown_when_a_moved_line_cannot_be_repriced():
     assert e.clv == pytest.approx(0.55 * (1 + 100 / 130) - 1)
 
 
+def test_a_moved_player_prop_gets_no_fake_clv():
+    # Bug (Nov 27): the "no fake CLV" guard covered spreads and totals only, so a prop whose line moved
+    # (Under 10.5 -> 9.5) kept its close frozen at the posting number and showed the vig as its CLV
+    # (NBA props: 0 of 29 beat the close, though 8 of the 9 moved lines went our way).
+    L = Ledger()
+    prop = make_pick("player_points", "under", 10.5, american=-115, player="Josh Hart", market_prob=0.5)
+    (e,) = L.publish([card(prop)], NOW)
+
+    class Scan:
+        picks = [make_pick("player_points", "under", 10.5, american=-115, player="Josh Hart", market_prob=0.5)]
+    L.update_prices([Scan()], NOW + timedelta(minutes=30))  # re-read at our number first
+    assert e.close_point == 10.5 and e.clv == pytest.approx(0.5 * (1 + 100 / 115) - 1)
+    Scan.picks = [make_pick("player_points", "under", 9.5, american=-115, player="Josh Hart", market_prob=0.5)]
+    L.update_prices([Scan()], NOW + timedelta(hours=1))
+    assert e.current_point == 9.5 and e.close_point == 10.5 and e.clv is None
+    assert L.clv_trust(START + timedelta(hours=1)) == {}  # an unknown close never moves the props' trust
+
+
 def test_refresh_grades_and_tracks_live():
     L = Ledger()
     (e,) = L.publish([card(make_pick())], NOW)

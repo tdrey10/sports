@@ -615,5 +615,16 @@
   "luck_control": "100 random tenths of all bets per sport (200 spots) through the same bar: 0 passed, 0 strong; luck alone gives ~0.27 passes across 40 tries at the ~1-in-150 base rate",
   "verdict": "dead: 0 of 40 passed. The big samples lose about the vig whichever way you bet: college football spread on a turnover-lucky side -6.5% tuning / -7.4% blind (405), unlucky side -3.7% / -4.2% (437); finishing-lucky -8.1% / -6.2% (500), unlucky -8.6% / -4.1% (380). NFL spread on an unlucky finishing side -20.8% / -11.5% (121), turnover-unlucky -20.4% / -0.7%. Flip-flops: NFL dog on a turnover-unlucky side -33.4% tuning then +6.0% blind; college football under in hot points-per-yard matchups +6.2% / +1.5% blind (214, SE 6.5%), over in cold ones +4.7% / -7.1%. The market already discounts turnover margin and points-per-yard luck.",
   "action": "Not wired (no units). Logged so it isn't retested. Only three seasons of football box scores; no recheck planned (no tweaking)."
+ },
+ {
+  "date": "2026-11-27",
+  "idea": "Body clock: the road team's kickoff hour on its OWN home clock. Home zone = most common standard UTC offset of the team's EARLIER non-neutral home games (ESPN tzo, US daylight time removed, 3+ games). Spots for the visitor: west visitor (home 2+ zones west) with a body clock before 11am; west visitor in a night game (8pm+ at the venue, ~5-6pm its time); east visitor (2+ zones east) with a body clock 10pm+; any visitor from another zone with a body clock before noon. Bet the visitor and the home team against it on +100..+220 dog ML, -170..-120 favorite ML, the spread side (football, hoops), plus the game's over/under. All at the real closing price.",
+  "sports": "nfl, ncaaf, nba, ncaab, mlb, nhl",
+  "data": "data/lines/espn closing lines 2016+ for all six sports (sportsedge/bodyclockstudy.py)",
+  "tuning": "2016-2021",
+  "blind": "2022 on, 168 variants",
+  "luck_control": "100 random tenths of all bets per sport (600 spots) through the same bar: 0 passed, 0 strong; luck alone gives ~1.1 passes across 168 tries at the ~1-in-150 base rate",
+  "verdict": "dead: 0 of 168 passed. The NFL West Coast story flips: road side when the visitor's clock reads before 11am +13.4% tuning (95) then -1.1% blind (126); home side vs them -21.3% / -7.5%; overs in those games -7.2% / -12.0%. MLB home dog vs a visitor whose clock reads before noon +20.5% blind (179, SE 8.8%) but -0.1% in tuning, so it fails the bar; MLB favorites on the early-clock visitor -16.0% blind. NBA spread on a west visitor at night +6.0% / +4.7% but only 64 blind bets with SE 12%. East visitors out late lose about the vig everywhere (NBA under -6.9% blind on 237, college hoops under -13.4%). The market prices body clock.",
+  "action": "Not wired (no units). Logged so it isn't retested (no tweaking)."
  }
 ]
