@@ -166,7 +166,10 @@ class Entry:
         """Expected value of our price against the closing no-vig line."""
         if self.close_fair is None:
             return None
-        if (self.market in ("spreads", "totals") and self.current_point is not None and self.point is not None
+        # Bug fix Nov 27: player props move by the number too (Under 10.5 -> 9.5), and fair_at_point can't
+        # re-price them, so their "close" stayed frozen at the old number: fake CLV on every moved prop.
+        if ((self.market in ("spreads", "totals") or self.player is not None)
+                and self.current_point is not None and self.point is not None
                 and self.current_point != self.point and self.close_point != self.current_point):
             return None  # the line moved and the close at our number is unknown: no fake CLV
         return self.close_fair * american_to_decimal(self.odds) - 1
