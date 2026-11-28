@@ -1095,6 +1095,21 @@ def cmd_shop_study(args) -> int:
     return 0
 
 
+def cmd_pdo_study(args) -> int:
+    """Hockey PDO luck (study of 2026-11-28), re-tested blind every morning; no units."""
+    from . import pdostudy
+
+    data_dir = Path(args.data_dir)
+    res = pdostudy.run(data_dir / "lines" / "espn", data_dir / "boxscores")
+    if not res["rows"]:
+        print("PDO study: no NHL lines or box scores yet")
+        return 0
+    res["watch"] = pdostudy.watch(res)
+    print(pdostudy.report(res))
+    (data_dir / "pdo_study.json").write_text(json.dumps(res, indent=1, default=str))
+    return 0
+
+
 def cmd_tennis_history(args) -> int:
     from . import tennishist
 
@@ -1353,6 +1368,10 @@ def build_parser() -> argparse.ArgumentParser:
     ss.add_argument("--fetch", action="store_true", help="refresh the odds history and results first")
     ss.add_argument("--data-dir", default="data")
     ss.set_defaults(func=cmd_shop_study)
+
+    pd = sub.add_parser("pdo-study", help="hockey PDO luck (shooting + save %), blind, no units")
+    pd.add_argument("--data-dir", default="data")
+    pd.set_defaults(func=cmd_pdo_study)
 
     th = sub.add_parser("tennis-history", help="tennis blind test on 2012+ closing odds (ATP and WTA)")
     th.add_argument("--fetch", action="store_true", help="refresh the odds history from the public archive first")
