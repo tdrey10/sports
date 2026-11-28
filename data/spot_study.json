@@ -4,16 +4,16 @@
    {
     "market": "moneyline dog",
     "spot": "fade: 2+ time zones from home",
-    "bets": 107,
+    "bets": 108,
     "open": {
-     "bets": 107,
-     "roi": 0.1445
+     "bets": 108,
+     "roi": 0.1339
     },
     "close": {
-     "bets": 107,
-     "roi": 0.1599
+     "bets": 108,
+     "roi": 0.1492
     },
-    "moved_our_way": 0.505
+    "moved_our_way": 0.509
    },
    {
     "market": "moneyline favorite",
@@ -32,8 +32,8 @@
   ],
   "stacking": {
    "1 spot": {
-    "bets": 344,
-    "roi": 0.1322
+    "bets": 345,
+    "roi": 0.1289
    }
   },
   "bands": [
@@ -55,8 +55,8 @@
     "market": "moneyline dog",
     "spot": "fade: 2+ time zones from home",
     "odds": "+200 to +300",
-    "bets": 59,
-    "roi": 0.1902
+    "bets": 60,
+    "roi": 0.1703
    },
    {
     "market": "moneyline favorite",
@@ -133,8 +133,8 @@
      "roi": null
     },
     "blind": {
-     "bets": 106,
-     "roi": 0.0348
+     "bets": 107,
+     "roi": 0.0251
     }
    }
   },
@@ -145,8 +145,8 @@
      "roi": 0.082
     },
     "blind": {
-     "bets": 177,
-     "roi": 0.1081
+     "bets": 178,
+     "roi": 0.1018
     }
    },
    "ratings much better than the price": {
@@ -292,6 +292,131 @@
     "blind": {
      "bets": 17,
      "roi": -0.2105
+    }
+   }
+  }
+ },
+ "ncaab": {
+  "timing": [
+   {
+    "market": "moneyline favorite",
+    "spot": "back: 2+ time zones from home",
+    "bets": 148,
+    "open": {
+     "bets": 148,
+     "roi": 0.1212
+    },
+    "close": {
+     "bets": 148,
+     "roi": 0.1109
+    },
+    "moved_our_way": 0.547
+   }
+  ],
+  "stacking": {
+   "1 spot": {
+    "bets": 270,
+    "roi": 0.0538
+   }
+  },
+  "bands": [
+   {
+    "market": "moneyline favorite",
+    "spot": "back: 2+ time zones from home",
+    "odds": "-115 to -101",
+    "bets": 63,
+    "roi": 0.2816
+   },
+   {
+    "market": "moneyline favorite",
+    "spot": "back: 2+ time zones from home",
+    "odds": "-130 to -116",
+    "bets": 84,
+    "roi": -0.0085
+   },
+   {
+    "market": "moneyline favorite",
+    "spot": "back: 2+ time zones from home",
+    "odds": "-150 to -131",
+    "bets": 65,
+    "roi": 0.155
+   }
+  ],
+  "first_half": [
+   {
+    "market": "moneyline favorite",
+    "spot": "back: 2+ time zones from home",
+    "in_sample": {
+     "bets": 91,
+     "roi": -0.1225
+    },
+    "blind": {
+     "bets": 158,
+     "roi": 0.0112
+    }
+   }
+  ],
+  "movement": {
+   "line didn't move": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 7,
+     "roi": 0.4914
+    }
+   },
+   "line moved against us": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 60,
+     "roi": 0.1666
+    }
+   },
+   "line moved our way": {
+    "in_sample": {
+     "bets": 0,
+     "roi": null
+    },
+    "blind": {
+     "bets": 81,
+     "roi": 0.0368
+    }
+   }
+  },
+  "ratings": {
+   "ratings close to the price": {
+    "in_sample": {
+     "bets": 40,
+     "roi": -0.0241
+    },
+    "blind": {
+     "bets": 87,
+     "roi": 0.0329
+    }
+   },
+   "ratings much better than the price": {
+    "in_sample": {
+     "bets": 1,
+     "roi": -1.0
+    },
+    "blind": {
+     "bets": 1,
+     "roi": 0.9259
+    }
+   },
+   "ratings much worse than the price": {
+    "in_sample": {
+     "bets": 18,
+     "roi": -0.075
+    },
+    "blind": {
+     "bets": 33,
+     "roi": -0.0276
     }
    }
   }
